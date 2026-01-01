@@ -3982,7 +3982,7 @@ where
             &opt.value_of("volume-position").unwrap_or(""),
             err,
             "<volume-position>",
-            "integer",
+            "int32",
         );
         let mut call = self.hub.mylibrary().bookshelves_move_volume(
             opt.value_of("shelf").unwrap_or(""),
@@ -6484,7 +6484,9 @@ where
         let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
             secret,
             yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-            hyper_util::client::legacy::Client::builder(executor).build(connector),
+            yup_oauth2::client::CustomHyperClientBuilder::from(
+                hyper_util::client::legacy::Client::builder(executor).build(connector),
+            ),
         )
         .persist_tokens_to_disk(format!("{}/books1", config_dir))
         .build()
@@ -7642,7 +7644,7 @@ async fn main() {
 
     let mut app = App::new("books1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("6.0.0+20240621")
+           .version("7.0.0+20251209")
            .about("The Google Books API allows clients to access the Google Books repository.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_books1_cli")
            .arg(Arg::with_name("url")
@@ -7707,7 +7709,7 @@ async fn main() {
         .with_native_roots()
         .unwrap()
         .https_or_http()
-        .enable_http1()
+        .enable_http2()
         .build();
 
     match Engine::new(matches, connector).await {

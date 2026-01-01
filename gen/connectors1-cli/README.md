@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Connectors* API at revision *20240619*. The CLI is at version *6.0.0*.
+This documentation was generated from the *Connectors* API at revision *20250930*. The CLI is at version *7.0.0*.
 
 ```bash
 connectors1 [options]
@@ -37,6 +37,11 @@ connectors1 [options]
                 locations-connections-connection-schema-metadata-refresh <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-connections-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-connections-delete <name> [-p <v>]... [-o <out>]
+                locations-connections-end-user-authentications-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-connections-end-user-authentications-delete <name> [-p <v>]... [-o <out>]
+                locations-connections-end-user-authentications-get <name> [-p <v>]... [-o <out>]
+                locations-connections-end-user-authentications-list <parent> [-p <v>]... [-o <out>]
+                locations-connections-end-user-authentications-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-connections-event-subscriptions-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-connections-event-subscriptions-delete <name> [-p <v>]... [-o <out>]
                 locations-connections-event-subscriptions-get <name> [-p <v>]... [-o <out>]
@@ -57,6 +62,8 @@ connectors1 [options]
                 locations-connections-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-custom-connectors-custom-connector-versions-delete <name> [-p <v>]... [-o <out>]
                 locations-custom-connectors-custom-connector-versions-deprecate <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-custom-connectors-custom-connector-versions-publish <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-custom-connectors-custom-connector-versions-withdraw <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-custom-connectors-validate-custom-connector-spec <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-endpoint-attachments-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-endpoint-attachments-delete <name> [-p <v>]... [-o <out>]
@@ -90,6 +97,7 @@ connectors1 [options]
                 locations-providers-connectors-list <parent> [-p <v>]... [-o <out>]
                 locations-providers-connectors-versions-eventtypes-get <name> [-p <v>]... [-o <out>]
                 locations-providers-connectors-versions-eventtypes-list <parent> [-p <v>]... [-o <out>]
+                locations-providers-connectors-versions-fetch-auth-schema <name> [-p <v>]... [-o <out>]
                 locations-providers-connectors-versions-get <name> [-p <v>]... [-o <out>]
                 locations-providers-connectors-versions-list <parent> [-p <v>]... [-o <out>]
                 locations-providers-get <name> [-p <v>]... [-o <out>]

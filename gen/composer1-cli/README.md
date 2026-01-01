@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Cloud Composer* API at revision *20240618*. The CLI is at version *6.0.0*.
+This documentation was generated from the *Cloud Composer* API at revision *20251209*. The CLI is at version *7.0.0*.
 
 ```bash
 composer1 [options]
@@ -41,6 +41,7 @@ composer1 [options]
                 locations-environments-load-snapshot <environment> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-environments-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-environments-poll-airflow-command <environment> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-environments-restart-web-server <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-environments-save-snapshot <environment> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-environments-stop-airflow-command <environment> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-environments-user-workloads-config-maps-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]

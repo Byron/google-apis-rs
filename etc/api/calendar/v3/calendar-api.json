@@ -5,11 +5,47 @@
                 "https://www.googleapis.com/auth/calendar": {
                     "description": "See, edit, share, and permanently delete all the calendars you can access using Google Calendar"
                 },
+                "https://www.googleapis.com/auth/calendar.acls": {
+                    "description": "See and change the sharing permissions of Google calendars you own"
+                },
+                "https://www.googleapis.com/auth/calendar.acls.readonly": {
+                    "description": "See the sharing permissions of Google calendars you own"
+                },
+                "https://www.googleapis.com/auth/calendar.app.created": {
+                    "description": "Make secondary Google calendars, and see, create, change, and delete events on them"
+                },
+                "https://www.googleapis.com/auth/calendar.calendarlist": {
+                    "description": "See, add, and remove Google calendars you\u2019re subscribed to"
+                },
+                "https://www.googleapis.com/auth/calendar.calendarlist.readonly": {
+                    "description": "See the list of Google calendars you\u2019re subscribed to"
+                },
+                "https://www.googleapis.com/auth/calendar.calendars": {
+                    "description": "See and change the properties of Google calendars you have access to, and create secondary calendars"
+                },
+                "https://www.googleapis.com/auth/calendar.calendars.readonly": {
+                    "description": "See the title, description, default time zone, and other properties of Google calendars you have access to"
+                },
                 "https://www.googleapis.com/auth/calendar.events": {
                     "description": "View and edit events on all your calendars"
                 },
+                "https://www.googleapis.com/auth/calendar.events.freebusy": {
+                    "description": "See the availability on Google calendars you have access to"
+                },
+                "https://www.googleapis.com/auth/calendar.events.owned": {
+                    "description": "See, create, change, and delete events on Google calendars you own"
+                },
+                "https://www.googleapis.com/auth/calendar.events.owned.readonly": {
+                    "description": "See the events on Google calendars you own"
+                },
+                "https://www.googleapis.com/auth/calendar.events.public.readonly": {
+                    "description": "See the events on public calendars"
+                },
                 "https://www.googleapis.com/auth/calendar.events.readonly": {
                     "description": "View events on all your calendars"
+                },
+                "https://www.googleapis.com/auth/calendar.freebusy": {
+                    "description": "View your availability in your calendars"
                 },
                 "https://www.googleapis.com/auth/calendar.readonly": {
                     "description": "See and download any calendar you can access using your Google Calendar"
@@ -25,7 +61,7 @@
     "batchPath": "batch/calendar/v3",
     "description": "Manipulates events and other calendar data.",
     "discoveryVersion": "v1",
-    "documentationLink": "https://developers.google.com/google-apps/calendar/firstapp",
+    "documentationLink": "https://developers.google.com/workspace/calendar/firstapp",
     "icons": {
         "x16": "http://fonts.gstatic.com/s/i/productlogos/calendar_2020q4/v8/web-16dp/logo_calendar_2020q4_color_1x_web_16dp.png",
         "x32": "http://fonts.gstatic.com/s/i/productlogos/calendar_2020q4/v8/web-32dp/logo_calendar_2020q4_color_1x_web_32dp.png"
@@ -108,7 +144,8 @@
                     },
                     "path": "calendars/{calendarId}/acl/{ruleId}",
                     "scopes": [
-                        "https://www.googleapis.com/auth/calendar"
+                        "https://www.googleapis.com/auth/calendar",
+                        "https://www.googleapis.com/auth/calendar.acls"
                     ]
                 },
                 "get": {
@@ -139,6 +176,8 @@
                     },
                     "scopes": [
                         "https://www.googleapis.com/auth/calendar",
+                        "https://www.googleapis.com/auth/calendar.acls",
+                        "https://www.googleapis.com/auth/calendar.acls.readonly",
                         "https://www.googleapis.com/auth/calendar.readonly"
                     ]
                 },
@@ -170,7 +209,8 @@
                         "$ref": "AclRule"
                     },
                     "scopes": [
-                        "https://www.googleapis.com/auth/calendar"
+                        "https://www.googleapis.com/auth/calendar",
+                        "https://www.googleapis.com/auth/calendar.acls"
                     ]
                 },
                 "list": {
@@ -215,7 +255,9 @@
                         "$ref": "Acl"
                     },
                     "scopes": [
-                        "https://www.googleapis.com/auth/calendar"
+                        "https://www.googleapis.com/auth/calendar",
+                        "https://www.googleapis.com/auth/calendar.acls",
+                        "https://www.googleapis.com/auth/calendar.acls.readonly"
                     ],
                     "supportsSubscription": true
                 },
@@ -254,7 +296,8 @@
                         "$ref": "AclRule"
                     },
                     "scopes": [
-                        "https://www.googleapis.com/auth/calendar"
+                        "https://www.googleapis.com/auth/calendar",
+                        "https://www.googleapis.com/auth/calendar.acls"
                     ]
                 },
                 "update": {
@@ -292,7 +335,8 @@
                         "$ref": "AclRule"
                     },
                     "scopes": [
-                        "https://www.googleapis.com/auth/calendar"
+                        "https://www.googleapis.com/auth/calendar",
+                        "https://www.googleapis.com/auth/calendar.acls"
                     ]
                 },
                 "watch": {
@@ -341,7 +385,9 @@
                         "$ref": "Channel"
                     },
                     "scopes": [
-                        "https://www.googleapis.com/auth/calendar"
+                        "https://www.googleapis.com/auth/calendar",
+                        "https://www.googleapis.com/auth/calendar.acls",
+                        "https://www.googleapis.com/auth/calendar.acls.readonly"
                     ],
                     "supportsSubscription": true
                 }
@@ -366,7 +412,9 @@
                     },
                     "path": "users/me/calendarList/{calendarId}",
                     "scopes": [
-                        "https://www.googleapis.com/auth/calendar"
+                        "https://www.googleapis.com/auth/calendar",
+                        "https://www.googleapis.com/auth/calendar.app.created",
+                        "https://www.googleapis.com/auth/calendar.calendarlist"
                     ]
                 },
                 "get": {
@@ -390,6 +438,9 @@
                     },
                     "scopes": [
                         "https://www.googleapis.com/auth/calendar",
+                        "https://www.googleapis.com/auth/calendar.app.created",
+                        "https://www.googleapis.com/auth/calendar.calendarlist",
+                        "https://www.googleapis.com/auth/calendar.calendarlist.readonly",
                         "https://www.googleapis.com/auth/calendar.readonly"
                     ]
                 },
@@ -412,7 +463,8 @@
                         "$ref": "CalendarListEntry"
                     },
                     "scopes": [
-                        "https://www.googleapis.com/auth/calendar"
+                        "https://www.googleapis.com/auth/calendar",
+                        "https://www.googleapis.com/auth/calendar.calendarlist"
                     ]
                 },
                 "list": {
@@ -471,6 +523,8 @@
                     },
                     "scopes": [
                         "https://www.googleapis.com/auth/calendar",
+                        "https://www.googleapis.com/auth/calendar.calendarlist",
+                        "https://www.googleapis.com/auth/calendar.calendarlist.readonly",
                         "https://www.googleapis.com/auth/calendar.readonly"
                     ],
                     "supportsSubscription": true
@@ -503,7 +557,9 @@
                         "$ref": "CalendarListEntry"
                     },
                     "scopes": [
-                        "https://www.googleapis.com/auth/calendar"
+                        "https://www.googleapis.com/auth/calendar",
+                        "https://www.googleapis.com/auth/calendar.app.created",
+                        "https://www.googleapis.com/auth/calendar.calendarlist"
                     ]
                 },
                 "update": {
@@ -534,7 +590,9 @@
                         "$ref": "CalendarListEntry"
                     },
                     "scopes": [
-                        "https://www.googleapis.com/auth/calendar"
+                        "https://www.googleapis.com/auth/calendar",
+                        "https://www.googleapis.com/auth/calendar.app.created",
+                        "https://www.googleapis.com/auth/calendar.calendarlist"
                     ]
                 },
                 "watch": {
@@ -597,6 +655,8 @@
                     },
                     "scopes": [
                         "https://www.googleapis.com/auth/calendar",
+                        "https://www.googleapis.com/auth/calendar.calendarlist",
+                        "https://www.googleapis.com/auth/calendar.calendarlist.readonly",
                         "https://www.googleapis.com/auth/calendar.readonly"
                     ],
                     "supportsSubscription": true
@@ -622,7 +682,8 @@
                     },
                     "path": "calendars/{calendarId}/clear",
                     "scopes": [
-                        "https://www.googleapis.com/auth/calendar"
+                        "https://www.googleapis.com/auth/calendar",
+                        "https://www.googleapis.com/auth/calendar.calendars"
                     ]
                 },
                 "delete": {
@@ -642,7 +703,9 @@
                     },
                     "path": "calendars/{calendarId}",
                     "scopes": [
-                        "https://www.googleapis.com/auth/calendar"
+                        "https://www.googleapis.com/auth/calendar",
+                        "https://www.googleapis.com/auth/calendar.app.created",
+                        "https://www.googleapis.com/auth/calendar.calendars"
                     ]
                 },
                 "get": {
@@ -666,11 +729,14 @@
                     },
                     "scopes": [
                         "https://www.googleapis.com/auth/calendar",
+                        "https://www.googleapis.com/auth/calendar.app.created",
+                        "https://www.googleapis.com/auth/calendar.calendars",
+                        "https://www.googleapis.com/auth/calendar.calendars.readonly",
                         "https://www.googleapis.com/auth/calendar.readonly"
                     ]
                 },
                 "insert": {
-                    "description": "Creates a secondary calendar.",
+                    "description": "Creates a secondary calendar.\nThe authenticated user for the request is made the data owner of the new calendar.\n\nNote: We recommend to authenticate as the intended data owner of the calendar. You can use domain-wide delegation of authority to allow applications to act on behalf of a specific user. Don't use a service account for authentication. If you use a service account for authentication, the service account is the data owner, which can lead to unexpected behavior. For example, if a service account is the data owner, data ownership cannot be transferred.",
                     "httpMethod": "POST",
                     "id": "calendar.calendars.insert",
                     "path": "calendars",
@@ -681,7 +747,9 @@
                         "$ref": "Calendar"
                     },
                     "scopes": [
-                        "https://www.googleapis.com/auth/calendar"
+                        "https://www.googleapis.com/auth/calendar",
+                        "https://www.googleapis.com/auth/calendar.app.created",
+                        "https://www.googleapis.com/auth/calendar.calendars"
                     ]
                 },
                 "patch": {
@@ -707,7 +775,9 @@
                         "$ref": "Calendar"
                     },
                     "scopes": [
-                        "https://www.googleapis.com/auth/calendar"
+                        "https://www.googleapis.com/auth/calendar",
+                        "https://www.googleapis.com/auth/calendar.app.created",
+                        "https://www.googleapis.com/auth/calendar.calendars"
                     ]
                 },
                 "update": {
@@ -733,7 +803,9 @@
                         "$ref": "Calendar"
                     },
                     "scopes": [
-                        "https://www.googleapis.com/auth/calendar"
+                        "https://www.googleapis.com/auth/calendar",
+                        "https://www.googleapis.com/auth/calendar.app.created",
+                        "https://www.googleapis.com/auth/calendar.calendars"
                     ]
                 }
             }
@@ -751,7 +823,16 @@
                     },
                     "scopes": [
                         "https://www.googleapis.com/auth/calendar",
+                        "https://www.googleapis.com/auth/calendar.acls",
+                        "https://www.googleapis.com/auth/calendar.acls.readonly",
+                        "https://www.googleapis.com/auth/calendar.app.created",
+                        "https://www.googleapis.com/auth/calendar.calendarlist",
+                        "https://www.googleapis.com/auth/calendar.calendarlist.readonly",
                         "https://www.googleapis.com/auth/calendar.events",
+                        "https://www.googleapis.com/auth/calendar.events.freebusy",
+                        "https://www.googleapis.com/auth/calendar.events.owned",
+                        "https://www.googleapis.com/auth/calendar.events.owned.readonly",
+                        "https://www.googleapis.com/auth/calendar.events.public.readonly",
                         "https://www.googleapis.com/auth/calendar.events.readonly",
                         "https://www.googleapis.com/auth/calendar.readonly",
                         "https://www.googleapis.com/auth/calendar.settings.readonly"
@@ -771,6 +852,13 @@
                     },
                     "scopes": [
                         "https://www.googleapis.com/auth/calendar",
+                        "https://www.googleapis.com/auth/calendar.app.created",
+                        "https://www.googleapis.com/auth/calendar.calendarlist",
+                        "https://www.googleapis.com/auth/calendar.calendarlist.readonly",
+                        "https://www.googleapis.com/auth/calendar.events.freebusy",
+                        "https://www.googleapis.com/auth/calendar.events.owned",
+                        "https://www.googleapis.com/auth/calendar.events.owned.readonly",
+                        "https://www.googleapis.com/auth/calendar.events.public.readonly",
                         "https://www.googleapis.com/auth/calendar.readonly"
                     ]
                 }
@@ -823,7 +911,9 @@
                     "path": "calendars/{calendarId}/events/{eventId}",
                     "scopes": [
                         "https://www.googleapis.com/auth/calendar",
-                        "https://www.googleapis.com/auth/calendar.events"
+                        "https://www.googleapis.com/auth/calendar.app.created",
+                        "https://www.googleapis.com/auth/calendar.events",
+                        "https://www.googleapis.com/auth/calendar.events.owned"
                     ]
                 },
                 "get": {
@@ -871,7 +961,12 @@
                     },
                     "scopes": [
                         "https://www.googleapis.com/auth/calendar",
+                        "https://www.googleapis.com/auth/calendar.app.created",
                         "https://www.googleapis.com/auth/calendar.events",
+                        "https://www.googleapis.com/auth/calendar.events.freebusy",
+                        "https://www.googleapis.com/auth/calendar.events.owned",
+                        "https://www.googleapis.com/auth/calendar.events.owned.readonly",
+                        "https://www.googleapis.com/auth/calendar.events.public.readonly",
                         "https://www.googleapis.com/auth/calendar.events.readonly",
                         "https://www.googleapis.com/auth/calendar.readonly"
                     ]
@@ -913,7 +1008,9 @@
                     },
                     "scopes": [
                         "https://www.googleapis.com/auth/calendar",
-                        "https://www.googleapis.com/auth/calendar.events"
+                        "https://www.googleapis.com/auth/calendar.app.created",
+                        "https://www.googleapis.com/auth/calendar.events",
+                        "https://www.googleapis.com/auth/calendar.events.owned"
                     ]
                 },
                 "insert": {
@@ -980,7 +1077,9 @@
                     },
                     "scopes": [
                         "https://www.googleapis.com/auth/calendar",
-                        "https://www.googleapis.com/auth/calendar.events"
+                        "https://www.googleapis.com/auth/calendar.app.created",
+                        "https://www.googleapis.com/auth/calendar.events",
+                        "https://www.googleapis.com/auth/calendar.events.owned"
                     ]
                 },
                 "instances": {
@@ -1062,7 +1161,12 @@
                     },
                     "scopes": [
                         "https://www.googleapis.com/auth/calendar",
+                        "https://www.googleapis.com/auth/calendar.app.created",
                         "https://www.googleapis.com/auth/calendar.events",
+                        "https://www.googleapis.com/auth/calendar.events.freebusy",
+                        "https://www.googleapis.com/auth/calendar.events.owned",
+                        "https://www.googleapis.com/auth/calendar.events.owned.readonly",
+                        "https://www.googleapis.com/auth/calendar.events.public.readonly",
                         "https://www.googleapis.com/auth/calendar.events.readonly",
                         "https://www.googleapis.com/auth/calendar.readonly"
                     ],
@@ -1090,6 +1194,7 @@
                         "eventTypes": {
                             "description": "Event types to return. Optional. This parameter can be repeated multiple times to return events of different types. If unset, returns all event types.",
                             "enum": [
+                                "birthday",
                                 "default",
                                 "focusTime",
                                 "fromGmail",
@@ -1097,6 +1202,7 @@
                                 "workingLocation"
                             ],
                             "enumDescriptions": [
+                                "Special all-day events with an annual recurrence.",
                                 "Regular events.",
                                 "Focus time events.",
                                 "Events from Gmail.",
@@ -1212,14 +1318,19 @@
                     },
                     "scopes": [
                         "https://www.googleapis.com/auth/calendar",
+                        "https://www.googleapis.com/auth/calendar.app.created",
                         "https://www.googleapis.com/auth/calendar.events",
+                        "https://www.googleapis.com/auth/calendar.events.freebusy",
+                        "https://www.googleapis.com/auth/calendar.events.owned",
+                        "https://www.googleapis.com/auth/calendar.events.owned.readonly",
+                        "https://www.googleapis.com/auth/calendar.events.public.readonly",
                         "https://www.googleapis.com/auth/calendar.events.readonly",
                         "https://www.googleapis.com/auth/calendar.readonly"
                     ],
                     "supportsSubscription": true
                 },
                 "move": {
-                    "description": "Moves an event to another calendar, i.e. changes an event's organizer. Note that only default events can be moved; outOfOffice, focusTime, workingLocation and fromGmail events cannot be moved.",
+                    "description": "Moves an event to another calendar, i.e. changes an event's organizer. Note that only default events can be moved; birthday, focusTime, fromGmail, outOfOffice and workingLocation events cannot be moved.",
                     "httpMethod": "POST",
                     "id": "calendar.events.move",
                     "parameterOrder": [
@@ -1273,7 +1384,8 @@
                     },
                     "scopes": [
                         "https://www.googleapis.com/auth/calendar",
-                        "https://www.googleapis.com/auth/calendar.events"
+                        "https://www.googleapis.com/auth/calendar.events",
+                        "https://www.googleapis.com/auth/calendar.events.owned"
                     ]
                 },
                 "patch": {
@@ -1352,7 +1464,9 @@
                     },
                     "scopes": [
                         "https://www.googleapis.com/auth/calendar",
-                        "https://www.googleapis.com/auth/calendar.events"
+                        "https://www.googleapis.com/auth/calendar.app.created",
+                        "https://www.googleapis.com/auth/calendar.events",
+                        "https://www.googleapis.com/auth/calendar.events.owned"
                     ]
                 },
                 "quickAdd": {
@@ -1403,7 +1517,9 @@
                     },
                     "scopes": [
                         "https://www.googleapis.com/auth/calendar",
-                        "https://www.googleapis.com/auth/calendar.events"
+                        "https://www.googleapis.com/auth/calendar.app.created",
+                        "https://www.googleapis.com/auth/calendar.events",
+                        "https://www.googleapis.com/auth/calendar.events.owned"
                     ]
                 },
                 "update": {
@@ -1482,7 +1598,9 @@
                     },
                     "scopes": [
                         "https://www.googleapis.com/auth/calendar",
-                        "https://www.googleapis.com/auth/calendar.events"
+                        "https://www.googleapis.com/auth/calendar.app.created",
+                        "https://www.googleapis.com/auth/calendar.events",
+                        "https://www.googleapis.com/auth/calendar.events.owned"
                     ]
                 },
                 "watch": {
@@ -1507,6 +1625,7 @@
                         "eventTypes": {
                             "description": "Event types to return. Optional. This parameter can be repeated multiple times to return events of different types. If unset, returns all event types.",
                             "enum": [
+                                "birthday",
                                 "default",
                                 "focusTime",
                                 "fromGmail",
@@ -1514,6 +1633,7 @@
                                 "workingLocation"
                             ],
                             "enumDescriptions": [
+                                "Special all-day events with an annual recurrence.",
                                 "Regular events.",
                                 "Focus time events.",
                                 "Events from Gmail.",
@@ -1633,7 +1753,12 @@
                     },
                     "scopes": [
                         "https://www.googleapis.com/auth/calendar",
+                        "https://www.googleapis.com/auth/calendar.app.created",
                         "https://www.googleapis.com/auth/calendar.events",
+                        "https://www.googleapis.com/auth/calendar.events.freebusy",
+                        "https://www.googleapis.com/auth/calendar.events.owned",
+                        "https://www.googleapis.com/auth/calendar.events.owned.readonly",
+                        "https://www.googleapis.com/auth/calendar.events.public.readonly",
                         "https://www.googleapis.com/auth/calendar.events.readonly",
                         "https://www.googleapis.com/auth/calendar.readonly"
                     ],
@@ -1656,6 +1781,8 @@
                     },
                     "scopes": [
                         "https://www.googleapis.com/auth/calendar",
+                        "https://www.googleapis.com/auth/calendar.events.freebusy",
+                        "https://www.googleapis.com/auth/calendar.freebusy",
                         "https://www.googleapis.com/auth/calendar.readonly"
                     ]
                 }
@@ -1763,7 +1890,7 @@
             }
         }
     },
-    "revision": "20240523",
+    "revision": "20251214",
     "rootUrl": "https://www.googleapis.com/",
     "schemas": {
         "Acl": {
@@ -1818,7 +1945,7 @@
                             "calendar.acl.insert"
                         ]
                     },
-                    "description": "The role assigned to the scope. Possible values are:  \n- \"none\" - Provides no access. \n- \"freeBusyReader\" - Provides read access to free/busy information. \n- \"reader\" - Provides read access to the calendar. Private events will appear to users with reader access, but event details will be hidden. \n- \"writer\" - Provides read and write access to the calendar. Private events will appear to users with writer access, and event details will be visible. \n- \"owner\" - Provides ownership of the calendar. This role has all of the permissions of the writer role with the additional ability to see and manipulate ACLs.",
+                    "description": "The role assigned to the scope. Possible values are:  \n- \"none\" - Provides no access. \n- \"freeBusyReader\" - Provides read access to free/busy information. \n- \"reader\" - Provides read access to the calendar. Private events will appear to users with reader access, but event details will be hidden. \n- \"writer\" - Provides read and write access to the calendar. Private events will appear to users with writer access, and event details will be visible. Provides read access to the calendar's ACLs. \n- \"owner\" - Provides manager access to the calendar. This role has all of the permissions of the writer role with the additional ability to modify access levels of other users.\nImportant: the owner role is different from the calendar's data owner. A calendar has a single data owner, but can have multiple users with owner role.",
                     "type": "string"
                 },
                 "scope": {
@@ -1853,9 +1980,17 @@
         "Calendar": {
             "id": "Calendar",
             "properties": {
+                "autoAcceptInvitations": {
+                    "description": "Whether this calendar automatically accepts invitations. Only valid for resource calendars.",
+                    "type": "boolean"
+                },
                 "conferenceProperties": {
                     "$ref": "ConferenceProperties",
                     "description": "Conferencing properties for this calendar, for example what types of conferences are allowed."
+                },
+                "dataOwner": {
+                    "description": "The email of the owner of the calendar. Set only for secondary calendars. Read-only.",
+                    "type": "string"
                 },
                 "description": {
                     "description": "Description of the calendar. Optional.",
@@ -1928,8 +2063,12 @@
             "id": "CalendarListEntry",
             "properties": {
                 "accessRole": {
-                    "description": "The effective access role that the authenticated user has on the calendar. Read-only. Possible values are:  \n- \"freeBusyReader\" - Provides read access to free/busy information. \n- \"reader\" - Provides read access to the calendar. Private events will appear to users with reader access, but event details will be hidden. \n- \"writer\" - Provides read and write access to the calendar. Private events will appear to users with writer access, and event details will be visible. \n- \"owner\" - Provides ownership of the calendar. This role has all of the permissions of the writer role with the additional ability to see and manipulate ACLs.",
+                    "description": "The effective access role that the authenticated user has on the calendar. Read-only. Possible values are:  \n- \"freeBusyReader\" - Provides read access to free/busy information. \n- \"reader\" - Provides read access to the calendar. Private events will appear to users with reader access, but event details will be hidden. \n- \"writer\" - Provides read and write access to the calendar. Private events will appear to users with writer access, and event details will be visible. \n- \"owner\" - Provides manager access to the calendar. This role has all of the permissions of the writer role with the additional ability to see and modify access levels of other users.\nImportant: the owner role is different from the calendar's data owner. A calendar has a single data owner, but can have multiple users with owner role.",
                     "type": "string"
+                },
+                "autoAcceptInvitations": {
+                    "description": "Whether this calendar automatically accepts invitations. Only valid for resource calendars. Read-only.",
+                    "type": "boolean"
                 },
                 "backgroundColor": {
                     "description": "The main color of the calendar in the hexadecimal format \"#0088aa\". This property supersedes the index-based colorId property. To set or change this property, you need to specify colorRgbFormat=true in the parameters of the insert, update and patch methods. Optional.",
@@ -1942,6 +2081,10 @@
                 "conferenceProperties": {
                     "$ref": "ConferenceProperties",
                     "description": "Conferencing properties for this calendar, for example what types of conferences are allowed."
+                },
+                "dataOwner": {
+                    "description": "The email of the owner of the calendar. Set only for secondary calendars. Read-only.",
+                    "type": "string"
                 },
                 "defaultReminders": {
                     "description": "The default reminders that the authenticated user has for this calendar.",
@@ -2358,6 +2501,10 @@
                     "description": "Whether attendees may have been omitted from the event's representation. When retrieving an event, this may be due to a restriction specified by the maxAttendee query parameter. When updating an event, this can be used to only update the participant's response. Optional. The default is False.",
                     "type": "boolean"
                 },
+                "birthdayProperties": {
+                    "$ref": "EventBirthdayProperties",
+                    "description": "Birthday or special event data. Used if eventType is \"birthday\". Immutable."
+                },
                 "colorId": {
                     "description": "The color of the event. This is an ID referring to an entry in the event section of the colors definition (see the  colors endpoint). Optional.",
                     "type": "string"
@@ -2420,7 +2567,7 @@
                 },
                 "eventType": {
                     "default": "default",
-                    "description": "Specific type of the event. This cannot be modified after the event is created. Possible values are:  \n- \"default\" - A regular event or not further specified. \n- \"outOfOffice\" - An out-of-office event. \n- \"focusTime\" - A focus-time event. \n- \"workingLocation\" - A working location event. \n- \"fromGmail\" - An event from Gmail. This type of event cannot be created.",
+                    "description": "Specific type of the event. This cannot be modified after the event is created. Possible values are:  \n- \"birthday\" - A special all-day event with an annual recurrence. \n- \"default\" - A regular event or not further specified. \n- \"focusTime\" - A focus-time event. \n- \"fromGmail\" - An event from Gmail. This type of event cannot be created. \n- \"outOfOffice\" - An out-of-office event. \n- \"workingLocation\" - A working location event.",
                     "type": "string"
                 },
                 "extendedProperties": {
@@ -2591,7 +2738,7 @@
                     "type": "string"
                 },
                 "reminders": {
-                    "description": "Information about the event's reminders for the authenticated user.",
+                    "description": "Information about the event's reminders for the authenticated user. Note that changing reminders does not also change the updated property of the enclosing event.",
                     "properties": {
                         "overrides": {
                             "description": "If the event doesn't use the default reminders, this lists the reminders specific to the event, or, if not set, indicates that no reminders are set for this event. The maximum number of override reminders is 5.",
@@ -2651,7 +2798,7 @@
                     "type": "string"
                 },
                 "updated": {
-                    "description": "Last modification time of the event (as a RFC3339 timestamp). Read-only.",
+                    "description": "Last modification time of the main event data (as a RFC3339 timestamp). Updating event reminders will not cause this to change. Read-only.",
                     "format": "date-time",
                     "type": "string"
                 },
@@ -2733,13 +2880,32 @@
                     "type": "boolean"
                 },
                 "responseStatus": {
-                    "description": "The attendee's response status. Possible values are:  \n- \"needsAction\" - The attendee has not responded to the invitation (recommended for new events). \n- \"declined\" - The attendee has declined the invitation. \n- \"tentative\" - The attendee has tentatively accepted the invitation. \n- \"accepted\" - The attendee has accepted the invitation.  Warning: If you add an event using the values declined, tentative, or accepted, attendees with the \"Add invitations to my calendar\" setting set to \"When I respond to invitation in email\" won't see an event on their calendar unless they choose to change their invitation response in the event invitation email.",
+                    "description": "The attendee's response status. Possible values are:  \n- \"needsAction\" - The attendee has not responded to the invitation (recommended for new events). \n- \"declined\" - The attendee has declined the invitation. \n- \"tentative\" - The attendee has tentatively accepted the invitation. \n- \"accepted\" - The attendee has accepted the invitation.  Warning: If you add an event using the values declined, tentative, or accepted, attendees with the \"Add invitations to my calendar\" setting set to \"When I respond to invitation in email\" or \"Only if the sender is known\" might have their response reset to needsAction and won't see an event in their calendar unless they change their response in the event invitation email. Furthermore, if more than 200 guests are invited to the event, response status is not propagated to the guests.",
                     "type": "string"
                 },
                 "self": {
                     "default": "false",
                     "description": "Whether this entry represents the calendar on which this copy of the event appears. Read-only. The default is False.",
                     "type": "boolean"
+                }
+            },
+            "type": "object"
+        },
+        "EventBirthdayProperties": {
+            "id": "EventBirthdayProperties",
+            "properties": {
+                "contact": {
+                    "description": "Resource name of the contact this birthday event is linked to. This can be used to fetch contact details from People API. Format: \"people/c12345\". Read-only.",
+                    "type": "string"
+                },
+                "customTypeName": {
+                    "description": "Custom type label specified for this event. This is populated if birthdayProperties.type is set to \"custom\". Read-only.",
+                    "type": "string"
+                },
+                "type": {
+                    "default": "birthday",
+                    "description": "Type of birthday or special event. Possible values are:  \n- \"anniversary\" - An anniversary other than birthday. Always has a contact. \n- \"birthday\" - A birthday event. This is the default value. \n- \"custom\" - A special date whose label is further specified in the customTypeName field. Always has a contact. \n- \"other\" - A special date which does not fall into the other categories, and does not have a custom label. Always has a contact. \n- \"self\" - Calendar owner's own birthday. Cannot have a contact.  The Calendar API only supports creating events with the type \"birthday\". The type cannot be changed after the event is created.",
+                    "type": "string"
                 }
             },
             "type": "object"
@@ -2865,7 +3031,7 @@
             "id": "Events",
             "properties": {
                 "accessRole": {
-                    "description": "The user's access role for this calendar. Read-only. Possible values are:  \n- \"none\" - The user has no access. \n- \"freeBusyReader\" - The user has read access to free/busy information. \n- \"reader\" - The user has read access to the calendar. Private events will appear to users with reader access, but event details will be hidden. \n- \"writer\" - The user has read and write access to the calendar. Private events will appear to users with writer access, and event details will be visible. \n- \"owner\" - The user has ownership of the calendar. This role has all of the permissions of the writer role with the additional ability to see and manipulate ACLs.",
+                    "description": "The user's access role for this calendar. Read-only. Possible values are:  \n- \"none\" - The user has no access. \n- \"freeBusyReader\" - The user has read access to free/busy information. \n- \"reader\" - The user has read access to the calendar. Private events will appear to users with reader access, but event details will be hidden. \n- \"writer\" - The user has read and write access to the calendar. Private events will appear to users with writer access, and event details will be visible. \n- \"owner\" - The user has manager access to the calendar. This role has all of the permissions of the writer role with the additional ability to see and modify access levels of other users.\nImportant: the owner role is different from the calendar's data owner. A calendar has a single data owner, but can have multiple users with owner role.",
                     "type": "string"
                 },
                 "defaultReminders": {

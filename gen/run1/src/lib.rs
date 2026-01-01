@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Cloud Run* crate version *6.0.0+20240621*, where *20240621* is the exact revision of the *run:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v6.0.0*.
+//! This documentation was generated from *Cloud Run* crate version *7.0.0+20251212*, where *20251212* is the exact revision of the *run:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v7.0.0*.
 //!
 //! Everything else about the *Cloud Run* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/run/).
@@ -12,9 +12,9 @@
 //! Handle the following *Resources* with ease from the central [hub](CloudRun) ...
 //!
 //! * namespaces
-//!  * [*authorizeddomains list*](api::NamespaceAuthorizeddomainListCall), [*configurations get*](api::NamespaceConfigurationGetCall), [*configurations list*](api::NamespaceConfigurationListCall), [*domainmappings create*](api::NamespaceDomainmappingCreateCall), [*domainmappings delete*](api::NamespaceDomainmappingDeleteCall), [*domainmappings get*](api::NamespaceDomainmappingGetCall), [*domainmappings list*](api::NamespaceDomainmappingListCall), [*executions cancel*](api::NamespaceExecutionCancelCall), [*executions delete*](api::NamespaceExecutionDeleteCall), [*executions get*](api::NamespaceExecutionGetCall), [*executions list*](api::NamespaceExecutionListCall), [*jobs create*](api::NamespaceJobCreateCall), [*jobs delete*](api::NamespaceJobDeleteCall), [*jobs get*](api::NamespaceJobGetCall), [*jobs list*](api::NamespaceJobListCall), [*jobs replace job*](api::NamespaceJobReplaceJobCall), [*jobs run*](api::NamespaceJobRunCall), [*revisions delete*](api::NamespaceRevisionDeleteCall), [*revisions get*](api::NamespaceRevisionGetCall), [*revisions list*](api::NamespaceRevisionListCall), [*routes get*](api::NamespaceRouteGetCall), [*routes list*](api::NamespaceRouteListCall), [*services create*](api::NamespaceServiceCreateCall), [*services delete*](api::NamespaceServiceDeleteCall), [*services get*](api::NamespaceServiceGetCall), [*services list*](api::NamespaceServiceListCall), [*services replace service*](api::NamespaceServiceReplaceServiceCall), [*tasks get*](api::NamespaceTaskGetCall) and [*tasks list*](api::NamespaceTaskListCall)
+//!  * [*authorizeddomains list*](api::NamespaceAuthorizeddomainListCall), [*configurations get*](api::NamespaceConfigurationGetCall), [*configurations list*](api::NamespaceConfigurationListCall), [*domainmappings create*](api::NamespaceDomainmappingCreateCall), [*domainmappings delete*](api::NamespaceDomainmappingDeleteCall), [*domainmappings get*](api::NamespaceDomainmappingGetCall), [*domainmappings list*](api::NamespaceDomainmappingListCall), [*executions cancel*](api::NamespaceExecutionCancelCall), [*executions delete*](api::NamespaceExecutionDeleteCall), [*executions get*](api::NamespaceExecutionGetCall), [*executions list*](api::NamespaceExecutionListCall), [*jobs create*](api::NamespaceJobCreateCall), [*jobs delete*](api::NamespaceJobDeleteCall), [*jobs get*](api::NamespaceJobGetCall), [*jobs list*](api::NamespaceJobListCall), [*jobs replace job*](api::NamespaceJobReplaceJobCall), [*jobs run*](api::NamespaceJobRunCall), [*revisions delete*](api::NamespaceRevisionDeleteCall), [*revisions get*](api::NamespaceRevisionGetCall), [*revisions list*](api::NamespaceRevisionListCall), [*routes get*](api::NamespaceRouteGetCall), [*routes list*](api::NamespaceRouteListCall), [*services create*](api::NamespaceServiceCreateCall), [*services delete*](api::NamespaceServiceDeleteCall), [*services get*](api::NamespaceServiceGetCall), [*services list*](api::NamespaceServiceListCall), [*services replace service*](api::NamespaceServiceReplaceServiceCall), [*tasks get*](api::NamespaceTaskGetCall), [*tasks list*](api::NamespaceTaskListCall), [*workerpools create*](api::NamespaceWorkerpoolCreateCall), [*workerpools delete*](api::NamespaceWorkerpoolDeleteCall), [*workerpools get*](api::NamespaceWorkerpoolGetCall), [*workerpools list*](api::NamespaceWorkerpoolListCall) and [*workerpools replace worker pool*](api::NamespaceWorkerpoolReplaceWorkerPoolCall)
 //! * projects
-//!  * [*authorizeddomains list*](api::ProjectAuthorizeddomainListCall), [*locations authorizeddomains list*](api::ProjectLocationAuthorizeddomainListCall), [*locations configurations get*](api::ProjectLocationConfigurationGetCall), [*locations configurations list*](api::ProjectLocationConfigurationListCall), [*locations domainmappings create*](api::ProjectLocationDomainmappingCreateCall), [*locations domainmappings delete*](api::ProjectLocationDomainmappingDeleteCall), [*locations domainmappings get*](api::ProjectLocationDomainmappingGetCall), [*locations domainmappings list*](api::ProjectLocationDomainmappingListCall), [*locations jobs get iam policy*](api::ProjectLocationJobGetIamPolicyCall), [*locations jobs set iam policy*](api::ProjectLocationJobSetIamPolicyCall), [*locations jobs test iam permissions*](api::ProjectLocationJobTestIamPermissionCall), [*locations list*](api::ProjectLocationListCall), [*locations operations delete*](api::ProjectLocationOperationDeleteCall), [*locations operations get*](api::ProjectLocationOperationGetCall), [*locations operations list*](api::ProjectLocationOperationListCall), [*locations operations wait*](api::ProjectLocationOperationWaitCall), [*locations revisions delete*](api::ProjectLocationRevisionDeleteCall), [*locations revisions get*](api::ProjectLocationRevisionGetCall), [*locations revisions list*](api::ProjectLocationRevisionListCall), [*locations routes get*](api::ProjectLocationRouteGetCall), [*locations routes list*](api::ProjectLocationRouteListCall), [*locations services create*](api::ProjectLocationServiceCreateCall), [*locations services delete*](api::ProjectLocationServiceDeleteCall), [*locations services get*](api::ProjectLocationServiceGetCall), [*locations services get iam policy*](api::ProjectLocationServiceGetIamPolicyCall), [*locations services list*](api::ProjectLocationServiceListCall), [*locations services replace service*](api::ProjectLocationServiceReplaceServiceCall), [*locations services set iam policy*](api::ProjectLocationServiceSetIamPolicyCall) and [*locations services test iam permissions*](api::ProjectLocationServiceTestIamPermissionCall)
+//!  * [*authorizeddomains list*](api::ProjectAuthorizeddomainListCall), [*locations authorizeddomains list*](api::ProjectLocationAuthorizeddomainListCall), [*locations configurations get*](api::ProjectLocationConfigurationGetCall), [*locations configurations list*](api::ProjectLocationConfigurationListCall), [*locations domainmappings create*](api::ProjectLocationDomainmappingCreateCall), [*locations domainmappings delete*](api::ProjectLocationDomainmappingDeleteCall), [*locations domainmappings get*](api::ProjectLocationDomainmappingGetCall), [*locations domainmappings list*](api::ProjectLocationDomainmappingListCall), [*locations jobs get iam policy*](api::ProjectLocationJobGetIamPolicyCall), [*locations jobs set iam policy*](api::ProjectLocationJobSetIamPolicyCall), [*locations jobs test iam permissions*](api::ProjectLocationJobTestIamPermissionCall), [*locations list*](api::ProjectLocationListCall), [*locations operations delete*](api::ProjectLocationOperationDeleteCall), [*locations operations get*](api::ProjectLocationOperationGetCall), [*locations operations list*](api::ProjectLocationOperationListCall), [*locations operations wait*](api::ProjectLocationOperationWaitCall), [*locations revisions delete*](api::ProjectLocationRevisionDeleteCall), [*locations revisions get*](api::ProjectLocationRevisionGetCall), [*locations revisions list*](api::ProjectLocationRevisionListCall), [*locations routes get*](api::ProjectLocationRouteGetCall), [*locations routes list*](api::ProjectLocationRouteListCall), [*locations services create*](api::ProjectLocationServiceCreateCall), [*locations services delete*](api::ProjectLocationServiceDeleteCall), [*locations services get*](api::ProjectLocationServiceGetCall), [*locations services get iam policy*](api::ProjectLocationServiceGetIamPolicyCall), [*locations services list*](api::ProjectLocationServiceListCall), [*locations services replace service*](api::ProjectLocationServiceReplaceServiceCall), [*locations services set iam policy*](api::ProjectLocationServiceSetIamPolicyCall), [*locations services test iam permissions*](api::ProjectLocationServiceTestIamPermissionCall), [*locations workerpools get iam policy*](api::ProjectLocationWorkerpoolGetIamPolicyCall), [*locations workerpools set iam policy*](api::ProjectLocationWorkerpoolSetIamPolicyCall) and [*locations workerpools test iam permissions*](api::ProjectLocationWorkerpoolTestIamPermissionCall)
 //!
 //!
 //!
@@ -54,6 +54,7 @@
 //! let r = hub.namespaces().jobs_delete(...).doit().await
 //! let r = hub.namespaces().revisions_delete(...).doit().await
 //! let r = hub.namespaces().services_delete(...).doit().await
+//! let r = hub.namespaces().workerpools_delete(...).doit().await
 //! let r = hub.projects().locations_domainmappings_delete(...).doit().await
 //! let r = hub.projects().locations_revisions_delete(...).doit().await
 //! let r = hub.projects().locations_services_delete(...).doit().await
@@ -95,9 +96,20 @@
 //! // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about
 //! // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 //! // retrieve them from storage.
-//! let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+//! let connector = hyper_rustls::HttpsConnectorBuilder::new()
+//!     .with_native_roots()
+//!     .unwrap()
+//!     .https_only()
+//!     .enable_http2()
+//!     .build();
+//!
+//! let executor = hyper_util::rt::TokioExecutor::new();
+//! let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 //!     secret,
 //!     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+//!     yup_oauth2::client::CustomHyperClientBuilder::from(
+//!         hyper_util::client::legacy::Client::builder(executor).build(connector),
+//!     ),
 //! ).build().await.unwrap();
 //!
 //! let client = hyper_util::client::legacy::Client::builder(
@@ -108,7 +120,7 @@
 //!         .with_native_roots()
 //!         .unwrap()
 //!         .https_or_http()
-//!         .enable_http1()
+//!         .enable_http2()
 //!         .build()
 //! );
 //! let mut hub = CloudRun::new(client, auth);

@@ -4029,6 +4029,13 @@ where
                         ctype: ComplexType::Vec,
                     },
                 )),
+                "rule.pin-action.pin-map" => Some((
+                    "rule.pinAction.pinMap",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Map,
+                    },
+                )),
                 "rule.redirect-action.redirect-uri" => Some((
                     "rule.redirectAction.redirectUri",
                     JsonTypeInfo {
@@ -4105,6 +4112,8 @@ where
                             "oneway-synonyms-action",
                             "oneway-terms",
                             "page-categories",
+                            "pin-action",
+                            "pin-map",
                             "products-filter",
                             "query-terms",
                             "redirect-action",
@@ -4606,6 +4615,13 @@ where
                         ctype: ComplexType::Vec,
                     },
                 )),
+                "rule.pin-action.pin-map" => Some((
+                    "rule.pinAction.pinMap",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Map,
+                    },
+                )),
                 "rule.redirect-action.redirect-uri" => Some((
                     "rule.redirectAction.redirectUri",
                     JsonTypeInfo {
@@ -4682,6 +4698,8 @@ where
                             "oneway-synonyms-action",
                             "oneway-terms",
                             "page-categories",
+                            "pin-action",
+                            "pin-map",
                             "products-filter",
                             "query-terms",
                             "redirect-action",
@@ -4979,6 +4997,218 @@ where
         }
     }
 
+    async fn _projects_locations_catalogs_generative_question_batch_update(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut field_cursor = FieldCursor::default();
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
+            }
+        }
+        let mut request: api::GoogleCloudRetailV2BatchUpdateGenerativeQuestionConfigsRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .locations_catalogs_generative_question_batch_update(
+                request,
+                opt.value_of("parent").unwrap_or(""),
+            );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_catalogs_generative_questions_list(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .locations_catalogs_generative_questions_list(opt.value_of("parent").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _projects_locations_catalogs_get_attributes_config(
         &self,
         opt: &ArgMatches<'n>,
@@ -5141,6 +5371,89 @@ where
         }
     }
 
+    async fn _projects_locations_catalogs_get_conversational_search_customization_config(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .locations_catalogs_get_conversational_search_customization_config(
+                opt.value_of("name").unwrap_or(""),
+            );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _projects_locations_catalogs_get_default_branch(
         &self,
         opt: &ArgMatches<'n>,
@@ -5151,6 +5464,89 @@ where
             .hub
             .projects()
             .locations_catalogs_get_default_branch(opt.value_of("catalog").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_catalogs_get_generative_question_feature(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .locations_catalogs_get_generative_question_feature(
+                opt.value_of("catalog").unwrap_or(""),
+            );
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -6563,6 +6959,13 @@ where
         {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "return-partial-success" => {
+                    call = call.return_partial_success(
+                        value
+                            .map(|v| arg_from_str(v, err, "return-partial-success", "boolean"))
+                            .unwrap_or(false),
+                    );
+                }
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
                 }
@@ -6593,7 +6996,16 @@ where
                             .push(CLIError::UnknownParameter(key.to_string(), {
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
-                                v.extend(["filter", "page-size", "page-token"].iter().map(|v| *v));
+                                v.extend(
+                                    [
+                                        "filter",
+                                        "page-size",
+                                        "page-token",
+                                        "return-partial-success",
+                                    ]
+                                    .iter()
+                                    .map(|v| *v),
+                                );
                                 v
                             }));
                     }
@@ -6767,6 +7179,152 @@ where
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
                                 v.extend(["update-mask"].iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_catalogs_placements_conversational_search(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut field_cursor = FieldCursor::default();
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "branch" => Some(("branch", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "conversation-id" => Some(("conversationId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "conversational-filtering-spec.conversational-filtering-mode" => Some(("conversationalFilteringSpec.conversationalFilteringMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "conversational-filtering-spec.enable-conversational-filtering" => Some(("conversationalFilteringSpec.enableConversationalFiltering", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "conversational-filtering-spec.user-answer.selected-answer.product-attribute-value.name" => Some(("conversationalFilteringSpec.userAnswer.selectedAnswer.productAttributeValue.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "conversational-filtering-spec.user-answer.selected-answer.product-attribute-value.value" => Some(("conversationalFilteringSpec.userAnswer.selectedAnswer.productAttributeValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "conversational-filtering-spec.user-answer.text-answer" => Some(("conversationalFilteringSpec.userAnswer.textAnswer", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "page-categories" => Some(("pageCategories", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "query" => Some(("query", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "search-params.boost-spec.skip-boost-spec-validation" => Some(("searchParams.boostSpec.skipBoostSpecValidation", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "search-params.canonical-filter" => Some(("searchParams.canonicalFilter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "search-params.filter" => Some(("searchParams.filter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "search-params.sort-by" => Some(("searchParams.sortBy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "user-info.direct-user-request" => Some(("userInfo.directUserRequest", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "user-info.ip-address" => Some(("userInfo.ipAddress", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "user-info.user-agent" => Some(("userInfo.userAgent", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "user-info.user-id" => Some(("userInfo.userId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "user-labels" => Some(("userLabels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "visitor-id" => Some(("visitorId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["boost-spec", "branch", "canonical-filter", "conversation-id", "conversational-filtering-mode", "conversational-filtering-spec", "direct-user-request", "enable-conversational-filtering", "filter", "ip-address", "name", "page-categories", "product-attribute-value", "query", "search-params", "selected-answer", "skip-boost-spec-validation", "sort-by", "text-answer", "user-agent", "user-answer", "user-id", "user-info", "user-labels", "value", "visitor-id"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
+            }
+        }
+        let mut request: api::GoogleCloudRetailV2ConversationalSearchRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .locations_catalogs_placements_conversational_search(
+                request,
+                opt.value_of("placement").unwrap_or(""),
+            );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
                                 v
                             }));
                     }
@@ -7241,218 +7799,47 @@ where
                 continue;
             }
 
-            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
-            {
-                "boost-spec.skip-boost-spec-validation" => Some((
-                    "boostSpec.skipBoostSpecValidation",
-                    JsonTypeInfo {
-                        jtype: JsonType::Boolean,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "branch" => Some((
-                    "branch",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "canonical-filter" => Some((
-                    "canonicalFilter",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "dynamic-facet-spec.mode" => Some((
-                    "dynamicFacetSpec.mode",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "entity" => Some((
-                    "entity",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "filter" => Some((
-                    "filter",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "labels" => Some((
-                    "labels",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Map,
-                    },
-                )),
-                "offset" => Some((
-                    "offset",
-                    JsonTypeInfo {
-                        jtype: JsonType::Int,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "order-by" => Some((
-                    "orderBy",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "page-categories" => Some((
-                    "pageCategories",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Vec,
-                    },
-                )),
-                "page-size" => Some((
-                    "pageSize",
-                    JsonTypeInfo {
-                        jtype: JsonType::Int,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "page-token" => Some((
-                    "pageToken",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "personalization-spec.mode" => Some((
-                    "personalizationSpec.mode",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "query" => Some((
-                    "query",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "query-expansion-spec.condition" => Some((
-                    "queryExpansionSpec.condition",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "query-expansion-spec.pin-unexpanded-results" => Some((
-                    "queryExpansionSpec.pinUnexpandedResults",
-                    JsonTypeInfo {
-                        jtype: JsonType::Boolean,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "search-mode" => Some((
-                    "searchMode",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "spell-correction-spec.mode" => Some((
-                    "spellCorrectionSpec.mode",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "user-info.direct-user-request" => Some((
-                    "userInfo.directUserRequest",
-                    JsonTypeInfo {
-                        jtype: JsonType::Boolean,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "user-info.ip-address" => Some((
-                    "userInfo.ipAddress",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "user-info.user-agent" => Some((
-                    "userInfo.userAgent",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "user-info.user-id" => Some((
-                    "userInfo.userId",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "variant-rollup-keys" => Some((
-                    "variantRollupKeys",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Vec,
-                    },
-                )),
-                "visitor-id" => Some((
-                    "visitorId",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(
-                        key,
-                        &vec![
-                            "boost-spec",
-                            "branch",
-                            "canonical-filter",
-                            "condition",
-                            "direct-user-request",
-                            "dynamic-facet-spec",
-                            "entity",
-                            "filter",
-                            "ip-address",
-                            "labels",
-                            "mode",
-                            "offset",
-                            "order-by",
-                            "page-categories",
-                            "page-size",
-                            "page-token",
-                            "personalization-spec",
-                            "pin-unexpanded-results",
-                            "query",
-                            "query-expansion-spec",
-                            "search-mode",
-                            "skip-boost-spec-validation",
-                            "spell-correction-spec",
-                            "user-agent",
-                            "user-id",
-                            "user-info",
-                            "variant-rollup-keys",
-                            "visitor-id",
-                        ],
-                    );
-                    err.issues.push(CLIError::Field(FieldError::Unknown(
-                        temp_cursor.to_string(),
-                        suggestion,
-                        value.map(|v| v.to_string()),
-                    )));
-                    None
-                }
-            };
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "boost-spec.skip-boost-spec-validation" => Some(("boostSpec.skipBoostSpecValidation", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "branch" => Some(("branch", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "canonical-filter" => Some(("canonicalFilter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "conversational-search-spec.conversation-id" => Some(("conversationalSearchSpec.conversationId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "conversational-search-spec.followup-conversation-requested" => Some(("conversationalSearchSpec.followupConversationRequested", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "conversational-search-spec.user-answer.selected-answer.product-attribute-value.name" => Some(("conversationalSearchSpec.userAnswer.selectedAnswer.productAttributeValue.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "conversational-search-spec.user-answer.selected-answer.product-attribute-value.value" => Some(("conversationalSearchSpec.userAnswer.selectedAnswer.productAttributeValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "conversational-search-spec.user-answer.text-answer" => Some(("conversationalSearchSpec.userAnswer.textAnswer", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "dynamic-facet-spec.mode" => Some(("dynamicFacetSpec.mode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity" => Some(("entity", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "filter" => Some(("filter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "language-code" => Some(("languageCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "offset" => Some(("offset", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "order-by" => Some(("orderBy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "page-categories" => Some(("pageCategories", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "page-size" => Some(("pageSize", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "page-token" => Some(("pageToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "personalization-spec.mode" => Some(("personalizationSpec.mode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "place-id" => Some(("placeId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "query" => Some(("query", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "query-expansion-spec.condition" => Some(("queryExpansionSpec.condition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "query-expansion-spec.pin-unexpanded-results" => Some(("queryExpansionSpec.pinUnexpandedResults", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "region-code" => Some(("regionCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "search-mode" => Some(("searchMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "spell-correction-spec.mode" => Some(("spellCorrectionSpec.mode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "tile-navigation-spec.tile-navigation-requested" => Some(("tileNavigationSpec.tileNavigationRequested", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "user-info.direct-user-request" => Some(("userInfo.directUserRequest", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "user-info.ip-address" => Some(("userInfo.ipAddress", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "user-info.user-agent" => Some(("userInfo.userAgent", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "user-info.user-id" => Some(("userInfo.userId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "variant-rollup-keys" => Some(("variantRollupKeys", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "visitor-id" => Some(("visitorId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["boost-spec", "branch", "canonical-filter", "condition", "conversation-id", "conversational-search-spec", "direct-user-request", "dynamic-facet-spec", "entity", "filter", "followup-conversation-requested", "ip-address", "labels", "language-code", "mode", "name", "offset", "order-by", "page-categories", "page-size", "page-token", "personalization-spec", "pin-unexpanded-results", "place-id", "product-attribute-value", "query", "query-expansion-spec", "region-code", "search-mode", "selected-answer", "skip-boost-spec-validation", "spell-correction-spec", "text-answer", "tile-navigation-requested", "tile-navigation-spec", "user-agent", "user-answer", "user-id", "user-info", "value", "variant-rollup-keys", "visitor-id"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
             if let Some((field_cursor_str, type_info)) = type_info {
                 FieldCursor::from(field_cursor_str).set_json_value(
                     &mut object,
@@ -7606,6 +7993,152 @@ where
             .locations_catalogs_serving_configs_add_control(
                 request,
                 opt.value_of("serving-config").unwrap_or(""),
+            );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_catalogs_serving_configs_conversational_search(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut field_cursor = FieldCursor::default();
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "branch" => Some(("branch", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "conversation-id" => Some(("conversationId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "conversational-filtering-spec.conversational-filtering-mode" => Some(("conversationalFilteringSpec.conversationalFilteringMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "conversational-filtering-spec.enable-conversational-filtering" => Some(("conversationalFilteringSpec.enableConversationalFiltering", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "conversational-filtering-spec.user-answer.selected-answer.product-attribute-value.name" => Some(("conversationalFilteringSpec.userAnswer.selectedAnswer.productAttributeValue.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "conversational-filtering-spec.user-answer.selected-answer.product-attribute-value.value" => Some(("conversationalFilteringSpec.userAnswer.selectedAnswer.productAttributeValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "conversational-filtering-spec.user-answer.text-answer" => Some(("conversationalFilteringSpec.userAnswer.textAnswer", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "page-categories" => Some(("pageCategories", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "query" => Some(("query", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "search-params.boost-spec.skip-boost-spec-validation" => Some(("searchParams.boostSpec.skipBoostSpecValidation", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "search-params.canonical-filter" => Some(("searchParams.canonicalFilter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "search-params.filter" => Some(("searchParams.filter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "search-params.sort-by" => Some(("searchParams.sortBy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "user-info.direct-user-request" => Some(("userInfo.directUserRequest", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "user-info.ip-address" => Some(("userInfo.ipAddress", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "user-info.user-agent" => Some(("userInfo.userAgent", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "user-info.user-id" => Some(("userInfo.userId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "user-labels" => Some(("userLabels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "visitor-id" => Some(("visitorId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["boost-spec", "branch", "canonical-filter", "conversation-id", "conversational-filtering-mode", "conversational-filtering-spec", "direct-user-request", "enable-conversational-filtering", "filter", "ip-address", "name", "page-categories", "product-attribute-value", "query", "search-params", "selected-answer", "skip-boost-spec-validation", "sort-by", "text-answer", "user-agent", "user-answer", "user-id", "user-info", "user-labels", "value", "visitor-id"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
+            }
+        }
+        let mut request: api::GoogleCloudRetailV2ConversationalSearchRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .locations_catalogs_serving_configs_conversational_search(
+                request,
+                opt.value_of("placement").unwrap_or(""),
             );
         for parg in opt
             .values_of("v")
@@ -9102,218 +9635,47 @@ where
                 continue;
             }
 
-            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
-            {
-                "boost-spec.skip-boost-spec-validation" => Some((
-                    "boostSpec.skipBoostSpecValidation",
-                    JsonTypeInfo {
-                        jtype: JsonType::Boolean,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "branch" => Some((
-                    "branch",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "canonical-filter" => Some((
-                    "canonicalFilter",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "dynamic-facet-spec.mode" => Some((
-                    "dynamicFacetSpec.mode",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "entity" => Some((
-                    "entity",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "filter" => Some((
-                    "filter",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "labels" => Some((
-                    "labels",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Map,
-                    },
-                )),
-                "offset" => Some((
-                    "offset",
-                    JsonTypeInfo {
-                        jtype: JsonType::Int,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "order-by" => Some((
-                    "orderBy",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "page-categories" => Some((
-                    "pageCategories",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Vec,
-                    },
-                )),
-                "page-size" => Some((
-                    "pageSize",
-                    JsonTypeInfo {
-                        jtype: JsonType::Int,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "page-token" => Some((
-                    "pageToken",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "personalization-spec.mode" => Some((
-                    "personalizationSpec.mode",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "query" => Some((
-                    "query",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "query-expansion-spec.condition" => Some((
-                    "queryExpansionSpec.condition",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "query-expansion-spec.pin-unexpanded-results" => Some((
-                    "queryExpansionSpec.pinUnexpandedResults",
-                    JsonTypeInfo {
-                        jtype: JsonType::Boolean,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "search-mode" => Some((
-                    "searchMode",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "spell-correction-spec.mode" => Some((
-                    "spellCorrectionSpec.mode",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "user-info.direct-user-request" => Some((
-                    "userInfo.directUserRequest",
-                    JsonTypeInfo {
-                        jtype: JsonType::Boolean,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "user-info.ip-address" => Some((
-                    "userInfo.ipAddress",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "user-info.user-agent" => Some((
-                    "userInfo.userAgent",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "user-info.user-id" => Some((
-                    "userInfo.userId",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "variant-rollup-keys" => Some((
-                    "variantRollupKeys",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Vec,
-                    },
-                )),
-                "visitor-id" => Some((
-                    "visitorId",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(
-                        key,
-                        &vec![
-                            "boost-spec",
-                            "branch",
-                            "canonical-filter",
-                            "condition",
-                            "direct-user-request",
-                            "dynamic-facet-spec",
-                            "entity",
-                            "filter",
-                            "ip-address",
-                            "labels",
-                            "mode",
-                            "offset",
-                            "order-by",
-                            "page-categories",
-                            "page-size",
-                            "page-token",
-                            "personalization-spec",
-                            "pin-unexpanded-results",
-                            "query",
-                            "query-expansion-spec",
-                            "search-mode",
-                            "skip-boost-spec-validation",
-                            "spell-correction-spec",
-                            "user-agent",
-                            "user-id",
-                            "user-info",
-                            "variant-rollup-keys",
-                            "visitor-id",
-                        ],
-                    );
-                    err.issues.push(CLIError::Field(FieldError::Unknown(
-                        temp_cursor.to_string(),
-                        suggestion,
-                        value.map(|v| v.to_string()),
-                    )));
-                    None
-                }
-            };
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "boost-spec.skip-boost-spec-validation" => Some(("boostSpec.skipBoostSpecValidation", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "branch" => Some(("branch", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "canonical-filter" => Some(("canonicalFilter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "conversational-search-spec.conversation-id" => Some(("conversationalSearchSpec.conversationId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "conversational-search-spec.followup-conversation-requested" => Some(("conversationalSearchSpec.followupConversationRequested", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "conversational-search-spec.user-answer.selected-answer.product-attribute-value.name" => Some(("conversationalSearchSpec.userAnswer.selectedAnswer.productAttributeValue.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "conversational-search-spec.user-answer.selected-answer.product-attribute-value.value" => Some(("conversationalSearchSpec.userAnswer.selectedAnswer.productAttributeValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "conversational-search-spec.user-answer.text-answer" => Some(("conversationalSearchSpec.userAnswer.textAnswer", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "dynamic-facet-spec.mode" => Some(("dynamicFacetSpec.mode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity" => Some(("entity", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "filter" => Some(("filter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "language-code" => Some(("languageCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "offset" => Some(("offset", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "order-by" => Some(("orderBy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "page-categories" => Some(("pageCategories", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "page-size" => Some(("pageSize", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "page-token" => Some(("pageToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "personalization-spec.mode" => Some(("personalizationSpec.mode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "place-id" => Some(("placeId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "query" => Some(("query", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "query-expansion-spec.condition" => Some(("queryExpansionSpec.condition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "query-expansion-spec.pin-unexpanded-results" => Some(("queryExpansionSpec.pinUnexpandedResults", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "region-code" => Some(("regionCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "search-mode" => Some(("searchMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "spell-correction-spec.mode" => Some(("spellCorrectionSpec.mode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "tile-navigation-spec.tile-navigation-requested" => Some(("tileNavigationSpec.tileNavigationRequested", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "user-info.direct-user-request" => Some(("userInfo.directUserRequest", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "user-info.ip-address" => Some(("userInfo.ipAddress", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "user-info.user-agent" => Some(("userInfo.userAgent", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "user-info.user-id" => Some(("userInfo.userId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "variant-rollup-keys" => Some(("variantRollupKeys", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "visitor-id" => Some(("visitorId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["boost-spec", "branch", "canonical-filter", "condition", "conversation-id", "conversational-search-spec", "direct-user-request", "dynamic-facet-spec", "entity", "filter", "followup-conversation-requested", "ip-address", "labels", "language-code", "mode", "name", "offset", "order-by", "page-categories", "page-size", "page-token", "personalization-spec", "pin-unexpanded-results", "place-id", "product-attribute-value", "query", "query-expansion-spec", "region-code", "search-mode", "selected-answer", "skip-boost-spec-validation", "spell-correction-spec", "text-answer", "tile-navigation-requested", "tile-navigation-spec", "user-agent", "user-answer", "user-id", "user-info", "value", "variant-rollup-keys", "visitor-id"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
             if let Some((field_cursor_str, type_info)) = type_info {
                 FieldCursor::from(field_cursor_str).set_json_value(
                     &mut object,
@@ -10096,16 +10458,111 @@ where
         }
     }
 
-    async fn _projects_locations_catalogs_user_events_collect(
+    async fn _projects_locations_catalogs_update_conversational_search_customization_config(
         &self,
         opt: &ArgMatches<'n>,
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
+        let mut field_cursor = FieldCursor::default();
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "catalog" => Some((
+                    "catalog",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "intent-classification-config.blocklist-keywords" => Some((
+                    "intentClassificationConfig.blocklistKeywords",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "intent-classification-config.disabled-intent-types" => Some((
+                    "intentClassificationConfig.disabledIntentTypes",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "intent-classification-config.model-preamble" => Some((
+                    "intentClassificationConfig.modelPreamble",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "retailer-display-name" => Some((
+                    "retailerDisplayName",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec![
+                            "blocklist-keywords",
+                            "catalog",
+                            "disabled-intent-types",
+                            "intent-classification-config",
+                            "model-preamble",
+                            "retailer-display-name",
+                        ],
+                    );
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
+            }
+        }
+        let mut request: api::GoogleCloudRetailV2ConversationalSearchCustomizationConfig =
+            serde_json::value::from_value(object).unwrap();
         let mut call = self
             .hub
             .projects()
-            .locations_catalogs_user_events_collect(opt.value_of("parent").unwrap_or(""));
+            .locations_catalogs_update_conversational_search_customization_config(
+                request,
+                opt.value_of("catalog").unwrap_or(""),
+            );
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -10114,23 +10571,11 @@ where
         {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "user-event" => {
-                    call = call.user_event(value.unwrap_or(""));
-                }
-                "uri" => {
-                    call = call.uri(value.unwrap_or(""));
-                }
-                "raw-json" => {
-                    call = call.raw_json(value.unwrap_or(""));
-                }
-                "prebuilt-rule" => {
-                    call = call.prebuilt_rule(value.unwrap_or(""));
-                }
-                "ets" => {
-                    call = call.ets(
+                "update-mask" => {
+                    call = call.update_mask(
                         value
-                            .map(|v| arg_from_str(v, err, "ets", "int64"))
-                            .unwrap_or(-0),
+                            .map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask"))
+                            .unwrap_or(apis_common::FieldMask::default()),
                     );
                 }
                 _ => {
@@ -10150,11 +10595,535 @@ where
                             .push(CLIError::UnknownParameter(key.to_string(), {
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
-                                v.extend(
-                                    ["ets", "prebuilt-rule", "raw-json", "uri", "user-event"]
-                                        .iter()
-                                        .map(|v| *v),
-                                );
+                                v.extend(["update-mask"].iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_catalogs_update_generative_question(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut field_cursor = FieldCursor::default();
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "allowed-in-conversation" => Some((
+                    "allowedInConversation",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "catalog" => Some((
+                    "catalog",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "example-values" => Some((
+                    "exampleValues",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "facet" => Some((
+                    "facet",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "final-question" => Some((
+                    "finalQuestion",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "frequency" => Some((
+                    "frequency",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "generated-question" => Some((
+                    "generatedQuestion",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec![
+                            "allowed-in-conversation",
+                            "catalog",
+                            "example-values",
+                            "facet",
+                            "final-question",
+                            "frequency",
+                            "generated-question",
+                        ],
+                    );
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
+            }
+        }
+        let mut request: api::GoogleCloudRetailV2GenerativeQuestionConfig =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .locations_catalogs_update_generative_question(
+                request,
+                opt.value_of("catalog").unwrap_or(""),
+            );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "update-mask" => {
+                    call = call.update_mask(
+                        value
+                            .map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask"))
+                            .unwrap_or(apis_common::FieldMask::default()),
+                    );
+                }
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["update-mask"].iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_catalogs_update_generative_question_feature(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut field_cursor = FieldCursor::default();
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "catalog" => Some((
+                    "catalog",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "feature-enabled" => Some((
+                    "featureEnabled",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "minimum-products" => Some((
+                    "minimumProducts",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec!["catalog", "feature-enabled", "minimum-products"],
+                    );
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
+            }
+        }
+        let mut request: api::GoogleCloudRetailV2GenerativeQuestionsFeatureConfig =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .locations_catalogs_update_generative_question_feature(
+                request,
+                opt.value_of("catalog").unwrap_or(""),
+            );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "update-mask" => {
+                    call = call.update_mask(
+                        value
+                            .map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask"))
+                            .unwrap_or(apis_common::FieldMask::default()),
+                    );
+                }
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["update-mask"].iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_catalogs_user_events_collect(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut field_cursor = FieldCursor::default();
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "ets" => Some((
+                    "ets",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "prebuilt-rule" => Some((
+                    "prebuiltRule",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "raw-json" => Some((
+                    "rawJson",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "uri" => Some((
+                    "uri",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "user-event" => Some((
+                    "userEvent",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec!["ets", "prebuilt-rule", "raw-json", "uri", "user-event"],
+                    );
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
+            }
+        }
+        let mut request: api::GoogleCloudRetailV2CollectUserEventRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .locations_catalogs_user_events_collect(request, opt.value_of("parent").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
                                 v
                             }));
                     }
@@ -11169,6 +12138,13 @@ where
         {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "return-partial-success" => {
+                    call = call.return_partial_success(
+                        value
+                            .map(|v| arg_from_str(v, err, "return-partial-success", "boolean"))
+                            .unwrap_or(false),
+                    );
+                }
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
                 }
@@ -11199,7 +12175,16 @@ where
                             .push(CLIError::UnknownParameter(key.to_string(), {
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
-                                v.extend(["filter", "page-size", "page-token"].iter().map(|v| *v));
+                                v.extend(
+                                    [
+                                        "filter",
+                                        "page-size",
+                                        "page-token",
+                                        "return-partial-success",
+                                    ]
+                                    .iter()
+                                    .map(|v| *v),
+                                );
                                 v
                             }));
                     }
@@ -11345,6 +12330,13 @@ where
         {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "return-partial-success" => {
+                    call = call.return_partial_success(
+                        value
+                            .map(|v| arg_from_str(v, err, "return-partial-success", "boolean"))
+                            .unwrap_or(false),
+                    );
+                }
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
                 }
@@ -11375,7 +12367,16 @@ where
                             .push(CLIError::UnknownParameter(key.to_string(), {
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
-                                v.extend(["filter", "page-size", "page-token"].iter().map(|v| *v));
+                                v.extend(
+                                    [
+                                        "filter",
+                                        "page-size",
+                                        "page-token",
+                                        "return-partial-success",
+                                    ]
+                                    .iter()
+                                    .map(|v| *v),
+                                );
                                 v
                             }));
                     }
@@ -11581,6 +12582,20 @@ where
                         )
                         .await;
                 }
+                ("locations-catalogs-generative-question-batch-update", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_catalogs_generative_question_batch_update(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
+                ("locations-catalogs-generative-questions-list", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_catalogs_generative_questions_list(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
                 ("locations-catalogs-get-attributes-config", Some(opt)) => {
                     call_result = self
                         ._projects_locations_catalogs_get_attributes_config(opt, dry_run, &mut err)
@@ -11591,9 +12606,22 @@ where
                         ._projects_locations_catalogs_get_completion_config(opt, dry_run, &mut err)
                         .await;
                 }
+                (
+                    "locations-catalogs-get-conversational-search-customization-config",
+                    Some(opt),
+                ) => {
+                    call_result = self._projects_locations_catalogs_get_conversational_search_customization_config(opt, dry_run, &mut err).await;
+                }
                 ("locations-catalogs-get-default-branch", Some(opt)) => {
                     call_result = self
                         ._projects_locations_catalogs_get_default_branch(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("locations-catalogs-get-generative-question-feature", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_catalogs_get_generative_question_feature(
+                            opt, dry_run, &mut err,
+                        )
                         .await;
                 }
                 ("locations-catalogs-list", Some(opt)) => {
@@ -11656,6 +12684,13 @@ where
                         ._projects_locations_catalogs_patch(opt, dry_run, &mut err)
                         .await;
                 }
+                ("locations-catalogs-placements-conversational-search", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_catalogs_placements_conversational_search(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
                 ("locations-catalogs-placements-predict", Some(opt)) => {
                     call_result = self
                         ._projects_locations_catalogs_placements_predict(opt, dry_run, &mut err)
@@ -11669,6 +12704,13 @@ where
                 ("locations-catalogs-serving-configs-add-control", Some(opt)) => {
                     call_result = self
                         ._projects_locations_catalogs_serving_configs_add_control(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
+                ("locations-catalogs-serving-configs-conversational-search", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_catalogs_serving_configs_conversational_search(
                             opt, dry_run, &mut err,
                         )
                         .await;
@@ -11732,6 +12774,26 @@ where
                 ("locations-catalogs-update-completion-config", Some(opt)) => {
                     call_result = self
                         ._projects_locations_catalogs_update_completion_config(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
+                (
+                    "locations-catalogs-update-conversational-search-customization-config",
+                    Some(opt),
+                ) => {
+                    call_result = self._projects_locations_catalogs_update_conversational_search_customization_config(opt, dry_run, &mut err).await;
+                }
+                ("locations-catalogs-update-generative-question", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_catalogs_update_generative_question(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
+                ("locations-catalogs-update-generative-question-feature", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_catalogs_update_generative_question_feature(
                             opt, dry_run, &mut err,
                         )
                         .await;
@@ -11823,7 +12885,9 @@ where
         let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
             secret,
             yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-            hyper_util::client::legacy::Client::builder(executor).build(connector),
+            yup_oauth2::client::CustomHyperClientBuilder::from(
+                hyper_util::client::legacy::Client::builder(executor).build(connector),
+            ),
         )
         .persist_tokens_to_disk(format!("{}/retail2", config_dir))
         .build()
@@ -11876,7 +12940,7 @@ where
 async fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("projects", "methods: 'locations-catalogs-attributes-config-add-catalog-attribute', 'locations-catalogs-attributes-config-remove-catalog-attribute', 'locations-catalogs-attributes-config-replace-catalog-attribute', 'locations-catalogs-branches-operations-get', 'locations-catalogs-branches-products-add-fulfillment-places', 'locations-catalogs-branches-products-add-local-inventories', 'locations-catalogs-branches-products-create', 'locations-catalogs-branches-products-delete', 'locations-catalogs-branches-products-get', 'locations-catalogs-branches-products-import', 'locations-catalogs-branches-products-list', 'locations-catalogs-branches-products-patch', 'locations-catalogs-branches-products-purge', 'locations-catalogs-branches-products-remove-fulfillment-places', 'locations-catalogs-branches-products-remove-local-inventories', 'locations-catalogs-branches-products-set-inventory', 'locations-catalogs-complete-query', 'locations-catalogs-completion-data-import', 'locations-catalogs-controls-create', 'locations-catalogs-controls-delete', 'locations-catalogs-controls-get', 'locations-catalogs-controls-list', 'locations-catalogs-controls-patch', 'locations-catalogs-export-analytics-metrics', 'locations-catalogs-get-attributes-config', 'locations-catalogs-get-completion-config', 'locations-catalogs-get-default-branch', 'locations-catalogs-list', 'locations-catalogs-models-create', 'locations-catalogs-models-delete', 'locations-catalogs-models-get', 'locations-catalogs-models-list', 'locations-catalogs-models-patch', 'locations-catalogs-models-pause', 'locations-catalogs-models-resume', 'locations-catalogs-models-tune', 'locations-catalogs-operations-get', 'locations-catalogs-operations-list', 'locations-catalogs-patch', 'locations-catalogs-placements-predict', 'locations-catalogs-placements-search', 'locations-catalogs-serving-configs-add-control', 'locations-catalogs-serving-configs-create', 'locations-catalogs-serving-configs-delete', 'locations-catalogs-serving-configs-get', 'locations-catalogs-serving-configs-list', 'locations-catalogs-serving-configs-patch', 'locations-catalogs-serving-configs-predict', 'locations-catalogs-serving-configs-remove-control', 'locations-catalogs-serving-configs-search', 'locations-catalogs-set-default-branch', 'locations-catalogs-update-attributes-config', 'locations-catalogs-update-completion-config', 'locations-catalogs-user-events-collect', 'locations-catalogs-user-events-import', 'locations-catalogs-user-events-purge', 'locations-catalogs-user-events-rejoin', 'locations-catalogs-user-events-write', 'locations-operations-get', 'locations-operations-list', 'operations-get' and 'operations-list'", vec![
+        ("projects", "methods: 'locations-catalogs-attributes-config-add-catalog-attribute', 'locations-catalogs-attributes-config-remove-catalog-attribute', 'locations-catalogs-attributes-config-replace-catalog-attribute', 'locations-catalogs-branches-operations-get', 'locations-catalogs-branches-products-add-fulfillment-places', 'locations-catalogs-branches-products-add-local-inventories', 'locations-catalogs-branches-products-create', 'locations-catalogs-branches-products-delete', 'locations-catalogs-branches-products-get', 'locations-catalogs-branches-products-import', 'locations-catalogs-branches-products-list', 'locations-catalogs-branches-products-patch', 'locations-catalogs-branches-products-purge', 'locations-catalogs-branches-products-remove-fulfillment-places', 'locations-catalogs-branches-products-remove-local-inventories', 'locations-catalogs-branches-products-set-inventory', 'locations-catalogs-complete-query', 'locations-catalogs-completion-data-import', 'locations-catalogs-controls-create', 'locations-catalogs-controls-delete', 'locations-catalogs-controls-get', 'locations-catalogs-controls-list', 'locations-catalogs-controls-patch', 'locations-catalogs-export-analytics-metrics', 'locations-catalogs-generative-question-batch-update', 'locations-catalogs-generative-questions-list', 'locations-catalogs-get-attributes-config', 'locations-catalogs-get-completion-config', 'locations-catalogs-get-conversational-search-customization-config', 'locations-catalogs-get-default-branch', 'locations-catalogs-get-generative-question-feature', 'locations-catalogs-list', 'locations-catalogs-models-create', 'locations-catalogs-models-delete', 'locations-catalogs-models-get', 'locations-catalogs-models-list', 'locations-catalogs-models-patch', 'locations-catalogs-models-pause', 'locations-catalogs-models-resume', 'locations-catalogs-models-tune', 'locations-catalogs-operations-get', 'locations-catalogs-operations-list', 'locations-catalogs-patch', 'locations-catalogs-placements-conversational-search', 'locations-catalogs-placements-predict', 'locations-catalogs-placements-search', 'locations-catalogs-serving-configs-add-control', 'locations-catalogs-serving-configs-conversational-search', 'locations-catalogs-serving-configs-create', 'locations-catalogs-serving-configs-delete', 'locations-catalogs-serving-configs-get', 'locations-catalogs-serving-configs-list', 'locations-catalogs-serving-configs-patch', 'locations-catalogs-serving-configs-predict', 'locations-catalogs-serving-configs-remove-control', 'locations-catalogs-serving-configs-search', 'locations-catalogs-set-default-branch', 'locations-catalogs-update-attributes-config', 'locations-catalogs-update-completion-config', 'locations-catalogs-update-conversational-search-customization-config', 'locations-catalogs-update-generative-question', 'locations-catalogs-update-generative-question-feature', 'locations-catalogs-user-events-collect', 'locations-catalogs-user-events-import', 'locations-catalogs-user-events-purge', 'locations-catalogs-user-events-rejoin', 'locations-catalogs-user-events-write', 'locations-operations-get', 'locations-operations-list', 'operations-get' and 'operations-list'", vec![
             ("locations-catalogs-attributes-config-add-catalog-attribute",
                     Some(r##"Adds the specified CatalogAttribute to the AttributesConfig. If the CatalogAttribute to add already exists, an ALREADY_EXISTS error is returned."##),
                     "Details at http://byron.github.io/google-apis-rs/google_retail2_cli/projects_locations-catalogs-attributes-config-add-catalog-attribute",
@@ -12437,6 +13501,51 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("locations-catalogs-generative-question-batch-update",
+                    Some(r##"Allows management of multiple questions."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_retail2_cli/projects_locations-catalogs-generative-question-batch-update",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Optional. Resource name of the parent catalog. Format: projects/{project}/locations/{location}/catalogs/{catalog}"##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-catalogs-generative-questions-list",
+                    Some(r##"Returns all questions for a given catalog."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_retail2_cli/projects_locations-catalogs-generative-questions-list",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. Resource name of the parent catalog. Format: projects/{project}/locations/{location}/catalogs/{catalog}"##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("locations-catalogs-get-attributes-config",
                     Some(r##"Gets an AttributesConfig."##),
                     "Details at http://byron.github.io/google-apis-rs/google_retail2_cli/projects_locations-catalogs-get-attributes-config",
@@ -12477,6 +13586,26 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("locations-catalogs-get-conversational-search-customization-config",
+                    Some(r##"Returns the conversational search customization config for a given catalog."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_retail2_cli/projects_locations-catalogs-get-conversational-search-customization-config",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. Resource name of the parent catalog. Format: projects/{project}/locations/{location}/catalogs/{catalog}"##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("locations-catalogs-get-default-branch",
                     Some(r##"Get which branch is currently default branch set by CatalogService.SetDefaultBranch method under a specified parent catalog."##),
                     "Details at http://byron.github.io/google-apis-rs/google_retail2_cli/projects_locations-catalogs-get-default-branch",
@@ -12484,6 +13613,26 @@ async fn main() {
                     (Some(r##"catalog"##),
                      None,
                      Some(r##"The parent catalog resource name, such as `projects/*/locations/global/catalogs/default_catalog`."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-catalogs-get-generative-question-feature",
+                    Some(r##"Manages overal generative question feature state -- enables toggling feature on and off."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_retail2_cli/projects_locations-catalogs-get-generative-question-feature",
+                  vec![
+                    (Some(r##"catalog"##),
+                     None,
+                     Some(r##"Required. Resource name of the parent catalog. Format: projects/{project}/locations/{location}/catalogs/{catalog}"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -12767,6 +13916,31 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("locations-catalogs-placements-conversational-search",
+                    Some(r##"Performs a conversational search. This feature is only available for users who have Conversational Search enabled."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_retail2_cli/projects_locations-catalogs-placements-conversational-search",
+                  vec![
+                    (Some(r##"placement"##),
+                     None,
+                     Some(r##"Required. The resource name of the search engine placement, such as `projects/*/locations/global/catalogs/default_catalog/placements/default_search` or `projects/*/locations/global/catalogs/default_catalog/servingConfigs/default_serving_config` This field is used to identify the serving config name and the set of models that will be used to make the search."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("locations-catalogs-placements-predict",
                     Some(r##"Makes a recommendation prediction."##),
                     "Details at http://byron.github.io/google-apis-rs/google_retail2_cli/projects_locations-catalogs-placements-predict",
@@ -12824,6 +13998,31 @@ async fn main() {
                     (Some(r##"serving-config"##),
                      None,
                      Some(r##"Required. The source ServingConfig resource name . Format: `projects/{project_number}/locations/{location_id}/catalogs/{catalog_id}/servingConfigs/{serving_config_id}`"##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-catalogs-serving-configs-conversational-search",
+                    Some(r##"Performs a conversational search. This feature is only available for users who have Conversational Search enabled."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_retail2_cli/projects_locations-catalogs-serving-configs-conversational-search",
+                  vec![
+                    (Some(r##"placement"##),
+                     None,
+                     Some(r##"Required. The resource name of the search engine placement, such as `projects/*/locations/global/catalogs/default_catalog/placements/default_search` or `projects/*/locations/global/catalogs/default_catalog/servingConfigs/default_serving_config` This field is used to identify the serving config name and the set of models that will be used to make the search."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -13102,8 +14301,83 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("locations-catalogs-update-conversational-search-customization-config",
+                    Some(r##"Updates the conversational search customization config for a given catalog."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_retail2_cli/projects_locations-catalogs-update-conversational-search-customization-config",
+                  vec![
+                    (Some(r##"catalog"##),
+                     None,
+                     Some(r##"Required. Resource name of the catalog. Format: projects/{project}/locations/{location}/catalogs/{catalog}"##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-catalogs-update-generative-question",
+                    Some(r##"Allows management of individual questions."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_retail2_cli/projects_locations-catalogs-update-generative-question",
+                  vec![
+                    (Some(r##"catalog"##),
+                     None,
+                     Some(r##"Required. Resource name of the catalog. Format: projects/{project}/locations/{location}/catalogs/{catalog}"##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-catalogs-update-generative-question-feature",
+                    Some(r##"Manages overal generative question feature state -- enables toggling feature on and off."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_retail2_cli/projects_locations-catalogs-update-generative-question-feature",
+                  vec![
+                    (Some(r##"catalog"##),
+                     None,
+                     Some(r##"Required. Resource name of the affected catalog. Format: projects/{project}/locations/{location}/catalogs/{catalog}"##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("locations-catalogs-user-events-collect",
-                    Some(r##"Writes a single user event from the browser. This uses a GET request to due to browser restriction of POST-ing to a 3rd party domain. This method is used only by the Retail API JavaScript pixel and Google Tag Manager. Users should not call this method directly."##),
+                    Some(r##"Writes a single user event from the browser. For larger user event payload over 16 KB, the POST method should be used instead, otherwise a 400 Bad Request error is returned. This method is used only by the Retail API JavaScript pixel and Google Tag Manager. Users should not call this method directly."##),
                     "Details at http://byron.github.io/google-apis-rs/google_retail2_cli/projects_locations-catalogs-user-events-collect",
                   vec![
                     (Some(r##"parent"##),
@@ -13111,6 +14385,11 @@ async fn main() {
                      Some(r##"Required. The parent catalog name, such as `projects/1234/locations/global/catalogs/default_catalog`."##),
                      Some(true),
                      Some(false)),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
@@ -13307,8 +14586,8 @@ async fn main() {
 
     let mut app = App::new("retail2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("6.0.0+20240614")
-           .about("Vertex AI Search for Retail API is made up of Retail Search, Browse and Recommendations. These discovery AI solutions help you implement personalized search, browse and recommendations, based on machine learning models, across your websites and mobile applications.")
+           .version("7.0.0+20251218")
+           .about("Vertex AI Search for commerce API is made up of Retail Search, Browse and Recommendations. These discovery AI solutions help you implement personalized search, browse and recommendations, based on machine learning models, across your websites and mobile applications.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_retail2_cli")
            .arg(Arg::with_name("url")
                    .long("scope")
@@ -13372,7 +14651,7 @@ async fn main() {
         .with_native_roots()
         .unwrap()
         .https_or_http()
-        .enable_http1()
+        .enable_http2()
         .build();
 
     match Engine::new(matches, connector).await {

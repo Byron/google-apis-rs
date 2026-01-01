@@ -908,6 +908,13 @@ where
         {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "return-partial-success" => {
+                    call = call.return_partial_success(
+                        value
+                            .map(|v| arg_from_str(v, err, "return-partial-success", "boolean"))
+                            .unwrap_or(false),
+                    );
+                }
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
                 }
@@ -938,7 +945,16 @@ where
                             .push(CLIError::UnknownParameter(key.to_string(), {
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
-                                v.extend(["filter", "page-size", "page-token"].iter().map(|v| *v));
+                                v.extend(
+                                    [
+                                        "filter",
+                                        "page-size",
+                                        "page-token",
+                                        "return-partial-success",
+                                    ]
+                                    .iter()
+                                    .map(|v| *v),
+                                );
                                 v
                             }));
                     }
@@ -1491,6 +1507,13 @@ where
         {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "return-partial-success" => {
+                    call = call.return_partial_success(
+                        value
+                            .map(|v| arg_from_str(v, err, "return-partial-success", "boolean"))
+                            .unwrap_or(false),
+                    );
+                }
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
                 }
@@ -1521,7 +1544,16 @@ where
                             .push(CLIError::UnknownParameter(key.to_string(), {
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
-                                v.extend(["filter", "page-size", "page-token"].iter().map(|v| *v));
+                                v.extend(
+                                    [
+                                        "filter",
+                                        "page-size",
+                                        "page-token",
+                                        "return-partial-success",
+                                    ]
+                                    .iter()
+                                    .map(|v| *v),
+                                );
                                 v
                             }));
                     }
@@ -1874,6 +1906,13 @@ where
 
             let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
             {
+                "backup-schedules" => Some((
+                    "backupSchedules",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
                 "create-time" => Some((
                     "createTime",
                     JsonTypeInfo {
@@ -1923,8 +1962,29 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "exclusive-size-bytes" => Some((
+                    "exclusiveSizeBytes",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "expire-time" => Some((
                     "expireTime",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "freeable-size-bytes" => Some((
+                    "freeableSizeBytes",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "incremental-backup-chain-id" => Some((
+                    "incrementalBackupChainId",
                     JsonTypeInfo {
                         jtype: JsonType::String,
                         ctype: ComplexType::Pod,
@@ -1939,6 +1999,13 @@ where
                 )),
                 "name" => Some((
                     "name",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "oldest-version-time" => Some((
+                    "oldestVersionTime",
                     JsonTypeInfo {
                         jtype: JsonType::String,
                         ctype: ComplexType::Pod,
@@ -1983,6 +2050,7 @@ where
                     let suggestion = FieldCursor::did_you_mean(
                         key,
                         &vec![
+                            "backup-schedules",
                             "code",
                             "create-time",
                             "database",
@@ -1990,11 +2058,15 @@ where
                             "encryption-info",
                             "encryption-status",
                             "encryption-type",
+                            "exclusive-size-bytes",
                             "expire-time",
+                            "freeable-size-bytes",
+                            "incremental-backup-chain-id",
                             "kms-key-version",
                             "max-expire-time",
                             "message",
                             "name",
+                            "oldest-version-time",
                             "referencing-backups",
                             "referencing-databases",
                             "size-bytes",
@@ -2773,6 +2845,13 @@ where
         {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "return-partial-success" => {
+                    call = call.return_partial_success(
+                        value
+                            .map(|v| arg_from_str(v, err, "return-partial-success", "boolean"))
+                            .unwrap_or(false),
+                    );
+                }
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
                 }
@@ -2803,7 +2882,16 @@ where
                             .push(CLIError::UnknownParameter(key.to_string(), {
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
-                                v.extend(["filter", "page-size", "page-token"].iter().map(|v| *v));
+                                v.extend(
+                                    [
+                                        "filter",
+                                        "page-size",
+                                        "page-token",
+                                        "return-partial-success",
+                                    ]
+                                    .iter()
+                                    .map(|v| *v),
+                                );
                                 v
                             }));
                     }
@@ -2881,6 +2969,13 @@ where
 
             let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
             {
+                "backup-schedules" => Some((
+                    "backupSchedules",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
                 "create-time" => Some((
                     "createTime",
                     JsonTypeInfo {
@@ -2930,8 +3025,29 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "exclusive-size-bytes" => Some((
+                    "exclusiveSizeBytes",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "expire-time" => Some((
                     "expireTime",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "freeable-size-bytes" => Some((
+                    "freeableSizeBytes",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "incremental-backup-chain-id" => Some((
+                    "incrementalBackupChainId",
                     JsonTypeInfo {
                         jtype: JsonType::String,
                         ctype: ComplexType::Pod,
@@ -2946,6 +3062,13 @@ where
                 )),
                 "name" => Some((
                     "name",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "oldest-version-time" => Some((
+                    "oldestVersionTime",
                     JsonTypeInfo {
                         jtype: JsonType::String,
                         ctype: ComplexType::Pod,
@@ -2990,6 +3113,7 @@ where
                     let suggestion = FieldCursor::did_you_mean(
                         key,
                         &vec![
+                            "backup-schedules",
                             "code",
                             "create-time",
                             "database",
@@ -2997,11 +3121,15 @@ where
                             "encryption-info",
                             "encryption-status",
                             "encryption-type",
+                            "exclusive-size-bytes",
                             "expire-time",
+                            "freeable-size-bytes",
+                            "incremental-backup-chain-id",
                             "kms-key-version",
                             "max-expire-time",
                             "message",
                             "name",
+                            "oldest-version-time",
                             "referencing-backups",
                             "referencing-databases",
                             "size-bytes",
@@ -3427,7 +3555,9 @@ where
                     "instance.autoscaling-config.autoscaling-targets.storage-utilization-percent" => Some(("instance.autoscalingConfig.autoscalingTargets.storageUtilizationPercent", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "instance.config" => Some(("instance.config", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "instance.create-time" => Some(("instance.createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance.default-backup-schedule-type" => Some(("instance.defaultBackupScheduleType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "instance.display-name" => Some(("instance.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance.edition" => Some(("instance.edition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "instance.endpoint-uris" => Some(("instance.endpointUris", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "instance.free-instance-metadata.expire-behavior" => Some(("instance.freeInstanceMetadata.expireBehavior", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "instance.free-instance-metadata.expire-time" => Some(("instance.freeInstanceMetadata.expireTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -3441,7 +3571,7 @@ where
                     "instance.update-time" => Some(("instance.updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "instance-id" => Some(("instanceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["autoscaling-config", "autoscaling-limits", "autoscaling-targets", "config", "create-time", "display-name", "endpoint-uris", "expire-behavior", "expire-time", "free-instance-metadata", "high-priority-cpu-utilization-percent", "instance", "instance-id", "instance-type", "labels", "max-nodes", "max-processing-units", "min-nodes", "min-processing-units", "name", "node-count", "processing-units", "state", "storage-utilization-percent", "update-time", "upgrade-time"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["autoscaling-config", "autoscaling-limits", "autoscaling-targets", "config", "create-time", "default-backup-schedule-type", "display-name", "edition", "endpoint-uris", "expire-behavior", "expire-time", "free-instance-metadata", "high-priority-cpu-utilization-percent", "instance", "instance-id", "instance-type", "labels", "max-nodes", "max-processing-units", "min-nodes", "min-processing-units", "name", "node-count", "processing-units", "state", "storage-utilization-percent", "update-time", "upgrade-time"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3582,6 +3712,1248 @@ where
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
                                 v.extend(["filter", "page-size", "page-token"].iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_instances_databases_add_split_points(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut field_cursor = FieldCursor::default();
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "initiator" => Some((
+                    "initiator",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(key, &vec!["initiator"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
+            }
+        }
+        let mut request: api::AddSplitPointsRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .instances_databases_add_split_points(request, opt.value_of("database").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_instances_databases_backup_schedules_create(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut field_cursor = FieldCursor::default();
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "encryption-config.encryption-type" => Some((
+                    "encryptionConfig.encryptionType",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "encryption-config.kms-key-name" => Some((
+                    "encryptionConfig.kmsKeyName",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "encryption-config.kms-key-names" => Some((
+                    "encryptionConfig.kmsKeyNames",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "name" => Some((
+                    "name",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "retention-duration" => Some((
+                    "retentionDuration",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "spec.cron-spec.creation-window" => Some((
+                    "spec.cronSpec.creationWindow",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "spec.cron-spec.text" => Some((
+                    "spec.cronSpec.text",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "spec.cron-spec.time-zone" => Some((
+                    "spec.cronSpec.timeZone",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "update-time" => Some((
+                    "updateTime",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec![
+                            "creation-window",
+                            "cron-spec",
+                            "encryption-config",
+                            "encryption-type",
+                            "kms-key-name",
+                            "kms-key-names",
+                            "name",
+                            "retention-duration",
+                            "spec",
+                            "text",
+                            "time-zone",
+                            "update-time",
+                        ],
+                    );
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
+            }
+        }
+        let mut request: api::BackupSchedule = serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .instances_databases_backup_schedules_create(
+                request,
+                opt.value_of("parent").unwrap_or(""),
+            );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "backup-schedule-id" => {
+                    call = call.backup_schedule_id(value.unwrap_or(""));
+                }
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["backup-schedule-id"].iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_instances_databases_backup_schedules_delete(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .instances_databases_backup_schedules_delete(opt.value_of("name").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_instances_databases_backup_schedules_get(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .instances_databases_backup_schedules_get(opt.value_of("name").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_instances_databases_backup_schedules_get_iam_policy(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut field_cursor = FieldCursor::default();
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "options.requested-policy-version" => Some((
+                    "options.requestedPolicyVersion",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec!["options", "requested-policy-version"],
+                    );
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
+            }
+        }
+        let mut request: api::GetIamPolicyRequest = serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .instances_databases_backup_schedules_get_iam_policy(
+                request,
+                opt.value_of("resource").unwrap_or(""),
+            );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_instances_databases_backup_schedules_list(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .instances_databases_backup_schedules_list(opt.value_of("parent").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                }
+                "page-size" => {
+                    call = call.page_size(
+                        value
+                            .map(|v| arg_from_str(v, err, "page-size", "int32"))
+                            .unwrap_or(-0),
+                    );
+                }
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["page-size", "page-token"].iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_instances_databases_backup_schedules_patch(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut field_cursor = FieldCursor::default();
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "encryption-config.encryption-type" => Some((
+                    "encryptionConfig.encryptionType",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "encryption-config.kms-key-name" => Some((
+                    "encryptionConfig.kmsKeyName",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "encryption-config.kms-key-names" => Some((
+                    "encryptionConfig.kmsKeyNames",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "name" => Some((
+                    "name",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "retention-duration" => Some((
+                    "retentionDuration",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "spec.cron-spec.creation-window" => Some((
+                    "spec.cronSpec.creationWindow",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "spec.cron-spec.text" => Some((
+                    "spec.cronSpec.text",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "spec.cron-spec.time-zone" => Some((
+                    "spec.cronSpec.timeZone",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "update-time" => Some((
+                    "updateTime",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec![
+                            "creation-window",
+                            "cron-spec",
+                            "encryption-config",
+                            "encryption-type",
+                            "kms-key-name",
+                            "kms-key-names",
+                            "name",
+                            "retention-duration",
+                            "spec",
+                            "text",
+                            "time-zone",
+                            "update-time",
+                        ],
+                    );
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
+            }
+        }
+        let mut request: api::BackupSchedule = serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .instances_databases_backup_schedules_patch(
+                request,
+                opt.value_of("name").unwrap_or(""),
+            );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "update-mask" => {
+                    call = call.update_mask(
+                        value
+                            .map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask"))
+                            .unwrap_or(apis_common::FieldMask::default()),
+                    );
+                }
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["update-mask"].iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_instances_databases_backup_schedules_set_iam_policy(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut field_cursor = FieldCursor::default();
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "policy.etag" => Some((
+                    "policy.etag",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "policy.version" => Some((
+                    "policy.version",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion =
+                        FieldCursor::did_you_mean(key, &vec!["etag", "policy", "version"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
+            }
+        }
+        let mut request: api::SetIamPolicyRequest = serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .instances_databases_backup_schedules_set_iam_policy(
+                request,
+                opt.value_of("resource").unwrap_or(""),
+            );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_instances_databases_backup_schedules_test_iam_permissions(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut field_cursor = FieldCursor::default();
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "permissions" => Some((
+                    "permissions",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(key, &vec!["permissions"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
+            }
+        }
+        let mut request: api::TestIamPermissionsRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .instances_databases_backup_schedules_test_iam_permissions(
+                request,
+                opt.value_of("resource").unwrap_or(""),
+            );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
                                 v
                             }));
                     }
@@ -5028,6 +6400,13 @@ where
         {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "return-partial-success" => {
+                    call = call.return_partial_success(
+                        value
+                            .map(|v| arg_from_str(v, err, "return-partial-success", "boolean"))
+                            .unwrap_or(false),
+                    );
+                }
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
                 }
@@ -5058,7 +6437,16 @@ where
                             .push(CLIError::UnknownParameter(key.to_string(), {
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
-                                v.extend(["filter", "page-size", "page-token"].iter().map(|v| *v));
+                                v.extend(
+                                    [
+                                        "filter",
+                                        "page-size",
+                                        "page-token",
+                                        "return-partial-success",
+                                    ]
+                                    .iter()
+                                    .map(|v| *v),
+                                );
                                 v
                             }));
                     }
@@ -5582,6 +6970,292 @@ where
         }
     }
 
+    async fn _projects_instances_databases_sessions_adapt_message(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut field_cursor = FieldCursor::default();
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "attachments" => Some((
+                    "attachments",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Map,
+                    },
+                )),
+                "payload" => Some((
+                    "payload",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "protocol" => Some((
+                    "protocol",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion =
+                        FieldCursor::did_you_mean(key, &vec!["attachments", "payload", "protocol"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
+            }
+        }
+        let mut request: api::AdaptMessageRequest = serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .instances_databases_sessions_adapt_message(
+                request,
+                opt.value_of("name").unwrap_or(""),
+            );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_instances_databases_sessions_adapter(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut field_cursor = FieldCursor::default();
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "name" => Some((
+                    "name",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(key, &vec!["name"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
+            }
+        }
+        let mut request: api::AdapterSession = serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .instances_databases_sessions_adapter(request, opt.value_of("parent").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _projects_instances_databases_sessions_batch_create(
         &self,
         opt: &ArgMatches<'n>,
@@ -5972,10 +7646,115 @@ where
 
             let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
             {
+                "mutation-key.ack.ignore-not-found" => Some((
+                    "mutationKey.ack.ignoreNotFound",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "mutation-key.ack.queue" => Some((
+                    "mutationKey.ack.queue",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "mutation-key.delete.key-set.all" => Some((
+                    "mutationKey.delete.keySet.all",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "mutation-key.delete.table" => Some((
+                    "mutationKey.delete.table",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "mutation-key.insert.columns" => Some((
+                    "mutationKey.insert.columns",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "mutation-key.insert.table" => Some((
+                    "mutationKey.insert.table",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "mutation-key.insert-or-update.columns" => Some((
+                    "mutationKey.insertOrUpdate.columns",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "mutation-key.insert-or-update.table" => Some((
+                    "mutationKey.insertOrUpdate.table",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "mutation-key.replace.columns" => Some((
+                    "mutationKey.replace.columns",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "mutation-key.replace.table" => Some((
+                    "mutationKey.replace.table",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "mutation-key.send.deliver-time" => Some((
+                    "mutationKey.send.deliverTime",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "mutation-key.send.queue" => Some((
+                    "mutationKey.send.queue",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "mutation-key.update.columns" => Some((
+                    "mutationKey.update.columns",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "mutation-key.update.table" => Some((
+                    "mutationKey.update.table",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "options.exclude-txn-from-change-streams" => Some((
                     "options.excludeTxnFromChangeStreams",
                     JsonTypeInfo {
                         jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "options.isolation-level" => Some((
+                    "options.isolationLevel",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
                         ctype: ComplexType::Pod,
                     },
                 )),
@@ -6021,6 +7800,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "options.read-write.multiplexed-session-previous-transaction-id" => Some((
+                    "options.readWrite.multiplexedSessionPreviousTransactionId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "options.read-write.read-lock-mode" => Some((
                     "options.readWrite.readLockMode",
                     JsonTypeInfo {
@@ -6053,21 +7839,38 @@ where
                     let suggestion = FieldCursor::did_you_mean(
                         key,
                         &vec![
+                            "ack",
+                            "all",
+                            "columns",
+                            "delete",
+                            "deliver-time",
                             "exact-staleness",
                             "exclude-txn-from-change-streams",
+                            "ignore-not-found",
+                            "insert",
+                            "insert-or-update",
+                            "isolation-level",
+                            "key-set",
                             "max-staleness",
                             "min-read-timestamp",
+                            "multiplexed-session-previous-transaction-id",
+                            "mutation-key",
                             "options",
                             "priority",
+                            "queue",
                             "read-lock-mode",
                             "read-only",
                             "read-timestamp",
                             "read-write",
+                            "replace",
                             "request-options",
                             "request-tag",
                             "return-read-timestamp",
+                            "send",
                             "strong",
+                            "table",
                             "transaction-tag",
+                            "update",
                         ],
                     );
                     err.issues.push(CLIError::Field(FieldError::Unknown(
@@ -6206,6 +8009,20 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "precommit-token.precommit-token" => Some((
+                    "precommitToken.precommitToken",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "precommit-token.seq-num" => Some((
+                    "precommitToken.seqNum",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "request-options.priority" => Some((
                     "requestOptions.priority",
                     JsonTypeInfo {
@@ -6238,6 +8055,13 @@ where
                     "singleUseTransaction.excludeTxnFromChangeStreams",
                     JsonTypeInfo {
                         jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "single-use-transaction.isolation-level" => Some((
+                    "singleUseTransaction.isolationLevel",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
                         ctype: ComplexType::Pod,
                     },
                 )),
@@ -6283,6 +8107,15 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "single-use-transaction.read-write.multiplexed-session-previous-transaction-id" => {
+                    Some((
+                        "singleUseTransaction.readWrite.multiplexedSessionPreviousTransactionId",
+                        JsonTypeInfo {
+                            jtype: JsonType::String,
+                            ctype: ComplexType::Pod,
+                        },
+                    ))
+                }
                 "single-use-transaction.read-write.read-lock-mode" => Some((
                     "singleUseTransaction.readWrite.readLockMode",
                     JsonTypeInfo {
@@ -6303,9 +8136,12 @@ where
                         &vec![
                             "exact-staleness",
                             "exclude-txn-from-change-streams",
+                            "isolation-level",
                             "max-commit-delay",
                             "max-staleness",
                             "min-read-timestamp",
+                            "multiplexed-session-previous-transaction-id",
+                            "precommit-token",
                             "priority",
                             "read-lock-mode",
                             "read-only",
@@ -6315,6 +8151,7 @@ where
                             "request-tag",
                             "return-commit-stats",
                             "return-read-timestamp",
+                            "seq-num",
                             "single-use-transaction",
                             "strong",
                             "transaction-id",
@@ -6707,6 +8544,13 @@ where
 
             let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
             {
+                "last-statements" => Some((
+                    "lastStatements",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "request-options.priority" => Some((
                     "requestOptions.priority",
                     JsonTypeInfo {
@@ -6739,6 +8583,13 @@ where
                     "transaction.begin.excludeTxnFromChangeStreams",
                     JsonTypeInfo {
                         jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "transaction.begin.isolation-level" => Some((
+                    "transaction.begin.isolationLevel",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
                         ctype: ComplexType::Pod,
                     },
                 )),
@@ -6784,6 +8635,15 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "transaction.begin.read-write.multiplexed-session-previous-transaction-id" => {
+                    Some((
+                        "transaction.begin.readWrite.multiplexedSessionPreviousTransactionId",
+                        JsonTypeInfo {
+                            jtype: JsonType::String,
+                            ctype: ComplexType::Pod,
+                        },
+                    ))
+                }
                 "transaction.begin.read-write.read-lock-mode" => Some((
                     "transaction.begin.readWrite.readLockMode",
                     JsonTypeInfo {
@@ -6802,6 +8662,13 @@ where
                     "transaction.singleUse.excludeTxnFromChangeStreams",
                     JsonTypeInfo {
                         jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "transaction.single-use.isolation-level" => Some((
+                    "transaction.singleUse.isolationLevel",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
                         ctype: ComplexType::Pod,
                     },
                 )),
@@ -6847,6 +8714,15 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "transaction.single-use.read-write.multiplexed-session-previous-transaction-id" => {
+                    Some((
+                        "transaction.singleUse.readWrite.multiplexedSessionPreviousTransactionId",
+                        JsonTypeInfo {
+                            jtype: JsonType::String,
+                            ctype: ComplexType::Pod,
+                        },
+                    ))
+                }
                 "transaction.single-use.read-write.read-lock-mode" => Some((
                     "transaction.singleUse.readWrite.readLockMode",
                     JsonTypeInfo {
@@ -6862,8 +8738,11 @@ where
                             "exact-staleness",
                             "exclude-txn-from-change-streams",
                             "id",
+                            "isolation-level",
+                            "last-statements",
                             "max-staleness",
                             "min-read-timestamp",
+                            "multiplexed-session-previous-transaction-id",
                             "priority",
                             "read-lock-mode",
                             "read-only",
@@ -7022,6 +8901,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "last-statement" => Some((
+                    "lastStatement",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "partition-token" => Some((
                     "partitionToken",
                     JsonTypeInfo {
@@ -7099,6 +8985,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "transaction.begin.isolation-level" => Some((
+                    "transaction.begin.isolationLevel",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "transaction.begin.read-only.exact-staleness" => Some((
                     "transaction.begin.readOnly.exactStaleness",
                     JsonTypeInfo {
@@ -7141,6 +9034,15 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "transaction.begin.read-write.multiplexed-session-previous-transaction-id" => {
+                    Some((
+                        "transaction.begin.readWrite.multiplexedSessionPreviousTransactionId",
+                        JsonTypeInfo {
+                            jtype: JsonType::String,
+                            ctype: ComplexType::Pod,
+                        },
+                    ))
+                }
                 "transaction.begin.read-write.read-lock-mode" => Some((
                     "transaction.begin.readWrite.readLockMode",
                     JsonTypeInfo {
@@ -7159,6 +9061,13 @@ where
                     "transaction.singleUse.excludeTxnFromChangeStreams",
                     JsonTypeInfo {
                         jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "transaction.single-use.isolation-level" => Some((
+                    "transaction.singleUse.isolationLevel",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
                         ctype: ComplexType::Pod,
                     },
                 )),
@@ -7204,6 +9113,15 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "transaction.single-use.read-write.multiplexed-session-previous-transaction-id" => {
+                    Some((
+                        "transaction.singleUse.readWrite.multiplexedSessionPreviousTransactionId",
+                        JsonTypeInfo {
+                            jtype: JsonType::String,
+                            ctype: ComplexType::Pod,
+                        },
+                    ))
+                }
                 "transaction.single-use.read-write.read-lock-mode" => Some((
                     "transaction.singleUse.readWrite.readLockMode",
                     JsonTypeInfo {
@@ -7223,8 +9141,11 @@ where
                             "exclude-txn-from-change-streams",
                             "id",
                             "include-replicas",
+                            "isolation-level",
+                            "last-statement",
                             "max-staleness",
                             "min-read-timestamp",
+                            "multiplexed-session-previous-transaction-id",
                             "optimizer-statistics-package",
                             "optimizer-version",
                             "partition-token",
@@ -7389,6 +9310,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "last-statement" => Some((
+                    "lastStatement",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "partition-token" => Some((
                     "partitionToken",
                     JsonTypeInfo {
@@ -7466,6 +9394,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "transaction.begin.isolation-level" => Some((
+                    "transaction.begin.isolationLevel",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "transaction.begin.read-only.exact-staleness" => Some((
                     "transaction.begin.readOnly.exactStaleness",
                     JsonTypeInfo {
@@ -7508,6 +9443,15 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "transaction.begin.read-write.multiplexed-session-previous-transaction-id" => {
+                    Some((
+                        "transaction.begin.readWrite.multiplexedSessionPreviousTransactionId",
+                        JsonTypeInfo {
+                            jtype: JsonType::String,
+                            ctype: ComplexType::Pod,
+                        },
+                    ))
+                }
                 "transaction.begin.read-write.read-lock-mode" => Some((
                     "transaction.begin.readWrite.readLockMode",
                     JsonTypeInfo {
@@ -7526,6 +9470,13 @@ where
                     "transaction.singleUse.excludeTxnFromChangeStreams",
                     JsonTypeInfo {
                         jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "transaction.single-use.isolation-level" => Some((
+                    "transaction.singleUse.isolationLevel",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
                         ctype: ComplexType::Pod,
                     },
                 )),
@@ -7571,6 +9522,15 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "transaction.single-use.read-write.multiplexed-session-previous-transaction-id" => {
+                    Some((
+                        "transaction.singleUse.readWrite.multiplexedSessionPreviousTransactionId",
+                        JsonTypeInfo {
+                            jtype: JsonType::String,
+                            ctype: ComplexType::Pod,
+                        },
+                    ))
+                }
                 "transaction.single-use.read-write.read-lock-mode" => Some((
                     "transaction.singleUse.readWrite.readLockMode",
                     JsonTypeInfo {
@@ -7590,8 +9550,11 @@ where
                             "exclude-txn-from-change-streams",
                             "id",
                             "include-replicas",
+                            "isolation-level",
+                            "last-statement",
                             "max-staleness",
                             "min-read-timestamp",
+                            "multiplexed-session-previous-transaction-id",
                             "optimizer-statistics-package",
                             "optimizer-version",
                             "partition-token",
@@ -7946,6 +9909,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "transaction.begin.isolation-level" => Some((
+                    "transaction.begin.isolationLevel",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "transaction.begin.read-only.exact-staleness" => Some((
                     "transaction.begin.readOnly.exactStaleness",
                     JsonTypeInfo {
@@ -7988,6 +9958,15 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "transaction.begin.read-write.multiplexed-session-previous-transaction-id" => {
+                    Some((
+                        "transaction.begin.readWrite.multiplexedSessionPreviousTransactionId",
+                        JsonTypeInfo {
+                            jtype: JsonType::String,
+                            ctype: ComplexType::Pod,
+                        },
+                    ))
+                }
                 "transaction.begin.read-write.read-lock-mode" => Some((
                     "transaction.begin.readWrite.readLockMode",
                     JsonTypeInfo {
@@ -8006,6 +9985,13 @@ where
                     "transaction.singleUse.excludeTxnFromChangeStreams",
                     JsonTypeInfo {
                         jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "transaction.single-use.isolation-level" => Some((
+                    "transaction.singleUse.isolationLevel",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
                         ctype: ComplexType::Pod,
                     },
                 )),
@@ -8051,6 +10037,15 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "transaction.single-use.read-write.multiplexed-session-previous-transaction-id" => {
+                    Some((
+                        "transaction.singleUse.readWrite.multiplexedSessionPreviousTransactionId",
+                        JsonTypeInfo {
+                            jtype: JsonType::String,
+                            ctype: ComplexType::Pod,
+                        },
+                    ))
+                }
                 "transaction.single-use.read-write.read-lock-mode" => Some((
                     "transaction.singleUse.readWrite.readLockMode",
                     JsonTypeInfo {
@@ -8066,9 +10061,11 @@ where
                             "exact-staleness",
                             "exclude-txn-from-change-streams",
                             "id",
+                            "isolation-level",
                             "max-partitions",
                             "max-staleness",
                             "min-read-timestamp",
+                            "multiplexed-session-previous-transaction-id",
                             "partition-options",
                             "partition-size-bytes",
                             "read-lock-mode",
@@ -8260,6 +10257,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "transaction.begin.isolation-level" => Some((
+                    "transaction.begin.isolationLevel",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "transaction.begin.read-only.exact-staleness" => Some((
                     "transaction.begin.readOnly.exactStaleness",
                     JsonTypeInfo {
@@ -8302,6 +10306,15 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "transaction.begin.read-write.multiplexed-session-previous-transaction-id" => {
+                    Some((
+                        "transaction.begin.readWrite.multiplexedSessionPreviousTransactionId",
+                        JsonTypeInfo {
+                            jtype: JsonType::String,
+                            ctype: ComplexType::Pod,
+                        },
+                    ))
+                }
                 "transaction.begin.read-write.read-lock-mode" => Some((
                     "transaction.begin.readWrite.readLockMode",
                     JsonTypeInfo {
@@ -8320,6 +10333,13 @@ where
                     "transaction.singleUse.excludeTxnFromChangeStreams",
                     JsonTypeInfo {
                         jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "transaction.single-use.isolation-level" => Some((
+                    "transaction.singleUse.isolationLevel",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
                         ctype: ComplexType::Pod,
                     },
                 )),
@@ -8365,6 +10385,15 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "transaction.single-use.read-write.multiplexed-session-previous-transaction-id" => {
+                    Some((
+                        "transaction.singleUse.readWrite.multiplexedSessionPreviousTransactionId",
+                        JsonTypeInfo {
+                            jtype: JsonType::String,
+                            ctype: ComplexType::Pod,
+                        },
+                    ))
+                }
                 "transaction.single-use.read-write.read-lock-mode" => Some((
                     "transaction.singleUse.readWrite.readLockMode",
                     JsonTypeInfo {
@@ -8383,10 +10412,12 @@ where
                             "exclude-txn-from-change-streams",
                             "id",
                             "index",
+                            "isolation-level",
                             "key-set",
                             "max-partitions",
                             "max-staleness",
                             "min-read-timestamp",
+                            "multiplexed-session-previous-transaction-id",
                             "partition-options",
                             "partition-size-bytes",
                             "read-lock-mode",
@@ -8633,6 +10664,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "transaction.begin.isolation-level" => Some((
+                    "transaction.begin.isolationLevel",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "transaction.begin.read-only.exact-staleness" => Some((
                     "transaction.begin.readOnly.exactStaleness",
                     JsonTypeInfo {
@@ -8675,6 +10713,15 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "transaction.begin.read-write.multiplexed-session-previous-transaction-id" => {
+                    Some((
+                        "transaction.begin.readWrite.multiplexedSessionPreviousTransactionId",
+                        JsonTypeInfo {
+                            jtype: JsonType::String,
+                            ctype: ComplexType::Pod,
+                        },
+                    ))
+                }
                 "transaction.begin.read-write.read-lock-mode" => Some((
                     "transaction.begin.readWrite.readLockMode",
                     JsonTypeInfo {
@@ -8693,6 +10740,13 @@ where
                     "transaction.singleUse.excludeTxnFromChangeStreams",
                     JsonTypeInfo {
                         jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "transaction.single-use.isolation-level" => Some((
+                    "transaction.singleUse.isolationLevel",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
                         ctype: ComplexType::Pod,
                     },
                 )),
@@ -8738,6 +10792,15 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "transaction.single-use.read-write.multiplexed-session-previous-transaction-id" => {
+                    Some((
+                        "transaction.singleUse.readWrite.multiplexedSessionPreviousTransactionId",
+                        JsonTypeInfo {
+                            jtype: JsonType::String,
+                            ctype: ComplexType::Pod,
+                        },
+                    ))
+                }
                 "transaction.single-use.read-write.read-lock-mode" => Some((
                     "transaction.singleUse.readWrite.readLockMode",
                     JsonTypeInfo {
@@ -8760,11 +10823,13 @@ where
                             "id",
                             "include-replicas",
                             "index",
+                            "isolation-level",
                             "key-set",
                             "limit",
                             "lock-hint",
                             "max-staleness",
                             "min-read-timestamp",
+                            "multiplexed-session-previous-transaction-id",
                             "order-by",
                             "partition-token",
                             "priority",
@@ -9147,6 +11212,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "transaction.begin.isolation-level" => Some((
+                    "transaction.begin.isolationLevel",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "transaction.begin.read-only.exact-staleness" => Some((
                     "transaction.begin.readOnly.exactStaleness",
                     JsonTypeInfo {
@@ -9189,6 +11261,15 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "transaction.begin.read-write.multiplexed-session-previous-transaction-id" => {
+                    Some((
+                        "transaction.begin.readWrite.multiplexedSessionPreviousTransactionId",
+                        JsonTypeInfo {
+                            jtype: JsonType::String,
+                            ctype: ComplexType::Pod,
+                        },
+                    ))
+                }
                 "transaction.begin.read-write.read-lock-mode" => Some((
                     "transaction.begin.readWrite.readLockMode",
                     JsonTypeInfo {
@@ -9207,6 +11288,13 @@ where
                     "transaction.singleUse.excludeTxnFromChangeStreams",
                     JsonTypeInfo {
                         jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "transaction.single-use.isolation-level" => Some((
+                    "transaction.singleUse.isolationLevel",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
                         ctype: ComplexType::Pod,
                     },
                 )),
@@ -9252,6 +11340,15 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "transaction.single-use.read-write.multiplexed-session-previous-transaction-id" => {
+                    Some((
+                        "transaction.singleUse.readWrite.multiplexedSessionPreviousTransactionId",
+                        JsonTypeInfo {
+                            jtype: JsonType::String,
+                            ctype: ComplexType::Pod,
+                        },
+                    ))
+                }
                 "transaction.single-use.read-write.read-lock-mode" => Some((
                     "transaction.singleUse.readWrite.readLockMode",
                     JsonTypeInfo {
@@ -9274,11 +11371,13 @@ where
                             "id",
                             "include-replicas",
                             "index",
+                            "isolation-level",
                             "key-set",
                             "limit",
                             "lock-hint",
                             "max-staleness",
                             "min-read-timestamp",
+                            "multiplexed-session-previous-transaction-id",
                             "order-by",
                             "partition-token",
                             "priority",
@@ -10280,119 +12379,32 @@ where
                 continue;
             }
 
-            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
-            {
-                "instance-partition.config" => Some((
-                    "instancePartition.config",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "instance-partition.create-time" => Some((
-                    "instancePartition.createTime",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "instance-partition.display-name" => Some((
-                    "instancePartition.displayName",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "instance-partition.etag" => Some((
-                    "instancePartition.etag",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "instance-partition.name" => Some((
-                    "instancePartition.name",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "instance-partition.node-count" => Some((
-                    "instancePartition.nodeCount",
-                    JsonTypeInfo {
-                        jtype: JsonType::Int,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "instance-partition.processing-units" => Some((
-                    "instancePartition.processingUnits",
-                    JsonTypeInfo {
-                        jtype: JsonType::Int,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "instance-partition.referencing-backups" => Some((
-                    "instancePartition.referencingBackups",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Vec,
-                    },
-                )),
-                "instance-partition.referencing-databases" => Some((
-                    "instancePartition.referencingDatabases",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Vec,
-                    },
-                )),
-                "instance-partition.state" => Some((
-                    "instancePartition.state",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "instance-partition.update-time" => Some((
-                    "instancePartition.updateTime",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "instance-partition-id" => Some((
-                    "instancePartitionId",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(
-                        key,
-                        &vec![
-                            "config",
-                            "create-time",
-                            "display-name",
-                            "etag",
-                            "instance-partition",
-                            "instance-partition-id",
-                            "name",
-                            "node-count",
-                            "processing-units",
-                            "referencing-backups",
-                            "referencing-databases",
-                            "state",
-                            "update-time",
-                        ],
-                    );
-                    err.issues.push(CLIError::Field(FieldError::Unknown(
-                        temp_cursor.to_string(),
-                        suggestion,
-                        value.map(|v| v.to_string()),
-                    )));
-                    None
-                }
-            };
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "instance-partition.autoscaling-config.autoscaling-limits.max-nodes" => Some(("instancePartition.autoscalingConfig.autoscalingLimits.maxNodes", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "instance-partition.autoscaling-config.autoscaling-limits.max-processing-units" => Some(("instancePartition.autoscalingConfig.autoscalingLimits.maxProcessingUnits", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "instance-partition.autoscaling-config.autoscaling-limits.min-nodes" => Some(("instancePartition.autoscalingConfig.autoscalingLimits.minNodes", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "instance-partition.autoscaling-config.autoscaling-limits.min-processing-units" => Some(("instancePartition.autoscalingConfig.autoscalingLimits.minProcessingUnits", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "instance-partition.autoscaling-config.autoscaling-targets.high-priority-cpu-utilization-percent" => Some(("instancePartition.autoscalingConfig.autoscalingTargets.highPriorityCpuUtilizationPercent", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "instance-partition.autoscaling-config.autoscaling-targets.storage-utilization-percent" => Some(("instancePartition.autoscalingConfig.autoscalingTargets.storageUtilizationPercent", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "instance-partition.config" => Some(("instancePartition.config", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-partition.create-time" => Some(("instancePartition.createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-partition.display-name" => Some(("instancePartition.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-partition.etag" => Some(("instancePartition.etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-partition.name" => Some(("instancePartition.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-partition.node-count" => Some(("instancePartition.nodeCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "instance-partition.processing-units" => Some(("instancePartition.processingUnits", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "instance-partition.referencing-backups" => Some(("instancePartition.referencingBackups", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "instance-partition.referencing-databases" => Some(("instancePartition.referencingDatabases", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "instance-partition.state" => Some(("instancePartition.state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-partition.update-time" => Some(("instancePartition.updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-partition-id" => Some(("instancePartitionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["autoscaling-config", "autoscaling-limits", "autoscaling-targets", "config", "create-time", "display-name", "etag", "high-priority-cpu-utilization-percent", "instance-partition", "instance-partition-id", "max-nodes", "max-processing-units", "min-nodes", "min-processing-units", "name", "node-count", "processing-units", "referencing-backups", "referencing-databases", "state", "storage-utilization-percent", "update-time"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
             if let Some((field_cursor_str, type_info)) = type_info {
                 FieldCursor::from(field_cursor_str).set_json_value(
                     &mut object,
@@ -11017,6 +13029,13 @@ where
         {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "return-partial-success" => {
+                    call = call.return_partial_success(
+                        value
+                            .map(|v| arg_from_str(v, err, "return-partial-success", "boolean"))
+                            .unwrap_or(false),
+                    );
+                }
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
                 }
@@ -11047,7 +13066,16 @@ where
                             .push(CLIError::UnknownParameter(key.to_string(), {
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
-                                v.extend(["filter", "page-size", "page-token"].iter().map(|v| *v));
+                                v.extend(
+                                    [
+                                        "filter",
+                                        "page-size",
+                                        "page-token",
+                                        "return-partial-success",
+                                    ]
+                                    .iter()
+                                    .map(|v| *v),
+                                );
                                 v
                             }));
                     }
@@ -11123,119 +13151,32 @@ where
                 continue;
             }
 
-            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
-            {
-                "field-mask" => Some((
-                    "fieldMask",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "instance-partition.config" => Some((
-                    "instancePartition.config",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "instance-partition.create-time" => Some((
-                    "instancePartition.createTime",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "instance-partition.display-name" => Some((
-                    "instancePartition.displayName",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "instance-partition.etag" => Some((
-                    "instancePartition.etag",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "instance-partition.name" => Some((
-                    "instancePartition.name",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "instance-partition.node-count" => Some((
-                    "instancePartition.nodeCount",
-                    JsonTypeInfo {
-                        jtype: JsonType::Int,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "instance-partition.processing-units" => Some((
-                    "instancePartition.processingUnits",
-                    JsonTypeInfo {
-                        jtype: JsonType::Int,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "instance-partition.referencing-backups" => Some((
-                    "instancePartition.referencingBackups",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Vec,
-                    },
-                )),
-                "instance-partition.referencing-databases" => Some((
-                    "instancePartition.referencingDatabases",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Vec,
-                    },
-                )),
-                "instance-partition.state" => Some((
-                    "instancePartition.state",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "instance-partition.update-time" => Some((
-                    "instancePartition.updateTime",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(
-                        key,
-                        &vec![
-                            "config",
-                            "create-time",
-                            "display-name",
-                            "etag",
-                            "field-mask",
-                            "instance-partition",
-                            "name",
-                            "node-count",
-                            "processing-units",
-                            "referencing-backups",
-                            "referencing-databases",
-                            "state",
-                            "update-time",
-                        ],
-                    );
-                    err.issues.push(CLIError::Field(FieldError::Unknown(
-                        temp_cursor.to_string(),
-                        suggestion,
-                        value.map(|v| v.to_string()),
-                    )));
-                    None
-                }
-            };
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "field-mask" => Some(("fieldMask", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-partition.autoscaling-config.autoscaling-limits.max-nodes" => Some(("instancePartition.autoscalingConfig.autoscalingLimits.maxNodes", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "instance-partition.autoscaling-config.autoscaling-limits.max-processing-units" => Some(("instancePartition.autoscalingConfig.autoscalingLimits.maxProcessingUnits", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "instance-partition.autoscaling-config.autoscaling-limits.min-nodes" => Some(("instancePartition.autoscalingConfig.autoscalingLimits.minNodes", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "instance-partition.autoscaling-config.autoscaling-limits.min-processing-units" => Some(("instancePartition.autoscalingConfig.autoscalingLimits.minProcessingUnits", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "instance-partition.autoscaling-config.autoscaling-targets.high-priority-cpu-utilization-percent" => Some(("instancePartition.autoscalingConfig.autoscalingTargets.highPriorityCpuUtilizationPercent", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "instance-partition.autoscaling-config.autoscaling-targets.storage-utilization-percent" => Some(("instancePartition.autoscalingConfig.autoscalingTargets.storageUtilizationPercent", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "instance-partition.config" => Some(("instancePartition.config", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-partition.create-time" => Some(("instancePartition.createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-partition.display-name" => Some(("instancePartition.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-partition.etag" => Some(("instancePartition.etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-partition.name" => Some(("instancePartition.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-partition.node-count" => Some(("instancePartition.nodeCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "instance-partition.processing-units" => Some(("instancePartition.processingUnits", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "instance-partition.referencing-backups" => Some(("instancePartition.referencingBackups", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "instance-partition.referencing-databases" => Some(("instancePartition.referencingDatabases", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "instance-partition.state" => Some(("instancePartition.state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-partition.update-time" => Some(("instancePartition.updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["autoscaling-config", "autoscaling-limits", "autoscaling-targets", "config", "create-time", "display-name", "etag", "field-mask", "high-priority-cpu-utilization-percent", "instance-partition", "max-nodes", "max-processing-units", "min-nodes", "min-processing-units", "name", "node-count", "processing-units", "referencing-backups", "referencing-databases", "state", "storage-utilization-percent", "update-time"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
             if let Some((field_cursor_str, type_info)) = type_info {
                 FieldCursor::from(field_cursor_str).set_json_value(
                     &mut object,
@@ -11824,6 +13765,13 @@ where
         {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "return-partial-success" => {
+                    call = call.return_partial_success(
+                        value
+                            .map(|v| arg_from_str(v, err, "return-partial-success", "boolean"))
+                            .unwrap_or(false),
+                    );
+                }
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
                 }
@@ -11854,7 +13802,16 @@ where
                             .push(CLIError::UnknownParameter(key.to_string(), {
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
-                                v.extend(["filter", "page-size", "page-token"].iter().map(|v| *v));
+                                v.extend(
+                                    [
+                                        "filter",
+                                        "page-size",
+                                        "page-token",
+                                        "return-partial-success",
+                                    ]
+                                    .iter()
+                                    .map(|v| *v),
+                                );
                                 v
                             }));
                     }
@@ -11941,7 +13898,9 @@ where
                     "instance.autoscaling-config.autoscaling-targets.storage-utilization-percent" => Some(("instance.autoscalingConfig.autoscalingTargets.storageUtilizationPercent", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "instance.config" => Some(("instance.config", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "instance.create-time" => Some(("instance.createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance.default-backup-schedule-type" => Some(("instance.defaultBackupScheduleType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "instance.display-name" => Some(("instance.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance.edition" => Some(("instance.edition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "instance.endpoint-uris" => Some(("instance.endpointUris", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "instance.free-instance-metadata.expire-behavior" => Some(("instance.freeInstanceMetadata.expireBehavior", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "instance.free-instance-metadata.expire-time" => Some(("instance.freeInstanceMetadata.expireTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -11954,7 +13913,7 @@ where
                     "instance.state" => Some(("instance.state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "instance.update-time" => Some(("instance.updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["autoscaling-config", "autoscaling-limits", "autoscaling-targets", "config", "create-time", "display-name", "endpoint-uris", "expire-behavior", "expire-time", "field-mask", "free-instance-metadata", "high-priority-cpu-utilization-percent", "instance", "instance-type", "labels", "max-nodes", "max-processing-units", "min-nodes", "min-processing-units", "name", "node-count", "processing-units", "state", "storage-utilization-percent", "update-time", "upgrade-time"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["autoscaling-config", "autoscaling-limits", "autoscaling-targets", "config", "create-time", "default-backup-schedule-type", "display-name", "edition", "endpoint-uris", "expire-behavior", "expire-time", "field-mask", "free-instance-metadata", "high-priority-cpu-utilization-percent", "instance", "instance-type", "labels", "max-nodes", "max-processing-units", "min-nodes", "min-processing-units", "name", "node-count", "processing-units", "state", "storage-utilization-percent", "update-time", "upgrade-time"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -12589,6 +14548,63 @@ where
                         ._projects_instances_database_operations_list(opt, dry_run, &mut err)
                         .await;
                 }
+                ("instances-databases-add-split-points", Some(opt)) => {
+                    call_result = self
+                        ._projects_instances_databases_add_split_points(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("instances-databases-backup-schedules-create", Some(opt)) => {
+                    call_result = self
+                        ._projects_instances_databases_backup_schedules_create(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
+                ("instances-databases-backup-schedules-delete", Some(opt)) => {
+                    call_result = self
+                        ._projects_instances_databases_backup_schedules_delete(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
+                ("instances-databases-backup-schedules-get", Some(opt)) => {
+                    call_result = self
+                        ._projects_instances_databases_backup_schedules_get(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("instances-databases-backup-schedules-get-iam-policy", Some(opt)) => {
+                    call_result = self
+                        ._projects_instances_databases_backup_schedules_get_iam_policy(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
+                ("instances-databases-backup-schedules-list", Some(opt)) => {
+                    call_result = self
+                        ._projects_instances_databases_backup_schedules_list(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("instances-databases-backup-schedules-patch", Some(opt)) => {
+                    call_result = self
+                        ._projects_instances_databases_backup_schedules_patch(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
+                ("instances-databases-backup-schedules-set-iam-policy", Some(opt)) => {
+                    call_result = self
+                        ._projects_instances_databases_backup_schedules_set_iam_policy(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
+                ("instances-databases-backup-schedules-test-iam-permissions", Some(opt)) => {
+                    call_result = self
+                        ._projects_instances_databases_backup_schedules_test_iam_permissions(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
                 ("instances-databases-changequorum", Some(opt)) => {
                     call_result = self
                         ._projects_instances_databases_changequorum(opt, dry_run, &mut err)
@@ -12669,6 +14685,18 @@ where
                 ("instances-databases-restore", Some(opt)) => {
                     call_result = self
                         ._projects_instances_databases_restore(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("instances-databases-sessions-adapt-message", Some(opt)) => {
+                    call_result = self
+                        ._projects_instances_databases_sessions_adapt_message(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
+                ("instances-databases-sessions-adapter", Some(opt)) => {
+                    call_result = self
+                        ._projects_instances_databases_sessions_adapter(opt, dry_run, &mut err)
                         .await;
                 }
                 ("instances-databases-sessions-batch-create", Some(opt)) => {
@@ -12946,7 +14974,9 @@ where
         let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
             secret,
             yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-            hyper_util::client::legacy::Client::builder(executor).build(connector),
+            yup_oauth2::client::CustomHyperClientBuilder::from(
+                hyper_util::client::legacy::Client::builder(executor).build(connector),
+            ),
         )
         .persist_tokens_to_disk(format!("{}/spanner1", config_dir))
         .build()
@@ -12999,14 +15029,14 @@ where
 async fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("projects", "methods: 'instance-config-operations-list', 'instance-configs-create', 'instance-configs-delete', 'instance-configs-get', 'instance-configs-list', 'instance-configs-operations-cancel', 'instance-configs-operations-delete', 'instance-configs-operations-get', 'instance-configs-operations-list', 'instance-configs-patch', 'instance-configs-ssd-caches-operations-cancel', 'instance-configs-ssd-caches-operations-delete', 'instance-configs-ssd-caches-operations-get', 'instance-configs-ssd-caches-operations-list', 'instances-backup-operations-list', 'instances-backups-copy', 'instances-backups-create', 'instances-backups-delete', 'instances-backups-get', 'instances-backups-get-iam-policy', 'instances-backups-list', 'instances-backups-operations-cancel', 'instances-backups-operations-delete', 'instances-backups-operations-get', 'instances-backups-operations-list', 'instances-backups-patch', 'instances-backups-set-iam-policy', 'instances-backups-test-iam-permissions', 'instances-create', 'instances-database-operations-list', 'instances-databases-changequorum', 'instances-databases-create', 'instances-databases-database-roles-list', 'instances-databases-database-roles-test-iam-permissions', 'instances-databases-drop-database', 'instances-databases-get', 'instances-databases-get-ddl', 'instances-databases-get-iam-policy', 'instances-databases-get-scans', 'instances-databases-list', 'instances-databases-operations-cancel', 'instances-databases-operations-delete', 'instances-databases-operations-get', 'instances-databases-operations-list', 'instances-databases-patch', 'instances-databases-restore', 'instances-databases-sessions-batch-create', 'instances-databases-sessions-batch-write', 'instances-databases-sessions-begin-transaction', 'instances-databases-sessions-commit', 'instances-databases-sessions-create', 'instances-databases-sessions-delete', 'instances-databases-sessions-execute-batch-dml', 'instances-databases-sessions-execute-sql', 'instances-databases-sessions-execute-streaming-sql', 'instances-databases-sessions-get', 'instances-databases-sessions-list', 'instances-databases-sessions-partition-query', 'instances-databases-sessions-partition-read', 'instances-databases-sessions-read', 'instances-databases-sessions-rollback', 'instances-databases-sessions-streaming-read', 'instances-databases-set-iam-policy', 'instances-databases-test-iam-permissions', 'instances-databases-update-ddl', 'instances-delete', 'instances-get', 'instances-get-iam-policy', 'instances-instance-partition-operations-list', 'instances-instance-partitions-create', 'instances-instance-partitions-delete', 'instances-instance-partitions-get', 'instances-instance-partitions-list', 'instances-instance-partitions-operations-cancel', 'instances-instance-partitions-operations-delete', 'instances-instance-partitions-operations-get', 'instances-instance-partitions-operations-list', 'instances-instance-partitions-patch', 'instances-list', 'instances-move', 'instances-operations-cancel', 'instances-operations-delete', 'instances-operations-get', 'instances-operations-list', 'instances-patch', 'instances-set-iam-policy' and 'instances-test-iam-permissions'", vec![
+        ("projects", "methods: 'instance-config-operations-list', 'instance-configs-create', 'instance-configs-delete', 'instance-configs-get', 'instance-configs-list', 'instance-configs-operations-cancel', 'instance-configs-operations-delete', 'instance-configs-operations-get', 'instance-configs-operations-list', 'instance-configs-patch', 'instance-configs-ssd-caches-operations-cancel', 'instance-configs-ssd-caches-operations-delete', 'instance-configs-ssd-caches-operations-get', 'instance-configs-ssd-caches-operations-list', 'instances-backup-operations-list', 'instances-backups-copy', 'instances-backups-create', 'instances-backups-delete', 'instances-backups-get', 'instances-backups-get-iam-policy', 'instances-backups-list', 'instances-backups-operations-cancel', 'instances-backups-operations-delete', 'instances-backups-operations-get', 'instances-backups-operations-list', 'instances-backups-patch', 'instances-backups-set-iam-policy', 'instances-backups-test-iam-permissions', 'instances-create', 'instances-database-operations-list', 'instances-databases-add-split-points', 'instances-databases-backup-schedules-create', 'instances-databases-backup-schedules-delete', 'instances-databases-backup-schedules-get', 'instances-databases-backup-schedules-get-iam-policy', 'instances-databases-backup-schedules-list', 'instances-databases-backup-schedules-patch', 'instances-databases-backup-schedules-set-iam-policy', 'instances-databases-backup-schedules-test-iam-permissions', 'instances-databases-changequorum', 'instances-databases-create', 'instances-databases-database-roles-list', 'instances-databases-database-roles-test-iam-permissions', 'instances-databases-drop-database', 'instances-databases-get', 'instances-databases-get-ddl', 'instances-databases-get-iam-policy', 'instances-databases-get-scans', 'instances-databases-list', 'instances-databases-operations-cancel', 'instances-databases-operations-delete', 'instances-databases-operations-get', 'instances-databases-operations-list', 'instances-databases-patch', 'instances-databases-restore', 'instances-databases-sessions-adapt-message', 'instances-databases-sessions-adapter', 'instances-databases-sessions-batch-create', 'instances-databases-sessions-batch-write', 'instances-databases-sessions-begin-transaction', 'instances-databases-sessions-commit', 'instances-databases-sessions-create', 'instances-databases-sessions-delete', 'instances-databases-sessions-execute-batch-dml', 'instances-databases-sessions-execute-sql', 'instances-databases-sessions-execute-streaming-sql', 'instances-databases-sessions-get', 'instances-databases-sessions-list', 'instances-databases-sessions-partition-query', 'instances-databases-sessions-partition-read', 'instances-databases-sessions-read', 'instances-databases-sessions-rollback', 'instances-databases-sessions-streaming-read', 'instances-databases-set-iam-policy', 'instances-databases-test-iam-permissions', 'instances-databases-update-ddl', 'instances-delete', 'instances-get', 'instances-get-iam-policy', 'instances-instance-partition-operations-list', 'instances-instance-partitions-create', 'instances-instance-partitions-delete', 'instances-instance-partitions-get', 'instances-instance-partitions-list', 'instances-instance-partitions-operations-cancel', 'instances-instance-partitions-operations-delete', 'instances-instance-partitions-operations-get', 'instances-instance-partitions-operations-list', 'instances-instance-partitions-patch', 'instances-list', 'instances-move', 'instances-operations-cancel', 'instances-operations-delete', 'instances-operations-get', 'instances-operations-list', 'instances-patch', 'instances-set-iam-policy' and 'instances-test-iam-permissions'", vec![
             ("instance-config-operations-list",
-                    Some(r##"Lists the user-managed instance config long-running operations in the given project. An instance config operation has a name of the form `projects//instanceConfigs//operations/`. The long-running operation metadata field type `metadata.type_url` describes the type of the metadata. Operations returned include those that have completed/failed/canceled within the last 7 days, and pending operations. Operations returned are ordered by `operation.metadata.value.start_time` in descending order starting from the most recently started operation."##),
+                    Some(r##"Lists the user-managed instance configuration long-running operations in the given project. An instance configuration operation has a name of the form `projects//instanceConfigs//operations/`. The long-running operation metadata field type `metadata.type_url` describes the type of the metadata. Operations returned include those that have completed/failed/canceled within the last 7 days, and pending operations. Operations returned are ordered by `operation.metadata.value.start_time` in descending order starting from the most recently started operation."##),
                     "Details at http://byron.github.io/google-apis-rs/google_spanner1_cli/projects_instance-config-operations-list",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The project of the instance config operations. Values are of the form `projects/`."##),
+                     Some(r##"Required. The project of the instance configuration operations. Values are of the form `projects/`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -13021,12 +15051,12 @@ async fn main() {
                      Some(false)),
                   ]),
             ("instance-configs-create",
-                    Some(r##"Creates an instance config and begins preparing it to be used. The returned long-running operation can be used to track the progress of preparing the new instance config. The instance config name is assigned by the caller. If the named instance config already exists, `CreateInstanceConfig` returns `ALREADY_EXISTS`. Immediately after the request returns: * The instance config is readable via the API, with all requested attributes. The instance config's reconciling field is set to true. Its state is `CREATING`. While the operation is pending: * Cancelling the operation renders the instance config immediately unreadable via the API. * Except for deleting the creating resource, all other attempts to modify the instance config are rejected. Upon completion of the returned operation: * Instances can be created using the instance configuration. * The instance config's reconciling field becomes false. Its state becomes `READY`. The returned long-running operation will have a name of the format `/operations/` and can be used to track creation of the instance config. The metadata field type is CreateInstanceConfigMetadata. The response field type is InstanceConfig, if successful. Authorization requires `spanner.instanceConfigs.create` permission on the resource parent."##),
+                    Some(r##"Creates an instance configuration and begins preparing it to be used. The returned long-running operation can be used to track the progress of preparing the new instance configuration. The instance configuration name is assigned by the caller. If the named instance configuration already exists, `CreateInstanceConfig` returns `ALREADY_EXISTS`. Immediately after the request returns: * The instance configuration is readable via the API, with all requested attributes. The instance configuration's reconciling field is set to true. Its state is `CREATING`. While the operation is pending: * Cancelling the operation renders the instance configuration immediately unreadable via the API. * Except for deleting the creating resource, all other attempts to modify the instance configuration are rejected. Upon completion of the returned operation: * Instances can be created using the instance configuration. * The instance configuration's reconciling field becomes false. Its state becomes `READY`. The returned long-running operation will have a name of the format `/operations/` and can be used to track creation of the instance configuration. The metadata field type is CreateInstanceConfigMetadata. The response field type is InstanceConfig, if successful. Authorization requires `spanner.instanceConfigs.create` permission on the resource parent."##),
                     "Details at http://byron.github.io/google-apis-rs/google_spanner1_cli/projects_instance-configs-create",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The name of the project in which to create the instance config. Values are of the form `projects/`."##),
+                     Some(r##"Required. The name of the project in which to create the instance configuration. Values are of the form `projects/`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -13046,7 +15076,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("instance-configs-delete",
-                    Some(r##"Deletes the instance config. Deletion is only allowed when no instances are using the configuration. If any instances are using the config, returns `FAILED_PRECONDITION`. Only user managed configurations can be deleted. Authorization requires `spanner.instanceConfigs.delete` permission on the resource name."##),
+                    Some(r##"Deletes the instance configuration. Deletion is only allowed when no instances are using the configuration. If any instances are using the configuration, returns `FAILED_PRECONDITION`. Only user-managed configurations can be deleted. Authorization requires `spanner.instanceConfigs.delete` permission on the resource name."##),
                     "Details at http://byron.github.io/google-apis-rs/google_spanner1_cli/projects_instance-configs-delete",
                   vec![
                     (Some(r##"name"##),
@@ -13086,7 +15116,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("instance-configs-list",
-                    Some(r##"Lists the supported instance configurations for a given project. Returns both Google managed configs and user managed configs."##),
+                    Some(r##"Lists the supported instance configurations for a given project. Returns both Google-managed configurations and user-managed configurations."##),
                     "Details at http://byron.github.io/google-apis-rs/google_spanner1_cli/projects_instance-configs-list",
                   vec![
                     (Some(r##"parent"##),
@@ -13106,7 +15136,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("instance-configs-operations-cancel",
-                    Some(r##"Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of 1, corresponding to `Code.CANCELLED`."##),
+                    Some(r##"Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of `1`, corresponding to `Code.CANCELLED`."##),
                     "Details at http://byron.github.io/google-apis-rs/google_spanner1_cli/projects_instance-configs-operations-cancel",
                   vec![
                     (Some(r##"name"##),
@@ -13186,12 +15216,12 @@ async fn main() {
                      Some(false)),
                   ]),
             ("instance-configs-patch",
-                    Some(r##"Updates an instance config. The returned long-running operation can be used to track the progress of updating the instance. If the named instance config does not exist, returns `NOT_FOUND`. Only user managed configurations can be updated. Immediately after the request returns: * The instance config's reconciling field is set to true. While the operation is pending: * Cancelling the operation sets its metadata's cancel_time. The operation is guaranteed to succeed at undoing all changes, after which point it terminates with a `CANCELLED` status. * All other attempts to modify the instance config are rejected. * Reading the instance config via the API continues to give the pre-request values. Upon completion of the returned operation: * Creating instances using the instance configuration uses the new values. * The instance config's new values are readable via the API. * The instance config's reconciling field becomes false. The returned long-running operation will have a name of the format `/operations/` and can be used to track the instance config modification. The metadata field type is UpdateInstanceConfigMetadata. The response field type is InstanceConfig, if successful. Authorization requires `spanner.instanceConfigs.update` permission on the resource name."##),
+                    Some(r##"Updates an instance configuration. The returned long-running operation can be used to track the progress of updating the instance. If the named instance configuration does not exist, returns `NOT_FOUND`. Only user-managed configurations can be updated. Immediately after the request returns: * The instance configuration's reconciling field is set to true. While the operation is pending: * Cancelling the operation sets its metadata's cancel_time. The operation is guaranteed to succeed at undoing all changes, after which point it terminates with a `CANCELLED` status. * All other attempts to modify the instance configuration are rejected. * Reading the instance configuration via the API continues to give the pre-request values. Upon completion of the returned operation: * Creating instances using the instance configuration uses the new values. * The new values of the instance configuration are readable via the API. * The instance configuration's reconciling field becomes false. The returned long-running operation will have a name of the format `/operations/` and can be used to track the instance configuration modification. The metadata field type is UpdateInstanceConfigMetadata. The response field type is InstanceConfig, if successful. Authorization requires `spanner.instanceConfigs.update` permission on the resource name."##),
                     "Details at http://byron.github.io/google-apis-rs/google_spanner1_cli/projects_instance-configs-patch",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"A unique identifier for the instance configuration. Values are of the form `projects//instanceConfigs/a-z*`. User instance config must start with `custom-`."##),
+                     Some(r##"A unique identifier for the instance configuration. Values are of the form `projects//instanceConfigs/a-z*`. User instance configuration must start with `custom-`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -13211,7 +15241,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("instance-configs-ssd-caches-operations-cancel",
-                    Some(r##"Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of 1, corresponding to `Code.CANCELLED`."##),
+                    Some(r##"Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of `1`, corresponding to `Code.CANCELLED`."##),
                     "Details at http://byron.github.io/google-apis-rs/google_spanner1_cli/projects_instance-configs-ssd-caches-operations-cancel",
                   vec![
                     (Some(r##"name"##),
@@ -13341,7 +15371,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The name of the instance in which the backup will be created. This must be the same instance that contains the database the backup will be created from. The backup will be stored in the location(s) specified in the instance configuration of this instance. Values are of the form `projects//instances/`."##),
+                     Some(r##"Required. The name of the instance in which the backup is created. This must be the same instance that contains the database the backup is created from. The backup will be stored in the locations specified in the instance configuration of this instance. Values are of the form `projects//instances/`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -13401,7 +15431,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("instances-backups-get-iam-policy",
-                    Some(r##"Gets the access control policy for a database or backup resource. Returns an empty policy if a database or backup exists but does not have a policy set. Authorization requires `spanner.databases.getIamPolicy` permission on resource. For backups, authorization requires `spanner.backups.getIamPolicy` permission on resource."##),
+                    Some(r##"Gets the access control policy for a database or backup resource. Returns an empty policy if a database or backup exists but does not have a policy set. Authorization requires `spanner.databases.getIamPolicy` permission on resource. For backups, authorization requires `spanner.backups.getIamPolicy` permission on resource. For backup schedules, authorization requires `spanner.backupSchedules.getIamPolicy` permission on resource."##),
                     "Details at http://byron.github.io/google-apis-rs/google_spanner1_cli/projects_instances-backups-get-iam-policy",
                   vec![
                     (Some(r##"resource"##),
@@ -13446,7 +15476,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("instances-backups-operations-cancel",
-                    Some(r##"Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of 1, corresponding to `Code.CANCELLED`."##),
+                    Some(r##"Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of `1`, corresponding to `Code.CANCELLED`."##),
                     "Details at http://byron.github.io/google-apis-rs/google_spanner1_cli/projects_instances-backups-operations-cancel",
                   vec![
                     (Some(r##"name"##),
@@ -13551,7 +15581,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("instances-backups-set-iam-policy",
-                    Some(r##"Sets the access control policy on a database or backup resource. Replaces any existing policy. Authorization requires `spanner.databases.setIamPolicy` permission on resource. For backups, authorization requires `spanner.backups.setIamPolicy` permission on resource."##),
+                    Some(r##"Sets the access control policy on a database or backup resource. Replaces any existing policy. Authorization requires `spanner.databases.setIamPolicy` permission on resource. For backups, authorization requires `spanner.backups.setIamPolicy` permission on resource. For backup schedules, authorization requires `spanner.backupSchedules.setIamPolicy` permission on resource."##),
                     "Details at http://byron.github.io/google-apis-rs/google_spanner1_cli/projects_instances-backups-set-iam-policy",
                   vec![
                     (Some(r##"resource"##),
@@ -13576,7 +15606,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("instances-backups-test-iam-permissions",
-                    Some(r##"Returns permissions that the caller has on the specified database or backup resource. Attempting this RPC on a non-existent Cloud Spanner database will result in a NOT_FOUND error if the user has `spanner.databases.list` permission on the containing Cloud Spanner instance. Otherwise returns an empty set of permissions. Calling this method on a backup that does not exist will result in a NOT_FOUND error if the user has `spanner.backups.list` permission on the containing instance."##),
+                    Some(r##"Returns permissions that the caller has on the specified database or backup resource. Attempting this RPC on a non-existent Cloud Spanner database will result in a NOT_FOUND error if the user has `spanner.databases.list` permission on the containing Cloud Spanner instance. Otherwise returns an empty set of permissions. Calling this method on a backup that does not exist will result in a NOT_FOUND error if the user has `spanner.backups.list` permission on the containing instance. Calling this method on a backup schedule that does not exist will result in a NOT_FOUND error if the user has `spanner.backupSchedules.list` permission on the containing database."##),
                     "Details at http://byron.github.io/google-apis-rs/google_spanner1_cli/projects_instances-backups-test-iam-permissions",
                   vec![
                     (Some(r##"resource"##),
@@ -13645,13 +15675,223 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("instances-databases-add-split-points",
+                    Some(r##"Adds split points to specified tables and indexes of a database."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_spanner1_cli/projects_instances-databases-add-split-points",
+                  vec![
+                    (Some(r##"database"##),
+                     None,
+                     Some(r##"Required. The database on whose tables or indexes the split points are to be added. Values are of the form `projects//instances//databases/`."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("instances-databases-backup-schedules-create",
+                    Some(r##"Creates a new backup schedule."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_spanner1_cli/projects_instances-databases-backup-schedules-create",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. The name of the database that this backup schedule applies to."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("instances-databases-backup-schedules-delete",
+                    Some(r##"Deletes a backup schedule."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_spanner1_cli/projects_instances-databases-backup-schedules-delete",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The name of the schedule to delete. Values are of the form `projects//instances//databases//backupSchedules/`."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("instances-databases-backup-schedules-get",
+                    Some(r##"Gets backup schedule for the input schedule name."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_spanner1_cli/projects_instances-databases-backup-schedules-get",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The name of the schedule to retrieve. Values are of the form `projects//instances//databases//backupSchedules/`."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("instances-databases-backup-schedules-get-iam-policy",
+                    Some(r##"Gets the access control policy for a database or backup resource. Returns an empty policy if a database or backup exists but does not have a policy set. Authorization requires `spanner.databases.getIamPolicy` permission on resource. For backups, authorization requires `spanner.backups.getIamPolicy` permission on resource. For backup schedules, authorization requires `spanner.backupSchedules.getIamPolicy` permission on resource."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_spanner1_cli/projects_instances-databases-backup-schedules-get-iam-policy",
+                  vec![
+                    (Some(r##"resource"##),
+                     None,
+                     Some(r##"REQUIRED: The Cloud Spanner resource for which the policy is being retrieved. The format is `projects//instances/` for instance resources and `projects//instances//databases/` for database resources."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("instances-databases-backup-schedules-list",
+                    Some(r##"Lists all the backup schedules for the database."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_spanner1_cli/projects_instances-databases-backup-schedules-list",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. Database is the parent resource whose backup schedules should be listed. Values are of the form projects//instances//databases/"##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("instances-databases-backup-schedules-patch",
+                    Some(r##"Updates a backup schedule."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_spanner1_cli/projects_instances-databases-backup-schedules-patch",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Identifier. Output only for the CreateBackupSchedule operation. Required for the UpdateBackupSchedule operation. A globally unique identifier for the backup schedule which cannot be changed. Values are of the form `projects//instances//databases//backupSchedules/a-z*[a-z0-9]` The final segment of the name must be between 2 and 60 characters in length."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("instances-databases-backup-schedules-set-iam-policy",
+                    Some(r##"Sets the access control policy on a database or backup resource. Replaces any existing policy. Authorization requires `spanner.databases.setIamPolicy` permission on resource. For backups, authorization requires `spanner.backups.setIamPolicy` permission on resource. For backup schedules, authorization requires `spanner.backupSchedules.setIamPolicy` permission on resource."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_spanner1_cli/projects_instances-databases-backup-schedules-set-iam-policy",
+                  vec![
+                    (Some(r##"resource"##),
+                     None,
+                     Some(r##"REQUIRED: The Cloud Spanner resource for which the policy is being set. The format is `projects//instances/` for instance resources and `projects//instances//databases/` for databases resources."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("instances-databases-backup-schedules-test-iam-permissions",
+                    Some(r##"Returns permissions that the caller has on the specified database or backup resource. Attempting this RPC on a non-existent Cloud Spanner database will result in a NOT_FOUND error if the user has `spanner.databases.list` permission on the containing Cloud Spanner instance. Otherwise returns an empty set of permissions. Calling this method on a backup that does not exist will result in a NOT_FOUND error if the user has `spanner.backups.list` permission on the containing instance. Calling this method on a backup schedule that does not exist will result in a NOT_FOUND error if the user has `spanner.backupSchedules.list` permission on the containing database."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_spanner1_cli/projects_instances-databases-backup-schedules-test-iam-permissions",
+                  vec![
+                    (Some(r##"resource"##),
+                     None,
+                     Some(r##"REQUIRED: The Cloud Spanner resource for which permissions are being tested. The format is `projects//instances/` for instance resources and `projects//instances//databases/` for database resources."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("instances-databases-changequorum",
-                    Some(r##"ChangeQuorum is strictly restricted to databases that use dual region instance configurations. Initiates a background operation to change quorum a database from dual-region mode to single-region mode and vice versa. The returned long-running operation will have a name of the format `projects//instances//databases//operations/` and can be used to track execution of the ChangeQuorum. The metadata field type is ChangeQuorumMetadata. Authorization requires `spanner.databases.changequorum` permission on the resource database."##),
+                    Some(r##"`ChangeQuorum` is strictly restricted to databases that use dual-region instance configurations. Initiates a background operation to change the quorum of a database from dual-region mode to single-region mode or vice versa. The returned long-running operation has a name of the format `projects//instances//databases//operations/` and can be used to track execution of the `ChangeQuorum`. The metadata field type is ChangeQuorumMetadata. Authorization requires `spanner.databases.changequorum` permission on the resource database."##),
                     "Details at http://byron.github.io/google-apis-rs/google_spanner1_cli/projects_instances-databases-changequorum",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. Name of the database in which to apply the ChangeQuorum. Values are of the form `projects//instances//databases/`."##),
+                     Some(r##"Required. Name of the database in which to apply `ChangeQuorum`. Values are of the form `projects//instances//databases/`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -13671,7 +15911,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("instances-databases-create",
-                    Some(r##"Creates a new Cloud Spanner database and starts to prepare it for serving. The returned long-running operation will have a name of the format `/operations/` and can be used to track preparation of the database. The metadata field type is CreateDatabaseMetadata. The response field type is Database, if successful."##),
+                    Some(r##"Creates a new Spanner database and starts to prepare it for serving. The returned long-running operation will have a name of the format `/operations/` and can be used to track preparation of the database. The metadata field type is CreateDatabaseMetadata. The response field type is Database, if successful."##),
                     "Details at http://byron.github.io/google-apis-rs/google_spanner1_cli/projects_instances-databases-create",
                   vec![
                     (Some(r##"parent"##),
@@ -13716,7 +15956,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("instances-databases-database-roles-test-iam-permissions",
-                    Some(r##"Returns permissions that the caller has on the specified database or backup resource. Attempting this RPC on a non-existent Cloud Spanner database will result in a NOT_FOUND error if the user has `spanner.databases.list` permission on the containing Cloud Spanner instance. Otherwise returns an empty set of permissions. Calling this method on a backup that does not exist will result in a NOT_FOUND error if the user has `spanner.backups.list` permission on the containing instance."##),
+                    Some(r##"Returns permissions that the caller has on the specified database or backup resource. Attempting this RPC on a non-existent Cloud Spanner database will result in a NOT_FOUND error if the user has `spanner.databases.list` permission on the containing Cloud Spanner instance. Otherwise returns an empty set of permissions. Calling this method on a backup that does not exist will result in a NOT_FOUND error if the user has `spanner.backups.list` permission on the containing instance. Calling this method on a backup schedule that does not exist will result in a NOT_FOUND error if the user has `spanner.backupSchedules.list` permission on the containing database."##),
                     "Details at http://byron.github.io/google-apis-rs/google_spanner1_cli/projects_instances-databases-database-roles-test-iam-permissions",
                   vec![
                     (Some(r##"resource"##),
@@ -13801,7 +16041,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("instances-databases-get-iam-policy",
-                    Some(r##"Gets the access control policy for a database or backup resource. Returns an empty policy if a database or backup exists but does not have a policy set. Authorization requires `spanner.databases.getIamPolicy` permission on resource. For backups, authorization requires `spanner.backups.getIamPolicy` permission on resource."##),
+                    Some(r##"Gets the access control policy for a database or backup resource. Returns an empty policy if a database or backup exists but does not have a policy set. Authorization requires `spanner.databases.getIamPolicy` permission on resource. For backups, authorization requires `spanner.backups.getIamPolicy` permission on resource. For backup schedules, authorization requires `spanner.backupSchedules.getIamPolicy` permission on resource."##),
                     "Details at http://byron.github.io/google-apis-rs/google_spanner1_cli/projects_instances-databases-get-iam-policy",
                   vec![
                     (Some(r##"resource"##),
@@ -13866,7 +16106,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("instances-databases-operations-cancel",
-                    Some(r##"Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of 1, corresponding to `Code.CANCELLED`."##),
+                    Some(r##"Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of `1`, corresponding to `Code.CANCELLED`."##),
                     "Details at http://byron.github.io/google-apis-rs/google_spanner1_cli/projects_instances-databases-operations-cancel",
                   vec![
                     (Some(r##"name"##),
@@ -13995,6 +16235,56 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("instances-databases-sessions-adapt-message",
+                    Some(r##"Handles a single message from the client and returns the result as a stream. The server will interpret the message frame and respond with message frames to the client."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_spanner1_cli/projects_instances-databases-sessions-adapt-message",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The database session in which the adapter request is processed."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("instances-databases-sessions-adapter",
+                    Some(r##"Creates a new session to be used for requests made by the adapter. A session identifies a specific incarnation of a database resource and is meant to be reused across many `AdaptMessage` calls."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_spanner1_cli/projects_instances-databases-sessions-adapter",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. The database in which the new session is created."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("instances-databases-sessions-batch-create",
                     Some(r##"Creates multiple new sessions. This API can be used to initialize a session cache on the clients. See https://goo.gl/TgSFN2 for best practices on session cache management."##),
                     "Details at http://byron.github.io/google-apis-rs/google_spanner1_cli/projects_instances-databases-sessions-batch-create",
@@ -14021,7 +16311,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("instances-databases-sessions-batch-write",
-                    Some(r##"Batches the supplied mutation groups in a collection of efficient transactions. All mutations in a group are committed atomically. However, mutations across groups can be committed non-atomically in an unspecified order and thus, they must be independent of each other. Partial failure is possible, i.e., some groups may have been committed successfully, while some may have failed. The results of individual batches are streamed into the response as the batches are applied. BatchWrite requests are not replay protected, meaning that each mutation group may be applied more than once. Replays of non-idempotent mutations may have undesirable effects. For example, replays of an insert mutation may produce an already exists error or if you use generated or commit timestamp-based keys, it may result in additional rows being added to the mutation's table. We recommend structuring your mutation groups to be idempotent to avoid this issue."##),
+                    Some(r##"Batches the supplied mutation groups in a collection of efficient transactions. All mutations in a group are committed atomically. However, mutations across groups can be committed non-atomically in an unspecified order and thus, they must be independent of each other. Partial failure is possible, that is, some groups might have been committed successfully, while some might have failed. The results of individual batches are streamed into the response as the batches are applied. `BatchWrite` requests are not replay protected, meaning that each mutation group can be applied more than once. Replays of non-idempotent mutations can have undesirable effects. For example, replays of an insert mutation can produce an already exists error or if you use generated or commit timestamp-based keys, it can result in additional rows being added to the mutation's table. We recommend structuring your mutation groups to be idempotent to avoid this issue."##),
                     "Details at http://byron.github.io/google-apis-rs/google_spanner1_cli/projects_instances-databases-sessions-batch-write",
                   vec![
                     (Some(r##"session"##),
@@ -14071,7 +16361,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("instances-databases-sessions-commit",
-                    Some(r##"Commits a transaction. The request includes the mutations to be applied to rows in the database. `Commit` might return an `ABORTED` error. This can occur at any time; commonly, the cause is conflicts with concurrent transactions. However, it can also happen for a variety of other reasons. If `Commit` returns `ABORTED`, the caller should re-attempt the transaction from the beginning, re-using the same session. On very rare occasions, `Commit` might return `UNKNOWN`. This can happen, for example, if the client job experiences a 1+ hour networking failure. At that point, Cloud Spanner has lost track of the transaction outcome and we recommend that you perform another read from the database to see the state of things as they are now."##),
+                    Some(r##"Commits a transaction. The request includes the mutations to be applied to rows in the database. `Commit` might return an `ABORTED` error. This can occur at any time; commonly, the cause is conflicts with concurrent transactions. However, it can also happen for a variety of other reasons. If `Commit` returns `ABORTED`, the caller should retry the transaction from the beginning, reusing the same session. On very rare occasions, `Commit` might return `UNKNOWN`. This can happen, for example, if the client job experiences a 1+ hour networking failure. At that point, Cloud Spanner has lost track of the transaction outcome and we recommend that you perform another read from the database to see the state of things as they are now."##),
                     "Details at http://byron.github.io/google-apis-rs/google_spanner1_cli/projects_instances-databases-sessions-commit",
                   vec![
                     (Some(r##"session"##),
@@ -14096,7 +16386,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("instances-databases-sessions-create",
-                    Some(r##"Creates a new session. A session can be used to perform transactions that read and/or modify data in a Cloud Spanner database. Sessions are meant to be reused for many consecutive transactions. Sessions can only execute one transaction at a time. To execute multiple concurrent read-write/write-only transactions, create multiple sessions. Note that standalone reads and queries use a transaction internally, and count toward the one transaction limit. Active sessions use additional server resources, so it is a good idea to delete idle and unneeded sessions. Aside from explicit deletes, Cloud Spanner may delete sessions for which no operations are sent for more than an hour. If a session is deleted, requests to it return `NOT_FOUND`. Idle sessions can be kept alive by sending a trivial SQL query periodically, e.g., `"SELECT 1"`."##),
+                    Some(r##"Creates a new session. A session can be used to perform transactions that read and/or modify data in a Cloud Spanner database. Sessions are meant to be reused for many consecutive transactions. Sessions can only execute one transaction at a time. To execute multiple concurrent read-write/write-only transactions, create multiple sessions. Note that standalone reads and queries use a transaction internally, and count toward the one transaction limit. Active sessions use additional server resources, so it's a good idea to delete idle and unneeded sessions. Aside from explicit deletes, Cloud Spanner can delete sessions when no operations are sent for more than an hour. If a session is deleted, requests to it return `NOT_FOUND`. Idle sessions can be kept alive by sending a trivial SQL query periodically, for example, `"SELECT 1"`."##),
                     "Details at http://byron.github.io/google-apis-rs/google_spanner1_cli/projects_instances-databases-sessions-create",
                   vec![
                     (Some(r##"database"##),
@@ -14121,7 +16411,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("instances-databases-sessions-delete",
-                    Some(r##"Ends a session, releasing server resources associated with it. This will asynchronously trigger cancellation of any operations that are running with this session."##),
+                    Some(r##"Ends a session, releasing server resources associated with it. This asynchronously triggers the cancellation of any operations that are running with this session."##),
                     "Details at http://byron.github.io/google-apis-rs/google_spanner1_cli/projects_instances-databases-sessions-delete",
                   vec![
                     (Some(r##"name"##),
@@ -14166,7 +16456,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("instances-databases-sessions-execute-sql",
-                    Some(r##"Executes an SQL statement, returning all results in a single reply. This method cannot be used to return a result set larger than 10 MiB; if the query yields more data than that, the query fails with a `FAILED_PRECONDITION` error. Operations inside read-write transactions might return `ABORTED`. If this occurs, the application should restart the transaction from the beginning. See Transaction for more details. Larger result sets can be fetched in streaming fashion by calling ExecuteStreamingSql instead."##),
+                    Some(r##"Executes an SQL statement, returning all results in a single reply. This method can't be used to return a result set larger than 10 MiB; if the query yields more data than that, the query fails with a `FAILED_PRECONDITION` error. Operations inside read-write transactions might return `ABORTED`. If this occurs, the application should restart the transaction from the beginning. See Transaction for more details. Larger result sets can be fetched in streaming fashion by calling ExecuteStreamingSql instead. The query string can be SQL or [Graph Query Language (GQL)](https://cloud.google.com/spanner/docs/reference/standard-sql/graph-intro)."##),
                     "Details at http://byron.github.io/google-apis-rs/google_spanner1_cli/projects_instances-databases-sessions-execute-sql",
                   vec![
                     (Some(r##"session"##),
@@ -14191,7 +16481,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("instances-databases-sessions-execute-streaming-sql",
-                    Some(r##"Like ExecuteSql, except returns the result set as a stream. Unlike ExecuteSql, there is no limit on the size of the returned result set. However, no individual row in the result set can exceed 100 MiB, and no column value can exceed 10 MiB."##),
+                    Some(r##"Like ExecuteSql, except returns the result set as a stream. Unlike ExecuteSql, there is no limit on the size of the returned result set. However, no individual row in the result set can exceed 100 MiB, and no column value can exceed 10 MiB. The query string can be SQL or [Graph Query Language (GQL)](https://cloud.google.com/spanner/docs/reference/standard-sql/graph-intro)."##),
                     "Details at http://byron.github.io/google-apis-rs/google_spanner1_cli/projects_instances-databases-sessions-execute-streaming-sql",
                   vec![
                     (Some(r##"session"##),
@@ -14216,7 +16506,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("instances-databases-sessions-get",
-                    Some(r##"Gets a session. Returns `NOT_FOUND` if the session does not exist. This is mainly useful for determining whether a session is still alive."##),
+                    Some(r##"Gets a session. Returns `NOT_FOUND` if the session doesn't exist. This is mainly useful for determining whether a session is still alive."##),
                     "Details at http://byron.github.io/google-apis-rs/google_spanner1_cli/projects_instances-databases-sessions-get",
                   vec![
                     (Some(r##"name"##),
@@ -14256,7 +16546,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("instances-databases-sessions-partition-query",
-                    Some(r##"Creates a set of partition tokens that can be used to execute a query operation in parallel. Each of the returned partition tokens can be used by ExecuteStreamingSql to specify a subset of the query result to read. The same session and read-only transaction must be used by the PartitionQueryRequest used to create the partition tokens and the ExecuteSqlRequests that use the partition tokens. Partition tokens become invalid when the session used to create them is deleted, is idle for too long, begins a new transaction, or becomes too old. When any of these happen, it is not possible to resume the query, and the whole operation must be restarted from the beginning."##),
+                    Some(r##"Creates a set of partition tokens that can be used to execute a query operation in parallel. Each of the returned partition tokens can be used by ExecuteStreamingSql to specify a subset of the query result to read. The same session and read-only transaction must be used by the `PartitionQueryRequest` used to create the partition tokens and the `ExecuteSqlRequests` that use the partition tokens. Partition tokens become invalid when the session used to create them is deleted, is idle for too long, begins a new transaction, or becomes too old. When any of these happen, it isn't possible to resume the query, and the whole operation must be restarted from the beginning."##),
                     "Details at http://byron.github.io/google-apis-rs/google_spanner1_cli/projects_instances-databases-sessions-partition-query",
                   vec![
                     (Some(r##"session"##),
@@ -14281,7 +16571,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("instances-databases-sessions-partition-read",
-                    Some(r##"Creates a set of partition tokens that can be used to execute a read operation in parallel. Each of the returned partition tokens can be used by StreamingRead to specify a subset of the read result to read. The same session and read-only transaction must be used by the PartitionReadRequest used to create the partition tokens and the ReadRequests that use the partition tokens. There are no ordering guarantees on rows returned among the returned partition tokens, or even within each individual StreamingRead call issued with a partition_token. Partition tokens become invalid when the session used to create them is deleted, is idle for too long, begins a new transaction, or becomes too old. When any of these happen, it is not possible to resume the read, and the whole operation must be restarted from the beginning."##),
+                    Some(r##"Creates a set of partition tokens that can be used to execute a read operation in parallel. Each of the returned partition tokens can be used by StreamingRead to specify a subset of the read result to read. The same session and read-only transaction must be used by the `PartitionReadRequest` used to create the partition tokens and the `ReadRequests` that use the partition tokens. There are no ordering guarantees on rows returned among the returned partition tokens, or even within each individual `StreamingRead` call issued with a `partition_token`. Partition tokens become invalid when the session used to create them is deleted, is idle for too long, begins a new transaction, or becomes too old. When any of these happen, it isn't possible to resume the read, and the whole operation must be restarted from the beginning."##),
                     "Details at http://byron.github.io/google-apis-rs/google_spanner1_cli/projects_instances-databases-sessions-partition-read",
                   vec![
                     (Some(r##"session"##),
@@ -14306,7 +16596,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("instances-databases-sessions-read",
-                    Some(r##"Reads rows from the database using key lookups and scans, as a simple key/value style alternative to ExecuteSql. This method cannot be used to return a result set larger than 10 MiB; if the read matches more data than that, the read fails with a `FAILED_PRECONDITION` error. Reads inside read-write transactions might return `ABORTED`. If this occurs, the application should restart the transaction from the beginning. See Transaction for more details. Larger result sets can be yielded in streaming fashion by calling StreamingRead instead."##),
+                    Some(r##"Reads rows from the database using key lookups and scans, as a simple key/value style alternative to ExecuteSql. This method can't be used to return a result set larger than 10 MiB; if the read matches more data than that, the read fails with a `FAILED_PRECONDITION` error. Reads inside read-write transactions might return `ABORTED`. If this occurs, the application should restart the transaction from the beginning. See Transaction for more details. Larger result sets can be yielded in streaming fashion by calling StreamingRead instead."##),
                     "Details at http://byron.github.io/google-apis-rs/google_spanner1_cli/projects_instances-databases-sessions-read",
                   vec![
                     (Some(r##"session"##),
@@ -14331,7 +16621,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("instances-databases-sessions-rollback",
-                    Some(r##"Rolls back a transaction, releasing any locks it holds. It is a good idea to call this for any transaction that includes one or more Read or ExecuteSql requests and ultimately decides not to commit. `Rollback` returns `OK` if it successfully aborts the transaction, the transaction was already aborted, or the transaction is not found. `Rollback` never returns `ABORTED`."##),
+                    Some(r##"Rolls back a transaction, releasing any locks it holds. It's a good idea to call this for any transaction that includes one or more Read or ExecuteSql requests and ultimately decides not to commit. `Rollback` returns `OK` if it successfully aborts the transaction, the transaction was already aborted, or the transaction isn't found. `Rollback` never returns `ABORTED`."##),
                     "Details at http://byron.github.io/google-apis-rs/google_spanner1_cli/projects_instances-databases-sessions-rollback",
                   vec![
                     (Some(r##"session"##),
@@ -14381,7 +16671,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("instances-databases-set-iam-policy",
-                    Some(r##"Sets the access control policy on a database or backup resource. Replaces any existing policy. Authorization requires `spanner.databases.setIamPolicy` permission on resource. For backups, authorization requires `spanner.backups.setIamPolicy` permission on resource."##),
+                    Some(r##"Sets the access control policy on a database or backup resource. Replaces any existing policy. Authorization requires `spanner.databases.setIamPolicy` permission on resource. For backups, authorization requires `spanner.backups.setIamPolicy` permission on resource. For backup schedules, authorization requires `spanner.backupSchedules.setIamPolicy` permission on resource."##),
                     "Details at http://byron.github.io/google-apis-rs/google_spanner1_cli/projects_instances-databases-set-iam-policy",
                   vec![
                     (Some(r##"resource"##),
@@ -14406,7 +16696,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("instances-databases-test-iam-permissions",
-                    Some(r##"Returns permissions that the caller has on the specified database or backup resource. Attempting this RPC on a non-existent Cloud Spanner database will result in a NOT_FOUND error if the user has `spanner.databases.list` permission on the containing Cloud Spanner instance. Otherwise returns an empty set of permissions. Calling this method on a backup that does not exist will result in a NOT_FOUND error if the user has `spanner.backups.list` permission on the containing instance."##),
+                    Some(r##"Returns permissions that the caller has on the specified database or backup resource. Attempting this RPC on a non-existent Cloud Spanner database will result in a NOT_FOUND error if the user has `spanner.databases.list` permission on the containing Cloud Spanner instance. Otherwise returns an empty set of permissions. Calling this method on a backup that does not exist will result in a NOT_FOUND error if the user has `spanner.backups.list` permission on the containing instance. Calling this method on a backup schedule that does not exist will result in a NOT_FOUND error if the user has `spanner.backupSchedules.list` permission on the containing database."##),
                     "Details at http://byron.github.io/google-apis-rs/google_spanner1_cli/projects_instances-databases-test-iam-permissions",
                   vec![
                     (Some(r##"resource"##),
@@ -14431,7 +16721,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("instances-databases-update-ddl",
-                    Some(r##"Updates the schema of a Cloud Spanner database by creating/altering/dropping tables, columns, indexes, etc. The returned long-running operation will have a name of the format `/operations/` and can be used to track execution of the schema change(s). The metadata field type is UpdateDatabaseDdlMetadata. The operation has no response."##),
+                    Some(r##"Updates the schema of a Cloud Spanner database by creating/altering/dropping tables, columns, indexes, etc. The returned long-running operation will have a name of the format `/operations/` and can be used to track execution of the schema changes. The metadata field type is UpdateDatabaseDdlMetadata. The operation has no response."##),
                     "Details at http://byron.github.io/google-apis-rs/google_spanner1_cli/projects_instances-databases-update-ddl",
                   vec![
                     (Some(r##"database"##),
@@ -14626,7 +16916,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("instances-instance-partitions-operations-cancel",
-                    Some(r##"Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of 1, corresponding to `Code.CANCELLED`."##),
+                    Some(r##"Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of `1`, corresponding to `Code.CANCELLED`."##),
                     "Details at http://byron.github.io/google-apis-rs/google_spanner1_cli/projects_instances-instance-partitions-operations-cancel",
                   vec![
                     (Some(r##"name"##),
@@ -14751,7 +17041,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("instances-move",
-                    Some(r##"Moves the instance to the target instance config. The returned long-running operation can be used to track the progress of moving the instance. `MoveInstance` returns `FAILED_PRECONDITION` if the instance meets any of the following criteria: * Has an ongoing move to a different instance config * Has backups * Has an ongoing update * Is under free trial * Contains any CMEK-enabled databases While the operation is pending: * All other attempts to modify the instance, including changes to its compute capacity, are rejected. * The following database and backup admin operations are rejected: * DatabaseAdmin.CreateDatabase, * DatabaseAdmin.UpdateDatabaseDdl (Disabled if default_leader is specified in the request.) * DatabaseAdmin.RestoreDatabase * DatabaseAdmin.CreateBackup * DatabaseAdmin.CopyBackup * Both the source and target instance configs are subject to hourly compute and storage charges. * The instance may experience higher read-write latencies and a higher transaction abort rate. However, moving an instance does not cause any downtime. The returned long-running operation will have a name of the format `/operations/` and can be used to track the move instance operation. The metadata field type is MoveInstanceMetadata. The response field type is Instance, if successful. Cancelling the operation sets its metadata's cancel_time. Cancellation is not immediate since it involves moving any data previously moved to target instance config back to the original instance config. The same operation can be used to track the progress of the cancellation. Upon successful completion of the cancellation, the operation terminates with CANCELLED status. Upon completion(if not cancelled) of the returned operation: * Instance would be successfully moved to the target instance config. * You are billed for compute and storage in target instance config. Authorization requires `spanner.instances.update` permission on the resource instance. For more details, please see [documentation](https://cloud.google.com/spanner/docs/move-instance)."##),
+                    Some(r##"Moves an instance to the target instance configuration. You can use the returned long-running operation to track the progress of moving the instance. `MoveInstance` returns `FAILED_PRECONDITION` if the instance meets any of the following criteria: * Is undergoing a move to a different instance configuration * Has backups * Has an ongoing update * Contains any CMEK-enabled databases * Is a free trial instance While the operation is pending: * All other attempts to modify the instance, including changes to its compute capacity, are rejected. * The following database and backup admin operations are rejected: * `DatabaseAdmin.CreateDatabase` * `DatabaseAdmin.UpdateDatabaseDdl` (disabled if default_leader is specified in the request.) * `DatabaseAdmin.RestoreDatabase` * `DatabaseAdmin.CreateBackup` * `DatabaseAdmin.CopyBackup` * Both the source and target instance configurations are subject to hourly compute and storage charges. * The instance might experience higher read-write latencies and a higher transaction abort rate. However, moving an instance doesn't cause any downtime. The returned long-running operation has a name of the format `/operations/` and can be used to track the move instance operation. The metadata field type is MoveInstanceMetadata. The response field type is Instance, if successful. Cancelling the operation sets its metadata's cancel_time. Cancellation is not immediate because it involves moving any data previously moved to the target instance configuration back to the original instance configuration. You can use this operation to track the progress of the cancellation. Upon successful completion of the cancellation, the operation terminates with `CANCELLED` status. If not cancelled, upon completion of the returned operation: * The instance successfully moves to the target instance configuration. * You are billed for compute and storage in target instance configuration. Authorization requires the `spanner.instances.update` permission on the resource instance. For more details, see [Move an instance](https://cloud.google.com/spanner/docs/move-instance)."##),
                     "Details at http://byron.github.io/google-apis-rs/google_spanner1_cli/projects_instances-move",
                   vec![
                     (Some(r##"name"##),
@@ -14776,7 +17066,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("instances-operations-cancel",
-                    Some(r##"Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of 1, corresponding to `Code.CANCELLED`."##),
+                    Some(r##"Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of `1`, corresponding to `Code.CANCELLED`."##),
                     "Details at http://byron.github.io/google-apis-rs/google_spanner1_cli/projects_instances-operations-cancel",
                   vec![
                     (Some(r##"name"##),
@@ -14957,7 +17247,7 @@ async fn main() {
 
     let mut app = App::new("spanner1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("6.0.0+20240618")
+           .version("7.0.0+20251205")
            .about("Cloud Spanner is a managed, mission-critical, globally consistent and scalable relational database service.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_spanner1_cli")
            .arg(Arg::with_name("url")
@@ -15022,7 +17312,7 @@ async fn main() {
         .with_native_roots()
         .unwrap()
         .https_or_http()
-        .enable_http1()
+        .enable_http2()
         .build();
 
     match Engine::new(matches, connector).await {

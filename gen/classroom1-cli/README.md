@@ -11,7 +11,7 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
 Everything else about the *classroom* API can be found at the
-[official documentation site](https://developers.google.com/classroom/).
+[official documentation site](https://developers.google.com/workspace/classroom/).
 
 # Installation and Source Code
 
@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *classroom* API at revision *20240617*. The CLI is at version *6.0.0*.
+This documentation was generated from the *classroom* API at revision *20251217*. The CLI is at version *7.0.0*.
 
 ```bash
 classroom1 [options]
@@ -59,6 +59,11 @@ classroom1 [options]
                 course-work-list <course-id> [-p <v>]... [-o <out>]
                 course-work-modify-assignees <course-id> <id> (-r <kv>)... [-p <v>]... [-o <out>]
                 course-work-patch <course-id> <id> (-r <kv>)... [-p <v>]... [-o <out>]
+                course-work-rubrics-create <course-id> <course-work-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                course-work-rubrics-delete <course-id> <course-work-id> <id> [-p <v>]... [-o <out>]
+                course-work-rubrics-get <course-id> <course-work-id> <id> [-p <v>]... [-o <out>]
+                course-work-rubrics-list <course-id> <course-work-id> [-p <v>]... [-o <out>]
+                course-work-rubrics-patch <course-id> <course-work-id> <id> (-r <kv>)... [-p <v>]... [-o <out>]
                 course-work-student-submissions-get <course-id> <course-work-id> <id> [-p <v>]... [-o <out>]
                 course-work-student-submissions-list <course-id> <course-work-id> [-p <v>]... [-o <out>]
                 course-work-student-submissions-modify-attachments <course-id> <course-work-id> <id> (-r <kv>)... [-p <v>]... [-o <out>]
@@ -66,6 +71,7 @@ classroom1 [options]
                 course-work-student-submissions-reclaim <course-id> <course-work-id> <id> (-r <kv>)... [-p <v>]... [-o <out>]
                 course-work-student-submissions-return <course-id> <course-work-id> <id> (-r <kv>)... [-p <v>]... [-o <out>]
                 course-work-student-submissions-turn-in <course-id> <course-work-id> <id> (-r <kv>)... [-p <v>]... [-o <out>]
+                course-work-update-rubric <course-id> <course-work-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 course-work-materials-add-on-attachments-create <course-id> <item-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 course-work-materials-add-on-attachments-delete <course-id> <item-id> <attachment-id> [-p <v>]... [-o <out>]
                 course-work-materials-add-on-attachments-get <course-id> <item-id> <attachment-id> [-p <v>]... [-o <out>]
@@ -80,6 +86,7 @@ classroom1 [options]
                 create (-r <kv>)... [-p <v>]... [-o <out>]
                 delete <id> [-p <v>]... [-o <out>]
                 get <id> [-p <v>]... [-o <out>]
+                get-grading-period-settings <course-id> [-p <v>]... [-o <out>]
                 list [-p <v>]... [-o <out>]
                 patch <id> (-r <kv>)... [-p <v>]... [-o <out>]
                 posts-add-on-attachments-create <course-id> <post-id> (-r <kv>)... [-p <v>]... [-o <out>]
@@ -104,6 +111,7 @@ classroom1 [options]
                 topics-list <course-id> [-p <v>]... [-o <out>]
                 topics-patch <course-id> <id> (-r <kv>)... [-p <v>]... [-o <out>]
                 update <id> (-r <kv>)... [-p <v>]... [-o <out>]
+                update-grading-period-settings <course-id> (-r <kv>)... [-p <v>]... [-o <out>]
         invitations
                 accept <id> [-p <v>]... [-o <out>]
                 create (-r <kv>)... [-p <v>]... [-o <out>]

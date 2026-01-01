@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *DLP* API at revision *20240616*. The CLI is at version *6.0.0*.
+This documentation was generated from the *DLP* API at revision *20251213*. The CLI is at version *7.0.0*.
 
 ```bash
 dlp2 [options]
@@ -49,6 +49,7 @@ dlp2 [options]
                 locations-connections-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-connections-delete <name> [-p <v>]... [-o <out>]
                 locations-connections-get <name> [-p <v>]... [-o <out>]
+                locations-connections-list <parent> [-p <v>]... [-o <out>]
                 locations-connections-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-connections-search <parent> [-p <v>]... [-o <out>]
                 locations-deidentify-templates-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
@@ -62,6 +63,10 @@ dlp2 [options]
                 locations-discovery-configs-list <parent> [-p <v>]... [-o <out>]
                 locations-discovery-configs-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-dlp-jobs-list <parent> [-p <v>]... [-o <out>]
+                locations-file-store-data-profiles-delete <name> [-p <v>]... [-o <out>]
+                locations-file-store-data-profiles-get <name> [-p <v>]... [-o <out>]
+                locations-file-store-data-profiles-list <parent> [-p <v>]... [-o <out>]
+                locations-info-types-list <parent> [-p <v>]... [-o <out>]
                 locations-inspect-templates-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-inspect-templates-delete <name> [-p <v>]... [-o <out>]
                 locations-inspect-templates-get <name> [-p <v>]... [-o <out>]
@@ -141,7 +146,11 @@ dlp2 [options]
                 locations-dlp-jobs-get <name> [-p <v>]... [-o <out>]
                 locations-dlp-jobs-hybrid-inspect <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-dlp-jobs-list <parent> [-p <v>]... [-o <out>]
+                locations-file-store-data-profiles-delete <name> [-p <v>]... [-o <out>]
+                locations-file-store-data-profiles-get <name> [-p <v>]... [-o <out>]
+                locations-file-store-data-profiles-list <parent> [-p <v>]... [-o <out>]
                 locations-image-redact <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-info-types-list <parent> [-p <v>]... [-o <out>]
                 locations-inspect-templates-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-inspect-templates-delete <name> [-p <v>]... [-o <out>]
                 locations-inspect-templates-get <name> [-p <v>]... [-o <out>]

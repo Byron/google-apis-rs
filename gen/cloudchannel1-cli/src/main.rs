@@ -1121,6 +1121,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "customer-attestation-state" => Some((
+                    "customerAttestationState",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "domain" => Some((
                     "domain",
                     JsonTypeInfo {
@@ -1288,6 +1295,7 @@ where
                             "cloud-identity-info",
                             "correlation-id",
                             "create-time",
+                            "customer-attestation-state",
                             "customer-type",
                             "display-name",
                             "domain",
@@ -1649,6 +1657,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "primary-admin-email" => Some((
+                    "primaryAdminEmail",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 _ => {
                     let suggestion = FieldCursor::did_you_mean(
                         key,
@@ -1659,6 +1674,7 @@ where
                             "customer",
                             "domain",
                             "overwrite-if-exists",
+                            "primary-admin-email",
                         ],
                     );
                     err.issues.push(CLIError::Field(FieldError::Unknown(
@@ -1987,6 +2003,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "customer-attestation-state" => Some((
+                    "customerAttestationState",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "domain" => Some((
                     "domain",
                     JsonTypeInfo {
@@ -2154,6 +2177,7 @@ where
                             "cloud-identity-info",
                             "correlation-id",
                             "create-time",
+                            "customer-attestation-state",
                             "customer-type",
                             "display-name",
                             "domain",
@@ -2648,8 +2672,16 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "primary-admin-email" => Some((
+                    "primaryAdminEmail",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["domain"]);
+                    let suggestion =
+                        FieldCursor::did_you_mean(key, &vec!["domain", "primary-admin-email"]);
                     err.issues.push(CLIError::Field(FieldError::Unknown(
                         temp_cursor.to_string(),
                         suggestion,
@@ -2881,6 +2913,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "customer-attestation-state" => Some((
+                    "customerAttestationState",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "domain" => Some((
                     "domain",
                     JsonTypeInfo {
@@ -3048,6 +3087,7 @@ where
                             "cloud-identity-info",
                             "correlation-id",
                             "create-time",
+                            "customer-attestation-state",
                             "customer-type",
                             "display-name",
                             "domain",
@@ -4237,6 +4277,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "price-reference-id" => Some((
+                    "priceReferenceId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "purchase-order-id" => Some((
                     "purchaseOrderId",
                     JsonTypeInfo {
@@ -4257,6 +4304,7 @@ where
                         &vec![
                             "billing-account",
                             "offer",
+                            "price-reference-id",
                             "purchase-order-id",
                             "request-id",
                         ],
@@ -4803,6 +4851,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "entitlement.price-reference-id" => Some((
+                    "entitlement.priceReferenceId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "entitlement.provisioned-service.product-id" => Some((
                     "entitlement.provisionedService.productId",
                     JsonTypeInfo {
@@ -4891,6 +4946,7 @@ where
                             "payment-cycle",
                             "payment-plan",
                             "period-type",
+                            "price-reference-id",
                             "product-id",
                             "provisioned-service",
                             "provisioning-id",
@@ -5775,6 +5831,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "primary-admin-email" => Some((
+                    "primaryAdminEmail",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 _ => {
                     let suggestion = FieldCursor::did_you_mean(
                         key,
@@ -5785,6 +5848,7 @@ where
                             "customer",
                             "domain",
                             "overwrite-if-exists",
+                            "primary-admin-email",
                         ],
                     );
                     err.issues.push(CLIError::Field(FieldError::Unknown(
@@ -6351,6 +6415,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "customer-attestation-state" => Some((
+                    "customerAttestationState",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "domain" => Some((
                     "domain",
                     JsonTypeInfo {
@@ -6518,6 +6589,7 @@ where
                             "cloud-identity-info",
                             "correlation-id",
                             "create-time",
+                            "customer-attestation-state",
                             "customer-type",
                             "display-name",
                             "domain",
@@ -7293,6 +7365,9 @@ where
                             .unwrap_or(-0),
                     );
                 }
+                "integrator" => {
+                    call = call.integrator(value.unwrap_or(""));
+                }
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -7310,7 +7385,9 @@ where
                             .push(CLIError::UnknownParameter(key.to_string(), {
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
-                                v.extend(["page-size", "page-token"].iter().map(|v| *v));
+                                v.extend(
+                                    ["integrator", "page-size", "page-token"].iter().map(|v| *v),
+                                );
                                 v
                             }));
                     }
@@ -7871,6 +7948,20 @@ where
 
             let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
             {
+                "account" => Some((
+                    "account",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "integrator" => Some((
+                    "integrator",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "service-account" => Some((
                     "serviceAccount",
                     JsonTypeInfo {
@@ -7879,7 +7970,10 @@ where
                     },
                 )),
                 _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["service-account"]);
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec!["account", "integrator", "service-account"],
+                    );
                     err.issues.push(CLIError::Field(FieldError::Unknown(
                         temp_cursor.to_string(),
                         suggestion,
@@ -8787,6 +8881,20 @@ where
 
             let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
             {
+                "account" => Some((
+                    "account",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "integrator" => Some((
+                    "integrator",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "service-account" => Some((
                     "serviceAccount",
                     JsonTypeInfo {
@@ -8795,7 +8903,10 @@ where
                     },
                 )),
                 _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["service-account"]);
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec!["account", "integrator", "service-account"],
+                    );
                     err.issues.push(CLIError::Field(FieldError::Unknown(
                         temp_cursor.to_string(),
                         suggestion,
@@ -8820,6 +8931,405 @@ where
             .hub
             .accounts()
             .unregister(request, opt.value_of("account").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _integrators_list_subscribers(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .integrators()
+            .list_subscribers(opt.value_of("integrator").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                }
+                "page-size" => {
+                    call = call.page_size(
+                        value
+                            .map(|v| arg_from_str(v, err, "page-size", "int32"))
+                            .unwrap_or(-0),
+                    );
+                }
+                "account" => {
+                    call = call.account(value.unwrap_or(""));
+                }
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["account", "page-size", "page-token"].iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _integrators_register_subscriber(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut field_cursor = FieldCursor::default();
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "account" => Some((
+                    "account",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "integrator" => Some((
+                    "integrator",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "service-account" => Some((
+                    "serviceAccount",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec!["account", "integrator", "service-account"],
+                    );
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
+            }
+        }
+        let mut request: api::GoogleCloudChannelV1RegisterSubscriberRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .integrators()
+            .register_subscriber(request, opt.value_of("integrator").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _integrators_unregister_subscriber(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut field_cursor = FieldCursor::default();
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "account" => Some((
+                    "account",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "integrator" => Some((
+                    "integrator",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "service-account" => Some((
+                    "serviceAccount",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec!["account", "integrator", "service-account"],
+                    );
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
+            }
+        }
+        let mut request: api::GoogleCloudChannelV1UnregisterSubscriberRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .integrators()
+            .unregister_subscriber(request, opt.value_of("integrator").unwrap_or(""));
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -9199,6 +9709,13 @@ where
         {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "return-partial-success" => {
+                    call = call.return_partial_success(
+                        value
+                            .map(|v| arg_from_str(v, err, "return-partial-success", "boolean"))
+                            .unwrap_or(false),
+                    );
+                }
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
                 }
@@ -9229,7 +9746,16 @@ where
                             .push(CLIError::UnknownParameter(key.to_string(), {
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
-                                v.extend(["filter", "page-size", "page-token"].iter().map(|v| *v));
+                                v.extend(
+                                    [
+                                        "filter",
+                                        "page-size",
+                                        "page-token",
+                                        "return-partial-success",
+                                    ]
+                                    .iter()
+                                    .map(|v| *v),
+                                );
                                 v
                             }));
                     }
@@ -9774,6 +10300,28 @@ where
                     writeln!(std::io::stderr(), "{}\n", opt.usage()).ok();
                 }
             },
+            ("integrators", Some(opt)) => match opt.subcommand() {
+                ("list-subscribers", Some(opt)) => {
+                    call_result = self
+                        ._integrators_list_subscribers(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("register-subscriber", Some(opt)) => {
+                    call_result = self
+                        ._integrators_register_subscriber(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("unregister-subscriber", Some(opt)) => {
+                    call_result = self
+                        ._integrators_unregister_subscriber(opt, dry_run, &mut err)
+                        .await;
+                }
+                _ => {
+                    err.issues
+                        .push(CLIError::MissingMethodError("integrators".to_string()));
+                    writeln!(std::io::stderr(), "{}\n", opt.usage()).ok();
+                }
+            },
             ("operations", Some(opt)) => match opt.subcommand() {
                 ("cancel", Some(opt)) => {
                     call_result = self._operations_cancel(opt, dry_run, &mut err).await;
@@ -9846,7 +10394,9 @@ where
         let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
             secret,
             yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-            hyper_util::client::legacy::Client::builder(executor).build(connector),
+            yup_oauth2::client::CustomHyperClientBuilder::from(
+                hyper_util::client::legacy::Client::builder(executor).build(connector),
+            ),
         )
         .persist_tokens_to_disk(format!("{}/cloudchannel1", config_dir))
         .build()
@@ -10921,12 +11471,12 @@ async fn main() {
                      Some(false)),
                   ]),
             ("list-subscribers",
-                    Some(r##"Lists service accounts with subscriber privileges on the Cloud Pub/Sub topic created for this Channel Services account. Possible error codes: * PERMISSION_DENIED: The reseller account making the request and the provided reseller account are different, or the impersonated user is not a super admin. * INVALID_ARGUMENT: Required request parameters are missing or invalid. * NOT_FOUND: The topic resource doesn't exist. * INTERNAL: Any non-user error related to a technical issue in the backend. Contact Cloud Channel support. * UNKNOWN: Any non-user error related to a technical issue in the backend. Contact Cloud Channel support. Return value: A list of service email addresses."##),
+                    Some(r##"Lists service accounts with subscriber privileges on the Pub/Sub topic created for this Channel Services account or integrator. Possible error codes: * PERMISSION_DENIED: The reseller account making the request and the provided reseller account are different, or the impersonated user is not a super admin. * INVALID_ARGUMENT: Required request parameters are missing or invalid. * NOT_FOUND: The topic resource doesn't exist. * INTERNAL: Any non-user error related to a technical issue in the backend. Contact Cloud Channel support. * UNKNOWN: Any non-user error related to a technical issue in the backend. Contact Cloud Channel support. Return value: A list of service email addresses."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudchannel1_cli/accounts_list-subscribers",
                   vec![
                     (Some(r##"account"##),
                      None,
-                     Some(r##"Required. Resource name of the account."##),
+                     Some(r##"Optional. Resource name of the account. Required if integrator is not provided. Otherwise, leave this field empty/unset."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -11011,12 +11561,12 @@ async fn main() {
                      Some(false)),
                   ]),
             ("register",
-                    Some(r##"Registers a service account with subscriber privileges on the Cloud Pub/Sub topic for this Channel Services account. After you create a subscriber, you get the events through SubscriberEvent Possible error codes: * PERMISSION_DENIED: The reseller account making the request and the provided reseller account are different, or the impersonated user is not a super admin. * INVALID_ARGUMENT: Required request parameters are missing or invalid. * INTERNAL: Any non-user error related to a technical issue in the backend. Contact Cloud Channel support. * UNKNOWN: Any non-user error related to a technical issue in the backend. Contact Cloud Channel support. Return value: The topic name with the registered service email address."##),
+                    Some(r##"Registers a service account with subscriber privileges on the Pub/Sub topic for this Channel Services account or integrator. After you create a subscriber, you get the events through SubscriberEvent Possible error codes: * PERMISSION_DENIED: The reseller account making the request and the provided reseller account are different, or the impersonated user is not a super admin. * INVALID_ARGUMENT: Required request parameters are missing or invalid. * INTERNAL: Any non-user error related to a technical issue in the backend. Contact Cloud Channel support. * UNKNOWN: Any non-user error related to a technical issue in the backend. Contact Cloud Channel support. Return value: The topic name with the registered service email address."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudchannel1_cli/accounts_register",
                   vec![
                     (Some(r##"account"##),
                      None,
-                     Some(r##"Required. Resource name of the account."##),
+                     Some(r##"Optional. Resource name of the account. Required if integrator is not provided. Otherwise, leave this field empty/unset."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -11146,12 +11696,84 @@ async fn main() {
                      Some(false)),
                   ]),
             ("unregister",
-                    Some(r##"Unregisters a service account with subscriber privileges on the Cloud Pub/Sub topic created for this Channel Services account. If there are no service accounts left with subscriber privileges, this deletes the topic. You can call ListSubscribers to check for these accounts. Possible error codes: * PERMISSION_DENIED: The reseller account making the request and the provided reseller account are different, or the impersonated user is not a super admin. * INVALID_ARGUMENT: Required request parameters are missing or invalid. * NOT_FOUND: The topic resource doesn't exist. * INTERNAL: Any non-user error related to a technical issue in the backend. Contact Cloud Channel support. * UNKNOWN: Any non-user error related to a technical issue in the backend. Contact Cloud Channel support. Return value: The topic name that unregistered the service email address. Returns a success response if the service email address wasn't registered with the topic."##),
+                    Some(r##"Unregisters a service account with subscriber privileges on the Pub/Sub topic created for this Channel Services account or integrator. If there are no service accounts left with subscriber privileges, this deletes the topic. You can call ListSubscribers to check for these accounts. Possible error codes: * PERMISSION_DENIED: The reseller account making the request and the provided reseller account are different, or the impersonated user is not a super admin. * INVALID_ARGUMENT: Required request parameters are missing or invalid. * NOT_FOUND: The topic resource doesn't exist. * INTERNAL: Any non-user error related to a technical issue in the backend. Contact Cloud Channel support. * UNKNOWN: Any non-user error related to a technical issue in the backend. Contact Cloud Channel support. Return value: The topic name that unregistered the service email address. Returns a success response if the service email address wasn't registered with the topic."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudchannel1_cli/accounts_unregister",
                   vec![
                     (Some(r##"account"##),
                      None,
-                     Some(r##"Required. Resource name of the account."##),
+                     Some(r##"Optional. Resource name of the account. Required if integrator is not provided. Otherwise, leave this field empty/unset."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ]),
+            ("integrators", "methods: 'list-subscribers', 'register-subscriber' and 'unregister-subscriber'", vec![
+            ("list-subscribers",
+                    Some(r##"Lists service accounts with subscriber privileges on the Pub/Sub topic created for this Channel Services account or integrator. Possible error codes: * PERMISSION_DENIED: The reseller account making the request and the provided reseller account are different, or the impersonated user is not a super admin. * INVALID_ARGUMENT: Required request parameters are missing or invalid. * NOT_FOUND: The topic resource doesn't exist. * INTERNAL: Any non-user error related to a technical issue in the backend. Contact Cloud Channel support. * UNKNOWN: Any non-user error related to a technical issue in the backend. Contact Cloud Channel support. Return value: A list of service email addresses."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_cloudchannel1_cli/integrators_list-subscribers",
+                  vec![
+                    (Some(r##"integrator"##),
+                     None,
+                     Some(r##"Optional. Resource name of the integrator. Required if account is not provided. Otherwise, leave this field empty/unset."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("register-subscriber",
+                    Some(r##"Registers a service account with subscriber privileges on the Pub/Sub topic for this Channel Services account or integrator. After you create a subscriber, you get the events through SubscriberEvent Possible error codes: * PERMISSION_DENIED: The reseller account making the request and the provided reseller account are different, or the impersonated user is not a super admin. * INVALID_ARGUMENT: Required request parameters are missing or invalid. * INTERNAL: Any non-user error related to a technical issue in the backend. Contact Cloud Channel support. * UNKNOWN: Any non-user error related to a technical issue in the backend. Contact Cloud Channel support. Return value: The topic name with the registered service email address."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_cloudchannel1_cli/integrators_register-subscriber",
+                  vec![
+                    (Some(r##"integrator"##),
+                     None,
+                     Some(r##"Optional. Resource name of the integrator. Required if account is not provided. Otherwise, leave this field empty/unset."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("unregister-subscriber",
+                    Some(r##"Unregisters a service account with subscriber privileges on the Pub/Sub topic created for this Channel Services account or integrator. If there are no service accounts left with subscriber privileges, this deletes the topic. You can call ListSubscribers to check for these accounts. Possible error codes: * PERMISSION_DENIED: The reseller account making the request and the provided reseller account are different, or the impersonated user is not a super admin. * INVALID_ARGUMENT: Required request parameters are missing or invalid. * NOT_FOUND: The topic resource doesn't exist. * INTERNAL: Any non-user error related to a technical issue in the backend. Contact Cloud Channel support. * UNKNOWN: Any non-user error related to a technical issue in the backend. Contact Cloud Channel support. Return value: The topic name that unregistered the service email address. Returns a success response if the service email address wasn't registered with the topic."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_cloudchannel1_cli/integrators_unregister-subscriber",
+                  vec![
+                    (Some(r##"integrator"##),
+                     None,
+                     Some(r##"Optional. Resource name of the integrator. Required if account is not provided. Otherwise, leave this field empty/unset."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -11173,7 +11795,7 @@ async fn main() {
             ]),
             ("operations", "methods: 'cancel', 'delete', 'get' and 'list'", vec![
             ("cancel",
-                    Some(r##"Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of 1, corresponding to `Code.CANCELLED`."##),
+                    Some(r##"Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of `1`, corresponding to `Code.CANCELLED`."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudchannel1_cli/operations_cancel",
                   vec![
                     (Some(r##"name"##),
@@ -11299,7 +11921,7 @@ async fn main() {
 
     let mut app = App::new("cloudchannel1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("6.0.0+20240625")
+           .version("7.0.0+20251216")
            .about("The Cloud Channel API enables Google Cloud partners to have a single unified resale platform and APIs across all of Google Cloud including GCP, Workspace, Maps and Chrome.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_cloudchannel1_cli")
            .arg(Arg::with_name("url")
@@ -11364,7 +11986,7 @@ async fn main() {
         .with_native_roots()
         .unwrap()
         .https_or_http()
-        .enable_http1()
+        .enable_http2()
         .build();
 
     match Engine::new(matches, connector).await {

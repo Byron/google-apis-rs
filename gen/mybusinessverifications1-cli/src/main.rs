@@ -693,6 +693,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "trusted-partner-token" => Some((
+                    "trustedPartnerToken",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 _ => {
                     let suggestion = FieldCursor::did_you_mean(
                         key,
@@ -716,6 +723,7 @@ where
                             "sublocality",
                             "token",
                             "token-string",
+                            "trusted-partner-token",
                         ],
                     );
                     err.issues.push(CLIError::Field(FieldError::Unknown(
@@ -742,6 +750,232 @@ where
             .hub
             .locations()
             .verify(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _verification_tokens_generate(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut field_cursor = FieldCursor::default();
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "location-data.address.address-lines" => Some((
+                    "locationData.address.addressLines",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "location-data.address.administrative-area" => Some((
+                    "locationData.address.administrativeArea",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "location-data.address.language-code" => Some((
+                    "locationData.address.languageCode",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "location-data.address.locality" => Some((
+                    "locationData.address.locality",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "location-data.address.organization" => Some((
+                    "locationData.address.organization",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "location-data.address.postal-code" => Some((
+                    "locationData.address.postalCode",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "location-data.address.recipients" => Some((
+                    "locationData.address.recipients",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "location-data.address.region-code" => Some((
+                    "locationData.address.regionCode",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "location-data.address.revision" => Some((
+                    "locationData.address.revision",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "location-data.address.sorting-code" => Some((
+                    "locationData.address.sortingCode",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "location-data.address.sublocality" => Some((
+                    "locationData.address.sublocality",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "location-data.name" => Some((
+                    "locationData.name",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "location-id" => Some((
+                    "locationId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec![
+                            "address",
+                            "address-lines",
+                            "administrative-area",
+                            "language-code",
+                            "locality",
+                            "location-data",
+                            "location-id",
+                            "name",
+                            "organization",
+                            "postal-code",
+                            "recipients",
+                            "region-code",
+                            "revision",
+                            "sorting-code",
+                            "sublocality",
+                        ],
+                    );
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
+            }
+        }
+        let mut request: api::GenerateInstantVerificationTokenRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self.hub.verification_tokens().generate(request);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -842,6 +1076,19 @@ where
                     writeln!(std::io::stderr(), "{}\n", opt.usage()).ok();
                 }
             },
+            ("verification-tokens", Some(opt)) => match opt.subcommand() {
+                ("generate", Some(opt)) => {
+                    call_result = self
+                        ._verification_tokens_generate(opt, dry_run, &mut err)
+                        .await;
+                }
+                _ => {
+                    err.issues.push(CLIError::MissingMethodError(
+                        "verification-tokens".to_string(),
+                    ));
+                    writeln!(std::io::stderr(), "{}\n", opt.usage()).ok();
+                }
+            },
             _ => {
                 err.issues.push(CLIError::MissingCommandError);
                 writeln!(std::io::stderr(), "{}\n", self.opt.usage()).ok();
@@ -882,7 +1129,9 @@ where
         let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
             secret,
             yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-            hyper_util::client::legacy::Client::builder(executor).build(connector),
+            yup_oauth2::client::CustomHyperClientBuilder::from(
+                hyper_util::client::legacy::Client::builder(executor).build(connector),
+            ),
         )
         .persist_tokens_to_disk(format!("{}/mybusinessverifications1", config_dir))
         .build()
@@ -1052,11 +1301,33 @@ async fn main() {
                      Some(false)),
                   ]),
             ]),
+            ("verification-tokens", "methods: 'generate'", vec![
+            ("generate",
+                    Some(r##"Generate a token for the provided location data to verify the location."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_mybusinessverifications1_cli/verification-tokens_generate",
+                  vec![
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ]),
         ];
 
     let mut app = App::new("mybusinessverifications1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("6.0.0+20240625")
+           .version("7.0.0+20251210")
            .about("The My Business Verifications API provides an interface for taking verifications related actions for locations.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_mybusinessverifications1_cli")
            .arg(Arg::with_name("folder")
@@ -1116,7 +1387,7 @@ async fn main() {
         .with_native_roots()
         .unwrap()
         .https_or_http()
-        .enable_http1()
+        .enable_http2()
         .build();
 
     match Engine::new(matches, connector).await {

@@ -1,4 +1,4 @@
-site_name: Connectors v6.0.0+20240619
+site_name: Connectors v7.0.0+20250930
 site_url: http://byron.github.io/google-apis-rs/google-connectors1-cli
 site_description: A complete library to interact with Connectors (protocol v1)
 
@@ -17,6 +17,11 @@ nav:
     - 'Locations Connections Connection Schema Metadata Refresh': 'projects_locations-connections-connection-schema-metadata-refresh.md'
     - 'Locations Connections Create': 'projects_locations-connections-create.md'
     - 'Locations Connections Delete': 'projects_locations-connections-delete.md'
+    - 'Locations Connections End User Authentications Create': 'projects_locations-connections-end-user-authentications-create.md'
+    - 'Locations Connections End User Authentications Delete': 'projects_locations-connections-end-user-authentications-delete.md'
+    - 'Locations Connections End User Authentications Get': 'projects_locations-connections-end-user-authentications-get.md'
+    - 'Locations Connections End User Authentications List': 'projects_locations-connections-end-user-authentications-list.md'
+    - 'Locations Connections End User Authentications Patch': 'projects_locations-connections-end-user-authentications-patch.md'
     - 'Locations Connections Event Subscriptions Create': 'projects_locations-connections-event-subscriptions-create.md'
     - 'Locations Connections Event Subscriptions Delete': 'projects_locations-connections-event-subscriptions-delete.md'
     - 'Locations Connections Event Subscriptions Get': 'projects_locations-connections-event-subscriptions-get.md'
@@ -37,6 +42,8 @@ nav:
     - 'Locations Connections Test Iam Permissions': 'projects_locations-connections-test-iam-permissions.md'
     - 'Locations Custom Connectors Custom Connector Versions Delete': 'projects_locations-custom-connectors-custom-connector-versions-delete.md'
     - 'Locations Custom Connectors Custom Connector Versions Deprecate': 'projects_locations-custom-connectors-custom-connector-versions-deprecate.md'
+    - 'Locations Custom Connectors Custom Connector Versions Publish': 'projects_locations-custom-connectors-custom-connector-versions-publish.md'
+    - 'Locations Custom Connectors Custom Connector Versions Withdraw': 'projects_locations-custom-connectors-custom-connector-versions-withdraw.md'
     - 'Locations Custom Connectors Validate Custom Connector Spec': 'projects_locations-custom-connectors-validate-custom-connector-spec.md'
     - 'Locations Endpoint Attachments Create': 'projects_locations-endpoint-attachments-create.md'
     - 'Locations Endpoint Attachments Delete': 'projects_locations-endpoint-attachments-delete.md'
@@ -70,6 +77,7 @@ nav:
     - 'Locations Providers Connectors List': 'projects_locations-providers-connectors-list.md'
     - 'Locations Providers Connectors Versions Eventtypes Get': 'projects_locations-providers-connectors-versions-eventtypes-get.md'
     - 'Locations Providers Connectors Versions Eventtypes List': 'projects_locations-providers-connectors-versions-eventtypes-list.md'
+    - 'Locations Providers Connectors Versions Fetch Auth Schema': 'projects_locations-providers-connectors-versions-fetch-auth-schema.md'
     - 'Locations Providers Connectors Versions Get': 'projects_locations-providers-connectors-versions-get.md'
     - 'Locations Providers Connectors Versions List': 'projects_locations-providers-connectors-versions-list.md'
     - 'Locations Providers Get': 'projects_locations-providers-get.md'

@@ -11,7 +11,7 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
 Everything else about the *drive* API can be found at the
-[official documentation site](https://developers.google.com/drive/).
+[official documentation site](https://developers.google.com/workspace/drive/).
 
 # Installation and Source Code
 
@@ -25,12 +25,19 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *drive* API at revision *20240618*. The CLI is at version *6.0.0*.
+This documentation was generated from the *drive* API at revision *20251218*. The CLI is at version *7.0.0*.
 
 ```bash
 drive3 [options]
         about
                 get [-p <v>]... [-o <out>]
+        accessproposals
+                get <file-id> <proposal-id> [-p <v>]... [-o <out>]
+                list <file-id> [-p <v>]... [-o <out>]
+                resolve <file-id> <proposal-id> (-r <kv>)... [-p <v>]...
+        approvals
+                get <file-id> <approval-id> [-p <v>]... [-o <out>]
+                list <file-id> [-p <v>]... [-o <out>]
         apps
                 get <app-id> [-p <v>]... [-o <out>]
                 list [-p <v>]... [-o <out>]
@@ -58,6 +65,7 @@ drive3 [options]
                 copy <file-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 create (-r <kv>)... (-u simple -f <file> [-m <mime>]) [-p <v>]... [-o <out>]
                 delete <file-id> [-p <v>]...
+                download <file-id> [-p <v>]... [-o <out>]
                 empty-trash [-p <v>]...
                 export <file-id> <mime-type> [-p <v>]... [-o <out>]
                 generate-ids [-p <v>]... [-o <out>]
@@ -67,6 +75,8 @@ drive3 [options]
                 modify-labels <file-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 update <file-id> (-r <kv>)... (-u simple -f <file> [-m <mime>]) [-p <v>]... [-o <out>]
                 watch <file-id> (-r <kv>)... [-p <v>]... [-o <out>]
+        operations
+                get <name> [-p <v>]... [-o <out>]
         permissions
                 create <file-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 delete <file-id> <permission-id> [-p <v>]...

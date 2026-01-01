@@ -109,6 +109,34 @@
             "resources": {
                 "locations": {
                     "methods": {
+                        "checkConsumerConfig": {
+                            "description": "CheckConsumerConfig validates the consumer network and project for potential PSC connection creation. This method performs several checks, including: - Validating the existence and permissions of the service class. - Ensuring the consumer network exists and is accessible. - Verifying XPN relationships if applicable. - Checking for compatible IP versions between the consumer network and the requested version. This method performs a dynamic IAM check for the `networkconnectivity.serviceClasses.use` permission on the service class resource in the Prepare phase.",
+                            "flatPath": "v1/projects/{projectsId}/locations/{locationsId}:checkConsumerConfig",
+                            "httpMethod": "POST",
+                            "id": "networkconnectivity.projects.locations.checkConsumerConfig",
+                            "parameterOrder": [
+                                "location"
+                            ],
+                            "parameters": {
+                                "location": {
+                                    "description": "Required. The location resource path. Example: - projects/{project}/locations/{location}",
+                                    "location": "path",
+                                    "pattern": "^projects/[^/]+/locations/[^/]+$",
+                                    "required": true,
+                                    "type": "string"
+                                }
+                            },
+                            "path": "v1/{+location}:checkConsumerConfig",
+                            "request": {
+                                "$ref": "CheckConsumerConfigRequest"
+                            },
+                            "response": {
+                                "$ref": "CheckConsumerConfigResponse"
+                            },
+                            "scopes": [
+                                "https://www.googleapis.com/auth/cloud-platform"
+                            ]
+                        },
                         "get": {
                             "description": "Gets information about a location.",
                             "flatPath": "v1/projects/{projectsId}/locations/{locationsId}",
@@ -143,6 +171,12 @@
                                 "name"
                             ],
                             "parameters": {
+                                "extraLocationTypes": {
+                                    "description": "Optional. Do not use this field. It is unsupported and is ignored unless explicitly documented otherwise. This is primarily for internal usage.",
+                                    "location": "query",
+                                    "repeated": true,
+                                    "type": "string"
+                                },
                                 "filter": {
                                     "description": "A filter to narrow down results to a preferred subset. The filtering language accepts strings like `\"displayName=tokyo\"`, and is documented in more detail in [AIP-160](https://google.aip.dev/160).",
                                     "location": "query",
@@ -201,6 +235,34 @@
                                             "path": "v1/{+name}:acceptSpoke",
                                             "request": {
                                                 "$ref": "AcceptHubSpokeRequest"
+                                            },
+                                            "response": {
+                                                "$ref": "GoogleLongrunningOperation"
+                                            },
+                                            "scopes": [
+                                                "https://www.googleapis.com/auth/cloud-platform"
+                                            ]
+                                        },
+                                        "acceptSpokeUpdate": {
+                                            "description": "Accepts a proposal to update a Network Connectivity Center spoke in a hub.",
+                                            "flatPath": "v1/projects/{projectsId}/locations/global/hubs/{hubsId}:acceptSpokeUpdate",
+                                            "httpMethod": "POST",
+                                            "id": "networkconnectivity.projects.locations.global.hubs.acceptSpokeUpdate",
+                                            "parameterOrder": [
+                                                "name"
+                                            ],
+                                            "parameters": {
+                                                "name": {
+                                                    "description": "Required. The name of the hub to accept spoke update.",
+                                                    "location": "path",
+                                                    "pattern": "^projects/[^/]+/locations/global/hubs/[^/]+$",
+                                                    "required": true,
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "path": "v1/{+name}:acceptSpokeUpdate",
+                                            "request": {
+                                                "$ref": "AcceptSpokeUpdateRequest"
                                             },
                                             "response": {
                                                 "$ref": "GoogleLongrunningOperation"
@@ -485,6 +547,57 @@
                                                 "https://www.googleapis.com/auth/cloud-platform"
                                             ]
                                         },
+                                        "queryStatus": {
+                                            "description": "Query the Private Service Connect propagation status of a Network Connectivity Center hub.",
+                                            "flatPath": "v1/projects/{projectsId}/locations/global/hubs/{hubsId}:queryStatus",
+                                            "httpMethod": "GET",
+                                            "id": "networkconnectivity.projects.locations.global.hubs.queryStatus",
+                                            "parameterOrder": [
+                                                "name"
+                                            ],
+                                            "parameters": {
+                                                "filter": {
+                                                    "description": "Optional. An expression that filters the list of results. The filter can be used to filter the results by the following fields: * `psc_propagation_status.source_spoke` * `psc_propagation_status.source_group` * `psc_propagation_status.source_forwarding_rule` * `psc_propagation_status.target_spoke` * `psc_propagation_status.target_group` * `psc_propagation_status.code` * `psc_propagation_status.message`",
+                                                    "location": "query",
+                                                    "type": "string"
+                                                },
+                                                "groupBy": {
+                                                    "description": "Optional. Aggregate the results by the specified fields. A comma-separated list of any of these fields: * `psc_propagation_status.source_spoke` * `psc_propagation_status.source_group` * `psc_propagation_status.source_forwarding_rule` * `psc_propagation_status.target_spoke` * `psc_propagation_status.target_group` * `psc_propagation_status.code`",
+                                                    "location": "query",
+                                                    "type": "string"
+                                                },
+                                                "name": {
+                                                    "description": "Required. The name of the hub.",
+                                                    "location": "path",
+                                                    "pattern": "^projects/[^/]+/locations/global/hubs/[^/]+$",
+                                                    "required": true,
+                                                    "type": "string"
+                                                },
+                                                "orderBy": {
+                                                    "description": "Optional. Sort the results in ascending order by the specified fields. A comma-separated list of any of these fields: * `psc_propagation_status.source_spoke` * `psc_propagation_status.source_group` * `psc_propagation_status.source_forwarding_rule` * `psc_propagation_status.target_spoke` * `psc_propagation_status.target_group` * `psc_propagation_status.code` If `group_by` is set, the value of the `order_by` field must be the same as or a subset of the `group_by` field.",
+                                                    "location": "query",
+                                                    "type": "string"
+                                                },
+                                                "pageSize": {
+                                                    "description": "Optional. The maximum number of results to return per page.",
+                                                    "format": "int32",
+                                                    "location": "query",
+                                                    "type": "integer"
+                                                },
+                                                "pageToken": {
+                                                    "description": "Optional. The page token.",
+                                                    "location": "query",
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "path": "v1/{+name}:queryStatus",
+                                            "response": {
+                                                "$ref": "QueryHubStatusResponse"
+                                            },
+                                            "scopes": [
+                                                "https://www.googleapis.com/auth/cloud-platform"
+                                            ]
+                                        },
                                         "rejectSpoke": {
                                             "description": "Rejects a Network Connectivity Center spoke from being attached to a hub. If the spoke was previously in the `ACTIVE` state, it transitions to the `INACTIVE` state and is no longer able to connect to other spokes that are attached to the hub.",
                                             "flatPath": "v1/projects/{projectsId}/locations/global/hubs/{hubsId}:rejectSpoke",
@@ -505,6 +618,34 @@
                                             "path": "v1/{+name}:rejectSpoke",
                                             "request": {
                                                 "$ref": "RejectHubSpokeRequest"
+                                            },
+                                            "response": {
+                                                "$ref": "GoogleLongrunningOperation"
+                                            },
+                                            "scopes": [
+                                                "https://www.googleapis.com/auth/cloud-platform"
+                                            ]
+                                        },
+                                        "rejectSpokeUpdate": {
+                                            "description": "Rejects a proposal to update a Network Connectivity Center spoke in a hub.",
+                                            "flatPath": "v1/projects/{projectsId}/locations/global/hubs/{hubsId}:rejectSpokeUpdate",
+                                            "httpMethod": "POST",
+                                            "id": "networkconnectivity.projects.locations.global.hubs.rejectSpokeUpdate",
+                                            "parameterOrder": [
+                                                "name"
+                                            ],
+                                            "parameters": {
+                                                "name": {
+                                                    "description": "Required. The name of the hub to reject spoke update.",
+                                                    "location": "path",
+                                                    "pattern": "^projects/[^/]+/locations/global/hubs/[^/]+$",
+                                                    "required": true,
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "path": "v1/{+name}:rejectSpokeUpdate",
+                                            "request": {
+                                                "$ref": "RejectSpokeUpdateRequest"
                                             },
                                             "response": {
                                                 "$ref": "GoogleLongrunningOperation"
@@ -945,7 +1086,7 @@
                                                     "type": "string"
                                                 },
                                                 "policyBasedRouteId": {
-                                                    "description": "Required. Unique id for the policy-based route to create.",
+                                                    "description": "Required. Unique id for the policy-based route to create. Provided by the client when the resource is created. The name must comply with https://google.aip.dev/122#resource-id-segments. Specifically, the name must be 1-63 characters long and match the regular expression [a-z]([a-z0-9-]*[a-z0-9])?. The first character must be a lowercase letter, and all following characters (except for the last character) must be a dash, lowercase letter, or digit. The last character must be a lowercase letter or digit.",
                                                     "location": "query",
                                                     "type": "string"
                                                 },
@@ -1253,6 +1394,37 @@
                                         "https://www.googleapis.com/auth/cloud-platform"
                                     ]
                                 },
+                                "getIamPolicy": {
+                                    "description": "Gets the access control policy for a resource. Returns an empty policy if the resource exists and does not have a policy set.",
+                                    "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/internalRanges/{internalRangesId}:getIamPolicy",
+                                    "httpMethod": "GET",
+                                    "id": "networkconnectivity.projects.locations.internalRanges.getIamPolicy",
+                                    "parameterOrder": [
+                                        "resource"
+                                    ],
+                                    "parameters": {
+                                        "options.requestedPolicyVersion": {
+                                            "description": "Optional. The maximum policy version that will be used to format the policy. Valid values are 0, 1, and 3. Requests specifying an invalid value will be rejected. Requests for policies with any conditional role bindings must specify version 3. Policies with no conditional role bindings may specify any valid value or leave the field unset. The policy in the response might use the policy version that you specified, or it might use a lower policy version. For example, if you specify version 3, but the policy has no conditional role bindings, the response uses version 1. To learn which resources support conditions in their IAM policies, see the [IAM documentation](https://cloud.google.com/iam/help/conditions/resource-policies).",
+                                            "format": "int32",
+                                            "location": "query",
+                                            "type": "integer"
+                                        },
+                                        "resource": {
+                                            "description": "REQUIRED: The resource for which the policy is being requested. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field.",
+                                            "location": "path",
+                                            "pattern": "^projects/[^/]+/locations/[^/]+/internalRanges/[^/]+$",
+                                            "required": true,
+                                            "type": "string"
+                                        }
+                                    },
+                                    "path": "v1/{+resource}:getIamPolicy",
+                                    "response": {
+                                        "$ref": "Policy"
+                                    },
+                                    "scopes": [
+                                        "https://www.googleapis.com/auth/cloud-platform"
+                                    ]
+                                },
                                 "list": {
                                     "description": "Lists internal ranges in a given project and location.",
                                     "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/internalRanges",
@@ -1309,7 +1481,7 @@
                                     ],
                                     "parameters": {
                                         "name": {
-                                            "description": "Immutable. The name of an internal range. Format: projects/{project}/locations/{location}/internalRanges/{internal_range} See: https://google.aip.dev/122#fields-representing-resource-names",
+                                            "description": "Identifier. The name of an internal range. Format: projects/{project}/locations/{location}/internalRanges/{internal_range} See: https://google.aip.dev/122#fields-representing-resource-names",
                                             "location": "path",
                                             "pattern": "^projects/[^/]+/locations/[^/]+/internalRanges/[^/]+$",
                                             "required": true,
@@ -1337,13 +1509,520 @@
                                     "scopes": [
                                         "https://www.googleapis.com/auth/cloud-platform"
                                     ]
+                                },
+                                "setIamPolicy": {
+                                    "description": "Sets the access control policy on the specified resource. Replaces any existing policy. Can return `NOT_FOUND`, `INVALID_ARGUMENT`, and `PERMISSION_DENIED` errors.",
+                                    "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/internalRanges/{internalRangesId}:setIamPolicy",
+                                    "httpMethod": "POST",
+                                    "id": "networkconnectivity.projects.locations.internalRanges.setIamPolicy",
+                                    "parameterOrder": [
+                                        "resource"
+                                    ],
+                                    "parameters": {
+                                        "resource": {
+                                            "description": "REQUIRED: The resource for which the policy is being specified. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field.",
+                                            "location": "path",
+                                            "pattern": "^projects/[^/]+/locations/[^/]+/internalRanges/[^/]+$",
+                                            "required": true,
+                                            "type": "string"
+                                        }
+                                    },
+                                    "path": "v1/{+resource}:setIamPolicy",
+                                    "request": {
+                                        "$ref": "SetIamPolicyRequest"
+                                    },
+                                    "response": {
+                                        "$ref": "Policy"
+                                    },
+                                    "scopes": [
+                                        "https://www.googleapis.com/auth/cloud-platform"
+                                    ]
+                                },
+                                "testIamPermissions": {
+                                    "description": "Returns permissions that a caller has on the specified resource. If the resource does not exist, this will return an empty set of permissions, not a `NOT_FOUND` error. Note: This operation is designed to be used for building permission-aware UIs and command-line tools, not for authorization checking. This operation may \"fail open\" without warning.",
+                                    "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/internalRanges/{internalRangesId}:testIamPermissions",
+                                    "httpMethod": "POST",
+                                    "id": "networkconnectivity.projects.locations.internalRanges.testIamPermissions",
+                                    "parameterOrder": [
+                                        "resource"
+                                    ],
+                                    "parameters": {
+                                        "resource": {
+                                            "description": "REQUIRED: The resource for which the policy detail is being requested. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field.",
+                                            "location": "path",
+                                            "pattern": "^projects/[^/]+/locations/[^/]+/internalRanges/[^/]+$",
+                                            "required": true,
+                                            "type": "string"
+                                        }
+                                    },
+                                    "path": "v1/{+resource}:testIamPermissions",
+                                    "request": {
+                                        "$ref": "TestIamPermissionsRequest"
+                                    },
+                                    "response": {
+                                        "$ref": "TestIamPermissionsResponse"
+                                    },
+                                    "scopes": [
+                                        "https://www.googleapis.com/auth/cloud-platform"
+                                    ]
+                                }
+                            }
+                        },
+                        "multicloudDataTransferConfigs": {
+                            "methods": {
+                                "create": {
+                                    "description": "Creates a `MulticloudDataTransferConfig` resource in a specified project and location.",
+                                    "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/multicloudDataTransferConfigs",
+                                    "httpMethod": "POST",
+                                    "id": "networkconnectivity.projects.locations.multicloudDataTransferConfigs.create",
+                                    "parameterOrder": [
+                                        "parent"
+                                    ],
+                                    "parameters": {
+                                        "multicloudDataTransferConfigId": {
+                                            "description": "Required. The ID to use for the `MulticloudDataTransferConfig` resource, which becomes the final component of the `MulticloudDataTransferConfig` resource name.",
+                                            "location": "query",
+                                            "type": "string"
+                                        },
+                                        "parent": {
+                                            "description": "Required. The name of the parent resource.",
+                                            "location": "path",
+                                            "pattern": "^projects/[^/]+/locations/[^/]+$",
+                                            "required": true,
+                                            "type": "string"
+                                        },
+                                        "requestId": {
+                                            "description": "Optional. A request ID to identify requests. Specify a unique request ID so that if you must retry your request, the server can ignore the request if it has already been completed. The server waits for at least 60 minutes since the first request. For example, consider a situation where you make an initial request and the request times out. If you make the request again with the same request ID, the server can check if original operation with the same request ID was received, and if so, can ignore the second request. This prevents clients from accidentally creating duplicate `MulticloudDataTransferConfig` resources. The request ID must be a valid UUID with the exception that zero UUID (00000000-0000-0000-0000-000000000000) isn't supported.",
+                                            "location": "query",
+                                            "type": "string"
+                                        }
+                                    },
+                                    "path": "v1/{+parent}/multicloudDataTransferConfigs",
+                                    "request": {
+                                        "$ref": "MulticloudDataTransferConfig"
+                                    },
+                                    "response": {
+                                        "$ref": "GoogleLongrunningOperation"
+                                    },
+                                    "scopes": [
+                                        "https://www.googleapis.com/auth/cloud-platform"
+                                    ]
+                                },
+                                "delete": {
+                                    "description": "Deletes a `MulticloudDataTransferConfig` resource.",
+                                    "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/multicloudDataTransferConfigs/{multicloudDataTransferConfigsId}",
+                                    "httpMethod": "DELETE",
+                                    "id": "networkconnectivity.projects.locations.multicloudDataTransferConfigs.delete",
+                                    "parameterOrder": [
+                                        "name"
+                                    ],
+                                    "parameters": {
+                                        "etag": {
+                                            "description": "Optional. The etag is computed by the server, and might be sent with update and delete requests so that the client has an up-to-date value before proceeding.",
+                                            "location": "query",
+                                            "type": "string"
+                                        },
+                                        "name": {
+                                            "description": "Required. The name of the `MulticloudDataTransferConfig` resource to delete.",
+                                            "location": "path",
+                                            "pattern": "^projects/[^/]+/locations/[^/]+/multicloudDataTransferConfigs/[^/]+$",
+                                            "required": true,
+                                            "type": "string"
+                                        },
+                                        "requestId": {
+                                            "description": "Optional. A request ID to identify requests. Specify a unique request ID so that if you must retry your request, the server can ignore the request if it has already been completed. The server waits for at least 60 minutes since the first request. For example, consider a situation where you make an initial request and the request times out. If you make the request again with the same request ID, the server can check if original operation with the same request ID was received, and if so, can ignore the second request. This prevents clients from accidentally creating duplicate `MulticloudDataTransferConfig` resources. The request ID must be a valid UUID with the exception that zero UUID (00000000-0000-0000-0000-000000000000) isn't supported.",
+                                            "location": "query",
+                                            "type": "string"
+                                        }
+                                    },
+                                    "path": "v1/{+name}",
+                                    "response": {
+                                        "$ref": "GoogleLongrunningOperation"
+                                    },
+                                    "scopes": [
+                                        "https://www.googleapis.com/auth/cloud-platform"
+                                    ]
+                                },
+                                "get": {
+                                    "description": "Gets the details of a `MulticloudDataTransferConfig` resource.",
+                                    "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/multicloudDataTransferConfigs/{multicloudDataTransferConfigsId}",
+                                    "httpMethod": "GET",
+                                    "id": "networkconnectivity.projects.locations.multicloudDataTransferConfigs.get",
+                                    "parameterOrder": [
+                                        "name"
+                                    ],
+                                    "parameters": {
+                                        "name": {
+                                            "description": "Required. The name of the `MulticloudDataTransferConfig` resource to get.",
+                                            "location": "path",
+                                            "pattern": "^projects/[^/]+/locations/[^/]+/multicloudDataTransferConfigs/[^/]+$",
+                                            "required": true,
+                                            "type": "string"
+                                        }
+                                    },
+                                    "path": "v1/{+name}",
+                                    "response": {
+                                        "$ref": "MulticloudDataTransferConfig"
+                                    },
+                                    "scopes": [
+                                        "https://www.googleapis.com/auth/cloud-platform"
+                                    ]
+                                },
+                                "list": {
+                                    "description": "Lists the `MulticloudDataTransferConfig` resources in a specified project and location.",
+                                    "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/multicloudDataTransferConfigs",
+                                    "httpMethod": "GET",
+                                    "id": "networkconnectivity.projects.locations.multicloudDataTransferConfigs.list",
+                                    "parameterOrder": [
+                                        "parent"
+                                    ],
+                                    "parameters": {
+                                        "filter": {
+                                            "description": "Optional. An expression that filters the results listed in the response.",
+                                            "location": "query",
+                                            "type": "string"
+                                        },
+                                        "orderBy": {
+                                            "description": "Optional. The sort order of the results.",
+                                            "location": "query",
+                                            "type": "string"
+                                        },
+                                        "pageSize": {
+                                            "description": "Optional. The maximum number of results listed per page.",
+                                            "format": "int32",
+                                            "location": "query",
+                                            "type": "integer"
+                                        },
+                                        "pageToken": {
+                                            "description": "Optional. The page token.",
+                                            "location": "query",
+                                            "type": "string"
+                                        },
+                                        "parent": {
+                                            "description": "Required. The name of the parent resource.",
+                                            "location": "path",
+                                            "pattern": "^projects/[^/]+/locations/[^/]+$",
+                                            "required": true,
+                                            "type": "string"
+                                        },
+                                        "returnPartialSuccess": {
+                                            "description": "Optional. If `true`, allows partial responses for multi-regional aggregated list requests.",
+                                            "location": "query",
+                                            "type": "boolean"
+                                        }
+                                    },
+                                    "path": "v1/{+parent}/multicloudDataTransferConfigs",
+                                    "response": {
+                                        "$ref": "ListMulticloudDataTransferConfigsResponse"
+                                    },
+                                    "scopes": [
+                                        "https://www.googleapis.com/auth/cloud-platform"
+                                    ]
+                                },
+                                "patch": {
+                                    "description": "Updates a `MulticloudDataTransferConfig` resource in a specified project and location.",
+                                    "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/multicloudDataTransferConfigs/{multicloudDataTransferConfigsId}",
+                                    "httpMethod": "PATCH",
+                                    "id": "networkconnectivity.projects.locations.multicloudDataTransferConfigs.patch",
+                                    "parameterOrder": [
+                                        "name"
+                                    ],
+                                    "parameters": {
+                                        "name": {
+                                            "description": "Identifier. The name of the `MulticloudDataTransferConfig` resource. Format: `projects/{project}/locations/{location}/multicloudDataTransferConfigs/{multicloud_data_transfer_config}`.",
+                                            "location": "path",
+                                            "pattern": "^projects/[^/]+/locations/[^/]+/multicloudDataTransferConfigs/[^/]+$",
+                                            "required": true,
+                                            "type": "string"
+                                        },
+                                        "requestId": {
+                                            "description": "Optional. A request ID to identify requests. Specify a unique request ID so that if you must retry your request, the server can ignore the request if it has already been completed. The server waits for at least 60 minutes since the first request. For example, consider a situation where you make an initial request and the request times out. If you make the request again with the same request ID, the server can check if original operation with the same request ID was received, and if so, can ignore the second request. This prevents clients from accidentally creating duplicate `MulticloudDataTransferConfig` resources. The request ID must be a valid UUID with the exception that zero UUID (00000000-0000-0000-0000-000000000000) isn't supported.",
+                                            "location": "query",
+                                            "type": "string"
+                                        },
+                                        "updateMask": {
+                                            "description": "Optional. `FieldMask` is used to specify the fields in the `MulticloudDataTransferConfig` resource to be overwritten by the update. The fields specified in `update_mask` are relative to the resource, not the full request. A field is overwritten if it is in the mask. If you don't specify a mask, all fields are overwritten.",
+                                            "format": "google-fieldmask",
+                                            "location": "query",
+                                            "type": "string"
+                                        }
+                                    },
+                                    "path": "v1/{+name}",
+                                    "request": {
+                                        "$ref": "MulticloudDataTransferConfig"
+                                    },
+                                    "response": {
+                                        "$ref": "GoogleLongrunningOperation"
+                                    },
+                                    "scopes": [
+                                        "https://www.googleapis.com/auth/cloud-platform"
+                                    ]
+                                }
+                            },
+                            "resources": {
+                                "destinations": {
+                                    "methods": {
+                                        "create": {
+                                            "description": "Creates a `Destination` resource in a specified project and location.",
+                                            "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/multicloudDataTransferConfigs/{multicloudDataTransferConfigsId}/destinations",
+                                            "httpMethod": "POST",
+                                            "id": "networkconnectivity.projects.locations.multicloudDataTransferConfigs.destinations.create",
+                                            "parameterOrder": [
+                                                "parent"
+                                            ],
+                                            "parameters": {
+                                                "destinationId": {
+                                                    "description": "Required. The ID to use for the `Destination` resource, which becomes the final component of the `Destination` resource name.",
+                                                    "location": "query",
+                                                    "type": "string"
+                                                },
+                                                "parent": {
+                                                    "description": "Required. The name of the parent resource.",
+                                                    "location": "path",
+                                                    "pattern": "^projects/[^/]+/locations/[^/]+/multicloudDataTransferConfigs/[^/]+$",
+                                                    "required": true,
+                                                    "type": "string"
+                                                },
+                                                "requestId": {
+                                                    "description": "Optional. A request ID to identify requests. Specify a unique request ID so that if you must retry your request, the server can ignore the request if it has already been completed. The server waits for at least 60 minutes since the first request. For example, consider a situation where you make an initial request and the request times out. If you make the request again with the same request ID, the server can check if original operation with the same request ID was received, and if so, can ignore the second request. This prevents clients from accidentally creating duplicate `Destination` resources. The request ID must be a valid UUID with the exception that zero UUID (00000000-0000-0000-0000-000000000000) isn't supported.",
+                                                    "location": "query",
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "path": "v1/{+parent}/destinations",
+                                            "request": {
+                                                "$ref": "Destination"
+                                            },
+                                            "response": {
+                                                "$ref": "GoogleLongrunningOperation"
+                                            },
+                                            "scopes": [
+                                                "https://www.googleapis.com/auth/cloud-platform"
+                                            ]
+                                        },
+                                        "delete": {
+                                            "description": "Deletes a `Destination` resource.",
+                                            "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/multicloudDataTransferConfigs/{multicloudDataTransferConfigsId}/destinations/{destinationsId}",
+                                            "httpMethod": "DELETE",
+                                            "id": "networkconnectivity.projects.locations.multicloudDataTransferConfigs.destinations.delete",
+                                            "parameterOrder": [
+                                                "name"
+                                            ],
+                                            "parameters": {
+                                                "etag": {
+                                                    "description": "Optional. The etag is computed by the server, and might be sent with update and delete requests so that the client has an up-to-date value before proceeding.",
+                                                    "location": "query",
+                                                    "type": "string"
+                                                },
+                                                "name": {
+                                                    "description": "Required. The name of the `Destination` resource to delete.",
+                                                    "location": "path",
+                                                    "pattern": "^projects/[^/]+/locations/[^/]+/multicloudDataTransferConfigs/[^/]+/destinations/[^/]+$",
+                                                    "required": true,
+                                                    "type": "string"
+                                                },
+                                                "requestId": {
+                                                    "description": "Optional. A request ID to identify requests. Specify a unique request ID so that if you must retry your request, the server can ignore the request if it has already been completed. The server waits for at least 60 minutes since the first request. For example, consider a situation where you make an initial request and the request times out. If you make the request again with the same request ID, the server can check if original operation with the same request ID was received, and if so, can ignore the second request. The request ID must be a valid UUID with the exception that zero UUID (00000000-0000-0000-0000-000000000000) isn't supported.",
+                                                    "location": "query",
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "path": "v1/{+name}",
+                                            "response": {
+                                                "$ref": "GoogleLongrunningOperation"
+                                            },
+                                            "scopes": [
+                                                "https://www.googleapis.com/auth/cloud-platform"
+                                            ]
+                                        },
+                                        "get": {
+                                            "description": "Gets the details of a `Destination` resource.",
+                                            "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/multicloudDataTransferConfigs/{multicloudDataTransferConfigsId}/destinations/{destinationsId}",
+                                            "httpMethod": "GET",
+                                            "id": "networkconnectivity.projects.locations.multicloudDataTransferConfigs.destinations.get",
+                                            "parameterOrder": [
+                                                "name"
+                                            ],
+                                            "parameters": {
+                                                "name": {
+                                                    "description": "Required. The name of the `Destination` resource to get.",
+                                                    "location": "path",
+                                                    "pattern": "^projects/[^/]+/locations/[^/]+/multicloudDataTransferConfigs/[^/]+/destinations/[^/]+$",
+                                                    "required": true,
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "path": "v1/{+name}",
+                                            "response": {
+                                                "$ref": "Destination"
+                                            },
+                                            "scopes": [
+                                                "https://www.googleapis.com/auth/cloud-platform"
+                                            ]
+                                        },
+                                        "list": {
+                                            "description": "Lists the `Destination` resources in a specified project and location.",
+                                            "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/multicloudDataTransferConfigs/{multicloudDataTransferConfigsId}/destinations",
+                                            "httpMethod": "GET",
+                                            "id": "networkconnectivity.projects.locations.multicloudDataTransferConfigs.destinations.list",
+                                            "parameterOrder": [
+                                                "parent"
+                                            ],
+                                            "parameters": {
+                                                "filter": {
+                                                    "description": "Optional. An expression that filters the results listed in the response.",
+                                                    "location": "query",
+                                                    "type": "string"
+                                                },
+                                                "orderBy": {
+                                                    "description": "Optional. The sort order of the results.",
+                                                    "location": "query",
+                                                    "type": "string"
+                                                },
+                                                "pageSize": {
+                                                    "description": "Optional. The maximum number of results listed per page.",
+                                                    "format": "int32",
+                                                    "location": "query",
+                                                    "type": "integer"
+                                                },
+                                                "pageToken": {
+                                                    "description": "Optional. The page token.",
+                                                    "location": "query",
+                                                    "type": "string"
+                                                },
+                                                "parent": {
+                                                    "description": "Required. The name of the parent resource.",
+                                                    "location": "path",
+                                                    "pattern": "^projects/[^/]+/locations/[^/]+/multicloudDataTransferConfigs/[^/]+$",
+                                                    "required": true,
+                                                    "type": "string"
+                                                },
+                                                "returnPartialSuccess": {
+                                                    "description": "Optional. If `true`, allow partial responses for multi-regional aggregated list requests.",
+                                                    "location": "query",
+                                                    "type": "boolean"
+                                                }
+                                            },
+                                            "path": "v1/{+parent}/destinations",
+                                            "response": {
+                                                "$ref": "ListDestinationsResponse"
+                                            },
+                                            "scopes": [
+                                                "https://www.googleapis.com/auth/cloud-platform"
+                                            ]
+                                        },
+                                        "patch": {
+                                            "description": "Updates a `Destination` resource in a specified project and location.",
+                                            "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/multicloudDataTransferConfigs/{multicloudDataTransferConfigsId}/destinations/{destinationsId}",
+                                            "httpMethod": "PATCH",
+                                            "id": "networkconnectivity.projects.locations.multicloudDataTransferConfigs.destinations.patch",
+                                            "parameterOrder": [
+                                                "name"
+                                            ],
+                                            "parameters": {
+                                                "name": {
+                                                    "description": "Identifier. The name of the `Destination` resource. Format: `projects/{project}/locations/{location}/multicloudDataTransferConfigs/{multicloud_data_transfer_config}/destinations/{destination}`.",
+                                                    "location": "path",
+                                                    "pattern": "^projects/[^/]+/locations/[^/]+/multicloudDataTransferConfigs/[^/]+/destinations/[^/]+$",
+                                                    "required": true,
+                                                    "type": "string"
+                                                },
+                                                "requestId": {
+                                                    "description": "Optional. A request ID to identify requests. Specify a unique request ID so that if you must retry your request, the server can ignore the request if it has already been completed. The server waits for at least 60 minutes since the first request. For example, consider a situation where you make an initial request and the request times out. If you make the request again with the same request ID, the server can check if original operation with the same request ID was received, and if so, can ignore the second request. The request ID must be a valid UUID with the exception that zero UUID (00000000-0000-0000-0000-000000000000) isn't supported.",
+                                                    "location": "query",
+                                                    "type": "string"
+                                                },
+                                                "updateMask": {
+                                                    "description": "Optional. `FieldMask is used to specify the fields to be overwritten in the `Destination` resource by the update. The fields specified in `update_mask` are relative to the resource, not the full request. A field is overwritten if it is in the mask. If you don't specify a mask, all fields are overwritten.",
+                                                    "format": "google-fieldmask",
+                                                    "location": "query",
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "path": "v1/{+name}",
+                                            "request": {
+                                                "$ref": "Destination"
+                                            },
+                                            "response": {
+                                                "$ref": "GoogleLongrunningOperation"
+                                            },
+                                            "scopes": [
+                                                "https://www.googleapis.com/auth/cloud-platform"
+                                            ]
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        "multicloudDataTransferSupportedServices": {
+                            "methods": {
+                                "get": {
+                                    "description": "Gets the details of a service that is supported for Data Transfer Essentials.",
+                                    "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/multicloudDataTransferSupportedServices/{multicloudDataTransferSupportedServicesId}",
+                                    "httpMethod": "GET",
+                                    "id": "networkconnectivity.projects.locations.multicloudDataTransferSupportedServices.get",
+                                    "parameterOrder": [
+                                        "name"
+                                    ],
+                                    "parameters": {
+                                        "name": {
+                                            "description": "Required. The name of the service.",
+                                            "location": "path",
+                                            "pattern": "^projects/[^/]+/locations/[^/]+/multicloudDataTransferSupportedServices/[^/]+$",
+                                            "required": true,
+                                            "type": "string"
+                                        }
+                                    },
+                                    "path": "v1/{+name}",
+                                    "response": {
+                                        "$ref": "MulticloudDataTransferSupportedService"
+                                    },
+                                    "scopes": [
+                                        "https://www.googleapis.com/auth/cloud-platform"
+                                    ]
+                                },
+                                "list": {
+                                    "description": "Lists the services in the project for a region that are supported for Data Transfer Essentials.",
+                                    "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/multicloudDataTransferSupportedServices",
+                                    "httpMethod": "GET",
+                                    "id": "networkconnectivity.projects.locations.multicloudDataTransferSupportedServices.list",
+                                    "parameterOrder": [
+                                        "parent"
+                                    ],
+                                    "parameters": {
+                                        "pageSize": {
+                                            "description": "Optional. The maximum number of results listed per page.",
+                                            "format": "int32",
+                                            "location": "query",
+                                            "type": "integer"
+                                        },
+                                        "pageToken": {
+                                            "description": "Optional. The page token.",
+                                            "location": "query",
+                                            "type": "string"
+                                        },
+                                        "parent": {
+                                            "description": "Required. The name of the parent resource.",
+                                            "location": "path",
+                                            "pattern": "^projects/[^/]+/locations/[^/]+$",
+                                            "required": true,
+                                            "type": "string"
+                                        }
+                                    },
+                                    "path": "v1/{+parent}/multicloudDataTransferSupportedServices",
+                                    "response": {
+                                        "$ref": "ListMulticloudDataTransferSupportedServicesResponse"
+                                    },
+                                    "scopes": [
+                                        "https://www.googleapis.com/auth/cloud-platform"
+                                    ]
                                 }
                             }
                         },
                         "operations": {
                             "methods": {
                                 "cancel": {
-                                    "description": "Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of 1, corresponding to `Code.CANCELLED`.",
+                                    "description": "Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of `1`, corresponding to `Code.CANCELLED`.",
                                     "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/operations/{operationsId}:cancel",
                                     "httpMethod": "POST",
                                     "id": "networkconnectivity.projects.locations.operations.cancel",
@@ -1451,6 +2130,11 @@
                                             "description": "The standard list page token.",
                                             "location": "query",
                                             "type": "string"
+                                        },
+                                        "returnPartialSuccess": {
+                                            "description": "When set to `true`, operations that are reachable are returned as normal, and those that are unreachable are returned in the ListOperationsResponse.unreachable field. This can only be `true` when reading across collections. For example, when `parent` is set to `\"projects/example/locations/-\"`. This field is not supported by default and will result in an `UNIMPLEMENTED` error if set unless explicitly documented otherwise in service or product specific documentation.",
+                                            "location": "query",
+                                            "type": "boolean"
                                         }
                                     },
                                     "path": "v1/{+name}/operations",
@@ -1482,7 +2166,7 @@
                                             "type": "string"
                                         },
                                         "regionalEndpointId": {
-                                            "description": "Required. Unique id of the Regional Endpoint to be created.",
+                                            "description": "Required. Unique id of the Regional Endpoint to be created. @pattern: ^[-a-z0-9](?:[-a-z0-9]{0,44})[a-z0-9]$",
                                             "location": "query",
                                             "type": "string"
                                         },
@@ -2127,6 +2811,35 @@
                                         "parent"
                                     ],
                                     "parameters": {
+                                        "autoSubnetworkConfig.allocRangeSpace": {
+                                            "description": "Optional. The space where we search for a free range to create a subnetwork. It can be narrow down or pick a different space. This is in standard CIDR format. If not specified, \u201c10.0.0.0/8\u201d is used. Only eligible for IPV4_ONLY and IPV4_IPV6 subnetwork.",
+                                            "location": "query",
+                                            "repeated": true,
+                                            "type": "string"
+                                        },
+                                        "autoSubnetworkConfig.ipStack": {
+                                            "description": "Optional. The requested IP stack for the subnetwork. If not specified, IPv4 is used.",
+                                            "enum": [
+                                                "SUBNET_IP_STACK_UNSPECIFIED",
+                                                "IPV4_ONLY",
+                                                "IPV6_ONLY",
+                                                "IPV4_IPV6"
+                                            ],
+                                            "enumDescriptions": [
+                                                "Default value. Will create an IPV4_ONLY subnetwork by default.",
+                                                "Will create an IPV4_ONLY subnetwork.",
+                                                "Will create an IPV6_ONLY subnetwork.",
+                                                "Will use IPv4 and IPv6 (dual stack)."
+                                            ],
+                                            "location": "query",
+                                            "type": "string"
+                                        },
+                                        "autoSubnetworkConfig.prefixLength": {
+                                            "description": "Optional. The desired prefix length for the subnet's IP address range. E.g., 24 for a /24. The actual range is allocated from available space. If not specified, 24 is used. Only eligible for IPV4_ONLY and IPV4_IPV6 subnetwork.",
+                                            "format": "int32",
+                                            "location": "query",
+                                            "type": "integer"
+                                        },
                                         "parent": {
                                             "description": "Required. The parent resource's name of the ServiceConnectionPolicy. ex. projects/123/locations/us-east1",
                                             "location": "path",
@@ -2141,6 +2854,21 @@
                                         },
                                         "serviceConnectionPolicyId": {
                                             "description": "Optional. Resource ID (i.e. 'foo' in '[...]/projects/p/locations/l/serviceConnectionPolicies/foo') See https://google.aip.dev/122#resource-id-segments Unique per location.",
+                                            "location": "query",
+                                            "type": "string"
+                                        },
+                                        "subnetworkMode": {
+                                            "description": "Optional. If this field is not set, USER_PROVIDED is the inferred value to use.",
+                                            "enum": [
+                                                "SUBNETWORK_MODE_UNSPECIFIED",
+                                                "USER_PROVIDED",
+                                                "AUTO_CREATED"
+                                            ],
+                                            "enumDescriptions": [
+                                                "The default value if the enum is unset. Note user is not allowed to set the subnetwork mode to this value.",
+                                                "Subnetworks are provided from the user input.",
+                                                "Subnetwork list is empty from the user input. A subnetwork will be created automatically."
+                                            ],
                                             "location": "query",
                                             "type": "string"
                                         }
@@ -2812,7 +3540,7 @@
             }
         }
     },
-    "revision": "20240618",
+    "revision": "20251209",
     "rootUrl": "https://networkconnectivity.googleapis.com/",
     "schemas": {
         "AcceptHubSpokeRequest": {
@@ -2837,6 +3565,55 @@
                 "spoke": {
                     "$ref": "Spoke",
                     "description": "The spoke that was operated on."
+                }
+            },
+            "type": "object"
+        },
+        "AcceptSpokeUpdateRequest": {
+            "description": "The request for HubService.AcceptSpokeUpdate.",
+            "id": "AcceptSpokeUpdateRequest",
+            "properties": {
+                "requestId": {
+                    "description": "Optional. A request ID to identify requests. Specify a unique request ID so that if you must retry your request, the server knows to ignore the request if it has already been completed. The server guarantees that a request doesn't result in creation of duplicate commitments for at least 60 minutes. For example, consider a situation where you make an initial request and the request times out. If you make the request again with the same request ID, the server can check to see whether the original operation was received. If it was, the server ignores the second request. This behavior prevents clients from mistakenly creating duplicate commitments. The request ID must be a valid UUID, with the exception that zero UUID is not supported (00000000-0000-0000-0000-000000000000).",
+                    "type": "string"
+                },
+                "spokeEtag": {
+                    "description": "Required. The etag of the spoke to accept update.",
+                    "type": "string"
+                },
+                "spokeUri": {
+                    "description": "Required. The URI of the spoke to accept update.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "AllocationOptions": {
+            "description": "Range auto-allocation options, to be optionally used when CIDR block is not explicitly set.",
+            "id": "AllocationOptions",
+            "properties": {
+                "allocationStrategy": {
+                    "description": "Optional. Allocation strategy Not setting this field when the allocation is requested means an implementation defined strategy is used.",
+                    "enum": [
+                        "ALLOCATION_STRATEGY_UNSPECIFIED",
+                        "RANDOM",
+                        "FIRST_AVAILABLE",
+                        "RANDOM_FIRST_N_AVAILABLE",
+                        "FIRST_SMALLEST_FITTING"
+                    ],
+                    "enumDescriptions": [
+                        "Unspecified is the only valid option when the range is specified explicitly by ip_cidr_range field. Otherwise unspefified means using the default strategy.",
+                        "Random strategy, the legacy algorithm, used for backwards compatibility. This allocation strategy remains efficient in the case of concurrent allocation requests in the same peered network space and doesn't require providing the level of concurrency in an explicit parameter, but it is prone to fragmenting available address space.",
+                        "Pick the first available address range. This strategy is deterministic and the result is easy to predict.",
+                        "Pick an arbitrary range out of the first N available ones. The N will be set in the first_available_ranges_lookup_size field. This strategy should be used when concurrent allocation requests are made in the same space of peered networks while the fragmentation of the addrress space is reduced.",
+                        "Pick the smallest but fitting available range. This deterministic strategy minimizes fragmentation of the address space."
+                    ],
+                    "type": "string"
+                },
+                "firstAvailableRangesLookupSize": {
+                    "description": "Optional. This field must be set only when allocation_strategy is set to RANDOM_FIRST_N_AVAILABLE. The value should be the maximum expected parallelism of range creation requests issued to the same space of peered netwroks.",
+                    "format": "int32",
+                    "type": "integer"
                 }
             },
             "type": "object"
@@ -2894,11 +3671,58 @@
             "id": "AutoAccept",
             "properties": {
                 "autoAcceptProjects": {
-                    "description": "A list of project ids or project numbers for which you want to enable auto-accept. The auto-accept setting is applied to spokes being created or updated in these projects.",
+                    "description": "Optional. A list of project ids or project numbers for which you want to enable auto-accept. The auto-accept setting is applied to spokes being created or updated in these projects.",
                     "items": {
                         "type": "string"
                     },
                     "type": "array"
+                }
+            },
+            "type": "object"
+        },
+        "AutoCreatedSubnetworkInfo": {
+            "description": "Information for the automatically created subnetwork and its associated IR.",
+            "id": "AutoCreatedSubnetworkInfo",
+            "properties": {
+                "internalRange": {
+                    "description": "Output only. URI of the automatically created Internal Range. Only set if the subnetwork mode is AUTO_CREATED during creation.",
+                    "readOnly": true,
+                    "type": "string"
+                },
+                "internalRangeRef": {
+                    "description": "Output only. URI of the automatically created Internal Range reference. Only set if the subnetwork mode is AUTO_CREATED during creation.",
+                    "readOnly": true,
+                    "type": "string"
+                },
+                "subnetwork": {
+                    "description": "Output only. URI of the automatically created subnetwork. Only set if the subnetwork mode is AUTO_CREATED during creation.",
+                    "readOnly": true,
+                    "type": "string"
+                },
+                "subnetworkRef": {
+                    "description": "Output only. URI of the automatically created subnetwork reference. Only set if the subnetwork mode is AUTO_CREATED during creation.",
+                    "readOnly": true,
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "AutomatedDnsCreationSpec": {
+            "description": "The specification for automatically creating a DNS record.",
+            "id": "AutomatedDnsCreationSpec",
+            "properties": {
+                "dnsSuffix": {
+                    "description": "Required. The DNS suffix to use for the DNS record. Must end with a dot. This should be a valid DNS domain name as per RFC 1035. Each label (between dots) can contain letters, digits, and hyphens, and must not start or end with a hyphen. Example: \"my-service.example.com.\", \"internal.\"",
+                    "type": "string"
+                },
+                "hostname": {
+                    "description": "Required. The hostname (the first label of the FQDN) to use for the DNS record. This should be a valid DNS label as per RFC 1035. Generally, this means the hostname can contain letters, digits, and hyphens, and must not start or end with a hyphen. Example: \"my-instance\", \"db-1\"",
+                    "type": "string"
+                },
+                "ttl": {
+                    "description": "Optional. The Time To Live for the DNS record, in seconds. If not provided, a default of 30 seconds will be used.",
+                    "format": "google-duration",
+                    "type": "string"
                 }
             },
             "type": "object"
@@ -2925,6 +3749,77 @@
             },
             "type": "object"
         },
+        "CheckConsumerConfigRequest": {
+            "description": "Request for CheckConsumerConfig.",
+            "id": "CheckConsumerConfigRequest",
+            "properties": {
+                "consumerNetwork": {
+                    "description": "Required. Full resource name of the consumer network. Example: - projects/{project}/global/networks/{network}.",
+                    "type": "string"
+                },
+                "endpointProject": {
+                    "description": "The project number or ID where the PSC endpoint is to be created.",
+                    "type": "string"
+                },
+                "requestedIpVersion": {
+                    "description": "The requested IP Version",
+                    "enum": [
+                        "IP_VERSION_UNSPECIFIED",
+                        "IPV4",
+                        "IPV6"
+                    ],
+                    "enumDescriptions": [
+                        "Default value. We will use IPv4 or IPv6 depending on the IP version of first available subnetwork.",
+                        "Will use IPv4 only.",
+                        "Will use IPv6 only."
+                    ],
+                    "type": "string"
+                },
+                "serviceClass": {
+                    "description": "Required. The service class identifier of the producer.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "CheckConsumerConfigResponse": {
+            "description": "Response for CheckConsumerConfig.",
+            "id": "CheckConsumerConfigResponse",
+            "properties": {
+                "errors": {
+                    "description": "List of validation errors. If the list is empty, the consumer config is valid.",
+                    "items": {
+                        "enum": [
+                            "ERROR_UNSPECIFIED",
+                            "NETWORK_PROJECT_INVALID",
+                            "NETWORK_PROJECT_APIS_NOT_ENABLED",
+                            "NETWORK_INVALID",
+                            "CONNECTION_POLICY_MISSING",
+                            "IP_VERSION_NOT_SUPPORTED",
+                            "NETWORK_PROJECT_SERVICE_AGENT_NOT_FOUND",
+                            "ENDPOINT_PROJECT_INVALID",
+                            "ENDPOINT_PROJECT_API_NOT_ENABLED",
+                            "ENDPOINT_PROJECT_IS_NOT_SERVICE_PROJECT"
+                        ],
+                        "enumDescriptions": [
+                            "An invalid error as the default case.",
+                            "Invalid Network project.",
+                            "Network Connectivity APIs not enabled in network project.",
+                            "Invalid network.",
+                            "No ServiceConnectionPolicy found for this network and ServiceClass.",
+                            "IP version not supported in any of the subnetworks.",
+                            "Service Agent missing for network project.",
+                            "Invalid endpoint project.",
+                            "Network Connectivity API is not enabled in the endpoint project.",
+                            "Endpoint project is not a service project of the network project."
+                        ],
+                        "type": "string"
+                    },
+                    "type": "array"
+                }
+            },
+            "type": "object"
+        },
         "ConsumerPscConfig": {
             "description": "Allow the producer to specify which consumers can connect to it.",
             "id": "ConsumerPscConfig",
@@ -2937,13 +3832,35 @@
                     "description": "This is used in PSC consumer ForwardingRule to control whether the PSC endpoint can be accessed from another region.",
                     "type": "boolean"
                 },
+                "ipVersion": {
+                    "description": "The requested IP version for the PSC connection.",
+                    "enum": [
+                        "IP_VERSION_UNSPECIFIED",
+                        "IPV4",
+                        "IPV6"
+                    ],
+                    "enumDescriptions": [
+                        "Default value. We will use IPv4 or IPv6 depending on the IP version of first available subnetwork.",
+                        "Will use IPv4 only.",
+                        "Will use IPv6 only."
+                    ],
+                    "type": "string"
+                },
                 "network": {
                     "description": "The resource path of the consumer network where PSC connections are allowed to be created in. Note, this network does not need be in the ConsumerPscConfig.project in the case of SharedVPC. Example: projects/{projectNumOrId}/global/networks/{networkId}.",
                     "type": "string"
                 },
                 "producerInstanceId": {
-                    "description": "Immutable. An immutable identifier for the producer instance.",
+                    "deprecated": true,
+                    "description": "Immutable. Deprecated. Use producer_instance_metadata instead. An immutable identifier for the producer instance.",
                     "type": "string"
+                },
+                "producerInstanceMetadata": {
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "description": "Immutable. An immutable map for the producer instance metadata.",
+                    "type": "object"
                 },
                 "project": {
                     "description": "The consumer project where PSC connections are allowed to be created in.",
@@ -2953,8 +3870,7 @@
                     "additionalProperties": {
                         "type": "string"
                     },
-                    "description": "Output only. A map to store mapping between customer vip and target service attachment. Only service attachment with producer specified ip addresses are stored here.",
-                    "readOnly": true,
+                    "description": "Optional. A map to store mapping between customer vip and target service attachment. This field can be used to specify a static IP address for a PSC connection.",
                     "type": "object"
                 },
                 "state": {
@@ -2963,13 +3879,15 @@
                         "STATE_UNSPECIFIED",
                         "VALID",
                         "CONNECTION_POLICY_MISSING",
-                        "POLICY_LIMIT_REACHED"
+                        "POLICY_LIMIT_REACHED",
+                        "CONSUMER_INSTANCE_PROJECT_NOT_ALLOWLISTED"
                     ],
                     "enumDescriptions": [
                         "Default state, when Connection Map is created initially.",
                         "Set when policy and map configuration is valid, and their matching can lead to allowing creation of PSC Connections subject to other constraints like connections limit.",
                         "No Service Connection Policy found for this network and Service Class",
-                        "Service Connection Policy limit reached for this network and Service Class"
+                        "Service Connection Policy limit reached for this network and Service Class",
+                        "The consumer instance project is not in AllowedGoogleProducersResourceHierarchyLevels of the matching ServiceConnectionPolicy."
                     ],
                     "readOnly": true,
                     "type": "string"
@@ -2981,6 +3899,11 @@
             "description": "PSC connection details on consumer side.",
             "id": "ConsumerPscConnection",
             "properties": {
+                "dnsAutomationStatus": {
+                    "$ref": "DnsAutomationStatus",
+                    "description": "Output only. The status of DNS automation for this PSC connection.",
+                    "readOnly": true
+                },
                 "error": {
                     "$ref": "GoogleRpcStatus",
                     "deprecated": true,
@@ -2992,6 +3915,7 @@
                     "readOnly": true
                 },
                 "errorType": {
+                    "deprecated": true,
                     "description": "The error type indicates whether the error is consumer facing, producer facing or system internal.",
                     "enum": [
                         "CONNECTION_ERROR_TYPE_UNSPECIFIED",
@@ -3019,13 +3943,35 @@
                     "description": "The IP literal allocated on the consumer network for the PSC forwarding rule that is created to connect to the producer service attachment in this service connection map.",
                     "type": "string"
                 },
+                "ipVersion": {
+                    "description": "The requested IP version for the PSC connection.",
+                    "enum": [
+                        "IP_VERSION_UNSPECIFIED",
+                        "IPV4",
+                        "IPV6"
+                    ],
+                    "enumDescriptions": [
+                        "Default value. We will use IPv4 or IPv6 depending on the IP version of first available subnetwork.",
+                        "Will use IPv4 only.",
+                        "Will use IPv6 only."
+                    ],
+                    "type": "string"
+                },
                 "network": {
                     "description": "The consumer network whose PSC forwarding rule is connected to the service attachments in this service connection map. Note that the network could be on a different project (shared VPC).",
                     "type": "string"
                 },
                 "producerInstanceId": {
-                    "description": "Immutable. An immutable identifier for the producer instance.",
+                    "deprecated": true,
+                    "description": "Immutable. Deprecated. Use producer_instance_metadata instead. An immutable identifier for the producer instance.",
                     "type": "string"
+                },
+                "producerInstanceMetadata": {
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "description": "Immutable. An immutable map for the producer instance metadata.",
+                    "type": "object"
                 },
                 "project": {
                     "description": "The consumer project whose PSC forwarding rule is connected to the service attachments in this service connection map.",
@@ -3051,15 +3997,153 @@
                         "ACTIVE",
                         "FAILED",
                         "CREATING",
-                        "DELETING"
+                        "DELETING",
+                        "CREATE_REPAIRING",
+                        "DELETE_REPAIRING"
                     ],
                     "enumDescriptions": [
                         "An invalid state as the default case.",
-                        "The connection is fully established and ready to use.",
+                        "The connection has been created successfully. However, for the up-to-date connection status, please use the service attachment's \"ConnectedEndpoint.status\" as the source of truth.",
                         "The connection is not functional since some resources on the connection fail to be created.",
                         "The connection is being created.",
-                        "The connection is being deleted."
+                        "The connection is being deleted.",
+                        "The connection is being repaired to complete creation.",
+                        "The connection is being repaired to complete deletion."
                     ],
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "Destination": {
+            "description": "The `Destination` resource. It specifies the IP prefix and the associated autonomous system numbers (ASN) that you want to include in a `MulticloudDataTransferConfig` resource.",
+            "id": "Destination",
+            "properties": {
+                "createTime": {
+                    "description": "Output only. Time when the `Destination` resource was created.",
+                    "format": "google-datetime",
+                    "readOnly": true,
+                    "type": "string"
+                },
+                "description": {
+                    "description": "Optional. A description of this resource.",
+                    "type": "string"
+                },
+                "endpoints": {
+                    "description": "Required. Unordered list. The list of `DestinationEndpoint` resources configured for the IP prefix.",
+                    "items": {
+                        "$ref": "DestinationEndpoint"
+                    },
+                    "type": "array"
+                },
+                "etag": {
+                    "description": "The etag is computed by the server, and might be sent with update and delete requests so that the client has an up-to-date value before proceeding.",
+                    "type": "string"
+                },
+                "ipPrefix": {
+                    "description": "Required. Immutable. The IP prefix that represents your workload on another CSP.",
+                    "type": "string"
+                },
+                "labels": {
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "description": "Optional. User-defined labels.",
+                    "type": "object"
+                },
+                "name": {
+                    "description": "Identifier. The name of the `Destination` resource. Format: `projects/{project}/locations/{location}/multicloudDataTransferConfigs/{multicloud_data_transfer_config}/destinations/{destination}`.",
+                    "type": "string"
+                },
+                "stateTimeline": {
+                    "$ref": "StateTimeline",
+                    "description": "Output only. The timeline of the expected `Destination` states or the current rest state. If a state change is expected, the value is `ADDING`, `DELETING` or `SUSPENDING`, depending on the action specified. Example: \"state_timeline\": { \"states\": [ { // The time when the `Destination` resource will be activated. \"effectiveTime\": \"2024-12-01T08:00:00Z\", \"state\": \"ADDING\" }, { // The time when the `Destination` resource will be suspended. \"effectiveTime\": \"2024-12-01T20:00:00Z\", \"state\": \"SUSPENDING\" } ] }",
+                    "readOnly": true
+                },
+                "uid": {
+                    "description": "Output only. The Google-generated unique ID for the `Destination` resource. This value is unique across all `Destination` resources. If a resource is deleted and another with the same name is created, the new resource is assigned a different and unique ID.",
+                    "readOnly": true,
+                    "type": "string"
+                },
+                "updateTime": {
+                    "description": "Output only. Time when the `Destination` resource was updated.",
+                    "format": "google-datetime",
+                    "readOnly": true,
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "DestinationEndpoint": {
+            "description": "The metadata for a `DestinationEndpoint` resource.",
+            "id": "DestinationEndpoint",
+            "properties": {
+                "asn": {
+                    "description": "Required. The ASN of the remote IP prefix.",
+                    "format": "int64",
+                    "type": "string"
+                },
+                "csp": {
+                    "description": "Required. The CSP of the remote IP prefix.",
+                    "type": "string"
+                },
+                "state": {
+                    "description": "Output only. The state of the `DestinationEndpoint` resource.",
+                    "enum": [
+                        "STATE_UNSPECIFIED",
+                        "VALID",
+                        "INVALID"
+                    ],
+                    "enumDescriptions": [
+                        "An invalid state, which is the default case.",
+                        "The `DestinationEndpoint` resource is valid.",
+                        "The `DestinationEndpoint` resource is invalid."
+                    ],
+                    "readOnly": true,
+                    "type": "string"
+                },
+                "updateTime": {
+                    "description": "Output only. Time when the `DestinationEndpoint` resource was updated.",
+                    "format": "google-datetime",
+                    "readOnly": true,
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "DnsAutomationStatus": {
+            "description": "The status of DNS automation for a PSC connection.",
+            "id": "DnsAutomationStatus",
+            "properties": {
+                "error": {
+                    "$ref": "GoogleRpcStatus",
+                    "description": "Output only. The error details if the state is CREATE_FAILED or DELETE_FAILED.",
+                    "readOnly": true
+                },
+                "fqdn": {
+                    "description": "Output only. The fully qualified domain name of the DNS record.",
+                    "readOnly": true,
+                    "type": "string"
+                },
+                "state": {
+                    "description": "Output only. The current state of DNS automation.",
+                    "enum": [
+                        "STATE_UNSPECIFIED",
+                        "PENDING_CREATE",
+                        "ACTIVE",
+                        "PENDING_DELETE",
+                        "CREATE_FAILED",
+                        "DELETE_FAILED"
+                    ],
+                    "enumDescriptions": [
+                        "Default value. This value is unused.",
+                        "DNS record creation is pending.",
+                        "DNS record is active.",
+                        "DNS record deletion is pending.",
+                        "DNS record creation failed.",
+                        "DNS record deletion failed."
+                    ],
+                    "readOnly": true,
                     "type": "string"
                 }
             },
@@ -3099,7 +4183,7 @@
             "id": "Filter",
             "properties": {
                 "destRange": {
-                    "description": "Optional. The destination IP range of outgoing packets that this policy-based route applies to. Default is \"0.0.0.0/0\" if protocol version is IPv4.",
+                    "description": "Optional. The destination IP range of outgoing packets that this policy-based route applies to. Default is \"0.0.0.0/0\" if protocol version is IPv4 and \"::/0\" if protocol version is IPv6.",
                     "type": "string"
                 },
                 "ipProtocol": {
@@ -3107,19 +4191,21 @@
                     "type": "string"
                 },
                 "protocolVersion": {
-                    "description": "Required. Internet protocol versions this policy-based route applies to. For this version, only IPV4 is supported. IPV6 is supported in preview.",
+                    "description": "Required. Internet protocol versions this policy-based route applies to. IPV4 and IPV6 is supported.",
                     "enum": [
                         "PROTOCOL_VERSION_UNSPECIFIED",
-                        "IPV4"
+                        "IPV4",
+                        "IPV6"
                     ],
                     "enumDescriptions": [
                         "Default value.",
-                        "The PBR is for IPv4 internet protocol traffic."
+                        "The PBR is for IPv4 internet protocol traffic.",
+                        "The PBR is for IPv6 internet protocol traffic."
                     ],
                     "type": "string"
                 },
                 "srcRange": {
-                    "description": "Optional. The source IP range of outgoing packets that this policy-based route applies to. Default is \"0.0.0.0/0\" if protocol version is IPv4.",
+                    "description": "Optional. The source IP range of outgoing packets that this policy-based route applies to. Default is \"0.0.0.0/0\" if protocol version is IPv4 and \"::/0\" if protocol version is IPv6.",
                     "type": "string"
                 }
             },
@@ -3143,6 +4229,13 @@
                     "description": "A list of operations that matches the specified filter in the request.",
                     "items": {
                         "$ref": "GoogleLongrunningOperation"
+                    },
+                    "type": "array"
+                },
+                "unreachable": {
+                    "description": "Unordered list. Unreachable resources. Populated when the request sets `ListOperationsRequest.return_partial_success` and reads across collections. For example, when attempting to list all resources across all supported locations.",
+                    "items": {
+                        "type": "string"
                     },
                     "type": "array"
                 }
@@ -3196,7 +4289,7 @@
                     "additionalProperties": {
                         "type": "string"
                     },
-                    "description": "Additional structured details about this error. Keys must match /a-z+/ but should ideally be lowerCamelCase. Also they must be limited to 64 characters in length. When identifying the current value of an exceeded limit, the units should be contained in the key, not the value. For example, rather than {\"instanceLimit\": \"100/request\"}, should be returned as, {\"instanceLimitPerRequest\": \"100\"}, if the client exceeds the number of instances that can be created in a single (batch) request.",
+                    "description": "Additional structured details about this error. Keys must match a regular expression of `a-z+` but should ideally be lowerCamelCase. Also, they must be limited to 64 characters in length. When identifying the current value of an exceeded limit, the units should be contained in the key, not the value. For example, rather than `{\"instanceLimit\": \"100/request\"}`, should be returned as, `{\"instanceLimitPerRequest\": \"100\"}`, if the client exceeds the number of instances that can be created in a single (batch) request.",
                     "type": "object"
                 },
                 "reason": {
@@ -3278,7 +4371,8 @@
                         "REJECTING",
                         "UPDATING",
                         "INACTIVE",
-                        "OBSOLETE"
+                        "OBSOLETE",
+                        "FAILED"
                     ],
                     "enumDescriptions": [
                         "No state information available",
@@ -3289,7 +4383,8 @@
                         "The resource's reject operation is in progress.",
                         "The resource's update operation is in progress.",
                         "The resource is inactive.",
-                        "The hub associated with this spoke resource has been deleted. This state applies to spoke resources only."
+                        "The hub associated with this spoke resource has been deleted. This state applies to spoke resources only.",
+                        "The resource is in an undefined state due to resource creation or deletion failure. You can try to delete the resource later or contact support for help."
                     ],
                     "readOnly": true,
                     "type": "string"
@@ -3319,11 +4414,11 @@
                     "type": "string"
                 },
                 "description": {
-                    "description": "An optional description of the hub.",
+                    "description": "Optional. An optional description of the hub.",
                     "type": "string"
                 },
                 "exportPsc": {
-                    "description": "Optional. Whether Private Service Connect transitivity is enabled for the hub. If true, Private Service Connect endpoints in VPC spokes attached to the hub are made accessible to other VPC spokes attached to the hub. The default value is false.",
+                    "description": "Optional. Whether Private Service Connect connection propagation is enabled for the hub. If true, Private Service Connect endpoints in VPC spokes attached to the hub are made accessible to other VPC spokes attached to the hub. The default value is false.",
                     "type": "boolean"
                 },
                 "labels": {
@@ -3372,10 +4467,11 @@
                     "type": "array"
                 },
                 "routingVpcs": {
-                    "description": "The VPC networks associated with this hub's spokes. This field is read-only. Network Connectivity Center automatically populates it based on the set of spokes attached to the hub.",
+                    "description": "Output only. The VPC networks associated with this hub's spokes. This field is read-only. Network Connectivity Center automatically populates it based on the set of spokes attached to the hub.",
                     "items": {
                         "$ref": "RoutingVPC"
                     },
+                    "readOnly": true,
                     "type": "array"
                 },
                 "spokeSummary": {
@@ -3394,7 +4490,8 @@
                         "REJECTING",
                         "UPDATING",
                         "INACTIVE",
-                        "OBSOLETE"
+                        "OBSOLETE",
+                        "FAILED"
                     ],
                     "enumDescriptions": [
                         "No state information available",
@@ -3405,7 +4502,8 @@
                         "The resource's reject operation is in progress.",
                         "The resource's update operation is in progress.",
                         "The resource is inactive.",
-                        "The hub associated with this spoke resource has been deleted. This state applies to spoke resources only."
+                        "The hub associated with this spoke resource has been deleted. This state applies to spoke resources only.",
+                        "The resource is in an undefined state due to resource creation or deletion failure. You can try to delete the resource later or contact support for help."
                     ],
                     "readOnly": true,
                     "type": "string"
@@ -3424,6 +4522,26 @@
             },
             "type": "object"
         },
+        "HubStatusEntry": {
+            "description": "A hub status entry represents the status of a set of propagated Private Service Connect connections grouped by certain fields.",
+            "id": "HubStatusEntry",
+            "properties": {
+                "count": {
+                    "description": "The number of propagated Private Service Connect connections with this status. If the `group_by` field was not set in the request message, the value of this field is 1.",
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "groupBy": {
+                    "description": "The fields that this entry is grouped by. This has the same value as the `group_by` field in the request message.",
+                    "type": "string"
+                },
+                "pscPropagationStatus": {
+                    "$ref": "PscPropagationStatus",
+                    "description": "The Private Service Connect propagation status."
+                }
+            },
+            "type": "object"
+        },
         "InterconnectAttachment": {
             "description": "InterconnectAttachment that this route applies to.",
             "id": "InterconnectAttachment",
@@ -3436,20 +4554,35 @@
             "type": "object"
         },
         "InternalRange": {
-            "description": "The internal range resource for IPAM operations within a VPC network. Used to represent a private address range along with behavioral characterstics of that range (its usage and peering behavior). Networking resources can link to this range if they are created as belonging to it.",
+            "description": "The internal range resource for IPAM operations within a VPC network. Used to represent a private address range along with behavioral characteristics of that range (its usage and peering behavior). Networking resources can link to this range if they are created as belonging to it.",
             "id": "InternalRange",
             "properties": {
+                "allocationOptions": {
+                    "$ref": "AllocationOptions",
+                    "description": "Optional. Range auto-allocation options, may be set only when auto-allocation is selected by not setting ip_cidr_range (and setting prefix_length)."
+                },
                 "createTime": {
                     "description": "Time when the internal range was created.",
                     "format": "google-datetime",
                     "type": "string"
                 },
                 "description": {
-                    "description": "A description of this resource.",
+                    "description": "Optional. A description of this resource.",
                     "type": "string"
                 },
+                "excludeCidrRanges": {
+                    "description": "Optional. ExcludeCidrRanges flag. Specifies a set of CIDR blocks that allows exclusion of particular CIDR ranges from the auto-allocation process, without having to reserve these blocks",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "immutable": {
+                    "description": "Optional. Immutable ranges cannot have their fields modified, except for labels and description.",
+                    "type": "boolean"
+                },
                 "ipCidrRange": {
-                    "description": "The IP range that this internal range defines.",
+                    "description": "Optional. The IP range that this internal range defines. NOTE: IPv6 ranges are limited to usage=EXTERNAL_TO_VPC and peering=FOR_SELF. NOTE: For IPv6 Ranges this field is compulsory, i.e. the address range must be specified explicitly.",
                     "type": "string"
                 },
                 "labels": {
@@ -3459,12 +4592,16 @@
                     "description": "User-defined labels.",
                     "type": "object"
                 },
+                "migration": {
+                    "$ref": "Migration",
+                    "description": "Optional. Must be present if usage is set to FOR_MIGRATION."
+                },
                 "name": {
-                    "description": "Immutable. The name of an internal range. Format: projects/{project}/locations/{location}/internalRanges/{internal_range} See: https://google.aip.dev/122#fields-representing-resource-names",
+                    "description": "Identifier. The name of an internal range. Format: projects/{project}/locations/{location}/internalRanges/{internal_range} See: https://google.aip.dev/122#fields-representing-resource-names",
                     "type": "string"
                 },
                 "network": {
-                    "description": "The URL or resource ID of the network in which to reserve the internal range. The network cannot be deleted if there are any reserved internal ranges referring to it. Legacy networks are not supported. For example: https://www.googleapis.com/compute/v1/projects/{project}/locations/global/networks/{network} projects/{project}/locations/global/networks/{network} {network}",
+                    "description": "Immutable. The URL or resource ID of the network in which to reserve the internal range. The network cannot be deleted if there are any reserved internal ranges referring to it. Legacy networks are not supported. For example: https://www.googleapis.com/compute/v1/projects/{project}/locations/global/networks/{network} projects/{project}/locations/global/networks/{network} {network}",
                     "type": "string"
                 },
                 "overlaps": {
@@ -3485,7 +4622,7 @@
                     "type": "array"
                 },
                 "peering": {
-                    "description": "The type of peering set for this internal range.",
+                    "description": "Optional. The type of peering set for this internal range.",
                     "enum": [
                         "PEERING_UNSPECIFIED",
                         "FOR_SELF",
@@ -3501,12 +4638,12 @@
                     "type": "string"
                 },
                 "prefixLength": {
-                    "description": "An alternate to ip_cidr_range. Can be set when trying to create a reservation that automatically finds a free range of the given size. If both ip_cidr_range and prefix_length are set, there is an error if the range sizes do not match. Can also be used during updates to change the range size.",
+                    "description": "Optional. An alternate to ip_cidr_range. Can be set when trying to create an IPv4 reservation that automatically finds a free range of the given size. If both ip_cidr_range and prefix_length are set, there is an error if the range sizes do not match. Can also be used during updates to change the range size. NOTE: For IPv6 this field only works if ip_cidr_range is set as well, and both fields must match. In other words, with IPv6 this field only works as a redundant parameter.",
                     "format": "int32",
                     "type": "integer"
                 },
                 "targetCidrRange": {
-                    "description": "Optional. Can be set to narrow down or pick a different address space while searching for a free range. If not set, defaults to the \"10.0.0.0/8\" address space. This can be used to search in other rfc-1918 address spaces like \"172.16.0.0/12\" and \"192.168.0.0/16\" or non-rfc-1918 address spaces used in the VPC.",
+                    "description": "Optional. Can be set to narrow down or pick a different address space while searching for a free range. If not set, defaults to the [\"10.0.0.0/8\", \"172.16.0.0/12\", \"192.168.0.0/16\"] address space (for auto-mode networks, the \"10.0.0.0/9\" range is used instead of \"10.0.0.0/8\"). This can be used to target the search in other rfc-1918 address spaces like \"172.16.0.0/12\" and \"192.168.0.0/16\" or non-rfc-1918 address spaces used in the VPC.",
                     "items": {
                         "type": "string"
                     },
@@ -3518,16 +4655,18 @@
                     "type": "string"
                 },
                 "usage": {
-                    "description": "The type of usage set for this InternalRange.",
+                    "description": "Optional. The type of usage set for this InternalRange.",
                     "enum": [
                         "USAGE_UNSPECIFIED",
                         "FOR_VPC",
-                        "EXTERNAL_TO_VPC"
+                        "EXTERNAL_TO_VPC",
+                        "FOR_MIGRATION"
                     ],
                     "enumDescriptions": [
                         "Unspecified usage is allowed in calls which identify the resource by other fields and do not need Usage set to complete. These are, i.e.: GetInternalRange and DeleteInternalRange. Usage needs to be specified explicitly in CreateInternalRange or UpdateInternalRange calls.",
                         "A VPC resource can use the reserved CIDR block by associating it with the internal range resource if usage is set to FOR_VPC.",
-                        "Ranges created with EXTERNAL_TO_VPC cannot be associated with VPC resources and are meant to block out address ranges for various use cases, like for example, usage on-prem, with dynamic route announcements via interconnect."
+                        "Ranges created with EXTERNAL_TO_VPC cannot be associated with VPC resources and are meant to block out address ranges for various use cases, like for example, usage on-prem, with dynamic route announcements via interconnect.",
+                        "Ranges created FOR_MIGRATION can be used to lock a CIDR range between a source and target subnet. If usage is set to FOR_MIGRATION, the peering value has to be set to FOR_SELF or default to FOR_SELF when unset."
                     ],
                     "type": "string"
                 },
@@ -3547,7 +4686,7 @@
             "id": "LinkedInterconnectAttachments",
             "properties": {
                 "includeImportRanges": {
-                    "description": "Optional. IP ranges allowed to be included during import from hub.(does not control transit connectivity) The only allowed value for now is \"ALL_IPV4_RANGES\".",
+                    "description": "Optional. Hub routes fully encompassed by include import ranges are included during import from hub.",
                     "items": {
                         "type": "string"
                     },
@@ -3572,12 +4711,66 @@
             },
             "type": "object"
         },
+        "LinkedProducerVpcNetwork": {
+            "id": "LinkedProducerVpcNetwork",
+            "properties": {
+                "excludeExportRanges": {
+                    "description": "Optional. IP ranges encompassing the subnets to be excluded from peering.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "includeExportRanges": {
+                    "description": "Optional. IP ranges allowed to be included from peering.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "network": {
+                    "description": "Immutable. The URI of the Service Consumer VPC that the Producer VPC is peered with.",
+                    "type": "string"
+                },
+                "peering": {
+                    "description": "Immutable. The name of the VPC peering between the Service Consumer VPC and the Producer VPC (defined in the Tenant project) which is added to the NCC hub. This peering must be in ACTIVE state.",
+                    "type": "string"
+                },
+                "producerNetwork": {
+                    "description": "Output only. The URI of the Producer VPC.",
+                    "readOnly": true,
+                    "type": "string"
+                },
+                "proposedExcludeExportRanges": {
+                    "description": "Output only. The proposed exclude export IP ranges waiting for hub administration's approval.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "readOnly": true,
+                    "type": "array"
+                },
+                "proposedIncludeExportRanges": {
+                    "description": "Output only. The proposed include export IP ranges waiting for hub administration's approval.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "readOnly": true,
+                    "type": "array"
+                },
+                "serviceConsumerVpcSpoke": {
+                    "description": "Output only. The Service Consumer Network spoke.",
+                    "readOnly": true,
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
         "LinkedRouterApplianceInstances": {
             "description": "A collection of router appliance instances. If you configure multiple router appliance instances to receive data from the same set of sites outside of Google Cloud, we recommend that you associate those instances with the same spoke.",
             "id": "LinkedRouterApplianceInstances",
             "properties": {
                 "includeImportRanges": {
-                    "description": "Optional. IP ranges allowed to be included during import from hub.(does not control transit connectivity) The only allowed value for now is \"ALL_IPV4_RANGES\".",
+                    "description": "Optional. Hub routes fully encompassed by include import ranges are included during import from hub.",
                     "items": {
                         "type": "string"
                     },
@@ -3620,6 +4813,30 @@
                     },
                     "type": "array"
                 },
+                "producerVpcSpokes": {
+                    "description": "Output only. The list of Producer VPC spokes that this VPC spoke is a service consumer VPC spoke for. These producer VPCs are connected through VPC peering to this spoke's backing VPC network. Because they are directly connected through VPC peering, NCC export filters do not apply between the service consumer VPC spoke and any of its producer VPC spokes. This VPC spoke cannot be deleted as long as any of these producer VPC spokes are connected to the NCC Hub.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "readOnly": true,
+                    "type": "array"
+                },
+                "proposedExcludeExportRanges": {
+                    "description": "Output only. The proposed exclude export IP ranges waiting for hub administration's approval.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "readOnly": true,
+                    "type": "array"
+                },
+                "proposedIncludeExportRanges": {
+                    "description": "Output only. The proposed include export IP ranges waiting for hub administration's approval.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "readOnly": true,
+                    "type": "array"
+                },
                 "uri": {
                     "description": "Required. The URI of the VPC network resource.",
                     "type": "string"
@@ -3632,7 +4849,7 @@
             "id": "LinkedVpnTunnels",
             "properties": {
                 "includeImportRanges": {
-                    "description": "Optional. IP ranges allowed to be included during import from hub.(does not control transit connectivity) The only allowed value for now is \"ALL_IPV4_RANGES\".",
+                    "description": "Optional. Hub routes fully encompassed by include import ranges are included during import from hub.",
                     "items": {
                         "type": "string"
                     },
@@ -3653,6 +4870,31 @@
                     "description": "Output only. The VPC network where these VPN tunnels are located.",
                     "readOnly": true,
                     "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "ListDestinationsResponse": {
+            "description": "Response message to list `Destination` resources.",
+            "id": "ListDestinationsResponse",
+            "properties": {
+                "destinations": {
+                    "description": "The list of `Destination` resources to be listed.",
+                    "items": {
+                        "$ref": "Destination"
+                    },
+                    "type": "array"
+                },
+                "nextPageToken": {
+                    "description": "The next page token.",
+                    "type": "string"
+                },
+                "unreachable": {
+                    "description": "Locations that could not be reached.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
                 }
             },
             "type": "object"
@@ -3775,8 +5017,51 @@
             },
             "type": "object"
         },
+        "ListMulticloudDataTransferConfigsResponse": {
+            "description": "Response message to list `MulticloudDataTransferConfig` resources.",
+            "id": "ListMulticloudDataTransferConfigsResponse",
+            "properties": {
+                "multicloudDataTransferConfigs": {
+                    "description": "The list of `MulticloudDataTransferConfig` resources to be listed.",
+                    "items": {
+                        "$ref": "MulticloudDataTransferConfig"
+                    },
+                    "type": "array"
+                },
+                "nextPageToken": {
+                    "description": "The next page token.",
+                    "type": "string"
+                },
+                "unreachable": {
+                    "description": "Locations that could not be reached.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                }
+            },
+            "type": "object"
+        },
+        "ListMulticloudDataTransferSupportedServicesResponse": {
+            "description": "Response message to list the services in your project in regions that are eligible for Data Transfer Essentials configuration.",
+            "id": "ListMulticloudDataTransferSupportedServicesResponse",
+            "properties": {
+                "multicloudDataTransferSupportedServices": {
+                    "description": "The list of supported services.",
+                    "items": {
+                        "$ref": "MulticloudDataTransferSupportedService"
+                    },
+                    "type": "array"
+                },
+                "nextPageToken": {
+                    "description": "The next page token.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
         "ListPolicyBasedRoutesResponse": {
-            "description": "Response for PolicyBasedRouting.ListPolicyBasedRoutes method.",
+            "description": "Response for PolicyBasedRoutingService.ListPolicyBasedRoutes method.",
             "id": "ListPolicyBasedRoutesResponse",
             "properties": {
                 "nextPageToken": {
@@ -4044,15 +5329,113 @@
                         "enum": [
                             "LOCATION_FEATURE_UNSPECIFIED",
                             "SITE_TO_CLOUD_SPOKES",
-                            "SITE_TO_SITE_SPOKES"
+                            "SITE_TO_SITE_SPOKES",
+                            "GATEWAY_SPOKES"
                         ],
                         "enumDescriptions": [
                             "No publicly supported feature in this location",
                             "Site-to-cloud spokes are supported in this location",
-                            "Site-to-site spokes are supported in this location"
+                            "Site-to-site spokes are supported in this location",
+                            "Gateway spokes are supported in this location."
                         ],
                         "type": "string"
                     },
+                    "type": "array"
+                }
+            },
+            "type": "object"
+        },
+        "Migration": {
+            "description": "Specification for migration with source and target resource names.",
+            "id": "Migration",
+            "properties": {
+                "source": {
+                    "description": "Immutable. Resource path as an URI of the source resource, for example a subnet. The project for the source resource should match the project for the InternalRange. An example: /projects/{project}/regions/{region}/subnetworks/{subnet}",
+                    "type": "string"
+                },
+                "target": {
+                    "description": "Immutable. Resource path of the target resource. The target project can be different, as in the cases when migrating to peer networks. For example: /projects/{project}/regions/{region}/subnetworks/{subnet}",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "MulticloudDataTransferConfig": {
+            "description": "The `MulticloudDataTransferConfig` resource. It lists the services that you configure for Data Transfer Essentials billing and metering.",
+            "id": "MulticloudDataTransferConfig",
+            "properties": {
+                "createTime": {
+                    "description": "Output only. Time when the `MulticloudDataTransferConfig` resource was created.",
+                    "format": "google-datetime",
+                    "readOnly": true,
+                    "type": "string"
+                },
+                "description": {
+                    "description": "Optional. A description of this resource.",
+                    "type": "string"
+                },
+                "destinationsActiveCount": {
+                    "description": "Output only. The number of `Destination` resources in use with the `MulticloudDataTransferConfig` resource.",
+                    "format": "int32",
+                    "readOnly": true,
+                    "type": "integer"
+                },
+                "destinationsCount": {
+                    "description": "Output only. The number of `Destination` resources configured for the `MulticloudDataTransferConfig` resource.",
+                    "format": "int32",
+                    "readOnly": true,
+                    "type": "integer"
+                },
+                "etag": {
+                    "description": "The etag is computed by the server, and might be sent with update and delete requests so that the client has an up-to-date value before proceeding.",
+                    "type": "string"
+                },
+                "labels": {
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "description": "Optional. User-defined labels.",
+                    "type": "object"
+                },
+                "name": {
+                    "description": "Identifier. The name of the `MulticloudDataTransferConfig` resource. Format: `projects/{project}/locations/{location}/multicloudDataTransferConfigs/{multicloud_data_transfer_config}`.",
+                    "type": "string"
+                },
+                "services": {
+                    "additionalProperties": {
+                        "$ref": "StateTimeline"
+                    },
+                    "description": "Optional. Maps services to their current or planned states. Service names are keys, and the associated values describe the state of the service. If a state change is expected, the value is either `ADDING` or `DELETING`, depending on the actions taken. Sample output: \"services\": { \"big-query\": { \"states\": [ { \"effectiveTime\": \"2024-12-12T08:00:00Z\" \"state\": \"ADDING\", }, ] }, \"cloud-storage\": { \"states\": [ { \"state\": \"ACTIVE\", } ] } }",
+                    "type": "object"
+                },
+                "uid": {
+                    "description": "Output only. The Google-generated unique ID for the `MulticloudDataTransferConfig` resource. This value is unique across all `MulticloudDataTransferConfig` resources. If a resource is deleted and another with the same name is created, the new resource is assigned a different and unique ID.",
+                    "readOnly": true,
+                    "type": "string"
+                },
+                "updateTime": {
+                    "description": "Output only. Time when the `MulticloudDataTransferConfig` resource was updated.",
+                    "format": "google-datetime",
+                    "readOnly": true,
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "MulticloudDataTransferSupportedService": {
+            "description": "A service in your project in a region that is eligible for Data Transfer Essentials configuration.",
+            "id": "MulticloudDataTransferSupportedService",
+            "properties": {
+                "name": {
+                    "description": "Identifier. The name of the service.",
+                    "type": "string"
+                },
+                "serviceConfigs": {
+                    "description": "Output only. The network service tier or regional endpoint supported for the service.",
+                    "items": {
+                        "$ref": "ServiceConfig"
+                    },
+                    "readOnly": true,
                     "type": "array"
                 }
             },
@@ -4091,6 +5474,21 @@
                 },
                 "vpcNetwork": {
                     "description": "The VPC network where this VM is located.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "NextHopSpoke": {
+            "description": "A route next hop that leads to a spoke resource.",
+            "id": "NextHopSpoke",
+            "properties": {
+                "siteToSiteDataTransfer": {
+                    "description": "Indicates whether site-to-site data transfer is allowed for this spoke resource. Data transfer is available only in [supported locations](https://cloud.google.com/network-connectivity/docs/network-connectivity-center/concepts/locations). Whether this route is accessible to other hybrid spokes with site-to-site data transfer enabled. If this is false, the route is only accessible to VPC spokes of the connected Hub.",
+                    "type": "boolean"
+                },
+                "uri": {
+                    "description": "The URI of the spoke resource.",
                     "type": "string"
                 }
             },
@@ -4147,7 +5545,7 @@
                     "type": "string"
                 },
                 "requestedCancellation": {
-                    "description": "Output only. Identifies whether the user has requested cancellation of the operation. Operations that have been cancelled successfully have Operation.error value with a google.rpc.Status.code of 1, corresponding to `Code.CANCELLED`.",
+                    "description": "Output only. Identifies whether the user has requested cancellation of the operation. Operations that have been cancelled successfully have google.longrunning.Operation.error value with a google.rpc.Status.code of 1, corresponding to `Code.CANCELLED`.",
                     "readOnly": true,
                     "type": "boolean"
                 },
@@ -4235,7 +5633,7 @@
                     "type": "object"
                 },
                 "name": {
-                    "description": "Immutable. A unique name of the resource in the form of `projects/{project_number}/locations/global/PolicyBasedRoutes/{policy_based_route_id}`",
+                    "description": "Immutable. Identifier. A unique name of the resource in the form of `projects/{project_number}/locations/global/PolicyBasedRoutes/{policy_based_route_id}`",
                     "type": "string"
                 },
                 "network": {
@@ -4293,6 +5691,10 @@
             "description": "The PSC configurations on producer side.",
             "id": "ProducerPscConfig",
             "properties": {
+                "automatedDnsCreationSpec": {
+                    "$ref": "AutomatedDnsCreationSpec",
+                    "description": "Optional. The specification for automatically creating a DNS record for this PSC connection."
+                },
                 "serviceAttachmentUri": {
                     "description": "The resource path of a service attachment. Example: projects/{projectNumOrId}/regions/{region}/serviceAttachments/{resourceId}.",
                     "type": "string"
@@ -4317,7 +5719,7 @@
                     "type": "string"
                 },
                 "producerInstanceLocation": {
-                    "description": "Required. ProducerInstanceLocation is used to specify which authorization mechanism to use to determine which projects the Producer instance can be within.",
+                    "description": "Optional. ProducerInstanceLocation is used to specify which authorization mechanism to use to determine which projects the Producer instance can be within.",
                     "enum": [
                         "PRODUCER_INSTANCE_LOCATION_UNSPECIFIED",
                         "CUSTOM_RESOURCE_HIERARCHY_LEVELS"
@@ -4357,7 +5759,7 @@
                 "error": {
                     "$ref": "GoogleRpcStatus",
                     "deprecated": true,
-                    "description": "The most recent error during operating this connection."
+                    "description": "The most recent error during operating this connection. Deprecated, please use error_info instead."
                 },
                 "errorInfo": {
                     "$ref": "GoogleRpcErrorInfo",
@@ -4365,6 +5767,7 @@
                     "readOnly": true
                 },
                 "errorType": {
+                    "deprecated": true,
                     "description": "The error type indicates whether the error is consumer facing, producer facing or system internal.",
                     "enum": [
                         "CONNECTION_ERROR_TYPE_UNSPECIFIED",
@@ -4384,9 +5787,31 @@
                     "description": "The last Compute Engine operation to setup PSC connection.",
                     "type": "string"
                 },
-                "producerInstanceId": {
-                    "description": "Immutable. An immutable identifier for the producer instance.",
+                "ipVersion": {
+                    "description": "The requested IP version for the PSC connection.",
+                    "enum": [
+                        "IP_VERSION_UNSPECIFIED",
+                        "IPV4",
+                        "IPV6"
+                    ],
+                    "enumDescriptions": [
+                        "Default value. We will use IPv4 or IPv6 depending on the IP version of first available subnetwork.",
+                        "Will use IPv4 only.",
+                        "Will use IPv6 only."
+                    ],
                     "type": "string"
+                },
+                "producerInstanceId": {
+                    "deprecated": true,
+                    "description": "Immutable. Deprecated. Use producer_instance_metadata instead. An immutable identifier for the producer instance.",
+                    "type": "string"
+                },
+                "producerInstanceMetadata": {
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "description": "Immutable. An immutable map for the producer instance metadata.",
+                    "type": "object"
                 },
                 "pscConnectionId": {
                     "description": "The PSC connection id of the PSC forwarding rule.",
@@ -4397,6 +5822,11 @@
                     "readOnly": true,
                     "type": "string"
                 },
+                "serviceClass": {
+                    "description": "Output only. [Output only] The service class associated with this PSC Connection. The value is derived from the SCPolicy and matches the service class name provided by the customer.",
+                    "readOnly": true,
+                    "type": "string"
+                },
                 "state": {
                     "description": "State of the PSC Connection",
                     "enum": [
@@ -4404,15 +5834,90 @@
                         "ACTIVE",
                         "FAILED",
                         "CREATING",
-                        "DELETING"
+                        "DELETING",
+                        "CREATE_REPAIRING",
+                        "DELETE_REPAIRING"
                     ],
                     "enumDescriptions": [
                         "An invalid state as the default case.",
-                        "The connection is fully established and ready to use.",
+                        "The connection has been created successfully. However, for the up-to-date connection status, please use the created forwarding rule's \"PscConnectionStatus\" as the source of truth.",
                         "The connection is not functional since some resources on the connection fail to be created.",
                         "The connection is being created.",
-                        "The connection is being deleted."
+                        "The connection is being deleted.",
+                        "The connection is being repaired to complete creation.",
+                        "The connection is being repaired to complete deletion."
                     ],
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "PscPropagationStatus": {
+            "description": "The status of one or more propagated Private Service Connect connections in a hub.",
+            "id": "PscPropagationStatus",
+            "properties": {
+                "code": {
+                    "description": "The propagation status.",
+                    "enum": [
+                        "CODE_UNSPECIFIED",
+                        "READY",
+                        "PROPAGATING",
+                        "ERROR_PRODUCER_PROPAGATED_CONNECTION_LIMIT_EXCEEDED",
+                        "ERROR_PRODUCER_NAT_IP_SPACE_EXHAUSTED",
+                        "ERROR_PRODUCER_QUOTA_EXCEEDED",
+                        "ERROR_CONSUMER_QUOTA_EXCEEDED"
+                    ],
+                    "enumDescriptions": [
+                        "The code is unspecified.",
+                        "The propagated Private Service Connect connection is ready.",
+                        "The Private Service Connect connection is propagating. This is a transient state.",
+                        "The Private Service Connect connection propagation failed because the VPC network or the project of the target spoke has exceeded the connection limit set by the producer.",
+                        "The Private Service Connect connection propagation failed because the NAT IP subnet space has been exhausted. It is equivalent to the `Needs attention` status of the Private Service Connect connection. See https://cloud.google.com/vpc/docs/about-accessing-vpc-hosted-services-endpoints#connection-statuses.",
+                        "The Private Service Connect connection propagation failed because the `PSC_ILB_CONSUMER_FORWARDING_RULES_PER_PRODUCER_NETWORK` quota in the producer VPC network has been exceeded.",
+                        "The Private Service Connect connection propagation failed because the `PSC_PROPAGATED_CONNECTIONS_PER_VPC_NETWORK` quota in the consumer VPC network has been exceeded."
+                    ],
+                    "type": "string"
+                },
+                "message": {
+                    "description": "The human-readable summary of the Private Service Connect connection propagation status.",
+                    "type": "string"
+                },
+                "sourceForwardingRule": {
+                    "description": "The name of the forwarding rule exported to the hub.",
+                    "type": "string"
+                },
+                "sourceGroup": {
+                    "description": "The name of the group that the source spoke belongs to.",
+                    "type": "string"
+                },
+                "sourceSpoke": {
+                    "description": "The name of the spoke that the source forwarding rule belongs to.",
+                    "type": "string"
+                },
+                "targetGroup": {
+                    "description": "The name of the group that the target spoke belongs to.",
+                    "type": "string"
+                },
+                "targetSpoke": {
+                    "description": "The name of the spoke that the source forwarding rule propagates to.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "QueryHubStatusResponse": {
+            "description": "The response for HubService.QueryHubStatus.",
+            "id": "QueryHubStatusResponse",
+            "properties": {
+                "hubStatusEntries": {
+                    "description": "The list of hub status.",
+                    "items": {
+                        "$ref": "HubStatusEntry"
+                    },
+                    "type": "array"
+                },
+                "nextPageToken": {
+                    "description": "The token for the next page of the response. To see more results, use this value as the page_token for your next request. If this value is empty, there are no more results.",
                     "type": "string"
                 }
             },
@@ -4437,7 +5942,7 @@
                     "type": "string"
                 },
                 "address": {
-                    "description": "Optional. The IP Address of the Regional Endpoint. When no address is provided, an IP from the subnetwork is allocated. Use one of the following formats: * IPv4 address as in `10.0.0.1` * Address resource URI as in `projects/{project}/regions/{region}/addresses/{address_name}`",
+                    "description": "Optional. The IP Address of the Regional Endpoint. When no address is provided, an IP from the subnetwork is allocated. Use one of the following formats: * IPv4 address as in `10.0.0.1` * Address resource URI as in `projects/{project}/regions/{region}/addresses/{address_name}` for an IPv4 or IPv6 address.",
                     "type": "string"
                 },
                 "createTime": {
@@ -4464,12 +5969,12 @@
                     "type": "object"
                 },
                 "name": {
-                    "description": "Output only. The name of a RegionalEndpoint. Format: `projects/{project}/locations/{location}/regionalEndpoints/{regional_endpoint}`.",
+                    "description": "Output only. The name of a RegionalEndpoint. Pattern: `projects/{project}/locations/{location}/regionalEndpoints/^[-a-z0-9](?:[-a-z0-9]{0,44})[a-z0-9]$`.",
                     "readOnly": true,
                     "type": "string"
                 },
                 "network": {
-                    "description": "The name of the VPC network for this private regional endpoint. Format: `projects/{project}/global/networks/{network}`",
+                    "description": "Optional. The name of the VPC network for this private regional endpoint. Format: `projects/{project}/global/networks/{network}`",
                     "type": "string"
                 },
                 "pscForwardingRule": {
@@ -4478,7 +5983,7 @@
                     "type": "string"
                 },
                 "subnetwork": {
-                    "description": "The name of the subnetwork from which the IP address will be allocated. Format: `projects/{project}/regions/{region}/subnetworks/{subnetwork}`",
+                    "description": "Optional. The name of the subnetwork from which the IP address will be allocated. Format: `projects/{project}/regions/{region}/subnetworks/{subnetwork}`",
                     "type": "string"
                 },
                 "targetGoogleApi": {
@@ -4520,6 +6025,29 @@
                 "spoke": {
                     "$ref": "Spoke",
                     "description": "The spoke that was operated on."
+                }
+            },
+            "type": "object"
+        },
+        "RejectSpokeUpdateRequest": {
+            "description": "The request for HubService.RejectSpokeUpdate.",
+            "id": "RejectSpokeUpdateRequest",
+            "properties": {
+                "details": {
+                    "description": "Optional. Additional information provided by the hub administrator.",
+                    "type": "string"
+                },
+                "requestId": {
+                    "description": "Optional. A request ID to identify requests. Specify a unique request ID so that if you must retry your request, the server knows to ignore the request if it has already been completed. The server guarantees that a request doesn't result in creation of duplicate commitments for at least 60 minutes. For example, consider a situation where you make an initial request and the request times out. If you make the request again with the same request ID, the server can check to see whether the original operation was received. If it was, the server ignores the second request. This behavior prevents clients from mistakenly creating duplicate commitments. The request ID must be a valid UUID, with the exception that zero UUID is not supported (00000000-0000-0000-0000-000000000000).",
+                    "type": "string"
+                },
+                "spokeEtag": {
+                    "description": "Required. The etag of the spoke to reject update.",
+                    "type": "string"
+                },
+                "spokeUri": {
+                    "description": "Required. The URI of the spoke to reject update.",
+                    "type": "string"
                 }
             },
             "type": "object"
@@ -4566,6 +6094,10 @@
                     "$ref": "NextHopRouterApplianceInstance",
                     "description": "Immutable. The next-hop Router appliance instance for packets on this route."
                 },
+                "nextHopSpoke": {
+                    "$ref": "NextHopSpoke",
+                    "description": "Immutable. The next-hop spoke for packets on this route."
+                },
                 "nextHopVpcNetwork": {
                     "$ref": "NextHopVpcNetwork",
                     "description": "Immutable. The destination VPC network for packets on this route."
@@ -4595,7 +6127,8 @@
                         "REJECTING",
                         "UPDATING",
                         "INACTIVE",
-                        "OBSOLETE"
+                        "OBSOLETE",
+                        "FAILED"
                     ],
                     "enumDescriptions": [
                         "No state information available",
@@ -4606,7 +6139,8 @@
                         "The resource's reject operation is in progress.",
                         "The resource's update operation is in progress.",
                         "The resource is inactive.",
-                        "The hub associated with this spoke resource has been deleted. This state applies to spoke resources only."
+                        "The hub associated with this spoke resource has been deleted. This state applies to spoke resources only.",
+                        "The resource is in an undefined state due to resource creation or deletion failure. You can try to delete the resource later or contact support for help."
                     ],
                     "readOnly": true,
                     "type": "string"
@@ -4677,7 +6211,8 @@
                         "REJECTING",
                         "UPDATING",
                         "INACTIVE",
-                        "OBSOLETE"
+                        "OBSOLETE",
+                        "FAILED"
                     ],
                     "enumDescriptions": [
                         "No state information available",
@@ -4688,7 +6223,8 @@
                         "The resource's reject operation is in progress.",
                         "The resource's update operation is in progress.",
                         "The resource is inactive.",
-                        "The hub associated with this spoke resource has been deleted. This state applies to spoke resources only."
+                        "The hub associated with this spoke resource has been deleted. This state applies to spoke resources only.",
+                        "The resource is in an undefined state due to resource creation or deletion failure. You can try to delete the resource later or contact support for help."
                     ],
                     "readOnly": true,
                     "type": "string"
@@ -4739,7 +6275,7 @@
             "type": "object"
         },
         "ServiceClass": {
-            "description": "The ServiceClass resource. Next id: 9",
+            "description": "The ServiceClass resource.",
             "id": "ServiceClass",
             "properties": {
                 "createTime": {
@@ -4781,8 +6317,38 @@
             },
             "type": "object"
         },
+        "ServiceConfig": {
+            "description": "Specifies eligibility information for the service.",
+            "id": "ServiceConfig",
+            "properties": {
+                "eligibilityCriteria": {
+                    "description": "Output only. The eligibility criteria for the service.",
+                    "enum": [
+                        "ELIGIBILITY_CRITERIA_UNSPECIFIED",
+                        "NETWORK_SERVICE_TIER_PREMIUM_ONLY",
+                        "NETWORK_SERVICE_TIER_STANDARD_ONLY",
+                        "REQUEST_ENDPOINT_REGIONAL_ENDPOINT_ONLY"
+                    ],
+                    "enumDescriptions": [
+                        "The service is not eligible for Data Transfer Essentials configuration. This is the default case.",
+                        "The service is eligible for Data Transfer Essentials configuration only for Premium Tier.",
+                        "The service is eligible for Data Transfer Essentials configuration only for Standard Tier.",
+                        "The service is eligible for Data Transfer Essentials configuration only for the regional endpoint."
+                    ],
+                    "readOnly": true,
+                    "type": "string"
+                },
+                "supportEndTime": {
+                    "description": "Output only. The end time for eligibility criteria support. If not specified, no planned end time is set.",
+                    "format": "google-datetime",
+                    "readOnly": true,
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
         "ServiceConnectionMap": {
-            "description": "The ServiceConnectionMap resource. Next id: 15",
+            "description": "The ServiceConnectionMap resource.",
             "id": "ServiceConnectionMap",
             "properties": {
                 "consumerPscConfigs": {
@@ -4846,7 +6412,7 @@
                     "type": "array"
                 },
                 "serviceClass": {
-                    "description": "The service class identifier this ServiceConnectionMap is for. The user of ServiceConnectionMap create API needs to have networkconnecitivty.serviceclasses.use iam permission for the service class.",
+                    "description": "The service class identifier this ServiceConnectionMap is for. The user of ServiceConnectionMap create API needs to have networkconnectivity.serviceClasses.use IAM permission for the service class.",
                     "type": "string"
                 },
                 "serviceClassUri": {
@@ -4855,7 +6421,7 @@
                     "type": "string"
                 },
                 "token": {
-                    "description": "The token provided by the consumer. This token authenticates that the consumer can create a connecton within the specified project and network.",
+                    "description": "The token provided by the consumer. This token authenticates that the consumer can create a connection within the specified project and network.",
                     "type": "string"
                 },
                 "updateTime": {
@@ -4868,11 +6434,16 @@
             "type": "object"
         },
         "ServiceConnectionPolicy": {
-            "description": "The ServiceConnectionPolicy resource. Next id: 12",
+            "description": "The ServiceConnectionPolicy resource.",
             "id": "ServiceConnectionPolicy",
             "properties": {
+                "autoCreatedSubnetInfo": {
+                    "$ref": "AutoCreatedSubnetworkInfo",
+                    "description": "Output only. Information for the automatically created subnetwork and its associated IR.",
+                    "readOnly": true
+                },
                 "createTime": {
-                    "description": "Output only. Time when the ServiceConnectionMap was created.",
+                    "description": "Output only. Time when the ServiceConnectionPolicy was created.",
                     "format": "google-datetime",
                     "readOnly": true,
                     "type": "string"
@@ -4926,11 +6497,11 @@
                     "type": "array"
                 },
                 "serviceClass": {
-                    "description": "The service class identifier for which this ServiceConnectionPolicy is for. The service class identifier is a unique, symbolic representation of a ServiceClass. It is provided by the Service Producer. Google services have a prefix of gcp. For example, gcp-cloud-sql. 3rd party services do not. For example, test-service-a3dfcx.",
+                    "description": "The service class identifier for which this ServiceConnectionPolicy is for. The service class identifier is a unique, symbolic representation of a ServiceClass. It is provided by the Service Producer. Google services have a prefix of gcp or google-cloud. For example, gcp-memorystore-redis or google-cloud-sql. 3rd party services do not. For example, test-service-a3dfcx.",
                     "type": "string"
                 },
                 "updateTime": {
-                    "description": "Output only. Time when the ServiceConnectionMap was updated.",
+                    "description": "Output only. Time when the ServiceConnectionPolicy was updated.",
                     "format": "google-datetime",
                     "readOnly": true,
                     "type": "string"
@@ -4939,7 +6510,7 @@
             "type": "object"
         },
         "ServiceConnectionToken": {
-            "description": "The ServiceConnectionToken resource. Next id: 10",
+            "description": "The ServiceConnectionToken resource.",
             "id": "ServiceConnectionToken",
             "properties": {
                 "createTime": {
@@ -5018,8 +6589,19 @@
                     "type": "string"
                 },
                 "description": {
-                    "description": "An optional description of the spoke.",
+                    "description": "Optional. An optional description of the spoke.",
                     "type": "string"
+                },
+                "etag": {
+                    "description": "Optional. This checksum is computed by the server based on the value of other fields, and may be sent on update and delete requests to ensure the client has an up-to-date value before proceeding.",
+                    "type": "string"
+                },
+                "fieldPathsPendingUpdate": {
+                    "description": "Optional. The list of fields waiting for hub administration's approval.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
                 },
                 "group": {
                     "description": "Optional. The name of the group that this spoke is associated with.",
@@ -5038,11 +6620,15 @@
                 },
                 "linkedInterconnectAttachments": {
                     "$ref": "LinkedInterconnectAttachments",
-                    "description": "VLAN attachments that are associated with the spoke."
+                    "description": "Optional. VLAN attachments that are associated with the spoke."
+                },
+                "linkedProducerVpcNetwork": {
+                    "$ref": "LinkedProducerVpcNetwork",
+                    "description": "Optional. The linked producer VPC that is associated with the spoke."
                 },
                 "linkedRouterApplianceInstances": {
                     "$ref": "LinkedRouterApplianceInstances",
-                    "description": "Router appliance instances that are associated with the spoke."
+                    "description": "Optional. Router appliance instances that are associated with the spoke."
                 },
                 "linkedVpcNetwork": {
                     "$ref": "LinkedVpcNetwork",
@@ -5050,14 +6636,14 @@
                 },
                 "linkedVpnTunnels": {
                     "$ref": "LinkedVpnTunnels",
-                    "description": "VPN tunnels that are associated with the spoke."
+                    "description": "Optional. VPN tunnels that are associated with the spoke."
                 },
                 "name": {
                     "description": "Immutable. The name of the spoke. Spoke names must be unique. They use the following form: `projects/{project_number}/locations/{region}/spokes/{spoke_id}`",
                     "type": "string"
                 },
                 "reasons": {
-                    "description": "Output only. The reasons for current state of the spoke. Only present when the spoke is in the `INACTIVE` state.",
+                    "description": "Output only. The reasons for current state of the spoke.",
                     "items": {
                         "$ref": "StateReason"
                     },
@@ -5071,14 +6657,16 @@
                         "VPN_TUNNEL",
                         "INTERCONNECT_ATTACHMENT",
                         "ROUTER_APPLIANCE",
-                        "VPC_NETWORK"
+                        "VPC_NETWORK",
+                        "PRODUCER_VPC_NETWORK"
                     ],
                     "enumDescriptions": [
                         "Unspecified spoke type.",
                         "Spokes associated with VPN tunnels.",
                         "Spokes associated with VLAN attachments.",
                         "Spokes associated with router appliance instances.",
-                        "Spokes associated with VPC networks."
+                        "Spokes associated with VPC networks.",
+                        "Spokes that are backed by a producer VPC network."
                     ],
                     "readOnly": true,
                     "type": "string"
@@ -5094,7 +6682,8 @@
                         "REJECTING",
                         "UPDATING",
                         "INACTIVE",
-                        "OBSOLETE"
+                        "OBSOLETE",
+                        "FAILED"
                     ],
                     "enumDescriptions": [
                         "No state information available",
@@ -5105,7 +6694,8 @@
                         "The resource's reject operation is in progress.",
                         "The resource's update operation is in progress.",
                         "The resource is inactive.",
-                        "The hub associated with this spoke resource has been deleted. This state applies to spoke resources only."
+                        "The hub associated with this spoke resource has been deleted. This state applies to spoke resources only.",
+                        "The resource is in an undefined state due to resource creation or deletion failure. You can try to delete the resource later or contact support for help."
                     ],
                     "readOnly": true,
                     "type": "string"
@@ -5145,7 +6735,8 @@
                         "REJECTING",
                         "UPDATING",
                         "INACTIVE",
-                        "OBSOLETE"
+                        "OBSOLETE",
+                        "FAILED"
                     ],
                     "enumDescriptions": [
                         "No state information available",
@@ -5156,7 +6747,8 @@
                         "The resource's reject operation is in progress.",
                         "The resource's update operation is in progress.",
                         "The resource is inactive.",
-                        "The hub associated with this spoke resource has been deleted. This state applies to spoke resources only."
+                        "The hub associated with this spoke resource has been deleted. This state applies to spoke resources only.",
+                        "The resource is in an undefined state due to resource creation or deletion failure. You can try to delete the resource later or contact support for help."
                     ],
                     "readOnly": true,
                     "type": "string"
@@ -5181,14 +6773,20 @@
                         "PENDING_REVIEW",
                         "REJECTED",
                         "PAUSED",
-                        "FAILED"
+                        "FAILED",
+                        "UPDATE_PENDING_REVIEW",
+                        "UPDATE_REJECTED",
+                        "UPDATE_FAILED"
                     ],
                     "enumDescriptions": [
                         "No information available.",
                         "The proposed spoke is pending review.",
                         "The proposed spoke has been rejected by the hub administrator.",
                         "The spoke has been deactivated internally.",
-                        "Network Connectivity Center encountered errors while accepting the spoke."
+                        "Network Connectivity Center encountered errors while accepting the spoke.",
+                        "The proposed spoke update is pending review.",
+                        "The proposed spoke update has been rejected by the hub administrator.",
+                        "Network Connectivity Center encountered errors while accepting the spoke update."
                     ],
                     "readOnly": true,
                     "type": "string"
@@ -5244,14 +6842,50 @@
                         "VPN_TUNNEL",
                         "INTERCONNECT_ATTACHMENT",
                         "ROUTER_APPLIANCE",
-                        "VPC_NETWORK"
+                        "VPC_NETWORK",
+                        "PRODUCER_VPC_NETWORK"
                     ],
                     "enumDescriptions": [
                         "Unspecified spoke type.",
                         "Spokes associated with VPN tunnels.",
                         "Spokes associated with VLAN attachments.",
                         "Spokes associated with router appliance instances.",
-                        "Spokes associated with VPC networks."
+                        "Spokes associated with VPC networks.",
+                        "Spokes that are backed by a producer VPC network."
+                    ],
+                    "readOnly": true,
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "StateMetadata": {
+            "description": "The state and activation time details of the resource state.",
+            "id": "StateMetadata",
+            "properties": {
+                "effectiveTime": {
+                    "description": "Output only. Accompanies only the transient states, which include `ADDING`, `DELETING`, and `SUSPENDING`, to denote the time until which the transient state of the resource will be effective. For instance, if the state is `ADDING`, this field shows the time when the resource state transitions to `ACTIVE`.",
+                    "format": "google-datetime",
+                    "readOnly": true,
+                    "type": "string"
+                },
+                "state": {
+                    "description": "Output only. The state of the resource.",
+                    "enum": [
+                        "STATE_UNSPECIFIED",
+                        "ADDING",
+                        "ACTIVE",
+                        "DELETING",
+                        "SUSPENDING",
+                        "SUSPENDED"
+                    ],
+                    "enumDescriptions": [
+                        "An invalid state, which is the default case.",
+                        "The resource is being added.",
+                        "The resource is in use.",
+                        "The resource is being deleted.",
+                        "The resource is being suspended.",
+                        "The resource is suspended and not in use."
                     ],
                     "readOnly": true,
                     "type": "string"
@@ -5270,14 +6904,20 @@
                         "PENDING_REVIEW",
                         "REJECTED",
                         "PAUSED",
-                        "FAILED"
+                        "FAILED",
+                        "UPDATE_PENDING_REVIEW",
+                        "UPDATE_REJECTED",
+                        "UPDATE_FAILED"
                     ],
                     "enumDescriptions": [
                         "No information available.",
                         "The proposed spoke is pending review.",
                         "The proposed spoke has been rejected by the hub administrator.",
                         "The spoke has been deactivated internally.",
-                        "Network Connectivity Center encountered errors while accepting the spoke."
+                        "Network Connectivity Center encountered errors while accepting the spoke.",
+                        "The proposed spoke update is pending review.",
+                        "The proposed spoke update has been rejected by the hub administrator.",
+                        "Network Connectivity Center encountered errors while accepting the spoke update."
                     ],
                     "type": "string"
                 },
@@ -5288,6 +6928,21 @@
                 "userDetails": {
                     "description": "Additional information provided by the user in the RejectSpoke call.",
                     "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "StateTimeline": {
+            "description": "The timeline of the pending states for a resource.",
+            "id": "StateTimeline",
+            "properties": {
+                "states": {
+                    "description": "Output only. The state and activation time details of the resource state.",
+                    "items": {
+                        "$ref": "StateMetadata"
+                    },
+                    "readOnly": true,
+                    "type": "array"
                 }
             },
             "type": "object"

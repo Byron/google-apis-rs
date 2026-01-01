@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Cloud Filestore* API at revision *20240608*. The CLI is at version *6.0.0*.
+This documentation was generated from the *Cloud Filestore* API at revision *20251204*. The CLI is at version *7.0.0*.
 
 ```bash
 file1 [options]
@@ -41,8 +41,10 @@ file1 [options]
                 locations-instances-get <name> [-p <v>]... [-o <out>]
                 locations-instances-list <parent> [-p <v>]... [-o <out>]
                 locations-instances-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-instances-pause-replica <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-instances-promote-replica <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-instances-restore <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-instances-resume-replica <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-instances-revert <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-instances-snapshots-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-instances-snapshots-delete <name> [-p <v>]... [-o <out>]

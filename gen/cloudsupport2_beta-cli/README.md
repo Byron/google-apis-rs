@@ -25,16 +25,18 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Cloud Support* API at revision *20240624*. The CLI is at version *6.0.0*.
+This documentation was generated from the *Cloud Support* API at revision *20251216*. The CLI is at version *7.0.0*.
 
 ```bash
 cloudsupport2-beta [options]
         case-classifications
                 search [-p <v>]... [-o <out>]
         cases
+                attachments-get <name> [-p <v>]... [-o <out>]
                 attachments-list <parent> [-p <v>]... [-o <out>]
                 close <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 comments-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                comments-get <name> [-p <v>]... [-o <out>]
                 comments-list <parent> [-p <v>]... [-o <out>]
                 create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 escalate <name> (-r <kv>)... [-p <v>]... [-o <out>]

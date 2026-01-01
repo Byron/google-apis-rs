@@ -1,4 +1,4 @@
-site_name: Recommendations AI v6.0.0+20240618
+site_name: Recommendations AI v7.0.0+20251204
 site_url: http://byron.github.io/google-apis-rs/google-recommendationengine1_beta1-cli
 site_description: A complete library to interact with Recommendations AI (protocol v1beta1)
 

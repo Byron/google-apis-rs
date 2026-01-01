@@ -42,6 +42,170 @@ impl<'n, C> Engine<'n, C>
 where
     C: apis_common::Connector,
 {
+    async fn _projects_locations_check_consumer_config(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut field_cursor = FieldCursor::default();
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "consumer-network" => Some((
+                    "consumerNetwork",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "endpoint-project" => Some((
+                    "endpointProject",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "requested-ip-version" => Some((
+                    "requestedIpVersion",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "service-class" => Some((
+                    "serviceClass",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec![
+                            "consumer-network",
+                            "endpoint-project",
+                            "requested-ip-version",
+                            "service-class",
+                        ],
+                    );
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
+            }
+        }
+        let mut request: api::CheckConsumerConfigRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .locations_check_consumer_config(request, opt.value_of("location").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _projects_locations_get(
         &self,
         opt: &ArgMatches<'n>,
@@ -195,6 +359,158 @@ where
             .hub
             .projects()
             .locations_global_hubs_accept_spoke(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_global_hubs_accept_spoke_update(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut field_cursor = FieldCursor::default();
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "request-id" => Some((
+                    "requestId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "spoke-etag" => Some((
+                    "spokeEtag",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "spoke-uri" => Some((
+                    "spokeUri",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec!["request-id", "spoke-etag", "spoke-uri"],
+                    );
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
+            }
+        }
+        let mut request: api::AcceptSpokeUpdateRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .locations_global_hubs_accept_spoke_update(request, opt.value_of("name").unwrap_or(""));
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -1977,6 +2293,111 @@ where
         }
     }
 
+    async fn _projects_locations_global_hubs_query_status(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .locations_global_hubs_query_status(opt.value_of("name").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                }
+                "page-size" => {
+                    call = call.page_size(
+                        value
+                            .map(|v| arg_from_str(v, err, "page-size", "int32"))
+                            .unwrap_or(-0),
+                    );
+                }
+                "order-by" => {
+                    call = call.order_by(value.unwrap_or(""));
+                }
+                "group-by" => {
+                    call = call.group_by(value.unwrap_or(""));
+                }
+                "filter" => {
+                    call = call.filter(value.unwrap_or(""));
+                }
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(
+                                    ["filter", "group-by", "order-by", "page-size", "page-token"]
+                                        .iter()
+                                        .map(|v| *v),
+                                );
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _projects_locations_global_hubs_reject_spoke(
         &self,
         opt: &ArgMatches<'n>,
@@ -2056,6 +2477,165 @@ where
             .hub
             .projects()
             .locations_global_hubs_reject_spoke(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_global_hubs_reject_spoke_update(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut field_cursor = FieldCursor::default();
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "details" => Some((
+                    "details",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "request-id" => Some((
+                    "requestId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "spoke-etag" => Some((
+                    "spokeEtag",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "spoke-uri" => Some((
+                    "spokeUri",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec!["details", "request-id", "spoke-etag", "spoke-uri"],
+                    );
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
+            }
+        }
+        let mut request: api::RejectSpokeUpdateRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .locations_global_hubs_reject_spoke_update(request, opt.value_of("name").unwrap_or(""));
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -3748,6 +4328,20 @@ where
 
             let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
             {
+                "allocation-options.allocation-strategy" => Some((
+                    "allocationOptions.allocationStrategy",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "allocation-options.first-available-ranges-lookup-size" => Some((
+                    "allocationOptions.firstAvailableRangesLookupSize",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "create-time" => Some((
                     "createTime",
                     JsonTypeInfo {
@@ -3759,6 +4353,20 @@ where
                     "description",
                     JsonTypeInfo {
                         jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "exclude-cidr-ranges" => Some((
+                    "excludeCidrRanges",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "immutable" => Some((
+                    "immutable",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
                         ctype: ComplexType::Pod,
                     },
                 )),
@@ -3774,6 +4382,20 @@ where
                     JsonTypeInfo {
                         jtype: JsonType::String,
                         ctype: ComplexType::Map,
+                    },
+                )),
+                "migration.source" => Some((
+                    "migration.source",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "migration.target" => Some((
+                    "migration.target",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
                     },
                 )),
                 "name" => Some((
@@ -3843,15 +4465,23 @@ where
                     let suggestion = FieldCursor::did_you_mean(
                         key,
                         &vec![
+                            "allocation-options",
+                            "allocation-strategy",
                             "create-time",
                             "description",
+                            "exclude-cidr-ranges",
+                            "first-available-ranges-lookup-size",
+                            "immutable",
                             "ip-cidr-range",
                             "labels",
+                            "migration",
                             "name",
                             "network",
                             "overlaps",
                             "peering",
                             "prefix-length",
+                            "source",
+                            "target",
                             "target-cidr-range",
                             "update-time",
                             "usage",
@@ -4125,6 +4755,97 @@ where
         }
     }
 
+    async fn _projects_locations_internal_ranges_get_iam_policy(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .locations_internal_ranges_get_iam_policy(opt.value_of("resource").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "options-requested-policy-version" => {
+                    call = call.options_requested_policy_version(
+                        value
+                            .map(|v| {
+                                arg_from_str(v, err, "options-requested-policy-version", "int32")
+                            })
+                            .unwrap_or(-0),
+                    );
+                }
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["options-requested-policy-version"].iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _projects_locations_internal_ranges_list(
         &self,
         opt: &ArgMatches<'n>,
@@ -4258,6 +4979,20 @@ where
 
             let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
             {
+                "allocation-options.allocation-strategy" => Some((
+                    "allocationOptions.allocationStrategy",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "allocation-options.first-available-ranges-lookup-size" => Some((
+                    "allocationOptions.firstAvailableRangesLookupSize",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "create-time" => Some((
                     "createTime",
                     JsonTypeInfo {
@@ -4269,6 +5004,20 @@ where
                     "description",
                     JsonTypeInfo {
                         jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "exclude-cidr-ranges" => Some((
+                    "excludeCidrRanges",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "immutable" => Some((
+                    "immutable",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
                         ctype: ComplexType::Pod,
                     },
                 )),
@@ -4284,6 +5033,20 @@ where
                     JsonTypeInfo {
                         jtype: JsonType::String,
                         ctype: ComplexType::Map,
+                    },
+                )),
+                "migration.source" => Some((
+                    "migration.source",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "migration.target" => Some((
+                    "migration.target",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
                     },
                 )),
                 "name" => Some((
@@ -4353,15 +5116,23 @@ where
                     let suggestion = FieldCursor::did_you_mean(
                         key,
                         &vec![
+                            "allocation-options",
+                            "allocation-strategy",
                             "create-time",
                             "description",
+                            "exclude-cidr-ranges",
+                            "first-available-ranges-lookup-size",
+                            "immutable",
                             "ip-cidr-range",
                             "labels",
+                            "migration",
                             "name",
                             "network",
                             "overlaps",
                             "peering",
                             "prefix-length",
+                            "source",
+                            "target",
                             "target-cidr-range",
                             "update-time",
                             "usage",
@@ -4473,6 +5244,298 @@ where
         }
     }
 
+    async fn _projects_locations_internal_ranges_set_iam_policy(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut field_cursor = FieldCursor::default();
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "policy.etag" => Some((
+                    "policy.etag",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "policy.version" => Some((
+                    "policy.version",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "update-mask" => Some((
+                    "updateMask",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec!["etag", "policy", "update-mask", "version"],
+                    );
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
+            }
+        }
+        let mut request: api::SetIamPolicyRequest = serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .locations_internal_ranges_set_iam_policy(
+                request,
+                opt.value_of("resource").unwrap_or(""),
+            );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_internal_ranges_test_iam_permissions(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut field_cursor = FieldCursor::default();
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "permissions" => Some((
+                    "permissions",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(key, &vec!["permissions"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
+            }
+        }
+        let mut request: api::TestIamPermissionsRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .locations_internal_ranges_test_iam_permissions(
+                request,
+                opt.value_of("resource").unwrap_or(""),
+            );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _projects_locations_list(
         &self,
         opt: &ArgMatches<'n>,
@@ -4504,6 +5567,9 @@ where
                 "filter" => {
                     call = call.filter(value.unwrap_or(""));
                 }
+                "extra-location-types" => {
+                    call = call.add_extra_location_types(value.unwrap_or(""));
+                }
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -4521,7 +5587,1612 @@ where
                             .push(CLIError::UnknownParameter(key.to_string(), {
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
-                                v.extend(["filter", "page-size", "page-token"].iter().map(|v| *v));
+                                v.extend(
+                                    ["extra-location-types", "filter", "page-size", "page-token"]
+                                        .iter()
+                                        .map(|v| *v),
+                                );
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_multicloud_data_transfer_configs_create(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut field_cursor = FieldCursor::default();
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "create-time" => Some((
+                    "createTime",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "description" => Some((
+                    "description",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "destinations-active-count" => Some((
+                    "destinationsActiveCount",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "destinations-count" => Some((
+                    "destinationsCount",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "etag" => Some((
+                    "etag",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "labels" => Some((
+                    "labels",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Map,
+                    },
+                )),
+                "name" => Some((
+                    "name",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "uid" => Some((
+                    "uid",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "update-time" => Some((
+                    "updateTime",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec![
+                            "create-time",
+                            "description",
+                            "destinations-active-count",
+                            "destinations-count",
+                            "etag",
+                            "labels",
+                            "name",
+                            "uid",
+                            "update-time",
+                        ],
+                    );
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
+            }
+        }
+        let mut request: api::MulticloudDataTransferConfig =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .locations_multicloud_data_transfer_configs_create(
+                request,
+                opt.value_of("parent").unwrap_or(""),
+            );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "request-id" => {
+                    call = call.request_id(value.unwrap_or(""));
+                }
+                "multicloud-data-transfer-config-id" => {
+                    call = call.multicloud_data_transfer_config_id(value.unwrap_or(""));
+                }
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(
+                                    ["multicloud-data-transfer-config-id", "request-id"]
+                                        .iter()
+                                        .map(|v| *v),
+                                );
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_multicloud_data_transfer_configs_delete(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .locations_multicloud_data_transfer_configs_delete(opt.value_of("name").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "request-id" => {
+                    call = call.request_id(value.unwrap_or(""));
+                }
+                "etag" => {
+                    call = call.etag(value.unwrap_or(""));
+                }
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["etag", "request-id"].iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_multicloud_data_transfer_configs_destinations_create(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut field_cursor = FieldCursor::default();
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "create-time" => Some((
+                    "createTime",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "description" => Some((
+                    "description",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "etag" => Some((
+                    "etag",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "ip-prefix" => Some((
+                    "ipPrefix",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "labels" => Some((
+                    "labels",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Map,
+                    },
+                )),
+                "name" => Some((
+                    "name",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "uid" => Some((
+                    "uid",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "update-time" => Some((
+                    "updateTime",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec![
+                            "create-time",
+                            "description",
+                            "etag",
+                            "ip-prefix",
+                            "labels",
+                            "name",
+                            "uid",
+                            "update-time",
+                        ],
+                    );
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
+            }
+        }
+        let mut request: api::Destination = serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .locations_multicloud_data_transfer_configs_destinations_create(
+                request,
+                opt.value_of("parent").unwrap_or(""),
+            );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "request-id" => {
+                    call = call.request_id(value.unwrap_or(""));
+                }
+                "destination-id" => {
+                    call = call.destination_id(value.unwrap_or(""));
+                }
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["destination-id", "request-id"].iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_multicloud_data_transfer_configs_destinations_delete(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .locations_multicloud_data_transfer_configs_destinations_delete(
+                opt.value_of("name").unwrap_or(""),
+            );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "request-id" => {
+                    call = call.request_id(value.unwrap_or(""));
+                }
+                "etag" => {
+                    call = call.etag(value.unwrap_or(""));
+                }
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["etag", "request-id"].iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_multicloud_data_transfer_configs_destinations_get(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .locations_multicloud_data_transfer_configs_destinations_get(
+                opt.value_of("name").unwrap_or(""),
+            );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_multicloud_data_transfer_configs_destinations_list(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .locations_multicloud_data_transfer_configs_destinations_list(
+                opt.value_of("parent").unwrap_or(""),
+            );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "return-partial-success" => {
+                    call = call.return_partial_success(
+                        value
+                            .map(|v| arg_from_str(v, err, "return-partial-success", "boolean"))
+                            .unwrap_or(false),
+                    );
+                }
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                }
+                "page-size" => {
+                    call = call.page_size(
+                        value
+                            .map(|v| arg_from_str(v, err, "page-size", "int32"))
+                            .unwrap_or(-0),
+                    );
+                }
+                "order-by" => {
+                    call = call.order_by(value.unwrap_or(""));
+                }
+                "filter" => {
+                    call = call.filter(value.unwrap_or(""));
+                }
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(
+                                    [
+                                        "filter",
+                                        "order-by",
+                                        "page-size",
+                                        "page-token",
+                                        "return-partial-success",
+                                    ]
+                                    .iter()
+                                    .map(|v| *v),
+                                );
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_multicloud_data_transfer_configs_destinations_patch(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut field_cursor = FieldCursor::default();
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "create-time" => Some((
+                    "createTime",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "description" => Some((
+                    "description",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "etag" => Some((
+                    "etag",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "ip-prefix" => Some((
+                    "ipPrefix",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "labels" => Some((
+                    "labels",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Map,
+                    },
+                )),
+                "name" => Some((
+                    "name",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "uid" => Some((
+                    "uid",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "update-time" => Some((
+                    "updateTime",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec![
+                            "create-time",
+                            "description",
+                            "etag",
+                            "ip-prefix",
+                            "labels",
+                            "name",
+                            "uid",
+                            "update-time",
+                        ],
+                    );
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
+            }
+        }
+        let mut request: api::Destination = serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .locations_multicloud_data_transfer_configs_destinations_patch(
+                request,
+                opt.value_of("name").unwrap_or(""),
+            );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "update-mask" => {
+                    call = call.update_mask(
+                        value
+                            .map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask"))
+                            .unwrap_or(apis_common::FieldMask::default()),
+                    );
+                }
+                "request-id" => {
+                    call = call.request_id(value.unwrap_or(""));
+                }
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["request-id", "update-mask"].iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_multicloud_data_transfer_configs_get(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .locations_multicloud_data_transfer_configs_get(opt.value_of("name").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_multicloud_data_transfer_configs_list(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .locations_multicloud_data_transfer_configs_list(opt.value_of("parent").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "return-partial-success" => {
+                    call = call.return_partial_success(
+                        value
+                            .map(|v| arg_from_str(v, err, "return-partial-success", "boolean"))
+                            .unwrap_or(false),
+                    );
+                }
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                }
+                "page-size" => {
+                    call = call.page_size(
+                        value
+                            .map(|v| arg_from_str(v, err, "page-size", "int32"))
+                            .unwrap_or(-0),
+                    );
+                }
+                "order-by" => {
+                    call = call.order_by(value.unwrap_or(""));
+                }
+                "filter" => {
+                    call = call.filter(value.unwrap_or(""));
+                }
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(
+                                    [
+                                        "filter",
+                                        "order-by",
+                                        "page-size",
+                                        "page-token",
+                                        "return-partial-success",
+                                    ]
+                                    .iter()
+                                    .map(|v| *v),
+                                );
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_multicloud_data_transfer_configs_patch(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut field_cursor = FieldCursor::default();
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "create-time" => Some((
+                    "createTime",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "description" => Some((
+                    "description",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "destinations-active-count" => Some((
+                    "destinationsActiveCount",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "destinations-count" => Some((
+                    "destinationsCount",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "etag" => Some((
+                    "etag",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "labels" => Some((
+                    "labels",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Map,
+                    },
+                )),
+                "name" => Some((
+                    "name",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "uid" => Some((
+                    "uid",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "update-time" => Some((
+                    "updateTime",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec![
+                            "create-time",
+                            "description",
+                            "destinations-active-count",
+                            "destinations-count",
+                            "etag",
+                            "labels",
+                            "name",
+                            "uid",
+                            "update-time",
+                        ],
+                    );
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
+            }
+        }
+        let mut request: api::MulticloudDataTransferConfig =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .locations_multicloud_data_transfer_configs_patch(
+                request,
+                opt.value_of("name").unwrap_or(""),
+            );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "update-mask" => {
+                    call = call.update_mask(
+                        value
+                            .map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask"))
+                            .unwrap_or(apis_common::FieldMask::default()),
+                    );
+                }
+                "request-id" => {
+                    call = call.request_id(value.unwrap_or(""));
+                }
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["request-id", "update-mask"].iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_multicloud_data_transfer_supported_services_get(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .locations_multicloud_data_transfer_supported_services_get(
+                opt.value_of("name").unwrap_or(""),
+            );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_multicloud_data_transfer_supported_services_list(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .locations_multicloud_data_transfer_supported_services_list(
+                opt.value_of("parent").unwrap_or(""),
+            );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                }
+                "page-size" => {
+                    call = call.page_size(
+                        value
+                            .map(|v| arg_from_str(v, err, "page-size", "int32"))
+                            .unwrap_or(-0),
+                    );
+                }
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["page-size", "page-token"].iter().map(|v| *v));
                                 v
                             }));
                     }
@@ -4876,6 +7547,13 @@ where
         {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "return-partial-success" => {
+                    call = call.return_partial_success(
+                        value
+                            .map(|v| arg_from_str(v, err, "return-partial-success", "boolean"))
+                            .unwrap_or(false),
+                    );
+                }
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
                 }
@@ -4906,7 +7584,16 @@ where
                             .push(CLIError::UnknownParameter(key.to_string(), {
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
-                                v.extend(["filter", "page-size", "page-token"].iter().map(|v| *v));
+                                v.extend(
+                                    [
+                                        "filter",
+                                        "page-size",
+                                        "page-token",
+                                        "return-partial-success",
+                                    ]
+                                    .iter()
+                                    .map(|v| *v),
+                                );
                                 v
                             }));
                     }
@@ -7441,6 +10128,34 @@ where
 
             let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
             {
+                "auto-created-subnet-info.internal-range" => Some((
+                    "autoCreatedSubnetInfo.internalRange",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "auto-created-subnet-info.internal-range-ref" => Some((
+                    "autoCreatedSubnetInfo.internalRangeRef",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "auto-created-subnet-info.subnetwork" => Some((
+                    "autoCreatedSubnetInfo.subnetwork",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "auto-created-subnet-info.subnetwork-ref" => Some((
+                    "autoCreatedSubnetInfo.subnetworkRef",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "create-time" => Some((
                     "createTime",
                     JsonTypeInfo {
@@ -7537,10 +10252,13 @@ where
                         key,
                         &vec![
                             "allowed-google-producers-resource-hierarchy-level",
+                            "auto-created-subnet-info",
                             "create-time",
                             "description",
                             "etag",
                             "infrastructure",
+                            "internal-range",
+                            "internal-range-ref",
                             "labels",
                             "limit",
                             "name",
@@ -7548,6 +10266,8 @@ where
                             "producer-instance-location",
                             "psc-config",
                             "service-class",
+                            "subnetwork",
+                            "subnetwork-ref",
                             "subnetworks",
                             "update-time",
                         ],
@@ -7587,11 +10307,34 @@ where
         {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "subnetwork-mode" => {
+                    call = call.subnetwork_mode(value.unwrap_or(""));
+                }
                 "service-connection-policy-id" => {
                     call = call.service_connection_policy_id(value.unwrap_or(""));
                 }
                 "request-id" => {
                     call = call.request_id(value.unwrap_or(""));
+                }
+                "auto-subnetwork-config-prefix-length" => {
+                    call = call.auto_subnetwork_config_prefix_length(
+                        value
+                            .map(|v| {
+                                arg_from_str(
+                                    v,
+                                    err,
+                                    "auto-subnetwork-config-prefix-length",
+                                    "int32",
+                                )
+                            })
+                            .unwrap_or(-0),
+                    );
+                }
+                "auto-subnetwork-config-ip-stack" => {
+                    call = call.auto_subnetwork_config_ip_stack(value.unwrap_or(""));
+                }
+                "auto-subnetwork-config-alloc-range-space" => {
+                    call = call.add_auto_subnetwork_config_alloc_range_space(value.unwrap_or(""));
                 }
                 _ => {
                     let mut found = false;
@@ -7611,9 +10354,16 @@ where
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
                                 v.extend(
-                                    ["request-id", "service-connection-policy-id"]
-                                        .iter()
-                                        .map(|v| *v),
+                                    [
+                                        "auto-subnetwork-config-alloc-range-space",
+                                        "auto-subnetwork-config-ip-stack",
+                                        "auto-subnetwork-config-prefix-length",
+                                        "request-id",
+                                        "service-connection-policy-id",
+                                        "subnetwork-mode",
+                                    ]
+                                    .iter()
+                                    .map(|v| *v),
                                 );
                                 v
                             }));
@@ -8056,6 +10806,34 @@ where
 
             let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
             {
+                "auto-created-subnet-info.internal-range" => Some((
+                    "autoCreatedSubnetInfo.internalRange",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "auto-created-subnet-info.internal-range-ref" => Some((
+                    "autoCreatedSubnetInfo.internalRangeRef",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "auto-created-subnet-info.subnetwork" => Some((
+                    "autoCreatedSubnetInfo.subnetwork",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "auto-created-subnet-info.subnetwork-ref" => Some((
+                    "autoCreatedSubnetInfo.subnetworkRef",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "create-time" => Some((
                     "createTime",
                     JsonTypeInfo {
@@ -8152,10 +10930,13 @@ where
                         key,
                         &vec![
                             "allowed-google-producers-resource-hierarchy-level",
+                            "auto-created-subnet-info",
                             "create-time",
                             "description",
                             "etag",
                             "infrastructure",
+                            "internal-range",
+                            "internal-range-ref",
                             "labels",
                             "limit",
                             "name",
@@ -8163,6 +10944,8 @@ where
                             "producer-instance-location",
                             "psc-config",
                             "service-class",
+                            "subnetwork",
+                            "subnetwork-ref",
                             "subnetworks",
                             "update-time",
                         ],
@@ -9102,6 +11885,20 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "etag" => Some((
+                    "etag",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "field-paths-pending-update" => Some((
+                    "fieldPathsPendingUpdate",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
                 "group" => Some((
                     "group",
                     JsonTypeInfo {
@@ -9151,6 +11948,62 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "linked-producer-vpc-network.exclude-export-ranges" => Some((
+                    "linkedProducerVpcNetwork.excludeExportRanges",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "linked-producer-vpc-network.include-export-ranges" => Some((
+                    "linkedProducerVpcNetwork.includeExportRanges",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "linked-producer-vpc-network.network" => Some((
+                    "linkedProducerVpcNetwork.network",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "linked-producer-vpc-network.peering" => Some((
+                    "linkedProducerVpcNetwork.peering",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "linked-producer-vpc-network.producer-network" => Some((
+                    "linkedProducerVpcNetwork.producerNetwork",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "linked-producer-vpc-network.proposed-exclude-export-ranges" => Some((
+                    "linkedProducerVpcNetwork.proposedExcludeExportRanges",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "linked-producer-vpc-network.proposed-include-export-ranges" => Some((
+                    "linkedProducerVpcNetwork.proposedIncludeExportRanges",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "linked-producer-vpc-network.service-consumer-vpc-spoke" => Some((
+                    "linkedProducerVpcNetwork.serviceConsumerVpcSpoke",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "linked-router-appliance-instances.include-import-ranges" => Some((
                     "linkedRouterApplianceInstances.includeImportRanges",
                     JsonTypeInfo {
@@ -9181,6 +12034,27 @@ where
                 )),
                 "linked-vpc-network.include-export-ranges" => Some((
                     "linkedVpcNetwork.includeExportRanges",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "linked-vpc-network.producer-vpc-spokes" => Some((
+                    "linkedVpcNetwork.producerVpcSpokes",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "linked-vpc-network.proposed-exclude-export-ranges" => Some((
+                    "linkedVpcNetwork.proposedExcludeExportRanges",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "linked-vpc-network.proposed-include-export-ranges" => Some((
+                    "linkedVpcNetwork.proposedIncludeExportRanges",
                     JsonTypeInfo {
                         jtype: JsonType::String,
                         ctype: ComplexType::Vec,
@@ -9262,17 +12136,27 @@ where
                         &vec![
                             "create-time",
                             "description",
+                            "etag",
                             "exclude-export-ranges",
+                            "field-paths-pending-update",
                             "group",
                             "hub",
                             "include-export-ranges",
                             "include-import-ranges",
                             "labels",
                             "linked-interconnect-attachments",
+                            "linked-producer-vpc-network",
                             "linked-router-appliance-instances",
                             "linked-vpc-network",
                             "linked-vpn-tunnels",
                             "name",
+                            "network",
+                            "peering",
+                            "producer-network",
+                            "producer-vpc-spokes",
+                            "proposed-exclude-export-ranges",
+                            "proposed-include-export-ranges",
+                            "service-consumer-vpc-spoke",
                             "site-to-site-data-transfer",
                             "spoke-type",
                             "state",
@@ -9788,6 +12672,20 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "etag" => Some((
+                    "etag",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "field-paths-pending-update" => Some((
+                    "fieldPathsPendingUpdate",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
                 "group" => Some((
                     "group",
                     JsonTypeInfo {
@@ -9837,6 +12735,62 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "linked-producer-vpc-network.exclude-export-ranges" => Some((
+                    "linkedProducerVpcNetwork.excludeExportRanges",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "linked-producer-vpc-network.include-export-ranges" => Some((
+                    "linkedProducerVpcNetwork.includeExportRanges",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "linked-producer-vpc-network.network" => Some((
+                    "linkedProducerVpcNetwork.network",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "linked-producer-vpc-network.peering" => Some((
+                    "linkedProducerVpcNetwork.peering",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "linked-producer-vpc-network.producer-network" => Some((
+                    "linkedProducerVpcNetwork.producerNetwork",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "linked-producer-vpc-network.proposed-exclude-export-ranges" => Some((
+                    "linkedProducerVpcNetwork.proposedExcludeExportRanges",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "linked-producer-vpc-network.proposed-include-export-ranges" => Some((
+                    "linkedProducerVpcNetwork.proposedIncludeExportRanges",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "linked-producer-vpc-network.service-consumer-vpc-spoke" => Some((
+                    "linkedProducerVpcNetwork.serviceConsumerVpcSpoke",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "linked-router-appliance-instances.include-import-ranges" => Some((
                     "linkedRouterApplianceInstances.includeImportRanges",
                     JsonTypeInfo {
@@ -9867,6 +12821,27 @@ where
                 )),
                 "linked-vpc-network.include-export-ranges" => Some((
                     "linkedVpcNetwork.includeExportRanges",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "linked-vpc-network.producer-vpc-spokes" => Some((
+                    "linkedVpcNetwork.producerVpcSpokes",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "linked-vpc-network.proposed-exclude-export-ranges" => Some((
+                    "linkedVpcNetwork.proposedExcludeExportRanges",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "linked-vpc-network.proposed-include-export-ranges" => Some((
+                    "linkedVpcNetwork.proposedIncludeExportRanges",
                     JsonTypeInfo {
                         jtype: JsonType::String,
                         ctype: ComplexType::Vec,
@@ -9948,17 +12923,27 @@ where
                         &vec![
                             "create-time",
                             "description",
+                            "etag",
                             "exclude-export-ranges",
+                            "field-paths-pending-update",
                             "group",
                             "hub",
                             "include-export-ranges",
                             "include-import-ranges",
                             "labels",
                             "linked-interconnect-attachments",
+                            "linked-producer-vpc-network",
                             "linked-router-appliance-instances",
                             "linked-vpc-network",
                             "linked-vpn-tunnels",
                             "name",
+                            "network",
+                            "peering",
+                            "producer-network",
+                            "producer-vpc-spokes",
+                            "proposed-exclude-export-ranges",
+                            "proposed-include-export-ranges",
+                            "service-consumer-vpc-spoke",
                             "site-to-site-data-transfer",
                             "spoke-type",
                             "state",
@@ -10369,12 +13354,22 @@ where
         let mut err_opt: Option<InvalidOptionsError> = None;
         match self.opt.subcommand() {
             ("projects", Some(opt)) => match opt.subcommand() {
+                ("locations-check-consumer-config", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_check_consumer_config(opt, dry_run, &mut err)
+                        .await;
+                }
                 ("locations-get", Some(opt)) => {
                     call_result = self._projects_locations_get(opt, dry_run, &mut err).await;
                 }
                 ("locations-global-hubs-accept-spoke", Some(opt)) => {
                     call_result = self
                         ._projects_locations_global_hubs_accept_spoke(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("locations-global-hubs-accept-spoke-update", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_global_hubs_accept_spoke_update(opt, dry_run, &mut err)
                         .await;
                 }
                 ("locations-global-hubs-create", Some(opt)) => {
@@ -10448,9 +13443,19 @@ where
                         ._projects_locations_global_hubs_patch(opt, dry_run, &mut err)
                         .await;
                 }
+                ("locations-global-hubs-query-status", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_global_hubs_query_status(opt, dry_run, &mut err)
+                        .await;
+                }
                 ("locations-global-hubs-reject-spoke", Some(opt)) => {
                     call_result = self
                         ._projects_locations_global_hubs_reject_spoke(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("locations-global-hubs-reject-spoke-update", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_global_hubs_reject_spoke_update(opt, dry_run, &mut err)
                         .await;
                 }
                 ("locations-global-hubs-route-tables-get", Some(opt)) => {
@@ -10549,6 +13554,11 @@ where
                         ._projects_locations_internal_ranges_get(opt, dry_run, &mut err)
                         .await;
                 }
+                ("locations-internal-ranges-get-iam-policy", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_internal_ranges_get_iam_policy(opt, dry_run, &mut err)
+                        .await;
+                }
                 ("locations-internal-ranges-list", Some(opt)) => {
                     call_result = self
                         ._projects_locations_internal_ranges_list(opt, dry_run, &mut err)
@@ -10559,8 +13569,104 @@ where
                         ._projects_locations_internal_ranges_patch(opt, dry_run, &mut err)
                         .await;
                 }
+                ("locations-internal-ranges-set-iam-policy", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_internal_ranges_set_iam_policy(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("locations-internal-ranges-test-iam-permissions", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_internal_ranges_test_iam_permissions(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
                 ("locations-list", Some(opt)) => {
                     call_result = self._projects_locations_list(opt, dry_run, &mut err).await;
+                }
+                ("locations-multicloud-data-transfer-configs-create", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_multicloud_data_transfer_configs_create(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
+                ("locations-multicloud-data-transfer-configs-delete", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_multicloud_data_transfer_configs_delete(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
+                ("locations-multicloud-data-transfer-configs-destinations-create", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_multicloud_data_transfer_configs_destinations_create(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
+                ("locations-multicloud-data-transfer-configs-destinations-delete", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_multicloud_data_transfer_configs_destinations_delete(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
+                ("locations-multicloud-data-transfer-configs-destinations-get", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_multicloud_data_transfer_configs_destinations_get(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
+                ("locations-multicloud-data-transfer-configs-destinations-list", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_multicloud_data_transfer_configs_destinations_list(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
+                ("locations-multicloud-data-transfer-configs-destinations-patch", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_multicloud_data_transfer_configs_destinations_patch(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
+                ("locations-multicloud-data-transfer-configs-get", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_multicloud_data_transfer_configs_get(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
+                ("locations-multicloud-data-transfer-configs-list", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_multicloud_data_transfer_configs_list(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
+                ("locations-multicloud-data-transfer-configs-patch", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_multicloud_data_transfer_configs_patch(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
+                ("locations-multicloud-data-transfer-supported-services-get", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_multicloud_data_transfer_supported_services_get(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
+                ("locations-multicloud-data-transfer-supported-services-list", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_multicloud_data_transfer_supported_services_list(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
                 }
                 ("locations-operations-cancel", Some(opt)) => {
                     call_result = self
@@ -10849,7 +13955,9 @@ where
         let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
             secret,
             yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-            hyper_util::client::legacy::Client::builder(executor).build(connector),
+            yup_oauth2::client::CustomHyperClientBuilder::from(
+                hyper_util::client::legacy::Client::builder(executor).build(connector),
+            ),
         )
         .persist_tokens_to_disk(format!("{}/networkconnectivity1", config_dir))
         .build()
@@ -10902,7 +14010,32 @@ where
 async fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("projects", "methods: 'locations-get', 'locations-global-hubs-accept-spoke', 'locations-global-hubs-create', 'locations-global-hubs-delete', 'locations-global-hubs-get', 'locations-global-hubs-get-iam-policy', 'locations-global-hubs-groups-get', 'locations-global-hubs-groups-get-iam-policy', 'locations-global-hubs-groups-list', 'locations-global-hubs-groups-patch', 'locations-global-hubs-groups-set-iam-policy', 'locations-global-hubs-groups-test-iam-permissions', 'locations-global-hubs-list', 'locations-global-hubs-list-spokes', 'locations-global-hubs-patch', 'locations-global-hubs-reject-spoke', 'locations-global-hubs-route-tables-get', 'locations-global-hubs-route-tables-list', 'locations-global-hubs-route-tables-routes-get', 'locations-global-hubs-route-tables-routes-list', 'locations-global-hubs-set-iam-policy', 'locations-global-hubs-test-iam-permissions', 'locations-global-policy-based-routes-create', 'locations-global-policy-based-routes-delete', 'locations-global-policy-based-routes-get', 'locations-global-policy-based-routes-get-iam-policy', 'locations-global-policy-based-routes-list', 'locations-global-policy-based-routes-set-iam-policy', 'locations-global-policy-based-routes-test-iam-permissions', 'locations-internal-ranges-create', 'locations-internal-ranges-delete', 'locations-internal-ranges-get', 'locations-internal-ranges-list', 'locations-internal-ranges-patch', 'locations-list', 'locations-operations-cancel', 'locations-operations-delete', 'locations-operations-get', 'locations-operations-list', 'locations-regional-endpoints-create', 'locations-regional-endpoints-delete', 'locations-regional-endpoints-get', 'locations-regional-endpoints-list', 'locations-service-classes-delete', 'locations-service-classes-get', 'locations-service-classes-get-iam-policy', 'locations-service-classes-list', 'locations-service-classes-patch', 'locations-service-classes-set-iam-policy', 'locations-service-classes-test-iam-permissions', 'locations-service-connection-maps-create', 'locations-service-connection-maps-delete', 'locations-service-connection-maps-get', 'locations-service-connection-maps-get-iam-policy', 'locations-service-connection-maps-list', 'locations-service-connection-maps-patch', 'locations-service-connection-maps-set-iam-policy', 'locations-service-connection-maps-test-iam-permissions', 'locations-service-connection-policies-create', 'locations-service-connection-policies-delete', 'locations-service-connection-policies-get', 'locations-service-connection-policies-get-iam-policy', 'locations-service-connection-policies-list', 'locations-service-connection-policies-patch', 'locations-service-connection-policies-set-iam-policy', 'locations-service-connection-policies-test-iam-permissions', 'locations-service-connection-tokens-create', 'locations-service-connection-tokens-delete', 'locations-service-connection-tokens-get', 'locations-service-connection-tokens-list', 'locations-spokes-create', 'locations-spokes-delete', 'locations-spokes-get', 'locations-spokes-get-iam-policy', 'locations-spokes-list', 'locations-spokes-patch', 'locations-spokes-set-iam-policy' and 'locations-spokes-test-iam-permissions'", vec![
+        ("projects", "methods: 'locations-check-consumer-config', 'locations-get', 'locations-global-hubs-accept-spoke', 'locations-global-hubs-accept-spoke-update', 'locations-global-hubs-create', 'locations-global-hubs-delete', 'locations-global-hubs-get', 'locations-global-hubs-get-iam-policy', 'locations-global-hubs-groups-get', 'locations-global-hubs-groups-get-iam-policy', 'locations-global-hubs-groups-list', 'locations-global-hubs-groups-patch', 'locations-global-hubs-groups-set-iam-policy', 'locations-global-hubs-groups-test-iam-permissions', 'locations-global-hubs-list', 'locations-global-hubs-list-spokes', 'locations-global-hubs-patch', 'locations-global-hubs-query-status', 'locations-global-hubs-reject-spoke', 'locations-global-hubs-reject-spoke-update', 'locations-global-hubs-route-tables-get', 'locations-global-hubs-route-tables-list', 'locations-global-hubs-route-tables-routes-get', 'locations-global-hubs-route-tables-routes-list', 'locations-global-hubs-set-iam-policy', 'locations-global-hubs-test-iam-permissions', 'locations-global-policy-based-routes-create', 'locations-global-policy-based-routes-delete', 'locations-global-policy-based-routes-get', 'locations-global-policy-based-routes-get-iam-policy', 'locations-global-policy-based-routes-list', 'locations-global-policy-based-routes-set-iam-policy', 'locations-global-policy-based-routes-test-iam-permissions', 'locations-internal-ranges-create', 'locations-internal-ranges-delete', 'locations-internal-ranges-get', 'locations-internal-ranges-get-iam-policy', 'locations-internal-ranges-list', 'locations-internal-ranges-patch', 'locations-internal-ranges-set-iam-policy', 'locations-internal-ranges-test-iam-permissions', 'locations-list', 'locations-multicloud-data-transfer-configs-create', 'locations-multicloud-data-transfer-configs-delete', 'locations-multicloud-data-transfer-configs-destinations-create', 'locations-multicloud-data-transfer-configs-destinations-delete', 'locations-multicloud-data-transfer-configs-destinations-get', 'locations-multicloud-data-transfer-configs-destinations-list', 'locations-multicloud-data-transfer-configs-destinations-patch', 'locations-multicloud-data-transfer-configs-get', 'locations-multicloud-data-transfer-configs-list', 'locations-multicloud-data-transfer-configs-patch', 'locations-multicloud-data-transfer-supported-services-get', 'locations-multicloud-data-transfer-supported-services-list', 'locations-operations-cancel', 'locations-operations-delete', 'locations-operations-get', 'locations-operations-list', 'locations-regional-endpoints-create', 'locations-regional-endpoints-delete', 'locations-regional-endpoints-get', 'locations-regional-endpoints-list', 'locations-service-classes-delete', 'locations-service-classes-get', 'locations-service-classes-get-iam-policy', 'locations-service-classes-list', 'locations-service-classes-patch', 'locations-service-classes-set-iam-policy', 'locations-service-classes-test-iam-permissions', 'locations-service-connection-maps-create', 'locations-service-connection-maps-delete', 'locations-service-connection-maps-get', 'locations-service-connection-maps-get-iam-policy', 'locations-service-connection-maps-list', 'locations-service-connection-maps-patch', 'locations-service-connection-maps-set-iam-policy', 'locations-service-connection-maps-test-iam-permissions', 'locations-service-connection-policies-create', 'locations-service-connection-policies-delete', 'locations-service-connection-policies-get', 'locations-service-connection-policies-get-iam-policy', 'locations-service-connection-policies-list', 'locations-service-connection-policies-patch', 'locations-service-connection-policies-set-iam-policy', 'locations-service-connection-policies-test-iam-permissions', 'locations-service-connection-tokens-create', 'locations-service-connection-tokens-delete', 'locations-service-connection-tokens-get', 'locations-service-connection-tokens-list', 'locations-spokes-create', 'locations-spokes-delete', 'locations-spokes-get', 'locations-spokes-get-iam-policy', 'locations-spokes-list', 'locations-spokes-patch', 'locations-spokes-set-iam-policy' and 'locations-spokes-test-iam-permissions'", vec![
+            ("locations-check-consumer-config",
+                    Some(r##"CheckConsumerConfig validates the consumer network and project for potential PSC connection creation. This method performs several checks, including: - Validating the existence and permissions of the service class. - Ensuring the consumer network exists and is accessible. - Verifying XPN relationships if applicable. - Checking for compatible IP versions between the consumer network and the requested version. This method performs a dynamic IAM check for the `networkconnectivity.serviceClasses.use` permission on the service class resource in the Prepare phase."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_networkconnectivity1_cli/projects_locations-check-consumer-config",
+                  vec![
+                    (Some(r##"location"##),
+                     None,
+                     Some(r##"Required. The location resource path. Example: - projects/{project}/locations/{location}"##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("locations-get",
                     Some(r##"Gets information about a location."##),
                     "Details at http://byron.github.io/google-apis-rs/google_networkconnectivity1_cli/projects_locations-get",
@@ -10930,6 +14063,31 @@ async fn main() {
                     (Some(r##"name"##),
                      None,
                      Some(r##"Required. The name of the hub into which to accept the spoke."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-global-hubs-accept-spoke-update",
+                    Some(r##"Accepts a proposal to update a Network Connectivity Center spoke in a hub."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_networkconnectivity1_cli/projects_locations-global-hubs-accept-spoke-update",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The name of the hub to accept spoke update."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -11233,6 +14391,26 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("locations-global-hubs-query-status",
+                    Some(r##"Query the Private Service Connect propagation status of a Network Connectivity Center hub."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_networkconnectivity1_cli/projects_locations-global-hubs-query-status",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The name of the hub."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("locations-global-hubs-reject-spoke",
                     Some(r##"Rejects a Network Connectivity Center spoke from being attached to a hub. If the spoke was previously in the `ACTIVE` state, it transitions to the `INACTIVE` state and is no longer able to connect to other spokes that are attached to the hub."##),
                     "Details at http://byron.github.io/google-apis-rs/google_networkconnectivity1_cli/projects_locations-global-hubs-reject-spoke",
@@ -11240,6 +14418,31 @@ async fn main() {
                     (Some(r##"name"##),
                      None,
                      Some(r##"Required. The name of the hub from which to reject the spoke."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-global-hubs-reject-spoke-update",
+                    Some(r##"Rejects a proposal to update a Network Connectivity Center spoke in a hub."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_networkconnectivity1_cli/projects_locations-global-hubs-reject-spoke-update",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The name of the hub to reject spoke update."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -11608,6 +14811,26 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("locations-internal-ranges-get-iam-policy",
+                    Some(r##"Gets the access control policy for a resource. Returns an empty policy if the resource exists and does not have a policy set."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_networkconnectivity1_cli/projects_locations-internal-ranges-get-iam-policy",
+                  vec![
+                    (Some(r##"resource"##),
+                     None,
+                     Some(r##"REQUIRED: The resource for which the policy is being requested. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("locations-internal-ranges-list",
                     Some(r##"Lists internal ranges in a given project and location."##),
                     "Details at http://byron.github.io/google-apis-rs/google_networkconnectivity1_cli/projects_locations-internal-ranges-list",
@@ -11634,7 +14857,57 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Immutable. The name of an internal range. Format: projects/{project}/locations/{location}/internalRanges/{internal_range} See: https://google.aip.dev/122#fields-representing-resource-names"##),
+                     Some(r##"Identifier. The name of an internal range. Format: projects/{project}/locations/{location}/internalRanges/{internal_range} See: https://google.aip.dev/122#fields-representing-resource-names"##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-internal-ranges-set-iam-policy",
+                    Some(r##"Sets the access control policy on the specified resource. Replaces any existing policy. Can return `NOT_FOUND`, `INVALID_ARGUMENT`, and `PERMISSION_DENIED` errors."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_networkconnectivity1_cli/projects_locations-internal-ranges-set-iam-policy",
+                  vec![
+                    (Some(r##"resource"##),
+                     None,
+                     Some(r##"REQUIRED: The resource for which the policy is being specified. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-internal-ranges-test-iam-permissions",
+                    Some(r##"Returns permissions that a caller has on the specified resource. If the resource does not exist, this will return an empty set of permissions, not a `NOT_FOUND` error. Note: This operation is designed to be used for building permission-aware UIs and command-line tools, not for authorization checking. This operation may "fail open" without warning."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_networkconnectivity1_cli/projects_locations-internal-ranges-test-iam-permissions",
+                  vec![
+                    (Some(r##"resource"##),
+                     None,
+                     Some(r##"REQUIRED: The resource for which the policy detail is being requested. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -11673,8 +14946,268 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("locations-multicloud-data-transfer-configs-create",
+                    Some(r##"Creates a `MulticloudDataTransferConfig` resource in a specified project and location."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_networkconnectivity1_cli/projects_locations-multicloud-data-transfer-configs-create",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. The name of the parent resource."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-multicloud-data-transfer-configs-delete",
+                    Some(r##"Deletes a `MulticloudDataTransferConfig` resource."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_networkconnectivity1_cli/projects_locations-multicloud-data-transfer-configs-delete",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The name of the `MulticloudDataTransferConfig` resource to delete."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-multicloud-data-transfer-configs-destinations-create",
+                    Some(r##"Creates a `Destination` resource in a specified project and location."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_networkconnectivity1_cli/projects_locations-multicloud-data-transfer-configs-destinations-create",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. The name of the parent resource."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-multicloud-data-transfer-configs-destinations-delete",
+                    Some(r##"Deletes a `Destination` resource."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_networkconnectivity1_cli/projects_locations-multicloud-data-transfer-configs-destinations-delete",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The name of the `Destination` resource to delete."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-multicloud-data-transfer-configs-destinations-get",
+                    Some(r##"Gets the details of a `Destination` resource."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_networkconnectivity1_cli/projects_locations-multicloud-data-transfer-configs-destinations-get",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The name of the `Destination` resource to get."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-multicloud-data-transfer-configs-destinations-list",
+                    Some(r##"Lists the `Destination` resources in a specified project and location."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_networkconnectivity1_cli/projects_locations-multicloud-data-transfer-configs-destinations-list",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. The name of the parent resource."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-multicloud-data-transfer-configs-destinations-patch",
+                    Some(r##"Updates a `Destination` resource in a specified project and location."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_networkconnectivity1_cli/projects_locations-multicloud-data-transfer-configs-destinations-patch",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Identifier. The name of the `Destination` resource. Format: `projects/{project}/locations/{location}/multicloudDataTransferConfigs/{multicloud_data_transfer_config}/destinations/{destination}`."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-multicloud-data-transfer-configs-get",
+                    Some(r##"Gets the details of a `MulticloudDataTransferConfig` resource."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_networkconnectivity1_cli/projects_locations-multicloud-data-transfer-configs-get",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The name of the `MulticloudDataTransferConfig` resource to get."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-multicloud-data-transfer-configs-list",
+                    Some(r##"Lists the `MulticloudDataTransferConfig` resources in a specified project and location."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_networkconnectivity1_cli/projects_locations-multicloud-data-transfer-configs-list",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. The name of the parent resource."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-multicloud-data-transfer-configs-patch",
+                    Some(r##"Updates a `MulticloudDataTransferConfig` resource in a specified project and location."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_networkconnectivity1_cli/projects_locations-multicloud-data-transfer-configs-patch",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Identifier. The name of the `MulticloudDataTransferConfig` resource. Format: `projects/{project}/locations/{location}/multicloudDataTransferConfigs/{multicloud_data_transfer_config}`."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-multicloud-data-transfer-supported-services-get",
+                    Some(r##"Gets the details of a service that is supported for Data Transfer Essentials."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_networkconnectivity1_cli/projects_locations-multicloud-data-transfer-supported-services-get",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The name of the service."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-multicloud-data-transfer-supported-services-list",
+                    Some(r##"Lists the services in the project for a region that are supported for Data Transfer Essentials."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_networkconnectivity1_cli/projects_locations-multicloud-data-transfer-supported-services-list",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. The name of the parent resource."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("locations-operations-cancel",
-                    Some(r##"Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of 1, corresponding to `Code.CANCELLED`."##),
+                    Some(r##"Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of `1`, corresponding to `Code.CANCELLED`."##),
                     "Details at http://byron.github.io/google-apis-rs/google_networkconnectivity1_cli/projects_locations-operations-cancel",
                   vec![
                     (Some(r##"name"##),
@@ -12628,7 +16161,7 @@ async fn main() {
 
     let mut app = App::new("networkconnectivity1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("6.0.0+20240618")
+           .version("7.0.0+20251209")
            .about("This API enables connectivity with and between Google Cloud resources.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_networkconnectivity1_cli")
            .arg(Arg::with_name("url")
@@ -12693,7 +16226,7 @@ async fn main() {
         .with_native_roots()
         .unwrap()
         .https_or_http()
-        .enable_http1()
+        .enable_http2()
         .build();
 
     match Engine::new(matches, connector).await {

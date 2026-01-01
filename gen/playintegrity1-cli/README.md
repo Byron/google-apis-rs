@@ -25,12 +25,15 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Play Integrity* API at revision *20240625*. The CLI is at version *6.0.0*.
+This documentation was generated from the *Play Integrity* API at revision *20251216*. The CLI is at version *7.0.0*.
 
 ```bash
 playintegrity1 [options]
+        device-recall
+                write <package-name> (-r <kv>)... [-p <v>]... [-o <out>]
         methods
                 decode-integrity-token <package-name> (-r <kv>)... [-p <v>]... [-o <out>]
+                decode-pc-integrity-token <package-name> (-r <kv>)... [-p <v>]... [-o <out>]
   playintegrity1 --help
 
 Configuration:

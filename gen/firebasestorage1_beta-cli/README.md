@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Firebasestorage* API at revision *20240621*. The CLI is at version *6.0.0*.
+This documentation was generated from the *Firebasestorage* API at revision *20251212*. The CLI is at version *7.0.0*.
 
 ```bash
 firebasestorage1-beta [options]
@@ -34,6 +34,9 @@ firebasestorage1-beta [options]
                 buckets-get <name> [-p <v>]... [-o <out>]
                 buckets-list <parent> [-p <v>]... [-o <out>]
                 buckets-remove-firebase <bucket> (-r <kv>)... [-p <v>]... [-o <out>]
+                default-bucket-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                delete-default-bucket <name> [-p <v>]... [-o <out>]
+                get-default-bucket <name> [-p <v>]... [-o <out>]
   firebasestorage1-beta --help
 
 Configuration:

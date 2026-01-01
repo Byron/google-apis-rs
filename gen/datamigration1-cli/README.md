@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Database Migration Service* API at revision *20240621*. The CLI is at version *6.0.0*.
+This documentation was generated from the *Database Migration Service* API at revision *20251210*. The CLI is at version *7.0.0*.
 
 ```bash
 datamigration1 [options]
@@ -65,11 +65,18 @@ datamigration1 [options]
                 locations-migration-jobs-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-migration-jobs-delete <name> [-p <v>]... [-o <out>]
                 locations-migration-jobs-demote-destination <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-migration-jobs-fetch-source-objects <name> [-p <v>]... [-o <out>]
                 locations-migration-jobs-generate-ssh-script <migration-job> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-migration-jobs-generate-tcp-proxy-script <migration-job> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-migration-jobs-get <name> [-p <v>]... [-o <out>]
                 locations-migration-jobs-get-iam-policy <resource> [-p <v>]... [-o <out>]
                 locations-migration-jobs-list <parent> [-p <v>]... [-o <out>]
+                locations-migration-jobs-objects-get <name> [-p <v>]... [-o <out>]
+                locations-migration-jobs-objects-get-iam-policy <resource> [-p <v>]... [-o <out>]
+                locations-migration-jobs-objects-list <parent> [-p <v>]... [-o <out>]
+                locations-migration-jobs-objects-lookup <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-migration-jobs-objects-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-migration-jobs-objects-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-migration-jobs-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-migration-jobs-promote <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-migration-jobs-restart <name> (-r <kv>)... [-p <v>]... [-o <out>]

@@ -1,4 +1,4 @@
-site_name: Cloud Retail v6.0.0+20240614
+site_name: Cloud Retail v7.0.0+20251218
 site_url: http://byron.github.io/google-apis-rs/google-retail2-cli
 site_description: A complete library to interact with Cloud Retail (protocol v2)
 
@@ -34,9 +34,13 @@ nav:
     - 'Locations Catalogs Controls List': 'projects_locations-catalogs-controls-list.md'
     - 'Locations Catalogs Controls Patch': 'projects_locations-catalogs-controls-patch.md'
     - 'Locations Catalogs Export Analytics Metrics': 'projects_locations-catalogs-export-analytics-metrics.md'
+    - 'Locations Catalogs Generative Question Batch Update': 'projects_locations-catalogs-generative-question-batch-update.md'
+    - 'Locations Catalogs Generative Questions List': 'projects_locations-catalogs-generative-questions-list.md'
     - 'Locations Catalogs Get Attributes Config': 'projects_locations-catalogs-get-attributes-config.md'
     - 'Locations Catalogs Get Completion Config': 'projects_locations-catalogs-get-completion-config.md'
+    - 'Locations Catalogs Get Conversational Search Customization Config': 'projects_locations-catalogs-get-conversational-search-customization-config.md'
     - 'Locations Catalogs Get Default Branch': 'projects_locations-catalogs-get-default-branch.md'
+    - 'Locations Catalogs Get Generative Question Feature': 'projects_locations-catalogs-get-generative-question-feature.md'
     - 'Locations Catalogs List': 'projects_locations-catalogs-list.md'
     - 'Locations Catalogs Models Create': 'projects_locations-catalogs-models-create.md'
     - 'Locations Catalogs Models Delete': 'projects_locations-catalogs-models-delete.md'
@@ -49,9 +53,11 @@ nav:
     - 'Locations Catalogs Operations Get': 'projects_locations-catalogs-operations-get.md'
     - 'Locations Catalogs Operations List': 'projects_locations-catalogs-operations-list.md'
     - 'Locations Catalogs Patch': 'projects_locations-catalogs-patch.md'
+    - 'Locations Catalogs Placements Conversational Search': 'projects_locations-catalogs-placements-conversational-search.md'
     - 'Locations Catalogs Placements Predict': 'projects_locations-catalogs-placements-predict.md'
     - 'Locations Catalogs Placements Search': 'projects_locations-catalogs-placements-search.md'
     - 'Locations Catalogs Serving Configs Add Control': 'projects_locations-catalogs-serving-configs-add-control.md'
+    - 'Locations Catalogs Serving Configs Conversational Search': 'projects_locations-catalogs-serving-configs-conversational-search.md'
     - 'Locations Catalogs Serving Configs Create': 'projects_locations-catalogs-serving-configs-create.md'
     - 'Locations Catalogs Serving Configs Delete': 'projects_locations-catalogs-serving-configs-delete.md'
     - 'Locations Catalogs Serving Configs Get': 'projects_locations-catalogs-serving-configs-get.md'
@@ -63,6 +69,9 @@ nav:
     - 'Locations Catalogs Set Default Branch': 'projects_locations-catalogs-set-default-branch.md'
     - 'Locations Catalogs Update Attributes Config': 'projects_locations-catalogs-update-attributes-config.md'
     - 'Locations Catalogs Update Completion Config': 'projects_locations-catalogs-update-completion-config.md'
+    - 'Locations Catalogs Update Conversational Search Customization Config': 'projects_locations-catalogs-update-conversational-search-customization-config.md'
+    - 'Locations Catalogs Update Generative Question': 'projects_locations-catalogs-update-generative-question.md'
+    - 'Locations Catalogs Update Generative Question Feature': 'projects_locations-catalogs-update-generative-question-feature.md'
     - 'Locations Catalogs User Events Collect': 'projects_locations-catalogs-user-events-collect.md'
     - 'Locations Catalogs User Events Import': 'projects_locations-catalogs-user-events-import.md'
     - 'Locations Catalogs User Events Purge': 'projects_locations-catalogs-user-events-purge.md'

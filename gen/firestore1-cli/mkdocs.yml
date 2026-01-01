@@ -1,4 +1,4 @@
-site_name: Firestore v6.0.0+20240617
+site_name: Firestore v7.0.0+20251216
 site_url: http://byron.github.io/google-apis-rs/google-firestore1-cli
 site_description: A complete library to interact with Firestore (protocol v1)
 
@@ -16,6 +16,7 @@ nav:
     - 'Databases Backup Schedules List': 'projects_databases-backup-schedules-list.md'
     - 'Databases Backup Schedules Patch': 'projects_databases-backup-schedules-patch.md'
     - 'Databases Bulk Delete Documents': 'projects_databases-bulk-delete-documents.md'
+    - 'Databases Clone': 'projects_databases-clone.md'
     - 'Databases Collection Groups Fields Get': 'projects_databases-collection-groups-fields-get.md'
     - 'Databases Collection Groups Fields List': 'projects_databases-collection-groups-fields-list.md'
     - 'Databases Collection Groups Fields Patch': 'projects_databases-collection-groups-fields-patch.md'
@@ -31,6 +32,7 @@ nav:
     - 'Databases Documents Commit': 'projects_databases-documents-commit.md'
     - 'Databases Documents Create Document': 'projects_databases-documents-create-document.md'
     - 'Databases Documents Delete': 'projects_databases-documents-delete.md'
+    - 'Databases Documents Execute Pipeline': 'projects_databases-documents-execute-pipeline.md'
     - 'Databases Documents Get': 'projects_databases-documents-get.md'
     - 'Databases Documents List': 'projects_databases-documents-list.md'
     - 'Databases Documents List Collection Ids': 'projects_databases-documents-list-collection-ids.md'
@@ -52,6 +54,13 @@ nav:
     - 'Databases Operations List': 'projects_databases-operations-list.md'
     - 'Databases Patch': 'projects_databases-patch.md'
     - 'Databases Restore': 'projects_databases-restore.md'
+    - 'Databases User Creds Create': 'projects_databases-user-creds-create.md'
+    - 'Databases User Creds Delete': 'projects_databases-user-creds-delete.md'
+    - 'Databases User Creds Disable': 'projects_databases-user-creds-disable.md'
+    - 'Databases User Creds Enable': 'projects_databases-user-creds-enable.md'
+    - 'Databases User Creds Get': 'projects_databases-user-creds-get.md'
+    - 'Databases User Creds List': 'projects_databases-user-creds-list.md'
+    - 'Databases User Creds Reset Password': 'projects_databases-user-creds-reset-password.md'
     - 'Locations Backups Delete': 'projects_locations-backups-delete.md'
     - 'Locations Backups Get': 'projects_locations-backups-get.md'
     - 'Locations Backups List': 'projects_locations-backups-list.md'

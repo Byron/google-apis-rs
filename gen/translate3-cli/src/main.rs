@@ -1395,8 +1395,56 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "glossary-config.contextual-translation-enabled" => Some((
+                    "glossaryConfig.contextualTranslationEnabled",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "glossary-config.glossary" => Some((
+                    "glossaryConfig.glossary",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "glossary-config.ignore-case" => Some((
+                    "glossaryConfig.ignoreCase",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "reference-sentence-config.source-language-code" => Some((
+                    "referenceSentenceConfig.sourceLanguageCode",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "reference-sentence-config.target-language-code" => Some((
+                    "referenceSentenceConfig.targetLanguageCode",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["content", "dataset"]);
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec![
+                            "content",
+                            "contextual-translation-enabled",
+                            "dataset",
+                            "glossary",
+                            "glossary-config",
+                            "ignore-case",
+                            "reference-sentence-config",
+                            "source-language-code",
+                            "target-language-code",
+                        ],
+                    );
                     err.issues.push(CLIError::Field(FieldError::Unknown(
                         temp_cursor.to_string(),
                         suggestion,
@@ -4346,6 +4394,9 @@ where
                 "filter" => {
                     call = call.filter(value.unwrap_or(""));
                 }
+                "extra-location-types" => {
+                    call = call.add_extra_location_types(value.unwrap_or(""));
+                }
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -4363,7 +4414,11 @@ where
                             .push(CLIError::UnknownParameter(key.to_string(), {
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
-                                v.extend(["filter", "page-size", "page-token"].iter().map(|v| *v));
+                                v.extend(
+                                    ["extra-location-types", "filter", "page-size", "page-token"]
+                                        .iter()
+                                        .map(|v| *v),
+                                );
                                 v
                             }));
                     }
@@ -5626,6 +5681,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "glossary-config.contextual-translation-enabled" => Some((
+                    "glossaryConfig.contextualTranslationEnabled",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "glossary-config.glossary" => Some((
                     "glossaryConfig.glossary",
                     JsonTypeInfo {
@@ -5680,6 +5742,7 @@ where
                         key,
                         &vec![
                             "content",
+                            "contextual-translation-enabled",
                             "customized-attribution",
                             "document-input-config",
                             "document-output-config",
@@ -5833,6 +5896,13 @@ where
                         ctype: ComplexType::Vec,
                     },
                 )),
+                "glossary-config.contextual-translation-enabled" => Some((
+                    "glossaryConfig.contextualTranslationEnabled",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "glossary-config.glossary" => Some((
                     "glossaryConfig.glossary",
                     JsonTypeInfo {
@@ -5894,6 +5964,7 @@ where
                         key,
                         &vec![
                             "contents",
+                            "contextual-translation-enabled",
                             "enable-transliteration",
                             "glossary",
                             "glossary-config",
@@ -6180,6 +6251,13 @@ where
                         ctype: ComplexType::Vec,
                     },
                 )),
+                "glossary-config.contextual-translation-enabled" => Some((
+                    "glossaryConfig.contextualTranslationEnabled",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "glossary-config.glossary" => Some((
                     "glossaryConfig.glossary",
                     JsonTypeInfo {
@@ -6241,6 +6319,7 @@ where
                         key,
                         &vec![
                             "contents",
+                            "contextual-translation-enabled",
                             "enable-transliteration",
                             "glossary",
                             "glossary-config",
@@ -6661,7 +6740,9 @@ where
         let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
             secret,
             yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-            hyper_util::client::legacy::Client::builder(executor).build(connector),
+            yup_oauth2::client::CustomHyperClientBuilder::from(
+                hyper_util::client::legacy::Client::builder(executor).build(connector),
+            ),
         )
         .persist_tokens_to_disk(format!("{}/translate3", config_dir))
         .build()
@@ -7421,7 +7502,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The resource name of the entry. Format: "projects/*/locations/*/glossaries/*/glossaryEntries/*""##),
+                     Some(r##"Identifier. The resource name of the entry. Format: `projects/*/locations/*/glossaries/*/glossaryEntries/*`"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -7591,7 +7672,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-operations-cancel",
-                    Some(r##"Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of 1, corresponding to `Code.CANCELLED`."##),
+                    Some(r##"Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of `1`, corresponding to `Code.CANCELLED`."##),
                     "Details at http://byron.github.io/google-apis-rs/google_translate3_cli/projects_locations-operations-cancel",
                   vec![
                     (Some(r##"name"##),
@@ -7830,7 +7911,7 @@ async fn main() {
 
     let mut app = App::new("translate3")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("6.0.0+20240301")
+           .version("7.0.0+20250424")
            .about("Integrates text translation into your website or application.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_translate3_cli")
            .arg(Arg::with_name("url")
@@ -7895,7 +7976,7 @@ async fn main() {
         .with_native_roots()
         .unwrap()
         .https_or_http()
-        .enable_http1()
+        .enable_http2()
         .build();
 
     match Engine::new(matches, connector).await {

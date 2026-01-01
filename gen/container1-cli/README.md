@@ -11,7 +11,7 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
 Everything else about the *Container* API can be found at the
-[official documentation site](https://cloud.google.com/container-engine/).
+[official documentation site](https://cloud.google.com/kubernetes-engine/docs/).
 
 # Installation and Source Code
 
@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Container* API at revision *20240608*. The CLI is at version *6.0.0*.
+This documentation was generated from the *Container* API at revision *20251216*. The CLI is at version *7.0.0*.
 
 ```bash
 container1 [options]
@@ -35,12 +35,14 @@ container1 [options]
                 locations-clusters-complete-ip-rotation <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-clusters-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-clusters-delete <name> [-p <v>]... [-o <out>]
+                locations-clusters-fetch-cluster-upgrade-info <name> [-p <v>]... [-o <out>]
                 locations-clusters-get <name> [-p <v>]... [-o <out>]
                 locations-clusters-get-jwks <parent> [-p <v>]... [-o <out>]
                 locations-clusters-list <parent> [-p <v>]... [-o <out>]
                 locations-clusters-node-pools-complete-upgrade <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-clusters-node-pools-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-clusters-node-pools-delete <name> [-p <v>]... [-o <out>]
+                locations-clusters-node-pools-fetch-node-pool-upgrade-info <name> [-p <v>]... [-o <out>]
                 locations-clusters-node-pools-get <name> [-p <v>]... [-o <out>]
                 locations-clusters-node-pools-list <parent> [-p <v>]... [-o <out>]
                 locations-clusters-node-pools-rollback <name> (-r <kv>)... [-p <v>]... [-o <out>]
@@ -69,6 +71,7 @@ container1 [options]
                 zones-clusters-complete-ip-rotation <project-id> <zone> <cluster-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 zones-clusters-create <project-id> <zone> (-r <kv>)... [-p <v>]... [-o <out>]
                 zones-clusters-delete <project-id> <zone> <cluster-id> [-p <v>]... [-o <out>]
+                zones-clusters-fetch-cluster-upgrade-info <name> [-p <v>]... [-o <out>]
                 zones-clusters-get <project-id> <zone> <cluster-id> [-p <v>]... [-o <out>]
                 zones-clusters-legacy-abac <project-id> <zone> <cluster-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 zones-clusters-list <project-id> <zone> [-p <v>]... [-o <out>]
@@ -79,6 +82,7 @@ container1 [options]
                 zones-clusters-node-pools-autoscaling <project-id> <zone> <cluster-id> <node-pool-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 zones-clusters-node-pools-create <project-id> <zone> <cluster-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 zones-clusters-node-pools-delete <project-id> <zone> <cluster-id> <node-pool-id> [-p <v>]... [-o <out>]
+                zones-clusters-node-pools-fetch-node-pool-upgrade-info <name> [-p <v>]... [-o <out>]
                 zones-clusters-node-pools-get <project-id> <zone> <cluster-id> <node-pool-id> [-p <v>]... [-o <out>]
                 zones-clusters-node-pools-list <project-id> <zone> <cluster-id> [-p <v>]... [-o <out>]
                 zones-clusters-node-pools-rollback <project-id> <zone> <cluster-id> <node-pool-id> (-r <kv>)... [-p <v>]... [-o <out>]

@@ -4,12 +4,12 @@
 [package]
 
 name = "google-script1"
-version = "7.0.0+20240617"
+version = "7.0.0+20251130"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Script (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/script1"
 homepage = "https://developers.google.com/apps-script/api/"
-documentation = "https://docs.rs/google-script1/7.0.0+20240617"
+documentation = "https://docs.rs/google-script1/7.0.0+20251130"
 license = "MIT"
 keywords = ["script", "google", "protocol", "web", "api"]
 autobins = false

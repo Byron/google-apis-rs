@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Bigquery* API at revision *20240214*. The CLI is at version *5.0.3*.
+This documentation was generated from the *Bigquery* API at revision *20251130*. The CLI is at version *7.0.0*.
 
 ```bash
 bigquery2 [options]
@@ -56,13 +56,21 @@ bigquery2 [options]
         routines
                 delete <project-id> <dataset-id> <routine-id> [-p <v>]...
                 get <project-id> <dataset-id> <routine-id> [-p <v>]... [-o <out>]
+                get-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 insert <project-id> <dataset-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 list <project-id> <dataset-id> [-p <v>]... [-o <out>]
+                set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 update <project-id> <dataset-id> <routine-id> (-r <kv>)... [-p <v>]... [-o <out>]
         row-access-policies
+                batch-delete <project-id> <dataset-id> <table-id> (-r <kv>)... [-p <v>]...
+                delete <project-id> <dataset-id> <table-id> <policy-id> [-p <v>]...
+                get <project-id> <dataset-id> <table-id> <policy-id> [-p <v>]... [-o <out>]
                 get-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                insert <project-id> <dataset-id> <table-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 list <project-id> <dataset-id> <table-id> [-p <v>]... [-o <out>]
                 test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                update <project-id> <dataset-id> <table-id> <policy-id> (-r <kv>)... [-p <v>]... [-o <out>]
         tabledata
                 insert-all <project-id> <dataset-id> <table-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 list <project-id> <dataset-id> <table-id> [-p <v>]... [-o <out>]
@@ -98,15 +106,15 @@ More information about the various kinds of persistent data are given in the fol
 
 # Authentication
 
-Most APIs require a user to authenticate any request. If this is the case, the [scope][scopes] determines the 
+Most APIs require a user to authenticate any request. If this is the case, the [scope][scopes] determines the
 set of permissions granted. The granularity of these is usually no more than *read-only* or *full-access*.
 
 If not set, the system will automatically select the smallest feasible scope, e.g. when invoking a
-method that is read-only, it will ask only for a read-only scope. 
-You may use the `--scope` flag to specify a scope directly. 
+method that is read-only, it will ask only for a read-only scope.
+You may use the `--scope` flag to specify a scope directly.
 All applicable scopes are documented in the respective method's CLI documentation.
 
-The first time a scope is used, the user is asked for permission. Follow the instructions given 
+The first time a scope is used, the user is asked for permission. Follow the instructions given
 by the CLI to grant permissions, or to decline.
 
 If a scope was authenticated by the user, the respective information will be stored as *JSON* in the configuration
@@ -117,7 +125,7 @@ To revoke granted authentication, please refer to the [official documentation][r
 
 # Application Secrets
 
-In order to allow any application to use Google services, it will need to be registered using the 
+In order to allow any application to use Google services, it will need to be registered using the
 [Google Developer Console][google-dev-console]. APIs the application may use are then enabled for it
 one by one. Most APIs can be used for free and have a daily quota.
 
@@ -125,9 +133,9 @@ To allow more comfortable usage of the CLI without forcing anyone to register an
 comes with a default application secret that is configured accordingly. This also means that heavy usage
 all around the world may deplete the daily quota.
 
-You can workaround this limitation by putting your own secrets file at this location: 
-`~/.google-service-cli/bigquery2-secret.json`, assuming that the required *bigquery* API 
-was enabled for it. Such a secret file can be downloaded in the *Google Developer Console* at 
+You can workaround this limitation by putting your own secrets file at this location:
+`~/.google-service-cli/bigquery2-secret.json`, assuming that the required *bigquery* API
+was enabled for it. Such a secret file can be downloaded in the *Google Developer Console* at
 *APIs & auth -> Credentials -> Download JSON* and used as is.
 
 Learn more about how to setup Google projects and enable APIs using the [official documentation][google-project-new].
@@ -136,7 +144,7 @@ Learn more about how to setup Google projects and enable APIs using the [officia
 # Debugging
 
 Even though the CLI does its best to provide usable error messages, sometimes it might be desirable to know
-what exactly led to a particular issue. This is done by allowing all client-server communication to be 
+what exactly led to a particular issue. This is done by allowing all client-server communication to be
 output to standard error *as-is*.
 
 The `--debug` flag will print errors using the `Debug` representation to standard error.

@@ -2,10 +2,10 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *SQL Admin* crate version *6.0.0+20240618*, where *20240618* is the exact revision of the *sqladmin:v1beta4* schema built by the [mako](http://www.makotemplates.org/) code generator *v6.0.0*.
+//! This documentation was generated from *SQL Admin* crate version *7.0.0+20251201*, where *20251201* is the exact revision of the *sqladmin:v1beta4* schema built by the [mako](http://www.makotemplates.org/) code generator *v7.0.0*.
 //!
 //! Everything else about the *SQL Admin* *v1_beta4* API can be found at the
-//! [official documentation site](https://developers.google.com/cloud-sql/).
+//! [official documentation site](https://cloud.google.com/sql/docs).
 //! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/main/gen/sqladmin1_beta4).
 //! # Features
 //!
@@ -13,6 +13,8 @@
 //!
 //! * [backup runs](api::BackupRun)
 //!  * [*delete*](api::BackupRunDeleteCall), [*get*](api::BackupRunGetCall), [*insert*](api::BackupRunInsertCall) and [*list*](api::BackupRunListCall)
+//! * [backups](api::Backup)
+//!  * [*create backup*](api::BackupCreateBackupCall), [*delete backup*](api::BackupDeleteBackupCall), [*get backup*](api::BackupGetBackupCall), [*list backups*](api::BackupListBackupCall) and [*update backup*](api::BackupUpdateBackupCall)
 //! * connect
 //!  * [*generate ephemeral*](api::ConnectGenerateEphemeralCall) and [*get*](api::ConnectGetCall)
 //! * [databases](api::Database)
@@ -20,7 +22,7 @@
 //! * [flags](api::Flag)
 //!  * [*list*](api::FlagListCall)
 //! * instances
-//!  * [*acquire ssrs lease*](api::InstanceAcquireSsrsLeaseCall), [*add server ca*](api::InstanceAddServerCaCall), [*clone*](api::InstanceCloneCall), [*delete*](api::InstanceDeleteCall), [*demote*](api::InstanceDemoteCall), [*demote master*](api::InstanceDemoteMasterCall), [*export*](api::InstanceExportCall), [*failover*](api::InstanceFailoverCall), [*get*](api::InstanceGetCall), [*import*](api::InstanceImportCall), [*insert*](api::InstanceInsertCall), [*list*](api::InstanceListCall), [*list server cas*](api::InstanceListServerCaCall), [*patch*](api::InstancePatchCall), [*promote replica*](api::InstancePromoteReplicaCall), [*reencrypt*](api::InstanceReencryptCall), [*release ssrs lease*](api::InstanceReleaseSsrsLeaseCall), [*reset ssl config*](api::InstanceResetSslConfigCall), [*restart*](api::InstanceRestartCall), [*restore backup*](api::InstanceRestoreBackupCall), [*rotate server ca*](api::InstanceRotateServerCaCall), [*start replica*](api::InstanceStartReplicaCall), [*stop replica*](api::InstanceStopReplicaCall), [*switchover*](api::InstanceSwitchoverCall), [*truncate log*](api::InstanceTruncateLogCall) and [*update*](api::InstanceUpdateCall)
+//!  * [*list entra id certificates*](api::InstanceListEntraIdCertificateCall), [*list server certificates*](api::InstanceListServerCertificateCall), [*rotate entra id certificate*](api::InstanceRotateEntraIdCertificateCall), [*rotate server certificate*](api::InstanceRotateServerCertificateCall), [*acquire ssrs lease*](api::InstanceAcquireSsrsLeaseCall), [*add entra id certificate*](api::InstanceAddEntraIdCertificateCall), [*add server ca*](api::InstanceAddServerCaCall), [*add server certificate*](api::InstanceAddServerCertificateCall), [*clone*](api::InstanceCloneCall), [*delete*](api::InstanceDeleteCall), [*demote*](api::InstanceDemoteCall), [*demote master*](api::InstanceDemoteMasterCall), [*execute sql*](api::InstanceExecuteSqlCall), [*export*](api::InstanceExportCall), [*failover*](api::InstanceFailoverCall), [*get*](api::InstanceGetCall), [*import*](api::InstanceImportCall), [*insert*](api::InstanceInsertCall), [*list*](api::InstanceListCall), [*list server cas*](api::InstanceListServerCaCall), [*patch*](api::InstancePatchCall), [*point in time restore*](api::InstancePointInTimeRestoreCall), [*pre check major version upgrade*](api::InstancePreCheckMajorVersionUpgradeCall), [*promote replica*](api::InstancePromoteReplicaCall), [*reencrypt*](api::InstanceReencryptCall), [*release ssrs lease*](api::InstanceReleaseSsrsLeaseCall), [*reset ssl config*](api::InstanceResetSslConfigCall), [*restart*](api::InstanceRestartCall), [*restore backup*](api::InstanceRestoreBackupCall), [*rotate server ca*](api::InstanceRotateServerCaCall), [*start replica*](api::InstanceStartReplicaCall), [*stop replica*](api::InstanceStopReplicaCall), [*switchover*](api::InstanceSwitchoverCall), [*truncate log*](api::InstanceTruncateLogCall) and [*update*](api::InstanceUpdateCall)
 //! * [operations](api::Operation)
 //!  * [*cancel*](api::OperationCancelCall), [*get*](api::OperationGetCall) and [*list*](api::OperationListCall)
 //! * projects
@@ -67,11 +69,18 @@
 //! ```ignore
 //! let r = hub.backup_runs().delete(...).doit().await
 //! let r = hub.backup_runs().insert(...).doit().await
+//! let r = hub.backups().create_backup(...).doit().await
+//! let r = hub.backups().delete_backup(...).doit().await
+//! let r = hub.backups().update_backup(...).doit().await
 //! let r = hub.databases().delete(...).doit().await
 //! let r = hub.databases().insert(...).doit().await
 //! let r = hub.databases().patch(...).doit().await
 //! let r = hub.databases().update(...).doit().await
+//! let r = hub.instances().rotate_entra_id_certificate(...).doit().await
+//! let r = hub.instances().rotate_server_certificate(...).doit().await
+//! let r = hub.instances().add_entra_id_certificate(...).doit().await
 //! let r = hub.instances().add_server_ca(...).doit().await
+//! let r = hub.instances().add_server_certificate(...).doit().await
 //! let r = hub.instances().clone(...).doit().await
 //! let r = hub.instances().delete(...).doit().await
 //! let r = hub.instances().demote(...).doit().await
@@ -81,6 +90,8 @@
 //! let r = hub.instances().import(...).doit().await
 //! let r = hub.instances().insert(...).doit().await
 //! let r = hub.instances().patch(...).doit().await
+//! let r = hub.instances().point_in_time_restore(...).doit().await
+//! let r = hub.instances().pre_check_major_version_upgrade(...).doit().await
 //! let r = hub.instances().promote_replica(...).doit().await
 //! let r = hub.instances().reencrypt(...).doit().await
 //! let r = hub.instances().reset_ssl_config(...).doit().await
@@ -142,9 +153,20 @@
 //! // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about
 //! // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 //! // retrieve them from storage.
-//! let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+//! let connector = hyper_rustls::HttpsConnectorBuilder::new()
+//!     .with_native_roots()
+//!     .unwrap()
+//!     .https_only()
+//!     .enable_http2()
+//!     .build();
+//!
+//! let executor = hyper_util::rt::TokioExecutor::new();
+//! let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 //!     secret,
 //!     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+//!     yup_oauth2::client::CustomHyperClientBuilder::from(
+//!         hyper_util::client::legacy::Client::builder(executor).build(connector),
+//!     ),
 //! ).build().await.unwrap();
 //!
 //! let client = hyper_util::client::legacy::Client::builder(
@@ -155,7 +177,7 @@
 //!         .with_native_roots()
 //!         .unwrap()
 //!         .https_or_http()
-//!         .enable_http1()
+//!         .enable_http2()
 //!         .build()
 //! );
 //! let mut hub = SQLAdmin::new(client, auth);
@@ -168,8 +190,10 @@
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
 //! let result = hub.users().update(req, "project", "instance")
-//!              .name("sanctus")
-//!              .host("sed")
+//!              .revoke_existing_roles(true)
+//!              .name("amet.")
+//!              .host("duo")
+//!              .add_database_roles("ipsum")
 //!              .doit().await;
 //!
 //! match result {

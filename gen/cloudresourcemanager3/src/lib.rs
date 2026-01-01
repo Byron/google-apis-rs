@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Cloud Resource Manager* crate version *6.0.0+20240617*, where *20240617* is the exact revision of the *cloudresourcemanager:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v6.0.0*.
+//! This documentation was generated from *Cloud Resource Manager* crate version *7.0.0+20251103*, where *20251103* is the exact revision of the *cloudresourcemanager:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v7.0.0*.
 //!
 //! Everything else about the *Cloud Resource Manager* *v3* API can be found at the
 //! [official documentation site](https://cloud.google.com/resource-manager).
@@ -14,9 +14,11 @@
 //! * [effective tags](api::EffectiveTag)
 //!  * [*list*](api::EffectiveTagListCall)
 //! * [folders](api::Folder)
-//!  * [*create*](api::FolderCreateCall), [*delete*](api::FolderDeleteCall), [*get*](api::FolderGetCall), [*get iam policy*](api::FolderGetIamPolicyCall), [*list*](api::FolderListCall), [*move*](api::FolderMoveCall), [*patch*](api::FolderPatchCall), [*search*](api::FolderSearchCall), [*set iam policy*](api::FolderSetIamPolicyCall), [*test iam permissions*](api::FolderTestIamPermissionCall) and [*undelete*](api::FolderUndeleteCall)
+//!  * [*capabilities get*](api::FolderCapabilityGetCall), [*capabilities patch*](api::FolderCapabilityPatchCall), [*create*](api::FolderCreateCall), [*delete*](api::FolderDeleteCall), [*get*](api::FolderGetCall), [*get iam policy*](api::FolderGetIamPolicyCall), [*list*](api::FolderListCall), [*move*](api::FolderMoveCall), [*patch*](api::FolderPatchCall), [*search*](api::FolderSearchCall), [*set iam policy*](api::FolderSetIamPolicyCall), [*test iam permissions*](api::FolderTestIamPermissionCall) and [*undelete*](api::FolderUndeleteCall)
 //! * [liens](api::Lien)
 //!  * [*create*](api::LienCreateCall), [*delete*](api::LienDeleteCall), [*get*](api::LienGetCall) and [*list*](api::LienListCall)
+//! * locations
+//!  * [*effective tag binding collections get*](api::LocationEffectiveTagBindingCollectionGetCall), [*tag binding collections get*](api::LocationTagBindingCollectionGetCall) and [*tag binding collections patch*](api::LocationTagBindingCollectionPatchCall)
 //! * [operations](api::Operation)
 //!  * [*get*](api::OperationGetCall)
 //! * [organizations](api::Organization)
@@ -63,11 +65,13 @@
 //! Or specifically ...
 //!
 //! ```ignore
+//! let r = hub.folders().capabilities_patch(...).doit().await
 //! let r = hub.folders().create(...).doit().await
 //! let r = hub.folders().delete(...).doit().await
 //! let r = hub.folders().move_(...).doit().await
 //! let r = hub.folders().patch(...).doit().await
 //! let r = hub.folders().undelete(...).doit().await
+//! let r = hub.locations().tag_binding_collections_patch(...).doit().await
 //! let r = hub.operations().get(...).doit().await
 //! let r = hub.projects().create(...).doit().await
 //! let r = hub.projects().delete(...).doit().await
@@ -123,9 +127,20 @@
 //! // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about
 //! // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 //! // retrieve them from storage.
-//! let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+//! let connector = hyper_rustls::HttpsConnectorBuilder::new()
+//!     .with_native_roots()
+//!     .unwrap()
+//!     .https_only()
+//!     .enable_http2()
+//!     .build();
+//!
+//! let executor = hyper_util::rt::TokioExecutor::new();
+//! let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 //!     secret,
 //!     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+//!     yup_oauth2::client::CustomHyperClientBuilder::from(
+//!         hyper_util::client::legacy::Client::builder(executor).build(connector),
+//!     ),
 //! ).build().await.unwrap();
 //!
 //! let client = hyper_util::client::legacy::Client::builder(
@@ -136,7 +151,7 @@
 //!         .with_native_roots()
 //!         .unwrap()
 //!         .https_or_http()
-//!         .enable_http1()
+//!         .enable_http2()
 //!         .build()
 //! );
 //! let mut hub = CloudResourceManager::new(client, auth);

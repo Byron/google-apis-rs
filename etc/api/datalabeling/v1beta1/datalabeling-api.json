@@ -233,7 +233,7 @@
                 "datasets": {
                     "methods": {
                         "create": {
-                            "description": "Creates dataset. If success return a Dataset resource.",
+                            "description": " Creates dataset. If success return a Dataset resource.",
                             "flatPath": "v1beta1/projects/{projectsId}/datasets",
                             "httpMethod": "POST",
                             "id": "datalabeling.projects.datasets.create",
@@ -677,7 +677,7 @@
                                             ]
                                         },
                                         "get": {
-                                            "description": "Get a FeedbackThread object.",
+                                            "description": " Get a FeedbackThread object.",
                                             "flatPath": "v1beta1/projects/{projectsId}/datasets/{datasetsId}/annotatedDatasets/{annotatedDatasetsId}/feedbackThreads/{feedbackThreadsId}",
                                             "httpMethod": "GET",
                                             "id": "datalabeling.projects.datasets.annotatedDatasets.feedbackThreads.get",
@@ -934,7 +934,7 @@
                         "evaluations": {
                             "methods": {
                                 "get": {
-                                    "description": "Gets an evaluation by resource name (to search, use projects.evaluations.search).",
+                                    "description": " Gets an evaluation by resource name (to search, use projects.evaluations.search).",
                                     "flatPath": "v1beta1/projects/{projectsId}/datasets/{datasetsId}/evaluations/{evaluationsId}",
                                     "httpMethod": "GET",
                                     "id": "datalabeling.projects.datasets.evaluations.get",
@@ -997,7 +997,7 @@
                         "image": {
                             "methods": {
                                 "label": {
-                                    "description": "Starts a labeling task for image. The type of image labeling task is configured by feature in the request.",
+                                    "description": " Starts a labeling task for image. The type of image labeling task is configured by feature in the request.",
                                     "flatPath": "v1beta1/projects/{projectsId}/datasets/{datasetsId}/image:label",
                                     "httpMethod": "POST",
                                     "id": "datalabeling.projects.datasets.image.label",
@@ -1095,7 +1095,7 @@
                 "evaluationJobs": {
                     "methods": {
                         "create": {
-                            "description": "Creates an evaluation job.",
+                            "description": " Creates an evaluation job.",
                             "flatPath": "v1beta1/projects/{projectsId}/evaluationJobs",
                             "httpMethod": "POST",
                             "id": "datalabeling.projects.evaluationJobs.create",
@@ -1476,7 +1476,7 @@
                 "operations": {
                     "methods": {
                         "cancel": {
-                            "description": "Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of 1, corresponding to `Code.CANCELLED`.",
+                            "description": "Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of `1`, corresponding to `Code.CANCELLED`.",
                             "flatPath": "v1beta1/projects/{projectsId}/operations/{operationsId}:cancel",
                             "httpMethod": "GET",
                             "id": "datalabeling.projects.operations.cancel",
@@ -1596,7 +1596,7 @@
             }
         }
     },
-    "revision": "20240207",
+    "revision": "20250723",
     "rootUrl": "https://datalabeling.googleapis.com/",
     "schemas": {
         "GoogleCloudDatalabelingV1alpha1CreateInstructionMetadata": {
@@ -2560,7 +2560,7 @@
             "type": "object"
         },
         "GoogleCloudDatalabelingV1beta1CreateEvaluationJobRequest": {
-            "description": "Request message for CreateEvaluationJob.",
+            "description": " Request message for CreateEvaluationJob.",
             "id": "GoogleCloudDatalabelingV1beta1CreateEvaluationJobRequest",
             "properties": {
                 "job": {
@@ -3614,7 +3614,7 @@
             "type": "object"
         },
         "GoogleCloudDatalabelingV1beta1LabelImageRequest": {
-            "description": "Request message for starting an image labeling task.",
+            "description": " Request message for starting an image labeling task.",
             "id": "GoogleCloudDatalabelingV1beta1LabelImageRequest",
             "properties": {
                 "basicConfig": {
@@ -3868,7 +3868,7 @@
             "type": "object"
         },
         "GoogleCloudDatalabelingV1beta1LabelVideoRequest": {
-            "description": "Request message for LabelVideo.",
+            "description": " Request message for LabelVideo.",
             "id": "GoogleCloudDatalabelingV1beta1LabelVideoRequest",
             "properties": {
                 "basicConfig": {

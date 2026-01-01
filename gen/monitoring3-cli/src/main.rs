@@ -442,6 +442,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "alert-strategy.notification-prompts" => Some((
+                    "alertStrategy.notificationPrompts",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
                 "alert-strategy.notification-rate-limit.period" => Some((
                     "alertStrategy.notificationRateLimit.period",
                     JsonTypeInfo {
@@ -581,6 +588,7 @@ where
                             "mutation-record",
                             "name",
                             "notification-channels",
+                            "notification-prompts",
                             "notification-rate-limit",
                             "period",
                             "severity",
@@ -985,6 +993,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "alert-strategy.notification-prompts" => Some((
+                    "alertStrategy.notificationPrompts",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
                 "alert-strategy.notification-rate-limit.period" => Some((
                     "alertStrategy.notificationRateLimit.period",
                     JsonTypeInfo {
@@ -1124,6 +1139,7 @@ where
                             "mutation-record",
                             "name",
                             "notification-channels",
+                            "notification-prompts",
                             "notification-rate-limit",
                             "period",
                             "severity",
@@ -1188,6 +1204,189 @@ where
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
                                 v.extend(["update-mask"].iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_alerts_get(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .alerts_get(opt.value_of("name").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_alerts_list(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .alerts_list(opt.value_of("parent").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                }
+                "page-size" => {
+                    call = call.page_size(
+                        value
+                            .map(|v| arg_from_str(v, err, "page-size", "int32"))
+                            .unwrap_or(-0),
+                    );
+                }
+                "order-by" => {
+                    call = call.order_by(value.unwrap_or(""));
+                }
+                "filter" => {
+                    call = call.filter(value.unwrap_or(""));
+                }
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(
+                                    ["filter", "order-by", "page-size", "page-token"]
+                                        .iter()
+                                        .map(|v| *v),
+                                );
                                 v
                             }));
                     }
@@ -2217,6 +2416,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "metadata.time-series-resource-hierarchy-level" => Some((
+                    "metadata.timeSeriesResourceHierarchyLevel",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
                 "metric-kind" => Some((
                     "metricKind",
                     JsonTypeInfo {
@@ -2272,6 +2478,7 @@ where
                             "monitored-resource-types",
                             "name",
                             "sample-period",
+                            "time-series-resource-hierarchy-level",
                             "type",
                             "unit",
                             "value-type",
@@ -2564,6 +2771,13 @@ where
                 "filter" => {
                     call = call.filter(value.unwrap_or(""));
                 }
+                "active-only" => {
+                    call = call.active_only(
+                        value
+                            .map(|v| arg_from_str(v, err, "active-only", "boolean"))
+                            .unwrap_or(false),
+                    );
+                }
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -2581,7 +2795,11 @@ where
                             .push(CLIError::UnknownParameter(key.to_string(), {
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
-                                v.extend(["filter", "page-size", "page-token"].iter().map(|v| *v));
+                                v.extend(
+                                    ["active-only", "filter", "page-size", "page-token"]
+                                        .iter()
+                                        .map(|v| *v),
+                                );
                                 v
                             }));
                     }
@@ -4116,6 +4334,13 @@ where
 
             let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
             {
+                "criteria.filter" => Some((
+                    "criteria.filter",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "criteria.policies" => Some((
                     "criteria.policies",
                     JsonTypeInfo {
@@ -4158,6 +4383,7 @@ where
                             "criteria",
                             "display-name",
                             "end-time",
+                            "filter",
                             "interval",
                             "name",
                             "policies",
@@ -4465,6 +4691,13 @@ where
 
             let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
             {
+                "criteria.filter" => Some((
+                    "criteria.filter",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "criteria.policies" => Some((
                     "criteria.policies",
                     JsonTypeInfo {
@@ -4507,6 +4740,7 @@ where
                             "criteria",
                             "display-name",
                             "end-time",
+                            "filter",
                             "interval",
                             "name",
                             "policies",
@@ -5240,6 +5474,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "disabled" => Some((
+                    "disabled",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "display-name" => Some((
                     "displayName",
                     JsonTypeInfo {
@@ -5347,6 +5588,13 @@ where
                 )),
                 "is-internal" => Some((
                     "isInternal",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "log-check-failures" => Some((
+                    "logCheckFailures",
                     JsonTypeInfo {
                         jtype: JsonType::Boolean,
                         ctype: ComplexType::Pod,
@@ -5461,12 +5709,14 @@ where
                             "cloud-run-revision",
                             "content-type",
                             "custom-content-type",
+                            "disabled",
                             "display-name",
                             "group-id",
                             "headers",
                             "http-check",
                             "is-internal",
                             "labels",
+                            "log-check-failures",
                             "mask-headers",
                             "monitored-resource",
                             "name",
@@ -5880,6 +6130,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "disabled" => Some((
+                    "disabled",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "display-name" => Some((
                     "displayName",
                     JsonTypeInfo {
@@ -5987,6 +6244,13 @@ where
                 )),
                 "is-internal" => Some((
                     "isInternal",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "log-check-failures" => Some((
+                    "logCheckFailures",
                     JsonTypeInfo {
                         jtype: JsonType::Boolean,
                         ctype: ComplexType::Pod,
@@ -6101,12 +6365,14 @@ where
                             "cloud-run-revision",
                             "content-type",
                             "custom-content-type",
+                            "disabled",
                             "display-name",
                             "group-id",
                             "headers",
                             "http-check",
                             "is-internal",
                             "labels",
+                            "log-check-failures",
                             "mask-headers",
                             "monitored-resource",
                             "name",
@@ -8054,6 +8320,12 @@ where
                         ._projects_alert_policies_patch(opt, dry_run, &mut err)
                         .await;
                 }
+                ("alerts-get", Some(opt)) => {
+                    call_result = self._projects_alerts_get(opt, dry_run, &mut err).await;
+                }
+                ("alerts-list", Some(opt)) => {
+                    call_result = self._projects_alerts_list(opt, dry_run, &mut err).await;
+                }
                 ("collectd-time-series-create", Some(opt)) => {
                     call_result = self
                         ._projects_collectd_time_series_create(opt, dry_run, &mut err)
@@ -8323,7 +8595,9 @@ where
         let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
             secret,
             yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-            hyper_util::client::legacy::Client::builder(executor).build(connector),
+            yup_oauth2::client::CustomHyperClientBuilder::from(
+                hyper_util::client::legacy::Client::builder(executor).build(connector),
+            ),
         )
         .persist_tokens_to_disk(format!("{}/monitoring3", config_dir))
         .build()
@@ -8420,7 +8694,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ]),
-            ("projects", "methods: 'alert-policies-create', 'alert-policies-delete', 'alert-policies-get', 'alert-policies-list', 'alert-policies-patch', 'collectd-time-series-create', 'groups-create', 'groups-delete', 'groups-get', 'groups-list', 'groups-members-list', 'groups-update', 'metric-descriptors-create', 'metric-descriptors-delete', 'metric-descriptors-get', 'metric-descriptors-list', 'monitored-resource-descriptors-get', 'monitored-resource-descriptors-list', 'notification-channel-descriptors-get', 'notification-channel-descriptors-list', 'notification-channels-create', 'notification-channels-delete', 'notification-channels-get', 'notification-channels-get-verification-code', 'notification-channels-list', 'notification-channels-patch', 'notification-channels-send-verification-code', 'notification-channels-verify', 'snoozes-create', 'snoozes-get', 'snoozes-list', 'snoozes-patch', 'time-series-create', 'time-series-create-service', 'time-series-list', 'time-series-query', 'uptime-check-configs-create', 'uptime-check-configs-delete', 'uptime-check-configs-get', 'uptime-check-configs-list' and 'uptime-check-configs-patch'", vec![
+            ("projects", "methods: 'alert-policies-create', 'alert-policies-delete', 'alert-policies-get', 'alert-policies-list', 'alert-policies-patch', 'alerts-get', 'alerts-list', 'collectd-time-series-create', 'groups-create', 'groups-delete', 'groups-get', 'groups-list', 'groups-members-list', 'groups-update', 'metric-descriptors-create', 'metric-descriptors-delete', 'metric-descriptors-get', 'metric-descriptors-list', 'monitored-resource-descriptors-get', 'monitored-resource-descriptors-list', 'notification-channel-descriptors-get', 'notification-channel-descriptors-list', 'notification-channels-create', 'notification-channels-delete', 'notification-channels-get', 'notification-channels-get-verification-code', 'notification-channels-list', 'notification-channels-patch', 'notification-channels-send-verification-code', 'notification-channels-verify', 'snoozes-create', 'snoozes-get', 'snoozes-list', 'snoozes-patch', 'time-series-create', 'time-series-create-service', 'time-series-list', 'time-series-query', 'uptime-check-configs-create', 'uptime-check-configs-delete', 'uptime-check-configs-get', 'uptime-check-configs-list' and 'uptime-check-configs-patch'", vec![
             ("alert-policies-create",
                     Some(r##"Creates a new alerting policy.Design your application to single-thread API calls that modify the state of alerting policies in a single project. This includes calls to CreateAlertPolicy, DeleteAlertPolicy and UpdateAlertPolicy."##),
                     "Details at http://byron.github.io/google-apis-rs/google_monitoring3_cli/projects_alert-policies-create",
@@ -8512,7 +8786,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required if the policy exists. The resource name for this policy. The format is: projects/[PROJECT_ID_OR_NUMBER]/alertPolicies/[ALERT_POLICY_ID] [ALERT_POLICY_ID] is assigned by Cloud Monitoring when the policy is created. When calling the alertPolicies.create method, do not include the name field in the alerting policy passed as part of the request."##),
+                     Some(r##"Identifier. Required if the policy exists. The resource name for this policy. The format is: projects/[PROJECT_ID_OR_NUMBER]/alertPolicies/[ALERT_POLICY_ID] [ALERT_POLICY_ID] is assigned by Cloud Monitoring when the policy is created. When calling the alertPolicies.create method, do not include the name field in the alerting policy passed as part of the request."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -8520,6 +8794,46 @@ async fn main() {
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("alerts-get",
+                    Some(r##"Gets a single alert."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_monitoring3_cli/projects_alerts-get",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The name of the alert.The format is: projects/[PROJECT_ID_OR_NUMBER]/alerts/[ALERT_ID] The [ALERT_ID] is a system-assigned unique identifier for the alert."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("alerts-list",
+                    Some(r##"Lists the existing alerts for the metrics scope of the project."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_monitoring3_cli/projects_alerts-list",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. The name of the project to list alerts for."##),
+                     Some(true),
+                     Some(false)),
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
@@ -8967,7 +9281,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The full REST resource name for this channel. The format is: projects/[PROJECT_ID_OR_NUMBER]/notificationChannels/[CHANNEL_ID] The [CHANNEL_ID] is automatically assigned by the server on creation."##),
+                     Some(r##"Identifier. The full REST resource name for this channel. The format is: projects/[PROJECT_ID_OR_NUMBER]/notificationChannels/[CHANNEL_ID] The [CHANNEL_ID] is automatically assigned by the server on creation."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -9197,7 +9511,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("time-series-query",
-                    Some(r##"Queries time series using Monitoring Query Language."##),
+                    Some(r##"Queries time series by using Monitoring Query Language (MQL). We recommend using PromQL instead of MQL. For more information about the status of MQL, see the MQL deprecation notice (https://cloud.google.com/stackdriver/docs/deprecations/mql)."##),
                     "Details at http://byron.github.io/google-apis-rs/google_monitoring3_cli/projects_time-series-query",
                   vec![
                     (Some(r##"name"##),
@@ -9575,7 +9889,7 @@ async fn main() {
 
     let mut app = App::new("monitoring3")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("6.0.0+20240623")
+           .version("7.0.0+20251215")
            .about("Manages your Cloud Monitoring data and configurations.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_monitoring3_cli")
            .arg(Arg::with_name("url")
@@ -9640,7 +9954,7 @@ async fn main() {
         .with_native_roots()
         .unwrap()
         .https_or_http()
-        .enable_http1()
+        .enable_http2()
         .build();
 
     match Engine::new(matches, connector).await {

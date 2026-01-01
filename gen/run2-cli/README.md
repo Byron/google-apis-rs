@@ -25,14 +25,16 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Cloud Run* API at revision *20240621*. The CLI is at version *6.0.0*.
+This documentation was generated from the *Cloud Run* API at revision *20251212*. The CLI is at version *7.0.0*.
 
 ```bash
 run2 [options]
         projects
+                locations-builds-submit <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-export-image <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-export-image-metadata <name> [-p <v>]... [-o <out>]
                 locations-export-metadata <name> [-p <v>]... [-o <out>]
+                locations-export-project-metadata <name> [-p <v>]... [-o <out>]
                 locations-jobs-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-jobs-delete <name> [-p <v>]... [-o <out>]
                 locations-jobs-executions-cancel <name> (-r <kv>)... [-p <v>]... [-o <out>]
@@ -65,6 +67,17 @@ run2 [options]
                 locations-services-revisions-list <parent> [-p <v>]... [-o <out>]
                 locations-services-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-services-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-worker-pools-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-worker-pools-delete <name> [-p <v>]... [-o <out>]
+                locations-worker-pools-get <name> [-p <v>]... [-o <out>]
+                locations-worker-pools-get-iam-policy <resource> [-p <v>]... [-o <out>]
+                locations-worker-pools-list <parent> [-p <v>]... [-o <out>]
+                locations-worker-pools-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-worker-pools-revisions-delete <name> [-p <v>]... [-o <out>]
+                locations-worker-pools-revisions-get <name> [-p <v>]... [-o <out>]
+                locations-worker-pools-revisions-list <parent> [-p <v>]... [-o <out>]
+                locations-worker-pools-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-worker-pools-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
   run2 --help
 
 Configuration:

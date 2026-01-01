@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Container Analysis* crate version *6.0.0+20240625*, where *20240625* is the exact revision of the *containeranalysis:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v6.0.0*.
+//! This documentation was generated from *Container Analysis* crate version *7.0.0+20251212*, where *20251212* is the exact revision of the *containeranalysis:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v7.0.0*.
 //!
 //! Everything else about the *Container Analysis* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/container-analysis/api/reference/rest/).
@@ -12,7 +12,7 @@
 //! Handle the following *Resources* with ease from the central [hub](ContainerAnalysis) ...
 //!
 //! * projects
-//!  * [*locations notes get*](api::ProjectLocationNoteGetCall), [*locations notes list*](api::ProjectLocationNoteListCall), [*locations notes occurrences list*](api::ProjectLocationNoteOccurrenceListCall), [*locations occurrences get*](api::ProjectLocationOccurrenceGetCall), [*locations occurrences get notes*](api::ProjectLocationOccurrenceGetNoteCall), [*locations occurrences get vulnerability summary*](api::ProjectLocationOccurrenceGetVulnerabilitySummaryCall), [*locations occurrences list*](api::ProjectLocationOccurrenceListCall), [*locations resources export sbom*](api::ProjectLocationResourceExportSBOMCall), [*notes batch create*](api::ProjectNoteBatchCreateCall), [*notes create*](api::ProjectNoteCreateCall), [*notes delete*](api::ProjectNoteDeleteCall), [*notes get*](api::ProjectNoteGetCall), [*notes get iam policy*](api::ProjectNoteGetIamPolicyCall), [*notes list*](api::ProjectNoteListCall), [*notes occurrences list*](api::ProjectNoteOccurrenceListCall), [*notes patch*](api::ProjectNotePatchCall), [*notes set iam policy*](api::ProjectNoteSetIamPolicyCall), [*notes test iam permissions*](api::ProjectNoteTestIamPermissionCall), [*occurrences batch create*](api::ProjectOccurrenceBatchCreateCall), [*occurrences create*](api::ProjectOccurrenceCreateCall), [*occurrences delete*](api::ProjectOccurrenceDeleteCall), [*occurrences get*](api::ProjectOccurrenceGetCall), [*occurrences get iam policy*](api::ProjectOccurrenceGetIamPolicyCall), [*occurrences get notes*](api::ProjectOccurrenceGetNoteCall), [*occurrences get vulnerability summary*](api::ProjectOccurrenceGetVulnerabilitySummaryCall), [*occurrences list*](api::ProjectOccurrenceListCall), [*occurrences patch*](api::ProjectOccurrencePatchCall), [*occurrences set iam policy*](api::ProjectOccurrenceSetIamPolicyCall), [*occurrences test iam permissions*](api::ProjectOccurrenceTestIamPermissionCall) and [*resources export sbom*](api::ProjectResourceExportSBOMCall)
+//!  * [*locations notes batch create*](api::ProjectLocationNoteBatchCreateCall), [*locations notes create*](api::ProjectLocationNoteCreateCall), [*locations notes delete*](api::ProjectLocationNoteDeleteCall), [*locations notes get*](api::ProjectLocationNoteGetCall), [*locations notes get iam policy*](api::ProjectLocationNoteGetIamPolicyCall), [*locations notes list*](api::ProjectLocationNoteListCall), [*locations notes occurrences list*](api::ProjectLocationNoteOccurrenceListCall), [*locations notes patch*](api::ProjectLocationNotePatchCall), [*locations notes set iam policy*](api::ProjectLocationNoteSetIamPolicyCall), [*locations notes test iam permissions*](api::ProjectLocationNoteTestIamPermissionCall), [*locations occurrences batch create*](api::ProjectLocationOccurrenceBatchCreateCall), [*locations occurrences create*](api::ProjectLocationOccurrenceCreateCall), [*locations occurrences delete*](api::ProjectLocationOccurrenceDeleteCall), [*locations occurrences get*](api::ProjectLocationOccurrenceGetCall), [*locations occurrences get iam policy*](api::ProjectLocationOccurrenceGetIamPolicyCall), [*locations occurrences get notes*](api::ProjectLocationOccurrenceGetNoteCall), [*locations occurrences get vulnerability summary*](api::ProjectLocationOccurrenceGetVulnerabilitySummaryCall), [*locations occurrences list*](api::ProjectLocationOccurrenceListCall), [*locations occurrences patch*](api::ProjectLocationOccurrencePatchCall), [*locations occurrences set iam policy*](api::ProjectLocationOccurrenceSetIamPolicyCall), [*locations occurrences test iam permissions*](api::ProjectLocationOccurrenceTestIamPermissionCall), [*locations resources export sbom*](api::ProjectLocationResourceExportSBOMCall), [*notes batch create*](api::ProjectNoteBatchCreateCall), [*notes create*](api::ProjectNoteCreateCall), [*notes delete*](api::ProjectNoteDeleteCall), [*notes get*](api::ProjectNoteGetCall), [*notes get iam policy*](api::ProjectNoteGetIamPolicyCall), [*notes list*](api::ProjectNoteListCall), [*notes occurrences list*](api::ProjectNoteOccurrenceListCall), [*notes patch*](api::ProjectNotePatchCall), [*notes set iam policy*](api::ProjectNoteSetIamPolicyCall), [*notes test iam permissions*](api::ProjectNoteTestIamPermissionCall), [*occurrences batch create*](api::ProjectOccurrenceBatchCreateCall), [*occurrences create*](api::ProjectOccurrenceCreateCall), [*occurrences delete*](api::ProjectOccurrenceDeleteCall), [*occurrences get*](api::ProjectOccurrenceGetCall), [*occurrences get iam policy*](api::ProjectOccurrenceGetIamPolicyCall), [*occurrences get notes*](api::ProjectOccurrenceGetNoteCall), [*occurrences get vulnerability summary*](api::ProjectOccurrenceGetVulnerabilitySummaryCall), [*occurrences list*](api::ProjectOccurrenceListCall), [*occurrences patch*](api::ProjectOccurrencePatchCall), [*occurrences set iam policy*](api::ProjectOccurrenceSetIamPolicyCall), [*occurrences test iam permissions*](api::ProjectOccurrenceTestIamPermissionCall) and [*resources export sbom*](api::ProjectResourceExportSBOMCall)
 //!
 //!
 //!
@@ -47,7 +47,9 @@
 //! Or specifically ...
 //!
 //! ```ignore
+//! let r = hub.projects().locations_notes_create(...).doit().await
 //! let r = hub.projects().locations_notes_get(...).doit().await
+//! let r = hub.projects().locations_notes_patch(...).doit().await
 //! let r = hub.projects().locations_occurrences_get_notes(...).doit().await
 //! let r = hub.projects().notes_create(...).doit().await
 //! let r = hub.projects().notes_get(...).doit().await
@@ -92,9 +94,20 @@
 //! // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about
 //! // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 //! // retrieve them from storage.
-//! let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+//! let connector = hyper_rustls::HttpsConnectorBuilder::new()
+//!     .with_native_roots()
+//!     .unwrap()
+//!     .https_only()
+//!     .enable_http2()
+//!     .build();
+//!
+//! let executor = hyper_util::rt::TokioExecutor::new();
+//! let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 //!     secret,
 //!     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+//!     yup_oauth2::client::CustomHyperClientBuilder::from(
+//!         hyper_util::client::legacy::Client::builder(executor).build(connector),
+//!     ),
 //! ).build().await.unwrap();
 //!
 //! let client = hyper_util::client::legacy::Client::builder(
@@ -105,7 +118,7 @@
 //!         .with_native_roots()
 //!         .unwrap()
 //!         .https_or_http()
-//!         .enable_http1()
+//!         .enable_http2()
 //!         .build()
 //! );
 //! let mut hub = ContainerAnalysis::new(client, auth);
@@ -117,7 +130,7 @@
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
-//! let result = hub.projects().notes_create(req, "parent")
+//! let result = hub.projects().locations_notes_create(req, "parent")
 //!              .note_id("ipsum")
 //!              .doit().await;
 //!

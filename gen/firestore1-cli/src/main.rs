@@ -80,34 +80,6 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
-                "daily-recurrence.time.hours" => Some((
-                    "dailyRecurrence.time.hours",
-                    JsonTypeInfo {
-                        jtype: JsonType::Int,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "daily-recurrence.time.minutes" => Some((
-                    "dailyRecurrence.time.minutes",
-                    JsonTypeInfo {
-                        jtype: JsonType::Int,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "daily-recurrence.time.nanos" => Some((
-                    "dailyRecurrence.time.nanos",
-                    JsonTypeInfo {
-                        jtype: JsonType::Int,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "daily-recurrence.time.seconds" => Some((
-                    "dailyRecurrence.time.seconds",
-                    JsonTypeInfo {
-                        jtype: JsonType::Int,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
                 "name" => Some((
                     "name",
                     JsonTypeInfo {
@@ -136,48 +108,14 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
-                "weekly-recurrence.time.hours" => Some((
-                    "weeklyRecurrence.time.hours",
-                    JsonTypeInfo {
-                        jtype: JsonType::Int,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "weekly-recurrence.time.minutes" => Some((
-                    "weeklyRecurrence.time.minutes",
-                    JsonTypeInfo {
-                        jtype: JsonType::Int,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "weekly-recurrence.time.nanos" => Some((
-                    "weeklyRecurrence.time.nanos",
-                    JsonTypeInfo {
-                        jtype: JsonType::Int,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "weekly-recurrence.time.seconds" => Some((
-                    "weeklyRecurrence.time.seconds",
-                    JsonTypeInfo {
-                        jtype: JsonType::Int,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
                 _ => {
                     let suggestion = FieldCursor::did_you_mean(
                         key,
                         &vec![
                             "create-time",
-                            "daily-recurrence",
                             "day",
-                            "hours",
-                            "minutes",
                             "name",
-                            "nanos",
                             "retention",
-                            "seconds",
-                            "time",
                             "update-time",
                             "weekly-recurrence",
                         ],
@@ -558,34 +496,6 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
-                "daily-recurrence.time.hours" => Some((
-                    "dailyRecurrence.time.hours",
-                    JsonTypeInfo {
-                        jtype: JsonType::Int,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "daily-recurrence.time.minutes" => Some((
-                    "dailyRecurrence.time.minutes",
-                    JsonTypeInfo {
-                        jtype: JsonType::Int,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "daily-recurrence.time.nanos" => Some((
-                    "dailyRecurrence.time.nanos",
-                    JsonTypeInfo {
-                        jtype: JsonType::Int,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "daily-recurrence.time.seconds" => Some((
-                    "dailyRecurrence.time.seconds",
-                    JsonTypeInfo {
-                        jtype: JsonType::Int,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
                 "name" => Some((
                     "name",
                     JsonTypeInfo {
@@ -614,48 +524,14 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
-                "weekly-recurrence.time.hours" => Some((
-                    "weeklyRecurrence.time.hours",
-                    JsonTypeInfo {
-                        jtype: JsonType::Int,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "weekly-recurrence.time.minutes" => Some((
-                    "weeklyRecurrence.time.minutes",
-                    JsonTypeInfo {
-                        jtype: JsonType::Int,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "weekly-recurrence.time.nanos" => Some((
-                    "weeklyRecurrence.time.nanos",
-                    JsonTypeInfo {
-                        jtype: JsonType::Int,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "weekly-recurrence.time.seconds" => Some((
-                    "weeklyRecurrence.time.seconds",
-                    JsonTypeInfo {
-                        jtype: JsonType::Int,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
                 _ => {
                     let suggestion = FieldCursor::did_you_mean(
                         key,
                         &vec![
                             "create-time",
-                            "daily-recurrence",
                             "day",
-                            "hours",
-                            "minutes",
                             "name",
-                            "nanos",
                             "retention",
-                            "seconds",
-                            "time",
                             "update-time",
                             "weekly-recurrence",
                         ],
@@ -835,6 +711,189 @@ where
             .hub
             .projects()
             .databases_bulk_delete_documents(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_databases_clone(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut field_cursor = FieldCursor::default();
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "database-id" => Some((
+                    "databaseId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "encryption-config.customer-managed-encryption.kms-key-name" => Some((
+                    "encryptionConfig.customerManagedEncryption.kmsKeyName",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "pitr-snapshot.database" => Some((
+                    "pitrSnapshot.database",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "pitr-snapshot.database-uid" => Some((
+                    "pitrSnapshot.databaseUid",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "pitr-snapshot.snapshot-time" => Some((
+                    "pitrSnapshot.snapshotTime",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "tags" => Some((
+                    "tags",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Map,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec![
+                            "customer-managed-encryption",
+                            "database",
+                            "database-id",
+                            "database-uid",
+                            "encryption-config",
+                            "kms-key-name",
+                            "pitr-snapshot",
+                            "snapshot-time",
+                            "tags",
+                        ],
+                    );
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
+            }
+        }
+        let mut request: api::GoogleFirestoreAdminV1CloneDatabaseRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .databases_clone(request, opt.value_of("parent").unwrap_or(""));
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -1302,6 +1361,20 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "density" => Some((
+                    "density",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "multikey" => Some((
+                    "multikey",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "name" => Some((
                     "name",
                     JsonTypeInfo {
@@ -1316,6 +1389,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "shard-count" => Some((
+                    "shardCount",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "state" => Some((
                     "state",
                     JsonTypeInfo {
@@ -1323,10 +1403,26 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "unique" => Some((
+                    "unique",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 _ => {
                     let suggestion = FieldCursor::did_you_mean(
                         key,
-                        &vec!["api-scope", "name", "query-scope", "state"],
+                        &vec![
+                            "api-scope",
+                            "density",
+                            "multikey",
+                            "name",
+                            "query-scope",
+                            "shard-count",
+                            "state",
+                            "unique",
+                        ],
                     );
                     err.issues.push(CLIError::Field(FieldError::Unknown(
                         temp_cursor.to_string(),
@@ -1749,6 +1845,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "database-edition" => Some((
+                    "databaseEdition",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "delete-protection-state" => Some((
                     "deleteProtectionState",
                     JsonTypeInfo {
@@ -1777,6 +1880,20 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "firestore-data-access-mode" => Some((
+                    "firestoreDataAccessMode",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "free-tier" => Some((
+                    "freeTier",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "key-prefix" => Some((
                     "keyPrefix",
                     JsonTypeInfo {
@@ -1786,6 +1903,13 @@ where
                 )),
                 "location-id" => Some((
                     "locationId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "mongodb-compatible-data-access-mode" => Some((
+                    "mongodbCompatibleDataAccessMode",
                     JsonTypeInfo {
                         jtype: JsonType::String,
                         ctype: ComplexType::Pod,
@@ -1810,6 +1934,34 @@ where
                     JsonTypeInfo {
                         jtype: JsonType::String,
                         ctype: ComplexType::Pod,
+                    },
+                )),
+                "realtime-updates-mode" => Some((
+                    "realtimeUpdatesMode",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "source-info.backup.backup" => Some((
+                    "sourceInfo.backup.backup",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "source-info.operation" => Some((
+                    "sourceInfo.operation",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "tags" => Some((
+                    "tags",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Map,
                     },
                 )),
                 "type" => Some((
@@ -1846,19 +1998,28 @@ where
                         &vec![
                             "active-key-version",
                             "app-engine-integration-mode",
+                            "backup",
                             "cmek-config",
                             "concurrency-mode",
                             "create-time",
+                            "database-edition",
                             "delete-protection-state",
                             "delete-time",
                             "earliest-version-time",
                             "etag",
+                            "firestore-data-access-mode",
+                            "free-tier",
                             "key-prefix",
                             "kms-key-name",
                             "location-id",
+                            "mongodb-compatible-data-access-mode",
                             "name",
+                            "operation",
                             "point-in-time-recovery-enablement",
                             "previous-id",
+                            "realtime-updates-mode",
+                            "source-info",
+                            "tags",
                             "type",
                             "uid",
                             "update-time",
@@ -2915,6 +3076,172 @@ where
         }
     }
 
+    async fn _projects_databases_documents_execute_pipeline(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut field_cursor = FieldCursor::default();
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "new-transaction.read-only.read-time" => Some((
+                    "newTransaction.readOnly.readTime",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "new-transaction.read-write.retry-transaction" => Some((
+                    "newTransaction.readWrite.retryTransaction",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "read-time" => Some((
+                    "readTime",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "transaction" => Some((
+                    "transaction",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec![
+                            "new-transaction",
+                            "read-only",
+                            "read-time",
+                            "read-write",
+                            "retry-transaction",
+                            "transaction",
+                        ],
+                    );
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
+            }
+        }
+        let mut request: api::ExecutePipelineRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .databases_documents_execute_pipeline(request, opt.value_of("database").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _projects_databases_documents_get(
         &self,
         opt: &ArgMatches<'n>,
@@ -3469,10 +3796,14 @@ where
                     "add-target.query.parent" => Some(("addTarget.query.parent", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "add-target.query.structured-query.end-at.before" => Some(("addTarget.query.structuredQuery.endAt.before", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "add-target.query.structured-query.find-nearest.distance-measure" => Some(("addTarget.query.structuredQuery.findNearest.distanceMeasure", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "add-target.query.structured-query.find-nearest.distance-result-field" => Some(("addTarget.query.structuredQuery.findNearest.distanceResultField", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "add-target.query.structured-query.find-nearest.distance-threshold" => Some(("addTarget.query.structuredQuery.findNearest.distanceThreshold", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "add-target.query.structured-query.find-nearest.limit" => Some(("addTarget.query.structuredQuery.findNearest.limit", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "add-target.query.structured-query.find-nearest.query-vector.boolean-value" => Some(("addTarget.query.structuredQuery.findNearest.queryVector.booleanValue", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "add-target.query.structured-query.find-nearest.query-vector.bytes-value" => Some(("addTarget.query.structuredQuery.findNearest.queryVector.bytesValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "add-target.query.structured-query.find-nearest.query-vector.double-value" => Some(("addTarget.query.structuredQuery.findNearest.queryVector.doubleValue", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "add-target.query.structured-query.find-nearest.query-vector.field-reference-value" => Some(("addTarget.query.structuredQuery.findNearest.queryVector.fieldReferenceValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "add-target.query.structured-query.find-nearest.query-vector.function-value.name" => Some(("addTarget.query.structuredQuery.findNearest.queryVector.functionValue.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "add-target.query.structured-query.find-nearest.query-vector.geo-point-value.latitude" => Some(("addTarget.query.structuredQuery.findNearest.queryVector.geoPointValue.latitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "add-target.query.structured-query.find-nearest.query-vector.geo-point-value.longitude" => Some(("addTarget.query.structuredQuery.findNearest.queryVector.geoPointValue.longitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "add-target.query.structured-query.find-nearest.query-vector.integer-value" => Some(("addTarget.query.structuredQuery.findNearest.queryVector.integerValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -3490,6 +3821,8 @@ where
                     "add-target.query.structured-query.where.field-filter.value.boolean-value" => Some(("addTarget.query.structuredQuery.where.fieldFilter.value.booleanValue", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "add-target.query.structured-query.where.field-filter.value.bytes-value" => Some(("addTarget.query.structuredQuery.where.fieldFilter.value.bytesValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "add-target.query.structured-query.where.field-filter.value.double-value" => Some(("addTarget.query.structuredQuery.where.fieldFilter.value.doubleValue", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "add-target.query.structured-query.where.field-filter.value.field-reference-value" => Some(("addTarget.query.structuredQuery.where.fieldFilter.value.fieldReferenceValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "add-target.query.structured-query.where.field-filter.value.function-value.name" => Some(("addTarget.query.structuredQuery.where.fieldFilter.value.functionValue.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "add-target.query.structured-query.where.field-filter.value.geo-point-value.latitude" => Some(("addTarget.query.structuredQuery.where.fieldFilter.value.geoPointValue.latitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "add-target.query.structured-query.where.field-filter.value.geo-point-value.longitude" => Some(("addTarget.query.structuredQuery.where.fieldFilter.value.geoPointValue.longitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "add-target.query.structured-query.where.field-filter.value.integer-value" => Some(("addTarget.query.structuredQuery.where.fieldFilter.value.integerValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -3505,7 +3838,7 @@ where
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "remove-target" => Some(("removeTarget", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["add-target", "before", "boolean-value", "bytes-value", "composite-filter", "distance-measure", "documents", "double-value", "end-at", "expected-count", "field", "field-filter", "field-path", "find-nearest", "geo-point-value", "integer-value", "labels", "latitude", "limit", "longitude", "null-value", "offset", "once", "op", "parent", "query", "query-vector", "read-time", "reference-value", "remove-target", "resume-token", "start-at", "string-value", "structured-query", "target-id", "timestamp-value", "unary-filter", "value", "vector-field", "where"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["add-target", "before", "boolean-value", "bytes-value", "composite-filter", "distance-measure", "distance-result-field", "distance-threshold", "documents", "double-value", "end-at", "expected-count", "field", "field-filter", "field-path", "field-reference-value", "find-nearest", "function-value", "geo-point-value", "integer-value", "labels", "latitude", "limit", "longitude", "name", "null-value", "offset", "once", "op", "parent", "query", "query-vector", "read-time", "reference-value", "remove-target", "resume-token", "start-at", "string-value", "structured-query", "target-id", "timestamp-value", "unary-filter", "value", "vector-field", "where"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3669,6 +4002,20 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "structured-query.find-nearest.distance-result-field" => Some((
+                    "structuredQuery.findNearest.distanceResultField",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "structured-query.find-nearest.distance-threshold" => Some((
+                    "structuredQuery.findNearest.distanceThreshold",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "structured-query.find-nearest.limit" => Some((
                     "structuredQuery.findNearest.limit",
                     JsonTypeInfo {
@@ -3694,6 +4041,20 @@ where
                     "structuredQuery.findNearest.queryVector.doubleValue",
                     JsonTypeInfo {
                         jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "structured-query.find-nearest.query-vector.field-reference-value" => Some((
+                    "structuredQuery.findNearest.queryVector.fieldReferenceValue",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "structured-query.find-nearest.query-vector.function-value.name" => Some((
+                    "structuredQuery.findNearest.queryVector.functionValue.name",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
                         ctype: ComplexType::Pod,
                     },
                 )),
@@ -3816,6 +4177,20 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "structured-query.where.field-filter.value.field-reference-value" => Some((
+                    "structuredQuery.where.fieldFilter.value.fieldReferenceValue",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "structured-query.where.field-filter.value.function-value.name" => Some((
+                    "structuredQuery.where.fieldFilter.value.functionValue.name",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "structured-query.where.field-filter.value.geo-point-value.latitude" => Some((
                     "structuredQuery.where.fieldFilter.value.geoPointValue.latitude",
                     JsonTypeInfo {
@@ -3888,17 +4263,22 @@ where
                             "bytes-value",
                             "composite-filter",
                             "distance-measure",
+                            "distance-result-field",
+                            "distance-threshold",
                             "double-value",
                             "end-at",
                             "field",
                             "field-filter",
                             "field-path",
+                            "field-reference-value",
                             "find-nearest",
+                            "function-value",
                             "geo-point-value",
                             "integer-value",
                             "latitude",
                             "limit",
                             "longitude",
+                            "name",
                             "null-value",
                             "offset",
                             "op",
@@ -4370,10 +4750,14 @@ where
                     "read-time" => Some(("readTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "structured-aggregation-query.structured-query.end-at.before" => Some(("structuredAggregationQuery.structuredQuery.endAt.before", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "structured-aggregation-query.structured-query.find-nearest.distance-measure" => Some(("structuredAggregationQuery.structuredQuery.findNearest.distanceMeasure", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "structured-aggregation-query.structured-query.find-nearest.distance-result-field" => Some(("structuredAggregationQuery.structuredQuery.findNearest.distanceResultField", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "structured-aggregation-query.structured-query.find-nearest.distance-threshold" => Some(("structuredAggregationQuery.structuredQuery.findNearest.distanceThreshold", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "structured-aggregation-query.structured-query.find-nearest.limit" => Some(("structuredAggregationQuery.structuredQuery.findNearest.limit", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "structured-aggregation-query.structured-query.find-nearest.query-vector.boolean-value" => Some(("structuredAggregationQuery.structuredQuery.findNearest.queryVector.booleanValue", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "structured-aggregation-query.structured-query.find-nearest.query-vector.bytes-value" => Some(("structuredAggregationQuery.structuredQuery.findNearest.queryVector.bytesValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "structured-aggregation-query.structured-query.find-nearest.query-vector.double-value" => Some(("structuredAggregationQuery.structuredQuery.findNearest.queryVector.doubleValue", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "structured-aggregation-query.structured-query.find-nearest.query-vector.field-reference-value" => Some(("structuredAggregationQuery.structuredQuery.findNearest.queryVector.fieldReferenceValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "structured-aggregation-query.structured-query.find-nearest.query-vector.function-value.name" => Some(("structuredAggregationQuery.structuredQuery.findNearest.queryVector.functionValue.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "structured-aggregation-query.structured-query.find-nearest.query-vector.geo-point-value.latitude" => Some(("structuredAggregationQuery.structuredQuery.findNearest.queryVector.geoPointValue.latitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "structured-aggregation-query.structured-query.find-nearest.query-vector.geo-point-value.longitude" => Some(("structuredAggregationQuery.structuredQuery.findNearest.queryVector.geoPointValue.longitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "structured-aggregation-query.structured-query.find-nearest.query-vector.integer-value" => Some(("structuredAggregationQuery.structuredQuery.findNearest.queryVector.integerValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -4391,6 +4775,8 @@ where
                     "structured-aggregation-query.structured-query.where.field-filter.value.boolean-value" => Some(("structuredAggregationQuery.structuredQuery.where.fieldFilter.value.booleanValue", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "structured-aggregation-query.structured-query.where.field-filter.value.bytes-value" => Some(("structuredAggregationQuery.structuredQuery.where.fieldFilter.value.bytesValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "structured-aggregation-query.structured-query.where.field-filter.value.double-value" => Some(("structuredAggregationQuery.structuredQuery.where.fieldFilter.value.doubleValue", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "structured-aggregation-query.structured-query.where.field-filter.value.field-reference-value" => Some(("structuredAggregationQuery.structuredQuery.where.fieldFilter.value.fieldReferenceValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "structured-aggregation-query.structured-query.where.field-filter.value.function-value.name" => Some(("structuredAggregationQuery.structuredQuery.where.fieldFilter.value.functionValue.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "structured-aggregation-query.structured-query.where.field-filter.value.geo-point-value.latitude" => Some(("structuredAggregationQuery.structuredQuery.where.fieldFilter.value.geoPointValue.latitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "structured-aggregation-query.structured-query.where.field-filter.value.geo-point-value.longitude" => Some(("structuredAggregationQuery.structuredQuery.where.fieldFilter.value.geoPointValue.longitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "structured-aggregation-query.structured-query.where.field-filter.value.integer-value" => Some(("structuredAggregationQuery.structuredQuery.where.fieldFilter.value.integerValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -4402,7 +4788,7 @@ where
                     "structured-aggregation-query.structured-query.where.unary-filter.op" => Some(("structuredAggregationQuery.structuredQuery.where.unaryFilter.op", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "transaction" => Some(("transaction", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["analyze", "before", "boolean-value", "bytes-value", "composite-filter", "distance-measure", "double-value", "end-at", "explain-options", "field", "field-filter", "field-path", "find-nearest", "geo-point-value", "integer-value", "latitude", "limit", "longitude", "new-transaction", "null-value", "offset", "op", "query-vector", "read-only", "read-time", "read-write", "reference-value", "retry-transaction", "start-at", "string-value", "structured-aggregation-query", "structured-query", "timestamp-value", "transaction", "unary-filter", "value", "vector-field", "where"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["analyze", "before", "boolean-value", "bytes-value", "composite-filter", "distance-measure", "distance-result-field", "distance-threshold", "double-value", "end-at", "explain-options", "field", "field-filter", "field-path", "field-reference-value", "find-nearest", "function-value", "geo-point-value", "integer-value", "latitude", "limit", "longitude", "name", "new-transaction", "null-value", "offset", "op", "query-vector", "read-only", "read-time", "read-write", "reference-value", "retry-transaction", "start-at", "string-value", "structured-aggregation-query", "structured-query", "timestamp-value", "transaction", "unary-filter", "value", "vector-field", "where"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -4570,6 +4956,20 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "structured-query.find-nearest.distance-result-field" => Some((
+                    "structuredQuery.findNearest.distanceResultField",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "structured-query.find-nearest.distance-threshold" => Some((
+                    "structuredQuery.findNearest.distanceThreshold",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "structured-query.find-nearest.limit" => Some((
                     "structuredQuery.findNearest.limit",
                     JsonTypeInfo {
@@ -4595,6 +4995,20 @@ where
                     "structuredQuery.findNearest.queryVector.doubleValue",
                     JsonTypeInfo {
                         jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "structured-query.find-nearest.query-vector.field-reference-value" => Some((
+                    "structuredQuery.findNearest.queryVector.fieldReferenceValue",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "structured-query.find-nearest.query-vector.function-value.name" => Some((
+                    "structuredQuery.findNearest.queryVector.functionValue.name",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
                         ctype: ComplexType::Pod,
                     },
                 )),
@@ -4717,6 +5131,20 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "structured-query.where.field-filter.value.field-reference-value" => Some((
+                    "structuredQuery.where.fieldFilter.value.fieldReferenceValue",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "structured-query.where.field-filter.value.function-value.name" => Some((
+                    "structuredQuery.where.fieldFilter.value.functionValue.name",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "structured-query.where.field-filter.value.geo-point-value.latitude" => Some((
                     "structuredQuery.where.fieldFilter.value.geoPointValue.latitude",
                     JsonTypeInfo {
@@ -4797,18 +5225,23 @@ where
                             "bytes-value",
                             "composite-filter",
                             "distance-measure",
+                            "distance-result-field",
+                            "distance-threshold",
                             "double-value",
                             "end-at",
                             "explain-options",
                             "field",
                             "field-filter",
                             "field-path",
+                            "field-reference-value",
                             "find-nearest",
+                            "function-value",
                             "geo-point-value",
                             "integer-value",
                             "latitude",
                             "limit",
                             "longitude",
+                            "name",
                             "new-transaction",
                             "null-value",
                             "offset",
@@ -5869,6 +6302,13 @@ where
         {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "return-partial-success" => {
+                    call = call.return_partial_success(
+                        value
+                            .map(|v| arg_from_str(v, err, "return-partial-success", "boolean"))
+                            .unwrap_or(false),
+                    );
+                }
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
                 }
@@ -5899,7 +6339,16 @@ where
                             .push(CLIError::UnknownParameter(key.to_string(), {
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
-                                v.extend(["filter", "page-size", "page-token"].iter().map(|v| *v));
+                                v.extend(
+                                    [
+                                        "filter",
+                                        "page-size",
+                                        "page-token",
+                                        "return-partial-success",
+                                    ]
+                                    .iter()
+                                    .map(|v| *v),
+                                );
                                 v
                             }));
                     }
@@ -6012,6 +6461,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "database-edition" => Some((
+                    "databaseEdition",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "delete-protection-state" => Some((
                     "deleteProtectionState",
                     JsonTypeInfo {
@@ -6040,6 +6496,20 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "firestore-data-access-mode" => Some((
+                    "firestoreDataAccessMode",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "free-tier" => Some((
+                    "freeTier",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "key-prefix" => Some((
                     "keyPrefix",
                     JsonTypeInfo {
@@ -6049,6 +6519,13 @@ where
                 )),
                 "location-id" => Some((
                     "locationId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "mongodb-compatible-data-access-mode" => Some((
+                    "mongodbCompatibleDataAccessMode",
                     JsonTypeInfo {
                         jtype: JsonType::String,
                         ctype: ComplexType::Pod,
@@ -6073,6 +6550,34 @@ where
                     JsonTypeInfo {
                         jtype: JsonType::String,
                         ctype: ComplexType::Pod,
+                    },
+                )),
+                "realtime-updates-mode" => Some((
+                    "realtimeUpdatesMode",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "source-info.backup.backup" => Some((
+                    "sourceInfo.backup.backup",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "source-info.operation" => Some((
+                    "sourceInfo.operation",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "tags" => Some((
+                    "tags",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Map,
                     },
                 )),
                 "type" => Some((
@@ -6109,19 +6614,28 @@ where
                         &vec![
                             "active-key-version",
                             "app-engine-integration-mode",
+                            "backup",
                             "cmek-config",
                             "concurrency-mode",
                             "create-time",
+                            "database-edition",
                             "delete-protection-state",
                             "delete-time",
                             "earliest-version-time",
                             "etag",
+                            "firestore-data-access-mode",
+                            "free-tier",
                             "key-prefix",
                             "kms-key-name",
                             "location-id",
+                            "mongodb-compatible-data-access-mode",
                             "name",
+                            "operation",
                             "point-in-time-recovery-enablement",
                             "previous-id",
+                            "realtime-updates-mode",
+                            "source-info",
+                            "tags",
                             "type",
                             "uid",
                             "update-time",
@@ -6276,17 +6790,31 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
-                "kms-key-name" => Some((
-                    "kmsKeyName",
+                "encryption-config.customer-managed-encryption.kms-key-name" => Some((
+                    "encryptionConfig.customerManagedEncryption.kmsKeyName",
                     JsonTypeInfo {
                         jtype: JsonType::String,
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "tags" => Some((
+                    "tags",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Map,
+                    },
+                )),
                 _ => {
                     let suggestion = FieldCursor::did_you_mean(
                         key,
-                        &vec!["backup", "database-id", "kms-key-name"],
+                        &vec![
+                            "backup",
+                            "customer-managed-encryption",
+                            "database-id",
+                            "encryption-config",
+                            "kms-key-name",
+                            "tags",
+                        ],
                     );
                     err.issues.push(CLIError::Field(FieldError::Unknown(
                         temp_cursor.to_string(),
@@ -6312,6 +6840,818 @@ where
             .hub
             .projects()
             .databases_restore(request, opt.value_of("parent").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_databases_user_creds_create(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut field_cursor = FieldCursor::default();
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "create-time" => Some((
+                    "createTime",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "name" => Some((
+                    "name",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "resource-identity.principal" => Some((
+                    "resourceIdentity.principal",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "secure-password" => Some((
+                    "securePassword",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "state" => Some((
+                    "state",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "update-time" => Some((
+                    "updateTime",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec![
+                            "create-time",
+                            "name",
+                            "principal",
+                            "resource-identity",
+                            "secure-password",
+                            "state",
+                            "update-time",
+                        ],
+                    );
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
+            }
+        }
+        let mut request: api::GoogleFirestoreAdminV1UserCreds =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .databases_user_creds_create(request, opt.value_of("parent").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "user-creds-id" => {
+                    call = call.user_creds_id(value.unwrap_or(""));
+                }
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["user-creds-id"].iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_databases_user_creds_delete(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .databases_user_creds_delete(opt.value_of("name").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_databases_user_creds_disable(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut field_cursor = FieldCursor::default();
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
+            }
+        }
+        let mut request: api::GoogleFirestoreAdminV1DisableUserCredsRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .databases_user_creds_disable(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_databases_user_creds_enable(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut field_cursor = FieldCursor::default();
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
+            }
+        }
+        let mut request: api::GoogleFirestoreAdminV1EnableUserCredsRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .databases_user_creds_enable(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_databases_user_creds_get(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .databases_user_creds_get(opt.value_of("name").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_databases_user_creds_list(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .databases_user_creds_list(opt.value_of("parent").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_databases_user_creds_reset_password(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut field_cursor = FieldCursor::default();
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
+            }
+        }
+        let mut request: api::GoogleFirestoreAdminV1ResetUserPasswordRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .databases_user_creds_reset_password(request, opt.value_of("name").unwrap_or(""));
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -6563,6 +7903,9 @@ where
         {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "filter" => {
+                    call = call.filter(value.unwrap_or(""));
+                }
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -6580,6 +7923,7 @@ where
                             .push(CLIError::UnknownParameter(key.to_string(), {
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["filter"].iter().map(|v| *v));
                                 v
                             }));
                     }
@@ -6738,6 +8082,9 @@ where
                 "filter" => {
                     call = call.filter(value.unwrap_or(""));
                 }
+                "extra-location-types" => {
+                    call = call.add_extra_location_types(value.unwrap_or(""));
+                }
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -6755,7 +8102,11 @@ where
                             .push(CLIError::UnknownParameter(key.to_string(), {
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
-                                v.extend(["filter", "page-size", "page-token"].iter().map(|v| *v));
+                                v.extend(
+                                    ["extra-location-types", "filter", "page-size", "page-token"]
+                                        .iter()
+                                        .map(|v| *v),
+                                );
                                 v
                             }));
                     }
@@ -6841,6 +8192,9 @@ where
                         ._projects_databases_bulk_delete_documents(opt, dry_run, &mut err)
                         .await;
                 }
+                ("databases-clone", Some(opt)) => {
+                    call_result = self._projects_databases_clone(opt, dry_run, &mut err).await;
+                }
                 ("databases-collection-groups-fields-get", Some(opt)) => {
                     call_result = self
                         ._projects_databases_collection_groups_fields_get(opt, dry_run, &mut err)
@@ -6918,6 +8272,11 @@ where
                 ("databases-documents-delete", Some(opt)) => {
                     call_result = self
                         ._projects_databases_documents_delete(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("databases-documents-execute-pipeline", Some(opt)) => {
+                    call_result = self
+                        ._projects_databases_documents_execute_pipeline(opt, dry_run, &mut err)
                         .await;
                 }
                 ("databases-documents-get", Some(opt)) => {
@@ -7019,6 +8378,41 @@ where
                         ._projects_databases_restore(opt, dry_run, &mut err)
                         .await;
                 }
+                ("databases-user-creds-create", Some(opt)) => {
+                    call_result = self
+                        ._projects_databases_user_creds_create(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("databases-user-creds-delete", Some(opt)) => {
+                    call_result = self
+                        ._projects_databases_user_creds_delete(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("databases-user-creds-disable", Some(opt)) => {
+                    call_result = self
+                        ._projects_databases_user_creds_disable(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("databases-user-creds-enable", Some(opt)) => {
+                    call_result = self
+                        ._projects_databases_user_creds_enable(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("databases-user-creds-get", Some(opt)) => {
+                    call_result = self
+                        ._projects_databases_user_creds_get(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("databases-user-creds-list", Some(opt)) => {
+                    call_result = self
+                        ._projects_databases_user_creds_list(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("databases-user-creds-reset-password", Some(opt)) => {
+                    call_result = self
+                        ._projects_databases_user_creds_reset_password(opt, dry_run, &mut err)
+                        .await;
+                }
                 ("locations-backups-delete", Some(opt)) => {
                     call_result = self
                         ._projects_locations_backups_delete(opt, dry_run, &mut err)
@@ -7086,7 +8480,9 @@ where
         let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
             secret,
             yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-            hyper_util::client::legacy::Client::builder(executor).build(connector),
+            yup_oauth2::client::CustomHyperClientBuilder::from(
+                hyper_util::client::legacy::Client::builder(executor).build(connector),
+            ),
         )
         .persist_tokens_to_disk(format!("{}/firestore1", config_dir))
         .build()
@@ -7139,7 +8535,7 @@ where
 async fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("projects", "methods: 'databases-backup-schedules-create', 'databases-backup-schedules-delete', 'databases-backup-schedules-get', 'databases-backup-schedules-list', 'databases-backup-schedules-patch', 'databases-bulk-delete-documents', 'databases-collection-groups-fields-get', 'databases-collection-groups-fields-list', 'databases-collection-groups-fields-patch', 'databases-collection-groups-indexes-create', 'databases-collection-groups-indexes-delete', 'databases-collection-groups-indexes-get', 'databases-collection-groups-indexes-list', 'databases-create', 'databases-delete', 'databases-documents-batch-get', 'databases-documents-batch-write', 'databases-documents-begin-transaction', 'databases-documents-commit', 'databases-documents-create-document', 'databases-documents-delete', 'databases-documents-get', 'databases-documents-list', 'databases-documents-list-collection-ids', 'databases-documents-list-documents', 'databases-documents-listen', 'databases-documents-partition-query', 'databases-documents-patch', 'databases-documents-rollback', 'databases-documents-run-aggregation-query', 'databases-documents-run-query', 'databases-documents-write', 'databases-export-documents', 'databases-get', 'databases-import-documents', 'databases-list', 'databases-operations-cancel', 'databases-operations-delete', 'databases-operations-get', 'databases-operations-list', 'databases-patch', 'databases-restore', 'locations-backups-delete', 'locations-backups-get', 'locations-backups-list', 'locations-get' and 'locations-list'", vec![
+        ("projects", "methods: 'databases-backup-schedules-create', 'databases-backup-schedules-delete', 'databases-backup-schedules-get', 'databases-backup-schedules-list', 'databases-backup-schedules-patch', 'databases-bulk-delete-documents', 'databases-clone', 'databases-collection-groups-fields-get', 'databases-collection-groups-fields-list', 'databases-collection-groups-fields-patch', 'databases-collection-groups-indexes-create', 'databases-collection-groups-indexes-delete', 'databases-collection-groups-indexes-get', 'databases-collection-groups-indexes-list', 'databases-create', 'databases-delete', 'databases-documents-batch-get', 'databases-documents-batch-write', 'databases-documents-begin-transaction', 'databases-documents-commit', 'databases-documents-create-document', 'databases-documents-delete', 'databases-documents-execute-pipeline', 'databases-documents-get', 'databases-documents-list', 'databases-documents-list-collection-ids', 'databases-documents-list-documents', 'databases-documents-listen', 'databases-documents-partition-query', 'databases-documents-patch', 'databases-documents-rollback', 'databases-documents-run-aggregation-query', 'databases-documents-run-query', 'databases-documents-write', 'databases-export-documents', 'databases-get', 'databases-import-documents', 'databases-list', 'databases-operations-cancel', 'databases-operations-delete', 'databases-operations-get', 'databases-operations-list', 'databases-patch', 'databases-restore', 'databases-user-creds-create', 'databases-user-creds-delete', 'databases-user-creds-disable', 'databases-user-creds-enable', 'databases-user-creds-get', 'databases-user-creds-list', 'databases-user-creds-reset-password', 'locations-backups-delete', 'locations-backups-get', 'locations-backups-list', 'locations-get' and 'locations-list'", vec![
             ("databases-backup-schedules-create",
                     Some(r##"Creates a backup schedule on a database. At most two backup schedules can be configured on a database, one daily backup schedule and one weekly backup schedule."##),
                     "Details at http://byron.github.io/google-apis-rs/google_firestore1_cli/projects_databases-backup-schedules-create",
@@ -7257,6 +8653,31 @@ async fn main() {
                     (Some(r##"name"##),
                      None,
                      Some(r##"Required. Database to operate. Should be of the form: `projects/{project_id}/databases/{database_id}`."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("databases-clone",
+                    Some(r##"Creates a new database by cloning an existing one. The new database must be in the same cloud region or multi-region location as the existing database. This behaves similar to FirestoreAdmin.CreateDatabase except instead of creating a new empty database, a new database is created with the database type, index configuration, and documents from an existing database. The long-running operation can be used to track the progress of the clone, with the Operation's metadata field type being the CloneDatabaseMetadata. The response type is the Database if the clone was successful. The new database is not readable or writeable until the LRO has completed."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_firestore1_cli/projects_databases-clone",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. The project to clone the database in. Format is `projects/{project_id}`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -7609,6 +9030,31 @@ async fn main() {
                      Some(r##"Required. The resource name of the Document to delete. In the format: `projects/{project_id}/databases/{database_id}/documents/{document_path}`."##),
                      Some(true),
                      Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("databases-documents-execute-pipeline",
+                    Some(r##"Executes a pipeline query."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_firestore1_cli/projects_databases-documents-execute-pipeline",
+                  vec![
+                    (Some(r##"database"##),
+                     None,
+                     Some(r##"Required. Database identifier, in the form `projects/{project}/databases/{database}`."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
@@ -7981,7 +9427,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("databases-operations-cancel",
-                    Some(r##"Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of 1, corresponding to `Code.CANCELLED`."##),
+                    Some(r##"Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of `1`, corresponding to `Code.CANCELLED`."##),
                     "Details at http://byron.github.io/google-apis-rs/google_firestore1_cli/projects_databases-operations-cancel",
                   vec![
                     (Some(r##"name"##),
@@ -8115,6 +9561,166 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("databases-user-creds-create",
+                    Some(r##"Create a user creds."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_firestore1_cli/projects_databases-user-creds-create",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. A parent name of the form `projects/{project_id}/databases/{database_id}`"##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("databases-user-creds-delete",
+                    Some(r##"Deletes a user creds."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_firestore1_cli/projects_databases-user-creds-delete",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. A name of the form `projects/{project_id}/databases/{database_id}/userCreds/{user_creds_id}`"##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("databases-user-creds-disable",
+                    Some(r##"Disables a user creds. No-op if the user creds are already disabled."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_firestore1_cli/projects_databases-user-creds-disable",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. A name of the form `projects/{project_id}/databases/{database_id}/userCreds/{user_creds_id}`"##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("databases-user-creds-enable",
+                    Some(r##"Enables a user creds. No-op if the user creds are already enabled."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_firestore1_cli/projects_databases-user-creds-enable",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. A name of the form `projects/{project_id}/databases/{database_id}/userCreds/{user_creds_id}`"##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("databases-user-creds-get",
+                    Some(r##"Gets a user creds resource. Note that the returned resource does not contain the secret value itself."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_firestore1_cli/projects_databases-user-creds-get",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. A name of the form `projects/{project_id}/databases/{database_id}/userCreds/{user_creds_id}`"##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("databases-user-creds-list",
+                    Some(r##"List all user creds in the database. Note that the returned resource does not contain the secret value itself."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_firestore1_cli/projects_databases-user-creds-list",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. A parent database name of the form `projects/{project_id}/databases/{database_id}`"##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("databases-user-creds-reset-password",
+                    Some(r##"Resets the password of a user creds."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_firestore1_cli/projects_databases-user-creds-reset-password",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. A name of the form `projects/{project_id}/databases/{database_id}/userCreds/{user_creds_id}`"##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("locations-backups-delete",
                     Some(r##"Deletes a backup."##),
                     "Details at http://byron.github.io/google-apis-rs/google_firestore1_cli/projects_locations-backups-delete",
@@ -8220,7 +9826,7 @@ async fn main() {
 
     let mut app = App::new("firestore1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("6.0.0+20240617")
+           .version("7.0.0+20251216")
            .about("Accesses the NoSQL document database built for automatic scaling, high performance, and ease of application development. ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_firestore1_cli")
            .arg(Arg::with_name("url")
@@ -8285,7 +9891,7 @@ async fn main() {
         .with_native_roots()
         .unwrap()
         .https_or_http()
-        .enable_http1()
+        .enable_http2()
         .build();
 
     match Engine::new(matches, connector).await {

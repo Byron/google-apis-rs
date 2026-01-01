@@ -143,6 +143,12 @@
                                 "name"
                             ],
                             "parameters": {
+                                "extraLocationTypes": {
+                                    "description": "Optional. Do not use this field. It is unsupported and is ignored unless explicitly documented otherwise. This is primarily for internal usage.",
+                                    "location": "query",
+                                    "repeated": true,
+                                    "type": "string"
+                                },
                                 "filter": {
                                     "description": "A filter to narrow down results to a preferred subset. The filtering language accepts strings like `\"displayName=tokyo\"`, and is documented in more detail in [AIP-160](https://google.aip.dev/160).",
                                     "location": "query",
@@ -392,7 +398,7 @@
                                     ],
                                     "parameters": {
                                         "name": {
-                                            "description": "Output only. The resource name for this CaPool in the format `projects/*/locations/*/caPools/*`.",
+                                            "description": "Identifier. The resource name for this CaPool in the format `projects/*/locations/*/caPools/*`.",
                                             "location": "path",
                                             "pattern": "^projects/[^/]+/locations/[^/]+/caPools/[^/]+$",
                                             "required": true,
@@ -754,7 +760,7 @@
                                             ],
                                             "parameters": {
                                                 "name": {
-                                                    "description": "Output only. The resource name for this CertificateAuthority in the format `projects/*/locations/*/caPools/*/certificateAuthorities/*`.",
+                                                    "description": "Identifier. The resource name for this CertificateAuthority in the format `projects/*/locations/*/caPools/*/certificateAuthorities/*`.",
                                                     "location": "path",
                                                     "pattern": "^projects/[^/]+/locations/[^/]+/caPools/[^/]+/certificateAuthorities/[^/]+$",
                                                     "required": true,
@@ -927,7 +933,7 @@
                                                     ],
                                                     "parameters": {
                                                         "name": {
-                                                            "description": "Output only. The resource name for this CertificateRevocationList in the format `projects/*/locations/*/caPools/*certificateAuthorities/*/ certificateRevocationLists/*`.",
+                                                            "description": "Identifier. The resource name for this CertificateRevocationList in the format `projects/*/locations/*/caPools/*certificateAuthorities/*/ certificateRevocationLists/*`.",
                                                             "location": "path",
                                                             "pattern": "^projects/[^/]+/locations/[^/]+/caPools/[^/]+/certificateAuthorities/[^/]+/certificateRevocationLists/[^/]+$",
                                                             "required": true,
@@ -1028,7 +1034,7 @@
                                             ],
                                             "parameters": {
                                                 "certificateId": {
-                                                    "description": "Optional. It must be unique within a location and match the regular expression `[a-zA-Z0-9_-]{1,63}`. This field is required when using a CertificateAuthority in the Enterprise CertificateAuthority.Tier, but is optional and its value is ignored otherwise.",
+                                                    "description": "Optional. It must be unique within a location and match the regular expression `[a-zA-Z0-9_-]{1,63}`. This field is required when using a CertificateAuthority in the Enterprise CertificateAuthority.tier, but is optional and its value is ignored otherwise.",
                                                     "location": "query",
                                                     "type": "string"
                                                 },
@@ -1147,7 +1153,7 @@
                                             ],
                                             "parameters": {
                                                 "name": {
-                                                    "description": "Output only. The resource name for this Certificate in the format `projects/*/locations/*/caPools/*/certificates/*`.",
+                                                    "description": "Identifier. The resource name for this Certificate in the format `projects/*/locations/*/caPools/*/certificates/*`.",
                                                     "location": "path",
                                                     "pattern": "^projects/[^/]+/locations/[^/]+/caPools/[^/]+/certificates/[^/]+$",
                                                     "required": true,
@@ -1390,7 +1396,7 @@
                                     ],
                                     "parameters": {
                                         "name": {
-                                            "description": "Output only. The resource name for this CertificateTemplate in the format `projects/*/locations/*/certificateTemplates/*`.",
+                                            "description": "Identifier. The resource name for this CertificateTemplate in the format `projects/*/locations/*/certificateTemplates/*`.",
                                             "location": "path",
                                             "pattern": "^projects/[^/]+/locations/[^/]+/certificateTemplates/[^/]+$",
                                             "required": true,
@@ -1480,7 +1486,7 @@
                         "operations": {
                             "methods": {
                                 "cancel": {
-                                    "description": "Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of 1, corresponding to `Code.CANCELLED`.",
+                                    "description": "Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of `1`, corresponding to `Code.CANCELLED`.",
                                     "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/operations/{operationsId}:cancel",
                                     "httpMethod": "POST",
                                     "id": "privateca.projects.locations.operations.cancel",
@@ -1588,6 +1594,11 @@
                                             "description": "The standard list page token.",
                                             "location": "query",
                                             "type": "string"
+                                        },
+                                        "returnPartialSuccess": {
+                                            "description": "When set to `true`, operations that are reachable are returned as normal, and those that are unreachable are returned in the [ListOperationsResponse.unreachable] field. This can only be `true` when reading across collections e.g. when `parent` is set to `\"projects/example/locations/-\"`. This field is not by default supported and will result in an `UNIMPLEMENTED` error if set unless explicitly documented otherwise in service or product specific documentation.",
+                                            "location": "query",
+                                            "type": "boolean"
                                         }
                                     },
                                     "path": "v1/{+name}/operations",
@@ -1605,7 +1616,7 @@
             }
         }
     },
-    "revision": "20240605",
+    "revision": "20251022",
     "rootUrl": "https://privateca.googleapis.com/",
     "schemas": {
         "AccessUrls": {
@@ -1656,6 +1667,47 @@
                 "rsa": {
                     "$ref": "RsaKeyType",
                     "description": "Represents an allowed RSA key type."
+                }
+            },
+            "type": "object"
+        },
+        "AttributeTypeAndValue": {
+            "description": "AttributeTypeAndValue specifies an attribute type and value. It can use either a OID or enum value to specify the attribute type.",
+            "id": "AttributeTypeAndValue",
+            "properties": {
+                "objectId": {
+                    "$ref": "ObjectId",
+                    "description": "Object ID for an attribute type of an attribute and value pair."
+                },
+                "type": {
+                    "description": "The attribute type of the attribute and value pair.",
+                    "enum": [
+                        "ATTRIBUTE_TYPE_UNSPECIFIED",
+                        "COMMON_NAME",
+                        "COUNTRY_CODE",
+                        "ORGANIZATION",
+                        "ORGANIZATIONAL_UNIT",
+                        "LOCALITY",
+                        "PROVINCE",
+                        "STREET_ADDRESS",
+                        "POSTAL_CODE"
+                    ],
+                    "enumDescriptions": [
+                        "Attribute type is unspecified.",
+                        "The \"common name\" of the subject.",
+                        "The country code of the subject.",
+                        "The organization of the subject.",
+                        "The organizational unit of the subject.",
+                        "The locality or city of the subject.",
+                        "The province, territory, or regional state of the subject.",
+                        "The street address of the subject.",
+                        "The postal code of the subject."
+                    ],
+                    "type": "string"
+                },
+                "value": {
+                    "description": "The value for the attribute type.",
+                    "type": "string"
                 }
             },
             "type": "object"
@@ -1750,6 +1802,10 @@
             "description": "A CaPool represents a group of CertificateAuthorities that form a trust anchor. A CaPool can be used to manage issuance policies for one or more CertificateAuthority resources and to rotate CA certificates in and out of the trust anchor.",
             "id": "CaPool",
             "properties": {
+                "encryptionSpec": {
+                    "$ref": "EncryptionSpec",
+                    "description": "Optional. When EncryptionSpec is provided, the Subject, SubjectAltNames, and the PEM-encoded certificate fields will be encrypted at rest."
+                },
                 "issuancePolicy": {
                     "$ref": "IssuancePolicy",
                     "description": "Optional. The IssuancePolicy to control how Certificates will be issued from this CaPool."
@@ -1762,8 +1818,7 @@
                     "type": "object"
                 },
                 "name": {
-                    "description": "Output only. The resource name for this CaPool in the format `projects/*/locations/*/caPools/*`.",
-                    "readOnly": true,
+                    "description": "Identifier. The resource name for this CaPool in the format `projects/*/locations/*/caPools/*`.",
                     "type": "string"
                 },
                 "publishingOptions": {
@@ -1847,8 +1902,7 @@
                     "type": "string"
                 },
                 "name": {
-                    "description": "Output only. The resource name for this Certificate in the format `projects/*/locations/*/caPools/*/certificates/*`.",
-                    "readOnly": true,
+                    "description": "Identifier. The resource name for this Certificate in the format `projects/*/locations/*/caPools/*/certificates/*`.",
                     "type": "string"
                 },
                 "pemCertificate": {
@@ -1878,11 +1932,13 @@
                     "enum": [
                         "SUBJECT_REQUEST_MODE_UNSPECIFIED",
                         "DEFAULT",
+                        "RDN_SEQUENCE",
                         "REFLECTED_SPIFFE"
                     ],
                     "enumDescriptions": [
                         "Not specified.",
                         "The default mode used in most cases. Indicates that the certificate's Subject and/or SubjectAltNames are specified in the certificate request. This mode requires the caller to have the `privateca.certificates.create` permission.",
+                        "A mode used to get an accurate representation of the Subject field's distinguished name. Indicates that the certificate's Subject and/or SubjectAltNames are specified in the certificate request. When parsing a PEM CSR this mode will maintain the sequence of RDNs found in the CSR's subject field in the issued Certificate. This mode requires the caller to have the `privateca.certificates.create` permission.",
                         "A mode reserved for special cases. Indicates that the certificate should have one SPIFFE SubjectAltNames set by the service based on the caller's identity. This mode will ignore any explicitly specified Subject and/or SubjectAltNames in the certificate request. This mode requires the caller to have the `privateca.certificates.createForSelf` permission."
                     ],
                     "type": "string"
@@ -1956,8 +2012,7 @@
                     "type": "string"
                 },
                 "name": {
-                    "description": "Output only. The resource name for this CertificateAuthority in the format `projects/*/locations/*/caPools/*/certificateAuthorities/*`.",
-                    "readOnly": true,
+                    "description": "Identifier. The resource name for this CertificateAuthority in the format `projects/*/locations/*/caPools/*/certificateAuthorities/*`.",
                     "type": "string"
                 },
                 "pemCaCertificates": {
@@ -2037,6 +2092,10 @@
                     "format": "google-datetime",
                     "readOnly": true,
                     "type": "string"
+                },
+                "userDefinedAccessUrls": {
+                    "$ref": "UserDefinedAccessUrls",
+                    "description": "Optional. User-defined URLs for CA certificate and CRLs. The service does not publish content to these URLs. It is up to the user to mirror content to these URLs."
                 }
             },
             "type": "object"
@@ -2112,6 +2171,10 @@
                 "subjectKeyId": {
                     "$ref": "KeyId",
                     "description": "Provides a means of identifiying certificates that contain a particular public key, per https://tools.ietf.org/html/rfc5280#section-4.2.1.2."
+                },
+                "tbsCertificateDigest": {
+                    "description": "The hash of the pre-signed certificate, which will be signed by the CA. Corresponds to the TBS Certificate in https://tools.ietf.org/html/rfc5280#section-4.1.2. The field will always be populated.",
+                    "type": "string"
                 },
                 "x509Description": {
                     "$ref": "X509Parameters",
@@ -2212,8 +2275,7 @@
                     "type": "object"
                 },
                 "name": {
-                    "description": "Output only. The resource name for this CertificateRevocationList in the format `projects/*/locations/*/caPools/*certificateAuthorities/*/ certificateRevocationLists/*`.",
-                    "readOnly": true,
+                    "description": "Identifier. The resource name for this CertificateRevocationList in the format `projects/*/locations/*/caPools/*certificateAuthorities/*/ certificateRevocationLists/*`.",
                     "type": "string"
                 },
                 "pemCrl": {
@@ -2295,8 +2357,7 @@
                     "type": "string"
                 },
                 "name": {
-                    "description": "Output only. The resource name for this CertificateTemplate in the format `projects/*/locations/*/certificateTemplates/*`.",
-                    "readOnly": true,
+                    "description": "Identifier. The resource name for this CertificateTemplate in the format `projects/*/locations/*/certificateTemplates/*`.",
                     "type": "string"
                 },
                 "passthroughExtensions": {
@@ -2366,6 +2427,17 @@
             "properties": {
                 "requestId": {
                     "description": "Optional. An ID to identify requests. Specify a unique request ID so that if you must retry your request, the server will know to ignore the request if it has already been completed. The server will guarantee that for at least 60 minutes since the first request. For example, consider a situation where you make an initial request and the request times out. If you make the request again with the same request ID, the server can check if original operation with the same request ID was received, and if so, will ignore the second request. This prevents clients from accidentally creating duplicate commitments. The request ID must be a valid UUID with the exception that zero UUID is not supported (00000000-0000-0000-0000-000000000000).",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "EncryptionSpec": {
+            "description": "The configuration used for encrypting data at rest.",
+            "id": "EncryptionSpec",
+            "properties": {
+                "cloudKmsKey": {
+                    "description": "The resource name for a Cloud KMS key in the format `projects/*/locations/*/keyRings/*/cryptoKeys/*`.",
                     "type": "string"
                 }
             },
@@ -2491,6 +2563,11 @@
                         "$ref": "AllowedKeyType"
                     },
                     "type": "array"
+                },
+                "backdateDuration": {
+                    "description": "Optional. The duration to backdate all certificates issued from this CaPool. If not set, the certificates will be issued with a not_before_time of the issuance time (i.e. the current time). If set, the certificates will be issued with a not_before_time of the issuance time minus the backdate_duration. The not_after_time will be adjusted to preserve the requested lifetime. The backdate_duration must be less than or equal to 48 hours.",
+                    "format": "google-duration",
+                    "type": "string"
                 },
                 "baselineValues": {
                     "$ref": "X509Parameters",
@@ -2637,7 +2714,7 @@
                     "type": "array"
                 },
                 "nextPageToken": {
-                    "description": "A token to retrieve next page of results. Pass this value in ListCertificateAuthoritiesRequest.next_page_token to retrieve the next page of results.",
+                    "description": "A token to retrieve next page of results. Pass this value in ListCertificateAuthoritiesRequest.page_token to retrieve the next page of results.",
                     "type": "string"
                 },
                 "unreachable": {
@@ -2662,7 +2739,7 @@
                     "type": "array"
                 },
                 "nextPageToken": {
-                    "description": "A token to retrieve next page of results. Pass this value in ListCertificateAuthoritiesRequest.next_page_token to retrieve the next page of results.",
+                    "description": "A token to retrieve next page of results. Pass this value in ListCertificateAuthoritiesRequest.page_token to retrieve the next page of results.",
                     "type": "string"
                 },
                 "unreachable": {
@@ -2687,7 +2764,7 @@
                     "type": "array"
                 },
                 "nextPageToken": {
-                    "description": "A token to retrieve next page of results. Pass this value in ListCertificateRevocationListsRequest.next_page_token to retrieve the next page of results.",
+                    "description": "A token to retrieve next page of results. Pass this value in ListCertificateRevocationListsRequest.page_token to retrieve the next page of results.",
                     "type": "string"
                 },
                 "unreachable": {
@@ -2712,7 +2789,7 @@
                     "type": "array"
                 },
                 "nextPageToken": {
-                    "description": "A token to retrieve next page of results. Pass this value in ListCertificateTemplatesRequest.next_page_token to retrieve the next page of results.",
+                    "description": "A token to retrieve next page of results. Pass this value in ListCertificateTemplatesRequest.page_token to retrieve the next page of results.",
                     "type": "string"
                 },
                 "unreachable": {
@@ -2737,7 +2814,7 @@
                     "type": "array"
                 },
                 "nextPageToken": {
-                    "description": "A token to retrieve next page of results. Pass this value in ListCertificatesRequest.next_page_token to retrieve the next page of results.",
+                    "description": "A token to retrieve next page of results. Pass this value in ListCertificatesRequest.page_token to retrieve the next page of results.",
                     "type": "string"
                 },
                 "unreachable": {
@@ -2780,6 +2857,13 @@
                     "description": "A list of operations that matches the specified filter in the request.",
                     "items": {
                         "$ref": "Operation"
+                    },
+                    "type": "array"
+                },
+                "unreachable": {
+                    "description": "Unordered list. Unreachable resources. Populated when the request sets `ListOperationsRequest.return_partial_success` and reads across collections e.g. when attempting to list all resources across all supported locations.",
+                    "items": {
+                        "type": "string"
                     },
                     "type": "array"
                 }
@@ -2959,7 +3043,7 @@
                     "type": "string"
                 },
                 "requestedCancellation": {
-                    "description": "Output only. Identifies whether the user has requested cancellation of the operation. Operations that have successfully been cancelled have Operation.error value with a google.rpc.Status.code of 1, corresponding to `Code.CANCELLED`.",
+                    "description": "Output only. Identifies whether the user has requested cancellation of the operation. Operations that have successfully been cancelled have google.longrunning.Operation.error value with a google.rpc.Status.code of 1, corresponding to `Code.CANCELLED`.",
                     "readOnly": true,
                     "type": "boolean"
                 },
@@ -3065,33 +3149,16 @@
             },
             "type": "object"
         },
-        "ReconciliationOperationMetadata": {
-            "description": "Operation metadata returned by the CLH during resource state reconciliation.",
-            "id": "ReconciliationOperationMetadata",
+        "RelativeDistinguishedName": {
+            "description": "RelativeDistinguishedName specifies a relative distinguished name which will be used to build a distinguished name.",
+            "id": "RelativeDistinguishedName",
             "properties": {
-                "deleteResource": {
-                    "deprecated": true,
-                    "description": "DEPRECATED. Use exclusive_action instead.",
-                    "type": "boolean"
-                },
-                "exclusiveAction": {
-                    "description": "Excluisive action returned by the CLH.",
-                    "enum": [
-                        "UNKNOWN_REPAIR_ACTION",
-                        "DELETE",
-                        "RETRY"
-                    ],
-                    "enumDeprecated": [
-                        false,
-                        true,
-                        false
-                    ],
-                    "enumDescriptions": [
-                        "Unknown repair action.",
-                        "The resource has to be deleted. When using this bit, the CLH should fail the operation. DEPRECATED. Instead use DELETE_RESOURCE OperationSignal in SideChannel.",
-                        "This resource could not be repaired but the repair should be tried again at a later time. This can happen if there is a dependency that needs to be resolved first- e.g. if a parent resource must be repaired before a child resource."
-                    ],
-                    "type": "string"
+                "attributes": {
+                    "description": "Attributes describes the attribute value assertions in the RDN.",
+                    "items": {
+                        "$ref": "AttributeTypeAndValue"
+                    },
+                    "type": "array"
                 }
             },
             "type": "object"
@@ -3304,6 +3371,13 @@
                     "description": "The province, territory, or regional state of the subject.",
                     "type": "string"
                 },
+                "rdnSequence": {
+                    "description": "This field can be used in place of the named subject fields.",
+                    "items": {
+                        "$ref": "RelativeDistinguishedName"
+                    },
+                    "type": "array"
+                },
                 "streetAddress": {
                     "description": "The street address of the subject.",
                     "type": "string"
@@ -3466,6 +3540,27 @@
                 "requestId": {
                     "description": "Optional. An ID to identify requests. Specify a unique request ID so that if you must retry your request, the server will know to ignore the request if it has already been completed. The server will guarantee that for at least 60 minutes since the first request. For example, consider a situation where you make an initial request and the request times out. If you make the request again with the same request ID, the server can check if original operation with the same request ID was received, and if so, will ignore the second request. This prevents clients from accidentally creating duplicate commitments. The request ID must be a valid UUID with the exception that zero UUID is not supported (00000000-0000-0000-0000-000000000000).",
                     "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "UserDefinedAccessUrls": {
+            "description": "User-defined URLs for accessing content published by this CertificateAuthority.",
+            "id": "UserDefinedAccessUrls",
+            "properties": {
+                "aiaIssuingCertificateUrls": {
+                    "description": "Optional. A list of URLs where the issuer CA certificate may be downloaded, which appears in the \"Authority Information Access\" extension in the certificate. If specified, the default Cloud Storage URLs will be omitted.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "crlAccessUrls": {
+                    "description": "Optional. A list of URLs where to obtain CRL information, i.e. the DistributionPoint.fullName described by https://tools.ietf.org/html/rfc5280#section-4.2.1.13. If specified, the default Cloud Storage URLs will be omitted.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
                 }
             },
             "type": "object"

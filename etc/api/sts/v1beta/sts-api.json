@@ -6,6 +6,233 @@
     "description": "The Security Token Service exchanges Google or third-party credentials for a short-lived access token to Google Cloud resources.",
     "discoveryVersion": "v1",
     "documentationLink": "http://cloud.google.com/iam/docs/workload-identity-federation",
+    "endpoints": [
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://sts.africa-south1.rep.googleapis.com/",
+            "location": "africa-south1"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://sts.asia-east1.rep.googleapis.com/",
+            "location": "asia-east1"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://sts.asia-east2.rep.googleapis.com/",
+            "location": "asia-east2"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://sts.asia-northeast1.rep.googleapis.com/",
+            "location": "asia-northeast1"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://sts.asia-northeast2.rep.googleapis.com/",
+            "location": "asia-northeast2"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://sts.asia-northeast3.rep.googleapis.com/",
+            "location": "asia-northeast3"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://sts.asia-south1.rep.googleapis.com/",
+            "location": "asia-south1"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://sts.asia-south2.rep.googleapis.com/",
+            "location": "asia-south2"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://sts.asia-southeast1.rep.googleapis.com/",
+            "location": "asia-southeast1"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://sts.asia-southeast2.rep.googleapis.com/",
+            "location": "asia-southeast2"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://sts.australia-southeast1.rep.googleapis.com/",
+            "location": "australia-southeast1"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://sts.australia-southeast2.rep.googleapis.com/",
+            "location": "australia-southeast2"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://sts.europe-central2.rep.googleapis.com/",
+            "location": "europe-central2"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://sts.europe-north1.rep.googleapis.com/",
+            "location": "europe-north1"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://sts.europe-southwest1.rep.googleapis.com/",
+            "location": "europe-southwest1"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://sts.europe-west1.rep.googleapis.com/",
+            "location": "europe-west1"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://sts.europe-west10.rep.googleapis.com/",
+            "location": "europe-west10"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://sts.europe-west12.rep.googleapis.com/",
+            "location": "europe-west12"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://sts.europe-west15.rep.googleapis.com/",
+            "location": "europe-west15"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://sts.europe-west2.rep.googleapis.com/",
+            "location": "europe-west2"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://sts.europe-west3.rep.googleapis.com/",
+            "location": "europe-west3"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://sts.europe-west4.rep.googleapis.com/",
+            "location": "europe-west4"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://sts.europe-west6.rep.googleapis.com/",
+            "location": "europe-west6"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://sts.europe-west8.rep.googleapis.com/",
+            "location": "europe-west8"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://sts.europe-west9.rep.googleapis.com/",
+            "location": "europe-west9"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://sts.me-central1.rep.googleapis.com/",
+            "location": "me-central1"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://sts.me-central2.rep.googleapis.com/",
+            "location": "me-central2"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://sts.me-west1.rep.googleapis.com/",
+            "location": "me-west1"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://sts.northamerica-northeast1.rep.googleapis.com/",
+            "location": "northamerica-northeast1"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://sts.northamerica-northeast2.rep.googleapis.com/",
+            "location": "northamerica-northeast2"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://sts.northamerica-south1.rep.googleapis.com/",
+            "location": "northamerica-south1"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://sts.southamerica-east1.rep.googleapis.com/",
+            "location": "southamerica-east1"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://sts.southamerica-west1.rep.googleapis.com/",
+            "location": "southamerica-west1"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://sts.us-central1.rep.googleapis.com/",
+            "location": "us-central1"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://sts.us-central2.rep.googleapis.com/",
+            "location": "us-central2"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://sts.us-east1.rep.googleapis.com/",
+            "location": "us-east1"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://sts.us-east4.rep.googleapis.com/",
+            "location": "us-east4"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://sts.us-east5.rep.googleapis.com/",
+            "location": "us-east5"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://sts.us-east7.rep.googleapis.com/",
+            "location": "us-east7"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://sts.us-south1.rep.googleapis.com/",
+            "location": "us-south1"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://sts.us-west1.rep.googleapis.com/",
+            "location": "us-west1"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://sts.us-west2.rep.googleapis.com/",
+            "location": "us-west2"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://sts.us-west3.rep.googleapis.com/",
+            "location": "us-west3"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://sts.us-west4.rep.googleapis.com/",
+            "location": "us-west4"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://sts.us-west8.rep.googleapis.com/",
+            "location": "us-west8"
+        }
+    ],
     "fullyEncodeReservedExpansion": true,
     "icons": {
         "x16": "http://www.google.com/images/icons/product/search-16.gif",
@@ -116,7 +343,7 @@
             }
         }
     },
-    "revision": "20240612",
+    "revision": "20251203",
     "rootUrl": "https://sts.googleapis.com/",
     "schemas": {
         "GoogleIamV1Binding": {
@@ -185,6 +412,10 @@
                     "$ref": "GoogleIdentityStsV1AccessBoundary",
                     "description": "An access boundary that defines the upper bound of permissions the credential may have. The value should be a JSON object of AccessBoundary. The access boundary can include up to 10 rules. The size of the parameter value should not exceed 2048 characters."
                 },
+                "bindCertFingerprint": {
+                    "description": "The unpadded, base64url-encoded SHA-256 hash of the certificate's DER encoding and it must be 43 characters long. The resulting token will be bound to this value.",
+                    "type": "string"
+                },
                 "userProject": {
                     "description": "A Google project used for quota and billing purposes when the credential is used to access Google APIs. The provided project overrides the project bound to the credential. The value must be a project number or a project ID. Example: `my-sample-project-191923`. The maximum length is 32 characters.",
                     "type": "string"
@@ -249,7 +480,7 @@
                     "type": "string"
                 },
                 "scope": {
-                    "description": "The OAuth 2.0 scopes to include on the resulting access token, formatted as a list of space-delimited, case-sensitive strings. Required when exchanging an external credential for a Google access token.",
+                    "description": "The OAuth 2.0 scopes to include on the resulting access token, formatted as a list of space-delimited, case-sensitive strings; for example, `https://www.googleapis.com/auth/cloud-platform`. Required when exchanging an external credential for a Google access token. For a list of OAuth 2.0 scopes, see [OAuth 2.0 Scopes for Google APIs](https://developers.google.com/identity/protocols/oauth2/scopes).",
                     "type": "string"
                 },
                 "subjectToken": {

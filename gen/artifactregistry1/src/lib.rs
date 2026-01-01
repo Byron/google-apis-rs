@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Artifact Registry* crate version *6.0.0+20240608*, where *20240608* is the exact revision of the *artifactregistry:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v6.0.0*.
+//! This documentation was generated from *Artifact Registry* crate version *7.0.0+20251209*, where *20251209* is the exact revision of the *artifactregistry:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v7.0.0*.
 //!
 //! Everything else about the *Artifact Registry* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/artifacts/docs/).
@@ -12,12 +12,13 @@
 //! Handle the following *Resources* with ease from the central [hub](ArtifactRegistry) ...
 //!
 //! * projects
-//!  * [*get project settings*](api::ProjectGetProjectSettingCall), [*locations get*](api::ProjectLocationGetCall), [*locations get vpcsc config*](api::ProjectLocationGetVpcscConfigCall), [*locations list*](api::ProjectLocationListCall), [*locations operations get*](api::ProjectLocationOperationGetCall), [*locations repositories apt artifacts import*](api::ProjectLocationRepositoryAptArtifactImportCall), [*locations repositories apt artifacts upload*](api::ProjectLocationRepositoryAptArtifactUploadCall), [*locations repositories create*](api::ProjectLocationRepositoryCreateCall), [*locations repositories delete*](api::ProjectLocationRepositoryDeleteCall), [*locations repositories docker images get*](api::ProjectLocationRepositoryDockerImageGetCall), [*locations repositories docker images list*](api::ProjectLocationRepositoryDockerImageListCall), [*locations repositories files delete*](api::ProjectLocationRepositoryFileDeleteCall), [*locations repositories files download*](api::ProjectLocationRepositoryFileDownloadCall), [*locations repositories files get*](api::ProjectLocationRepositoryFileGetCall), [*locations repositories files list*](api::ProjectLocationRepositoryFileListCall), [*locations repositories generic artifacts upload*](api::ProjectLocationRepositoryGenericArtifactUploadCall), [*locations repositories get*](api::ProjectLocationRepositoryGetCall), [*locations repositories get iam policy*](api::ProjectLocationRepositoryGetIamPolicyCall), [*locations repositories go modules upload*](api::ProjectLocationRepositoryGoModuleUploadCall), [*locations repositories googet artifacts import*](api::ProjectLocationRepositoryGoogetArtifactImportCall), [*locations repositories googet artifacts upload*](api::ProjectLocationRepositoryGoogetArtifactUploadCall), [*locations repositories kfp artifacts upload*](api::ProjectLocationRepositoryKfpArtifactUploadCall), [*locations repositories list*](api::ProjectLocationRepositoryListCall), [*locations repositories maven artifacts get*](api::ProjectLocationRepositoryMavenArtifactGetCall), [*locations repositories maven artifacts list*](api::ProjectLocationRepositoryMavenArtifactListCall), [*locations repositories npm packages get*](api::ProjectLocationRepositoryNpmPackageGetCall), [*locations repositories npm packages list*](api::ProjectLocationRepositoryNpmPackageListCall), [*locations repositories packages delete*](api::ProjectLocationRepositoryPackageDeleteCall), [*locations repositories packages get*](api::ProjectLocationRepositoryPackageGetCall), [*locations repositories packages list*](api::ProjectLocationRepositoryPackageListCall), [*locations repositories packages patch*](api::ProjectLocationRepositoryPackagePatchCall), [*locations repositories packages tags create*](api::ProjectLocationRepositoryPackageTagCreateCall), [*locations repositories packages tags delete*](api::ProjectLocationRepositoryPackageTagDeleteCall), [*locations repositories packages tags get*](api::ProjectLocationRepositoryPackageTagGetCall), [*locations repositories packages tags list*](api::ProjectLocationRepositoryPackageTagListCall), [*locations repositories packages tags patch*](api::ProjectLocationRepositoryPackageTagPatchCall), [*locations repositories packages versions batch delete*](api::ProjectLocationRepositoryPackageVersionBatchDeleteCall), [*locations repositories packages versions delete*](api::ProjectLocationRepositoryPackageVersionDeleteCall), [*locations repositories packages versions get*](api::ProjectLocationRepositoryPackageVersionGetCall), [*locations repositories packages versions list*](api::ProjectLocationRepositoryPackageVersionListCall), [*locations repositories patch*](api::ProjectLocationRepositoryPatchCall), [*locations repositories python packages get*](api::ProjectLocationRepositoryPythonPackageGetCall), [*locations repositories python packages list*](api::ProjectLocationRepositoryPythonPackageListCall), [*locations repositories set iam policy*](api::ProjectLocationRepositorySetIamPolicyCall), [*locations repositories test iam permissions*](api::ProjectLocationRepositoryTestIamPermissionCall), [*locations repositories yum artifacts import*](api::ProjectLocationRepositoryYumArtifactImportCall), [*locations repositories yum artifacts upload*](api::ProjectLocationRepositoryYumArtifactUploadCall), [*locations update vpcsc config*](api::ProjectLocationUpdateVpcscConfigCall) and [*update project settings*](api::ProjectUpdateProjectSettingCall)
+//!  * [*get project settings*](api::ProjectGetProjectSettingCall), [*locations get*](api::ProjectLocationGetCall), [*locations get vpcsc config*](api::ProjectLocationGetVpcscConfigCall), [*locations list*](api::ProjectLocationListCall), [*locations operations get*](api::ProjectLocationOperationGetCall), [*locations repositories apt artifacts import*](api::ProjectLocationRepositoryAptArtifactImportCall), [*locations repositories apt artifacts upload*](api::ProjectLocationRepositoryAptArtifactUploadCall), [*locations repositories attachments create*](api::ProjectLocationRepositoryAttachmentCreateCall), [*locations repositories attachments delete*](api::ProjectLocationRepositoryAttachmentDeleteCall), [*locations repositories attachments get*](api::ProjectLocationRepositoryAttachmentGetCall), [*locations repositories attachments list*](api::ProjectLocationRepositoryAttachmentListCall), [*locations repositories create*](api::ProjectLocationRepositoryCreateCall), [*locations repositories delete*](api::ProjectLocationRepositoryDeleteCall), [*locations repositories docker images get*](api::ProjectLocationRepositoryDockerImageGetCall), [*locations repositories docker images list*](api::ProjectLocationRepositoryDockerImageListCall), [*locations repositories export artifact*](api::ProjectLocationRepositoryExportArtifactCall), [*locations repositories files delete*](api::ProjectLocationRepositoryFileDeleteCall), [*locations repositories files download*](api::ProjectLocationRepositoryFileDownloadCall), [*locations repositories files get*](api::ProjectLocationRepositoryFileGetCall), [*locations repositories files list*](api::ProjectLocationRepositoryFileListCall), [*locations repositories files patch*](api::ProjectLocationRepositoryFilePatchCall), [*locations repositories files upload*](api::ProjectLocationRepositoryFileUploadCall), [*locations repositories generic artifacts upload*](api::ProjectLocationRepositoryGenericArtifactUploadCall), [*locations repositories get*](api::ProjectLocationRepositoryGetCall), [*locations repositories get iam policy*](api::ProjectLocationRepositoryGetIamPolicyCall), [*locations repositories go modules upload*](api::ProjectLocationRepositoryGoModuleUploadCall), [*locations repositories googet artifacts import*](api::ProjectLocationRepositoryGoogetArtifactImportCall), [*locations repositories googet artifacts upload*](api::ProjectLocationRepositoryGoogetArtifactUploadCall), [*locations repositories kfp artifacts upload*](api::ProjectLocationRepositoryKfpArtifactUploadCall), [*locations repositories list*](api::ProjectLocationRepositoryListCall), [*locations repositories maven artifacts get*](api::ProjectLocationRepositoryMavenArtifactGetCall), [*locations repositories maven artifacts list*](api::ProjectLocationRepositoryMavenArtifactListCall), [*locations repositories npm packages get*](api::ProjectLocationRepositoryNpmPackageGetCall), [*locations repositories npm packages list*](api::ProjectLocationRepositoryNpmPackageListCall), [*locations repositories packages delete*](api::ProjectLocationRepositoryPackageDeleteCall), [*locations repositories packages get*](api::ProjectLocationRepositoryPackageGetCall), [*locations repositories packages list*](api::ProjectLocationRepositoryPackageListCall), [*locations repositories packages patch*](api::ProjectLocationRepositoryPackagePatchCall), [*locations repositories packages tags create*](api::ProjectLocationRepositoryPackageTagCreateCall), [*locations repositories packages tags delete*](api::ProjectLocationRepositoryPackageTagDeleteCall), [*locations repositories packages tags get*](api::ProjectLocationRepositoryPackageTagGetCall), [*locations repositories packages tags list*](api::ProjectLocationRepositoryPackageTagListCall), [*locations repositories packages tags patch*](api::ProjectLocationRepositoryPackageTagPatchCall), [*locations repositories packages versions batch delete*](api::ProjectLocationRepositoryPackageVersionBatchDeleteCall), [*locations repositories packages versions delete*](api::ProjectLocationRepositoryPackageVersionDeleteCall), [*locations repositories packages versions get*](api::ProjectLocationRepositoryPackageVersionGetCall), [*locations repositories packages versions list*](api::ProjectLocationRepositoryPackageVersionListCall), [*locations repositories packages versions patch*](api::ProjectLocationRepositoryPackageVersionPatchCall), [*locations repositories patch*](api::ProjectLocationRepositoryPatchCall), [*locations repositories python packages get*](api::ProjectLocationRepositoryPythonPackageGetCall), [*locations repositories python packages list*](api::ProjectLocationRepositoryPythonPackageListCall), [*locations repositories rules create*](api::ProjectLocationRepositoryRuleCreateCall), [*locations repositories rules delete*](api::ProjectLocationRepositoryRuleDeleteCall), [*locations repositories rules get*](api::ProjectLocationRepositoryRuleGetCall), [*locations repositories rules list*](api::ProjectLocationRepositoryRuleListCall), [*locations repositories rules patch*](api::ProjectLocationRepositoryRulePatchCall), [*locations repositories set iam policy*](api::ProjectLocationRepositorySetIamPolicyCall), [*locations repositories test iam permissions*](api::ProjectLocationRepositoryTestIamPermissionCall), [*locations repositories yum artifacts import*](api::ProjectLocationRepositoryYumArtifactImportCall), [*locations repositories yum artifacts upload*](api::ProjectLocationRepositoryYumArtifactUploadCall), [*locations update vpcsc config*](api::ProjectLocationUpdateVpcscConfigCall) and [*update project settings*](api::ProjectUpdateProjectSettingCall)
 //!
 //!
 //! Upload supported by ...
 //!
 //! * [*locations repositories apt artifacts upload projects*](api::ProjectLocationRepositoryAptArtifactUploadCall)
+//! * [*locations repositories files upload projects*](api::ProjectLocationRepositoryFileUploadCall)
 //! * [*locations repositories generic artifacts upload projects*](api::ProjectLocationRepositoryGenericArtifactUploadCall)
 //! * [*locations repositories go modules upload projects*](api::ProjectLocationRepositoryGoModuleUploadCall)
 //! * [*locations repositories googet artifacts upload projects*](api::ProjectLocationRepositoryGoogetArtifactUploadCall)
@@ -62,6 +63,8 @@
 //! ```ignore
 //! let r = hub.projects().locations_operations_get(...).doit().await
 //! let r = hub.projects().locations_repositories_apt_artifacts_import(...).doit().await
+//! let r = hub.projects().locations_repositories_attachments_create(...).doit().await
+//! let r = hub.projects().locations_repositories_attachments_delete(...).doit().await
 //! let r = hub.projects().locations_repositories_files_delete(...).doit().await
 //! let r = hub.projects().locations_repositories_googet_artifacts_import(...).doit().await
 //! let r = hub.projects().locations_repositories_packages_versions_batch_delete(...).doit().await
@@ -70,6 +73,7 @@
 //! let r = hub.projects().locations_repositories_yum_artifacts_import(...).doit().await
 //! let r = hub.projects().locations_repositories_create(...).doit().await
 //! let r = hub.projects().locations_repositories_delete(...).doit().await
+//! let r = hub.projects().locations_repositories_export_artifact(...).doit().await
 //! ```
 //!
 //! The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities`
@@ -96,7 +100,7 @@
 //! extern crate hyper;
 //! extern crate hyper_rustls;
 //! extern crate google_artifactregistry1 as artifactregistry1;
-//! use artifactregistry1::api::Repository;
+//! use artifactregistry1::api::Attachment;
 //! use artifactregistry1::{Result, Error};
 //! # async fn dox() {
 //! use artifactregistry1::{ArtifactRegistry, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
@@ -109,9 +113,20 @@
 //! // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about
 //! // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 //! // retrieve them from storage.
-//! let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+//! let connector = hyper_rustls::HttpsConnectorBuilder::new()
+//!     .with_native_roots()
+//!     .unwrap()
+//!     .https_only()
+//!     .enable_http2()
+//!     .build();
+//!
+//! let executor = hyper_util::rt::TokioExecutor::new();
+//! let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 //!     secret,
 //!     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+//!     yup_oauth2::client::CustomHyperClientBuilder::from(
+//!         hyper_util::client::legacy::Client::builder(executor).build(connector),
+//!     ),
 //! ).build().await.unwrap();
 //!
 //! let client = hyper_util::client::legacy::Client::builder(
@@ -122,20 +137,20 @@
 //!         .with_native_roots()
 //!         .unwrap()
 //!         .https_or_http()
-//!         .enable_http1()
+//!         .enable_http2()
 //!         .build()
 //! );
 //! let mut hub = ArtifactRegistry::new(client, auth);
 //! // As the method needs a request, you would usually fill it with the desired information
 //! // into the respective structure. Some of the parts shown here might not be applicable !
 //! // Values shown here are possibly random and not representative !
-//! let mut req = Repository::default();
+//! let mut req = Attachment::default();
 //!
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
-//! let result = hub.projects().locations_repositories_create(req, "parent")
-//!              .repository_id("ipsum")
+//! let result = hub.projects().locations_repositories_attachments_create(req, "parent")
+//!              .attachment_id("ipsum")
 //!              .doit().await;
 //!
 //! match result {

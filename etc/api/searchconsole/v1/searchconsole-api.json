@@ -17,7 +17,7 @@
     "canonicalName": "Search Console",
     "description": "The Search Console API provides access to both Search Console data (verified users only) and to public information on an URL basis (anyone)",
     "discoveryVersion": "v1",
-    "documentationLink": "https://developers.google.com/webmaster-tools/search-console-api/",
+    "documentationLink": "https://developers.google.com/webmaster-tools/about",
     "fullyEncodeReservedExpansion": true,
     "icons": {
         "x16": "http://www.google.com/images/icons/product/search-16.gif",
@@ -400,7 +400,7 @@
             }
         }
     },
-    "revision": "20240625",
+    "revision": "20251221",
     "rootUrl": "https://searchconsole.googleapis.com/",
     "schemas": {
         "AmpInspectionResult": {
@@ -872,6 +872,21 @@
             },
             "type": "object"
         },
+        "Metadata": {
+            "description": "An object that may be returned with your query results, providing context about the state of the data. When you request recent data (using `all` or `hourly_all` for `dataState`), some of the rows returned may represent data that is incomplete, which means that the data is still being collected and processed. This metadata object helps you identify exactly when this starts and ends. All dates and times provided in this object are in the `America/Los_Angeles` time zone. The specific field returned within this object depends on how you've grouped your data in the request. See details in inner fields.",
+            "id": "Metadata",
+            "properties": {
+                "firstIncompleteDate": {
+                    "description": "The first date for which the data is still being collected and processed, presented in `YYYY-MM-DD` format (ISO-8601 extended local date format). This field is populated only when the request's `dataState` is \"`all`\", data is grouped by \"`DATE`\", and the requested date range contains incomplete data points. All values after the `first_incomplete_date` may still change noticeably.",
+                    "type": "string"
+                },
+                "firstIncompleteHour": {
+                    "description": "The first hour for which the data is still being collected and processed, presented in `YYYY-MM-DDThh:mm:ss[+|-]hh:mm` format (ISO-8601 extended offset date-time format). This field is populated only when the request's `dataState` is \"`hourly_all`\", data is grouped by \"`HOUR`\" and the requested date range contains incomplete data points. All values after the `first_incomplete_hour` may still change noticeably.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
         "MobileFriendlyIssue": {
             "description": "Mobile-friendly issue.",
             "id": "MobileFriendlyIssue",
@@ -1130,12 +1145,14 @@
                     "enum": [
                         "DATA_STATE_UNSPECIFIED",
                         "FINAL",
-                        "ALL"
+                        "ALL",
+                        "HOURLY_ALL"
                     ],
                     "enumDescriptions": [
                         "Default value, should not be used.",
                         "Include full final data only, without partial.",
-                        "Include all data, full and partial."
+                        "Include all data, full and partial.",
+                        "Include hourly data, full and partial. Required when grouping by HOUR."
                     ],
                     "type": "string"
                 },
@@ -1155,15 +1172,17 @@
                             "PAGE",
                             "COUNTRY",
                             "DEVICE",
-                            "SEARCH_APPEARANCE"
+                            "SEARCH_APPEARANCE",
+                            "HOUR"
                         ],
                         "enumDescriptions": [
-                            "",
-                            "",
-                            "",
-                            "",
-                            "",
-                            ""
+                            "Group by date, which is returned in YYYY-MM-DD format, in PT time (UTC - 7:00/8:00).",
+                            "Group by query string.",
+                            "Group by page, a URI string.",
+                            "Group by country, specified by 3-letter country code ([ISO 3166-1 alpha-3](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-3)).",
+                            "Group by device type (DESKTOP, MOBILE and TABLET).",
+                            "Group by search result feature.",
+                            "Group by hour, which is returned in YYYY-MM-DDThh:mm:ss[+|-]hh:mm format (ISO-8601 extended offset date-time format) in PT time (UTC - 7:00/8:00). Data is available up to 10 days. Requires setting the dataState to HOURLY_ALL."
                         ],
                         "type": "string"
                     },
@@ -1234,6 +1253,10 @@
             "description": "A list of rows, one per result, grouped by key. Metrics in each row are aggregated for all data grouped by that key either by page or property, as specified by the aggregation type parameter.",
             "id": "SearchAnalyticsQueryResponse",
             "properties": {
+                "metadata": {
+                    "$ref": "Metadata",
+                    "description": "An object that may be returned with your query results, providing context about the state of the data. See details in Metadata object documentation."
+                },
                 "responseAggregationType": {
                     "description": "How the results were aggregated.",
                     "enum": [
@@ -1333,6 +1356,7 @@
                 },
                 "mobileUsabilityResult": {
                     "$ref": "MobileUsabilityInspectionResult",
+                    "deprecated": true,
                     "description": "Result of the Mobile usability analysis."
                 },
                 "richResultsResult": {

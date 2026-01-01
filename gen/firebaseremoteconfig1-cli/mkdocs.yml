@@ -1,4 +1,4 @@
-site_name: Firebase Remote Config v6.0.0+20171129
+site_name: Firebase Remote Config v7.0.0+20171129
 site_url: http://byron.github.io/google-apis-rs/google-firebaseremoteconfig1-cli
 site_description: A complete library to interact with Firebase Remote Config (protocol v1)
 

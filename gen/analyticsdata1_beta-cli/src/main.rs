@@ -2516,7 +2516,9 @@ where
         let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
             secret,
             yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-            hyper_util::client::legacy::Client::builder(executor).build(connector),
+            yup_oauth2::client::CustomHyperClientBuilder::from(
+                hyper_util::client::legacy::Client::builder(executor).build(connector),
+            ),
         )
         .persist_tokens_to_disk(format!("{}/analyticsdata1-beta", config_dir))
         .build()
@@ -2661,12 +2663,12 @@ async fn main() {
                      Some(false)),
                   ]),
             ("batch-run-pivot-reports",
-                    Some(r##"Returns multiple pivot reports in a batch. All reports must be for the same GA4 Property."##),
+                    Some(r##"Returns multiple pivot reports in a batch. All reports must be for the same Google Analytics property."##),
                     "Details at http://byron.github.io/google-apis-rs/google_analyticsdata1_beta_cli/properties_batch-run-pivot-reports",
                   vec![
                     (Some(r##"property"##),
                      None,
-                     Some(r##"A Google Analytics GA4 property identifier whose events are tracked. Specified in the URL path and not the body. To learn more, see [where to find your Property ID](https://developers.google.com/analytics/devguides/reporting/data/v1/property-id). This property must be specified for the batch. The property within RunPivotReportRequest may either be unspecified or consistent with this property. Example: properties/1234"##),
+                     Some(r##"A Google Analytics property identifier whose events are tracked. Specified in the URL path and not the body. To learn more, see [where to find your Property ID](https://developers.google.com/analytics/devguides/reporting/data/v1/property-id). This property must be specified for the batch. The property within RunPivotReportRequest may either be unspecified or consistent with this property. Example: properties/1234"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -2686,12 +2688,12 @@ async fn main() {
                      Some(false)),
                   ]),
             ("batch-run-reports",
-                    Some(r##"Returns multiple reports in a batch. All reports must be for the same GA4 Property."##),
+                    Some(r##"Returns multiple reports in a batch. All reports must be for the same Google Analytics property."##),
                     "Details at http://byron.github.io/google-apis-rs/google_analyticsdata1_beta_cli/properties_batch-run-reports",
                   vec![
                     (Some(r##"property"##),
                      None,
-                     Some(r##"A Google Analytics GA4 property identifier whose events are tracked. Specified in the URL path and not the body. To learn more, see [where to find your Property ID](https://developers.google.com/analytics/devguides/reporting/data/v1/property-id). This property must be specified for the batch. The property within RunReportRequest may either be unspecified or consistent with this property. Example: properties/1234"##),
+                     Some(r##"A Google Analytics property identifier whose events are tracked. Specified in the URL path and not the body. To learn more, see [where to find your Property ID](https://developers.google.com/analytics/devguides/reporting/data/v1/property-id). This property must be specified for the batch. The property within RunReportRequest may either be unspecified or consistent with this property. Example: properties/1234"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -2716,7 +2718,7 @@ async fn main() {
                   vec![
                     (Some(r##"property"##),
                      None,
-                     Some(r##"A Google Analytics GA4 property identifier whose events are tracked. To learn more, see [where to find your Property ID](https://developers.google.com/analytics/devguides/reporting/data/v1/property-id). `property` should be the same value as in your `runReport` request. Example: properties/1234"##),
+                     Some(r##"A Google Analytics property identifier whose events are tracked. To learn more, see [where to find your Property ID](https://developers.google.com/analytics/devguides/reporting/data/v1/property-id). `property` should be the same value as in your `runReport` request. Example: properties/1234"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -2736,12 +2738,12 @@ async fn main() {
                      Some(false)),
                   ]),
             ("get-metadata",
-                    Some(r##"Returns metadata for dimensions and metrics available in reporting methods. Used to explore the dimensions and metrics. In this method, a Google Analytics GA4 Property Identifier is specified in the request, and the metadata response includes Custom dimensions and metrics as well as Universal metadata. For example if a custom metric with parameter name `levels_unlocked` is registered to a property, the Metadata response will contain `customEvent:levels_unlocked`. Universal metadata are dimensions and metrics applicable to any property such as `country` and `totalUsers`."##),
+                    Some(r##"Returns metadata for dimensions and metrics available in reporting methods. Used to explore the dimensions and metrics. In this method, a Google Analytics property identifier is specified in the request, and the metadata response includes Custom dimensions and metrics as well as Universal metadata. For example if a custom metric with parameter name `levels_unlocked` is registered to a property, the Metadata response will contain `customEvent:levels_unlocked`. Universal metadata are dimensions and metrics applicable to any property such as `country` and `totalUsers`."##),
                     "Details at http://byron.github.io/google-apis-rs/google_analyticsdata1_beta_cli/properties_get-metadata",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The resource name of the metadata to retrieve. This name field is specified in the URL path and not URL parameters. Property is a numeric Google Analytics GA4 Property identifier. To learn more, see [where to find your Property ID](https://developers.google.com/analytics/devguides/reporting/data/v1/property-id). Example: properties/1234/metadata Set the Property ID to 0 for dimensions and metrics common to all properties. In this special mode, this method will not return custom dimensions and metrics."##),
+                     Some(r##"Required. The resource name of the metadata to retrieve. This name field is specified in the URL path and not URL parameters. Property is a numeric Google Analytics property identifier. To learn more, see [where to find your Property ID](https://developers.google.com/analytics/devguides/reporting/data/v1/property-id). Example: properties/1234/metadata Set the Property ID to 0 for dimensions and metrics common to all properties. In this special mode, this method will not return custom dimensions and metrics."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -2761,7 +2763,7 @@ async fn main() {
                   vec![
                     (Some(r##"property"##),
                      None,
-                     Some(r##"A Google Analytics GA4 property identifier whose events are tracked. Specified in the URL path and not the body. To learn more, see [where to find your Property ID](https://developers.google.com/analytics/devguides/reporting/data/v1/property-id). Within a batch request, this property should either be unspecified or consistent with the batch-level property. Example: properties/1234"##),
+                     Some(r##"A Google Analytics property identifier whose events are tracked. Specified in the URL path and not the body. To learn more, see [where to find your Property ID](https://developers.google.com/analytics/devguides/reporting/data/v1/property-id). Within a batch request, this property should either be unspecified or consistent with the batch-level property. Example: properties/1234"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -2786,7 +2788,7 @@ async fn main() {
                   vec![
                     (Some(r##"property"##),
                      None,
-                     Some(r##"A Google Analytics GA4 property identifier whose events are tracked. Specified in the URL path and not the body. To learn more, see [where to find your Property ID](https://developers.google.com/analytics/devguides/reporting/data/v1/property-id). Example: properties/1234"##),
+                     Some(r##"A Google Analytics property identifier whose events are tracked. Specified in the URL path and not the body. To learn more, see [where to find your Property ID](https://developers.google.com/analytics/devguides/reporting/data/v1/property-id). Example: properties/1234"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -2811,7 +2813,7 @@ async fn main() {
                   vec![
                     (Some(r##"property"##),
                      None,
-                     Some(r##"A Google Analytics GA4 property identifier whose events are tracked. Specified in the URL path and not the body. To learn more, see [where to find your Property ID](https://developers.google.com/analytics/devguides/reporting/data/v1/property-id). Within a batch request, this property should either be unspecified or consistent with the batch-level property. Example: properties/1234"##),
+                     Some(r##"A Google Analytics property identifier whose events are tracked. Specified in the URL path and not the body. To learn more, see [where to find your Property ID](https://developers.google.com/analytics/devguides/reporting/data/v1/property-id). Within a batch request, this property should either be unspecified or consistent with the batch-level property. Example: properties/1234"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -2835,7 +2837,7 @@ async fn main() {
 
     let mut app = App::new("analyticsdata1-beta")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("6.0.0+20240625")
+           .version("7.0.0+20251210")
            .about("Accesses report data in Google Analytics. Warning: Creating multiple Customer Applications, Accounts, or Projects to simulate or act as a single Customer Application, Account, or Project (respectively) or to circumvent Service-specific usage limits or quotas is a direct violation of Google Cloud Platform Terms of Service as well as Google APIs Terms of Service. These actions can result in immediate termination of your GCP project(s) without any warning. ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_analyticsdata1_beta_cli")
            .arg(Arg::with_name("url")
@@ -2900,7 +2902,7 @@ async fn main() {
         .with_native_roots()
         .unwrap()
         .https_or_http()
-        .enable_http1()
+        .enable_http2()
         .build();
 
     match Engine::new(matches, connector).await {

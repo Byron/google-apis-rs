@@ -1,4 +1,4 @@
-site_name: Android Management v6.0.0+20240626
+site_name: Android Management v7.0.0+20251216
 site_url: http://byron.github.io/google-apis-rs/google-androidmanagement1-cli
 site_description: A complete library to interact with Android Management (protocol v1)
 
@@ -25,6 +25,7 @@ nav:
     - 'Enrollment Tokens Delete': 'enterprises_enrollment-tokens-delete.md'
     - 'Enrollment Tokens Get': 'enterprises_enrollment-tokens-get.md'
     - 'Enrollment Tokens List': 'enterprises_enrollment-tokens-list.md'
+    - 'Generate Enterprise Upgrade Url': 'enterprises_generate-enterprise-upgrade-url.md'
     - 'Get': 'enterprises_get.md'
     - 'List': 'enterprises_list.md'
     - 'Migration Tokens Create': 'enterprises_migration-tokens-create.md'
@@ -34,7 +35,9 @@ nav:
     - 'Policies Delete': 'enterprises_policies-delete.md'
     - 'Policies Get': 'enterprises_policies-get.md'
     - 'Policies List': 'enterprises_policies-list.md'
+    - 'Policies Modify Policy Applications': 'enterprises_policies-modify-policy-applications.md'
     - 'Policies Patch': 'enterprises_policies-patch.md'
+    - 'Policies Remove Policy Applications': 'enterprises_policies-remove-policy-applications.md'
     - 'Web Apps Create': 'enterprises_web-apps-create.md'
     - 'Web Apps Delete': 'enterprises_web-apps-delete.md'
     - 'Web Apps Get': 'enterprises_web-apps-get.md'

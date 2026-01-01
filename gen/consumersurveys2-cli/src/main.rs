@@ -1715,7 +1715,9 @@ where
         let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
             secret,
             yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-            hyper_util::client::legacy::Client::builder(executor).build(connector),
+            yup_oauth2::client::CustomHyperClientBuilder::from(
+                hyper_util::client::legacy::Client::builder(executor).build(connector),
+            ),
         )
         .persist_tokens_to_disk(format!("{}/consumersurveys2", config_dir))
         .build()
@@ -2001,7 +2003,7 @@ async fn main() {
 
     let mut app = App::new("consumersurveys2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("6.0.0+20170407")
+           .version("7.0.0+20170407")
            .about("Creates and conducts surveys, lists the surveys that an authenticated user owns, and retrieves survey results and information about specified surveys.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_consumersurveys2_cli")
            .arg(Arg::with_name("url")
@@ -2066,7 +2068,7 @@ async fn main() {
         .with_native_roots()
         .unwrap()
         .https_or_http()
-        .enable_http1()
+        .enable_http2()
         .build();
 
     match Engine::new(matches, connector).await {

@@ -1,4 +1,4 @@
-site_name: Cloud KMS v6.0.0+20240621
+site_name: Cloud KMS v7.0.0+20251203
 site_url: http://byron.github.io/google-apis-rs/google-cloudkms1-cli
 site_description: A complete library to interact with Cloud KMS (protocol v1)
 
@@ -11,8 +11,14 @@ nav:
 - Home: 'index.md'
 - 'Folders':
     - 'Get Autokey Config': 'folders_get-autokey-config.md'
+    - 'Get Kaj Policy Config': 'folders_get-kaj-policy-config.md'
     - 'Update Autokey Config': 'folders_update-autokey-config.md'
+    - 'Update Kaj Policy Config': 'folders_update-kaj-policy-config.md'
+- 'Organizations':
+    - 'Get Kaj Policy Config': 'organizations_get-kaj-policy-config.md'
+    - 'Update Kaj Policy Config': 'organizations_update-kaj-policy-config.md'
 - 'Projects':
+    - 'Get Kaj Policy Config': 'projects_get-kaj-policy-config.md'
     - 'Locations Ekm Config Get Iam Policy': 'projects_locations-ekm-config-get-iam-policy.md'
     - 'Locations Ekm Config Set Iam Policy': 'projects_locations-ekm-config-set-iam-policy.md'
     - 'Locations Ekm Config Test Iam Permissions': 'projects_locations-ekm-config-test-iam-permissions.md'
@@ -35,6 +41,7 @@ nav:
     - 'Locations Key Rings Crypto Keys Crypto Key Versions Asymmetric Decrypt': 'projects_locations-key-rings-crypto-keys-crypto-key-versions-asymmetric-decrypt.md'
     - 'Locations Key Rings Crypto Keys Crypto Key Versions Asymmetric Sign': 'projects_locations-key-rings-crypto-keys-crypto-key-versions-asymmetric-sign.md'
     - 'Locations Key Rings Crypto Keys Crypto Key Versions Create': 'projects_locations-key-rings-crypto-keys-crypto-key-versions-create.md'
+    - 'Locations Key Rings Crypto Keys Crypto Key Versions Decapsulate': 'projects_locations-key-rings-crypto-keys-crypto-key-versions-decapsulate.md'
     - 'Locations Key Rings Crypto Keys Crypto Key Versions Destroy': 'projects_locations-key-rings-crypto-keys-crypto-key-versions-destroy.md'
     - 'Locations Key Rings Crypto Keys Crypto Key Versions Get': 'projects_locations-key-rings-crypto-keys-crypto-key-versions-get.md'
     - 'Locations Key Rings Crypto Keys Crypto Key Versions Get Public Key': 'projects_locations-key-rings-crypto-keys-crypto-key-versions-get-public-key.md'
@@ -70,6 +77,9 @@ nav:
     - 'Locations Operations Get': 'projects_locations-operations-get.md'
     - 'Locations Update Ekm Config': 'projects_locations-update-ekm-config.md'
     - 'Show Effective Autokey Config': 'projects_show-effective-autokey-config.md'
+    - 'Show Effective Key Access Justifications Enrollment Config': 'projects_show-effective-key-access-justifications-enrollment-config.md'
+    - 'Show Effective Key Access Justifications Policy Config': 'projects_show-effective-key-access-justifications-policy-config.md'
+    - 'Update Kaj Policy Config': 'projects_update-kaj-policy-config.md'
 
 theme: readthedocs
 

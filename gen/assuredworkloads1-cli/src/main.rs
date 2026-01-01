@@ -141,6 +141,13 @@ where
         {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "return-partial-success" => {
+                    call = call.return_partial_success(
+                        value
+                            .map(|v| arg_from_str(v, err, "return-partial-success", "boolean"))
+                            .unwrap_or(false),
+                    );
+                }
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
                 }
@@ -171,7 +178,16 @@ where
                             .push(CLIError::UnknownParameter(key.to_string(), {
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
-                                v.extend(["filter", "page-size", "page-token"].iter().map(|v| *v));
+                                v.extend(
+                                    [
+                                        "filter",
+                                        "page-size",
+                                        "page-token",
+                                        "return-partial-success",
+                                    ]
+                                    .iter()
+                                    .map(|v| *v),
+                                );
                                 v
                             }));
                     }
@@ -491,6 +507,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "partner-permissions.access-transparency-logs-support-case-viewer" => Some((
+                    "partnerPermissions.accessTransparencyLogsSupportCaseViewer",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "partner-permissions.assured-workloads-monitoring" => Some((
                     "partnerPermissions.assuredWorkloadsMonitoring",
                     JsonTypeInfo {
@@ -509,6 +532,13 @@ where
                     "partnerPermissions.serviceAccessApprover",
                     JsonTypeInfo {
                         jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "partner-services-billing-account" => Some((
+                    "partnerServicesBillingAccount",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
                         ctype: ComplexType::Pod,
                     },
                 )),
@@ -547,10 +577,18 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "workload-options.kaj-enrollment-type" => Some((
+                    "workloadOptions.kajEnrollmentType",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 _ => {
                     let suggestion = FieldCursor::did_you_mean(
                         key,
                         &vec![
+                            "access-transparency-logs-support-case-viewer",
                             "acknowledged-resource-violation-count",
                             "acknowledged-violation-count",
                             "active-resource-violation-count",
@@ -570,12 +608,14 @@ where
                             "enable-sovereign-controls",
                             "etag",
                             "kaj-enrollment-state",
+                            "kaj-enrollment-type",
                             "kms-settings",
                             "labels",
                             "name",
                             "next-rotation-time",
                             "partner",
                             "partner-permissions",
+                            "partner-services-billing-account",
                             "provisioned-resources-parent",
                             "resource-monitoring-enabled",
                             "rotation-period",
@@ -584,6 +624,7 @@ where
                             "setup-errors",
                             "setup-status",
                             "violation-notifications-enabled",
+                            "workload-options",
                         ],
                     );
                     err.issues.push(CLIError::Field(FieldError::Unknown(
@@ -724,6 +765,87 @@ where
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
                                 v.extend(["etag"].iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _organizations_locations_workloads_enable_compliance_updates(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .organizations()
+            .locations_workloads_enable_compliance_updates(opt.value_of("name").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
                                 v
                             }));
                     }
@@ -1065,6 +1187,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "partner-permissions.access-transparency-logs-support-case-viewer" => Some((
+                    "partnerPermissions.accessTransparencyLogsSupportCaseViewer",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "partner-permissions.assured-workloads-monitoring" => Some((
                     "partnerPermissions.assuredWorkloadsMonitoring",
                     JsonTypeInfo {
@@ -1097,6 +1226,7 @@ where
                     let suggestion = FieldCursor::did_you_mean(
                         key,
                         &vec![
+                            "access-transparency-logs-support-case-viewer",
                             "assured-workloads-monitoring",
                             "data-logs-viewer",
                             "etag",
@@ -1374,6 +1504,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "partner-permissions.access-transparency-logs-support-case-viewer" => Some((
+                    "partnerPermissions.accessTransparencyLogsSupportCaseViewer",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "partner-permissions.assured-workloads-monitoring" => Some((
                     "partnerPermissions.assuredWorkloadsMonitoring",
                     JsonTypeInfo {
@@ -1392,6 +1529,13 @@ where
                     "partnerPermissions.serviceAccessApprover",
                     JsonTypeInfo {
                         jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "partner-services-billing-account" => Some((
+                    "partnerServicesBillingAccount",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
                         ctype: ComplexType::Pod,
                     },
                 )),
@@ -1430,10 +1574,18 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "workload-options.kaj-enrollment-type" => Some((
+                    "workloadOptions.kajEnrollmentType",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 _ => {
                     let suggestion = FieldCursor::did_you_mean(
                         key,
                         &vec![
+                            "access-transparency-logs-support-case-viewer",
                             "acknowledged-resource-violation-count",
                             "acknowledged-violation-count",
                             "active-resource-violation-count",
@@ -1453,12 +1605,14 @@ where
                             "enable-sovereign-controls",
                             "etag",
                             "kaj-enrollment-state",
+                            "kaj-enrollment-type",
                             "kms-settings",
                             "labels",
                             "name",
                             "next-rotation-time",
                             "partner",
                             "partner-permissions",
+                            "partner-services-billing-account",
                             "provisioned-resources-parent",
                             "resource-monitoring-enabled",
                             "rotation-period",
@@ -1467,6 +1621,7 @@ where
                             "setup-errors",
                             "setup-status",
                             "violation-notifications-enabled",
+                            "workload-options",
                         ],
                     );
                     err.issues.push(CLIError::Field(FieldError::Unknown(
@@ -1664,6 +1819,233 @@ where
                             .push(CLIError::UnknownParameter(key.to_string(), {
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _organizations_locations_workloads_updates_apply(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut field_cursor = FieldCursor::default();
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "action" => Some((
+                    "action",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(key, &vec!["action"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
+            }
+        }
+        let mut request: api::GoogleCloudAssuredworkloadsV1ApplyWorkloadUpdateRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .organizations()
+            .locations_workloads_updates_apply(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _organizations_locations_workloads_updates_list(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .organizations()
+            .locations_workloads_updates_list(opt.value_of("parent").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                }
+                "page-size" => {
+                    call = call.page_size(
+                        value
+                            .map(|v| arg_from_str(v, err, "page-size", "int32"))
+                            .unwrap_or(-0),
+                    );
+                }
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["page-size", "page-token"].iter().map(|v| *v));
                                 v
                             }));
                     }
@@ -2101,6 +2483,13 @@ where
                         ._organizations_locations_workloads_delete(opt, dry_run, &mut err)
                         .await;
                 }
+                ("locations-workloads-enable-compliance-updates", Some(opt)) => {
+                    call_result = self
+                        ._organizations_locations_workloads_enable_compliance_updates(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
                 ("locations-workloads-enable-resource-monitoring", Some(opt)) => {
                     call_result = self
                         ._organizations_locations_workloads_enable_resource_monitoring(
@@ -2135,6 +2524,16 @@ where
                         ._organizations_locations_workloads_restrict_allowed_resources(
                             opt, dry_run, &mut err,
                         )
+                        .await;
+                }
+                ("locations-workloads-updates-apply", Some(opt)) => {
+                    call_result = self
+                        ._organizations_locations_workloads_updates_apply(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("locations-workloads-updates-list", Some(opt)) => {
+                    call_result = self
+                        ._organizations_locations_workloads_updates_list(opt, dry_run, &mut err)
                         .await;
                 }
                 ("locations-workloads-violations-acknowledge", Some(opt)) => {
@@ -2200,7 +2599,9 @@ where
         let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
             secret,
             yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-            hyper_util::client::legacy::Client::builder(executor).build(connector),
+            yup_oauth2::client::CustomHyperClientBuilder::from(
+                hyper_util::client::legacy::Client::builder(executor).build(connector),
+            ),
         )
         .persist_tokens_to_disk(format!("{}/assuredworkloads1", config_dir))
         .build()
@@ -2253,7 +2654,7 @@ where
 async fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("organizations", "methods: 'locations-operations-get', 'locations-operations-list', 'locations-workloads-analyze-workload-move', 'locations-workloads-create', 'locations-workloads-delete', 'locations-workloads-enable-resource-monitoring', 'locations-workloads-get', 'locations-workloads-list', 'locations-workloads-mutate-partner-permissions', 'locations-workloads-patch', 'locations-workloads-restrict-allowed-resources', 'locations-workloads-violations-acknowledge', 'locations-workloads-violations-get' and 'locations-workloads-violations-list'", vec![
+        ("organizations", "methods: 'locations-operations-get', 'locations-operations-list', 'locations-workloads-analyze-workload-move', 'locations-workloads-create', 'locations-workloads-delete', 'locations-workloads-enable-compliance-updates', 'locations-workloads-enable-resource-monitoring', 'locations-workloads-get', 'locations-workloads-list', 'locations-workloads-mutate-partner-permissions', 'locations-workloads-patch', 'locations-workloads-restrict-allowed-resources', 'locations-workloads-updates-apply', 'locations-workloads-updates-list', 'locations-workloads-violations-acknowledge', 'locations-workloads-violations-get' and 'locations-workloads-violations-list'", vec![
             ("locations-operations-get",
                     Some(r##"Gets the latest state of a long-running operation. Clients can use this method to poll the operation result at intervals as recommended by the API service."##),
                     "Details at http://byron.github.io/google-apis-rs/google_assuredworkloads1_cli/organizations_locations-operations-get",
@@ -2342,6 +2743,26 @@ async fn main() {
             ("locations-workloads-delete",
                     Some(r##"Deletes the workload. Make sure that workload's direct children are already in a deleted state, otherwise the request will fail with a FAILED_PRECONDITION error. In addition to assuredworkloads.workload.delete permission, the user should also have orgpolicy.policy.set permission on the deleted folder to remove Assured Workloads OrgPolicies."##),
                     "Details at http://byron.github.io/google-apis-rs/google_assuredworkloads1_cli/organizations_locations-workloads-delete",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The `name` field is used to identify the workload. Format: organizations/{org_id}/locations/{location_id}/workloads/{workload_id}"##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-workloads-enable-compliance-updates",
+                    Some(r##"This endpoint enables Assured Workloads service to offer compliance updates for the folder based assured workload. It sets up an Assured Workloads Service Agent, having permissions to read compliance controls (for example: Org Policies) applied on the workload. The caller must have `resourcemanager.folders.getIamPolicy` and `resourcemanager.folders.setIamPolicy` permissions on the assured workload folder."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_assuredworkloads1_cli/organizations_locations-workloads-enable-compliance-updates",
                   vec![
                     (Some(r##"name"##),
                      None,
@@ -2494,6 +2915,51 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("locations-workloads-updates-apply",
+                    Some(r##"This endpoint creates a new operation to apply the given update."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_assuredworkloads1_cli/organizations_locations-workloads-updates-apply",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The resource name of the update. Format: organizations/{org_id}/locations/{location_id}/workloads/{workload_id}/updates/{update_id}"##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-workloads-updates-list",
+                    Some(r##"This endpoint lists all updates for the given workload."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_assuredworkloads1_cli/organizations_locations-workloads-updates-list",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. organizations/{org_id}/locations/{location_id}/workloads/{workload_id}"##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("locations-workloads-violations-acknowledge",
                     Some(r##"Acknowledges an existing violation. By acknowledging a violation, users acknowledge the existence of a compliance violation in their workload and decide to ignore it due to a valid business justification. Acknowledgement is a permanent operation and it cannot be reverted."##),
                     "Details at http://byron.github.io/google-apis-rs/google_assuredworkloads1_cli/organizations_locations-workloads-violations-acknowledge",
@@ -2564,7 +3030,7 @@ async fn main() {
 
     let mut app = App::new("assuredworkloads1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("6.0.0+20240617")
+           .version("7.0.0+20251211")
            .about("")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_assuredworkloads1_cli")
            .arg(Arg::with_name("url")
@@ -2629,7 +3095,7 @@ async fn main() {
         .with_native_roots()
         .unwrap()
         .https_or_http()
-        .enable_http1()
+        .enable_http2()
         .build();
 
     match Engine::new(matches, connector).await {

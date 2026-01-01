@@ -246,6 +246,134 @@ where
         }
     }
 
+    async fn _bidders_finalized_deals_set_ready_to_serve(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut field_cursor = FieldCursor::default();
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
+            }
+        }
+        let mut request: api::SetReadyToServeRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .bidders()
+            .finalized_deals_set_ready_to_serve(request, opt.value_of("deal").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _buyers_auction_packages_get(
         &self,
         opt: &ArgMatches<'n>,
@@ -3868,6 +3996,7 @@ where
                 match &temp_cursor.to_string()[..] {
                     "billed-buyer" => Some(("billedBuyer", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "buyer" => Some(("buyer", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "buyer-permission-type" => Some(("buyerPermissionType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "client" => Some(("client", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "creative-requirements.creative-format" => Some(("creativeRequirements.creativeFormat", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -3890,6 +4019,9 @@ where
                     "flight-end-time" => Some(("flightEndTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "flight-start-time" => Some(("flightStartTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "media-planner.account-id" => Some(("mediaPlanner.accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "media-planner.ancestor-names" => Some(("mediaPlanner.ancestorNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "media-planner.display-name" => Some(("mediaPlanner.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "media-planner.name" => Some(("mediaPlanner.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "preferred-deal-terms.fixed-price.amount.currency-code" => Some(("preferredDealTerms.fixedPrice.amount.currencyCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "preferred-deal-terms.fixed-price.amount.nanos" => Some(("preferredDealTerms.fixedPrice.amount.nanos", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
@@ -3938,7 +4070,7 @@ where
                     "targeting.video-targeting.targeted-position-types" => Some(("targeting.videoTargeting.targetedPositionTypes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "amount", "billed-buyer", "buyer", "client", "companion-delivery-type", "create-time", "creative-format", "creative-pre-approval-policy", "creative-requirements", "creative-rotation-type", "creative-safe-frame-compatibility", "currency-code", "daypart-targeting", "deal-type", "delivery-control", "delivery-rate-type", "description", "device-capability-targeting", "device-category-targeting", "display-name", "eligible-seat-ids", "estimated-gross-spend", "excluded-app-ids", "excluded-criteria-ids", "excluded-position-types", "excluded-sensitive-category-ids", "excluded-uris", "first-party-targeting", "fixed-price", "flight-end-time", "flight-start-time", "floor-price", "geo-targeting", "guaranteed-looks", "id", "impression-cap", "inventory-type-targeting", "inventory-types", "max-ad-duration-ms", "media-planner", "minimum-daily-looks", "mobile-application-targeting", "name", "nanos", "open-auction-allowed", "operating-system-criteria", "operating-system-targeting", "operating-system-version-criteria", "percent-share-of-voice", "placement-targeting", "preferred-deal-terms", "private-auction-terms", "programmatic-creative-source", "programmatic-guaranteed-terms", "proposal-revision", "publisher-profile", "reservation-type", "roadblocking-type", "seller-time-zone", "skippable-ad-type", "targeted-app-ids", "targeted-criteria-ids", "targeted-position-types", "targeted-uris", "targeting", "technology-targeting", "time-zone-type", "type", "units", "update-time", "uri-targeting", "user-list-targeting", "version", "vertical-targeting", "video-targeting"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "amount", "ancestor-names", "billed-buyer", "buyer", "buyer-permission-type", "client", "companion-delivery-type", "create-time", "creative-format", "creative-pre-approval-policy", "creative-requirements", "creative-rotation-type", "creative-safe-frame-compatibility", "currency-code", "daypart-targeting", "deal-type", "delivery-control", "delivery-rate-type", "description", "device-capability-targeting", "device-category-targeting", "display-name", "eligible-seat-ids", "estimated-gross-spend", "excluded-app-ids", "excluded-criteria-ids", "excluded-position-types", "excluded-sensitive-category-ids", "excluded-uris", "first-party-targeting", "fixed-price", "flight-end-time", "flight-start-time", "floor-price", "geo-targeting", "guaranteed-looks", "id", "impression-cap", "inventory-type-targeting", "inventory-types", "max-ad-duration-ms", "media-planner", "minimum-daily-looks", "mobile-application-targeting", "name", "nanos", "open-auction-allowed", "operating-system-criteria", "operating-system-targeting", "operating-system-version-criteria", "percent-share-of-voice", "placement-targeting", "preferred-deal-terms", "private-auction-terms", "programmatic-creative-source", "programmatic-guaranteed-terms", "proposal-revision", "publisher-profile", "reservation-type", "roadblocking-type", "seller-time-zone", "skippable-ad-type", "targeted-app-ids", "targeted-criteria-ids", "targeted-position-types", "targeted-uris", "targeting", "technology-targeting", "time-zone-type", "type", "units", "update-time", "uri-targeting", "user-list-targeting", "version", "vertical-targeting", "video-targeting"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -4998,6 +5130,11 @@ where
                         ._bidders_finalized_deals_list(opt, dry_run, &mut err)
                         .await;
                 }
+                ("finalized-deals-set-ready-to-serve", Some(opt)) => {
+                    call_result = self
+                        ._bidders_finalized_deals_set_ready_to_serve(opt, dry_run, &mut err)
+                        .await;
+                }
                 _ => {
                     err.issues
                         .push(CLIError::MissingMethodError("bidders".to_string()));
@@ -5216,7 +5353,9 @@ where
         let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
             secret,
             yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-            hyper_util::client::legacy::Client::builder(executor).build(connector),
+            yup_oauth2::client::CustomHyperClientBuilder::from(
+                hyper_util::client::legacy::Client::builder(executor).build(connector),
+            ),
         )
         .persist_tokens_to_disk(format!("{}/authorizedbuyersmarketplace1", config_dir))
         .build()
@@ -5269,7 +5408,7 @@ where
 async fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("bidders", "methods: 'auction-packages-list' and 'finalized-deals-list'", vec![
+        ("bidders", "methods: 'auction-packages-list', 'finalized-deals-list' and 'finalized-deals-set-ready-to-serve'", vec![
             ("auction-packages-list",
                     Some(r##"List the auction packages. Buyers can use the URL path "/v1/buyers/{accountId}/auctionPackages" to list auction packages for the current buyer and its clients. Bidders can use the URL path "/v1/bidders/{accountId}/auctionPackages" to list auction packages for the bidder, its media planners, its buyers, and all their clients."##),
                     "Details at http://byron.github.io/google-apis-rs/google_authorizedbuyersmarketplace1_cli/bidders_auction-packages-list",
@@ -5299,6 +5438,31 @@ async fn main() {
                      Some(r##"Required. The buyer to list the finalized deals for, in the format: `buyers/{accountId}`. When used to list finalized deals for a bidder, its buyers and clients, in the format `bidders/{accountId}`."##),
                      Some(true),
                      Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("finalized-deals-set-ready-to-serve",
+                    Some(r##"Sets the given finalized deal as ready to serve. By default, deals are set as ready to serve as soon as they're finalized. If you want to opt out of the default behavior, and manually indicate that deals are ready to serve, ask your Technical Account Manager to add you to the allowlist. If you choose to use this method, finalized deals belonging to the bidder and its child seats don't start serving until after you call `setReadyToServe`, and after the deals become active. For example, you can use this method to delay receiving bid requests until your creative is ready. In addition, bidders can use the URL path "/v1/bidders/{accountId}/finalizedDeals/{dealId}" to set ready to serve for the finalized deals belong to itself, its child seats and all their clients. This method only applies to programmatic guaranteed deals."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_authorizedbuyersmarketplace1_cli/bidders_finalized-deals-set-ready-to-serve",
+                  vec![
+                    (Some(r##"deal"##),
+                     None,
+                     Some(r##"Required. Format: `buyers/{accountId}/finalizedDeals/{dealId}` or `bidders/{accountId}/finalizedDeals/{dealId}`"##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
@@ -5843,12 +6007,12 @@ async fn main() {
                      Some(false)),
                   ]),
             ("finalized-deals-set-ready-to-serve",
-                    Some(r##"Sets the given finalized deal as ready to serve. By default, deals are set as ready to serve as soon as they're finalized. If you want to opt out of the default behavior, and manually indicate that deals are ready to serve, ask your Technical Account Manager to add you to the allowlist. If you choose to use this method, finalized deals belonging to the bidder and its child seats don't start serving until after you call `setReadyToServe`, and after the deals become active. For example, you can use this method to delay receiving bid requests until your creative is ready. This method only applies to programmatic guaranteed deals."##),
+                    Some(r##"Sets the given finalized deal as ready to serve. By default, deals are set as ready to serve as soon as they're finalized. If you want to opt out of the default behavior, and manually indicate that deals are ready to serve, ask your Technical Account Manager to add you to the allowlist. If you choose to use this method, finalized deals belonging to the bidder and its child seats don't start serving until after you call `setReadyToServe`, and after the deals become active. For example, you can use this method to delay receiving bid requests until your creative is ready. In addition, bidders can use the URL path "/v1/bidders/{accountId}/finalizedDeals/{dealId}" to set ready to serve for the finalized deals belong to itself, its child seats and all their clients. This method only applies to programmatic guaranteed deals."##),
                     "Details at http://byron.github.io/google-apis-rs/google_authorizedbuyersmarketplace1_cli/buyers_finalized-deals-set-ready-to-serve",
                   vec![
                     (Some(r##"deal"##),
                      None,
-                     Some(r##"Required. Format: `buyers/{accountId}/finalizedDeals/{dealId}`"##),
+                     Some(r##"Required. Format: `buyers/{accountId}/finalizedDeals/{dealId}` or `bidders/{accountId}/finalizedDeals/{dealId}`"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -6073,7 +6237,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("proposals-patch",
-                    Some(r##"Updates the proposal at the given revision number. If the revision number in the request is behind the latest one kept in the server, an error message will be returned. See FieldMask for how to use FieldMask. Only fields specified in the UpdateProposalRequest.update_mask will be updated; Fields noted as 'Immutable' or 'Output only' yet specified in the UpdateProposalRequest.update_mask will be ignored and left unchanged. Updating a private auction proposal is not allowed and will result in an error."##),
+                    Some(r##"Updates the proposal at the given revision number. If the revision number in the request is behind the latest one kept in the server, an error message will be returned. See FieldMask for how to use FieldMask. Only fields specified in the UpdateProposalRequest.update_mask will be updated; Fields noted as 'Immutable' or 'Output only' yet specified in the UpdateProposalRequest.update_mask will be ignored and left unchanged. Updating a private auction proposal is only allowed for buyer private data, all other fields are immutable."##),
                     "Details at http://byron.github.io/google-apis-rs/google_authorizedbuyersmarketplace1_cli/buyers_proposals-patch",
                   vec![
                     (Some(r##"name"##),
@@ -6167,7 +6331,7 @@ async fn main() {
 
     let mut app = App::new("authorizedbuyersmarketplace1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("6.0.0+20240625")
+           .version("7.0.0+20251211")
            .about("The Authorized Buyers Marketplace API lets buyers programmatically discover inventory; propose, retrieve and negotiate deals with publishers.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_authorizedbuyersmarketplace1_cli")
            .arg(Arg::with_name("url")
@@ -6232,7 +6396,7 @@ async fn main() {
         .with_native_roots()
         .unwrap()
         .https_or_http()
-        .enable_http1()
+        .enable_http2()
         .build();
 
     match Engine::new(matches, connector).await {

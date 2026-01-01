@@ -35,9 +35,20 @@ use tokio::time::sleep;
 /// // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about
 /// // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 /// // retrieve them from storage.
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let connector = hyper_rustls::HttpsConnectorBuilder::new()
+///     .with_native_roots()
+///     .unwrap()
+///     .https_only()
+///     .enable_http2()
+///     .build();
+///
+/// let executor = hyper_util::rt::TokioExecutor::new();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 ///     secret,
 ///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///     yup_oauth2::client::CustomHyperClientBuilder::from(
+///         hyper_util::client::legacy::Client::builder(executor).build(connector),
+///     ),
 /// ).build().await.unwrap();
 ///
 /// let client = hyper_util::client::legacy::Client::builder(
@@ -48,7 +59,7 @@ use tokio::time::sleep;
 ///         .with_native_roots()
 ///         .unwrap()
 ///         .https_or_http()
-///         .enable_http1()
+///         .enable_http2()
 ///         .build()
 /// );
 /// let mut hub = Digitalassetlinks::new(client, auth);
@@ -101,7 +112,7 @@ impl<'a, C> Digitalassetlinks<C> {
         Digitalassetlinks {
             client,
             auth: Box::new(auth),
-            _user_agent: "google-api-rust-client/6.0.0".to_string(),
+            _user_agent: "google-api-rust-client/7.0.0".to_string(),
             _base_url: "https://digitalassetlinks.googleapis.com/".to_string(),
             _root_url: "https://digitalassetlinks.googleapis.com/".to_string(),
         }
@@ -115,7 +126,7 @@ impl<'a, C> Digitalassetlinks<C> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/6.0.0`.
+    /// It defaults to `google-api-rust-client/7.0.0`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -188,9 +199,6 @@ impl common::Part for Asset {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct BulkCheckRequest {
-    /// Same configuration as in Check request, all statements checks will use same configurations.
-    #[serde(rename = "allowGoogleInternalDataSources")]
-    pub allow_google_internal_data_sources: Option<bool>,
     /// If specified, will be used in any given template statement that doesn’t specify a relation.
     #[serde(rename = "defaultRelation")]
     pub default_relation: Option<String>,
@@ -200,9 +208,9 @@ pub struct BulkCheckRequest {
     /// If specified, will be used in any given template statement that doesn’t specify a target.
     #[serde(rename = "defaultTarget")]
     pub default_target: Option<Asset>,
-    /// Same configuration as in Check request, all statements checks will use same configurations.
-    #[serde(rename = "skipCacheLookup")]
-    pub skip_cache_lookup: Option<bool>,
+    /// Same configuration as in CheckRequest; all statement checks will use the same configuration.
+    #[serde(rename = "returnRelationExtensions")]
+    pub return_relation_extensions: Option<bool>,
     /// List of statements to check. For each statement, you can omit a field if the corresponding default_* field below was supplied. Minimum 1 statement; maximum 1,000 statements. Any additional statements will be ignored.
     pub statements: Option<Vec<StatementTemplate>>,
 }
@@ -261,7 +269,7 @@ pub struct CheckResponse {
     /// Human-readable message containing information intended to help end users understand, reproduce and debug the result. The message will be in English and we are currently not planning to offer any translations. Please note that no guarantees are made about the contents or format of this string. Any aspect of it may be subject to change without notice. You should not attempt to programmatically parse this data. For programmatic access, use the error_code field below.
     #[serde(rename = "debugString")]
     pub debug_string: Option<String>,
-    /// Error codes that describe the result of the Check operation.
+    /// Error codes that describe the result of the Check operation. NOTE: Error codes may be populated even when `linked` is true. The error codes do not necessarily imply that the request failed, but rather, specify any errors encountered in the statements file(s) which may or may not impact whether the server determines the requested source and target to be linked.
     #[serde(rename = "errorCode")]
     pub error_code: Option<Vec<String>>,
     /// Set to true if the assets specified in the request are linked by the relation specified in the request.
@@ -270,6 +278,9 @@ pub struct CheckResponse {
     #[serde(rename = "maxAge")]
     #[serde_as(as = "Option<common::serde::duration::Wrapper>")]
     pub max_age: Option<chrono::Duration>,
+    /// Statements may specify relation level extensions/payloads to express more details when declaring permissions to grant from the source asset to the target asset. When requested, the API will return relation_extensions specified in any and all statements linking the requested source and target assets by the relation specified in the request.
+    #[serde(rename = "relationExtensions")]
+    pub relation_extensions: Option<Vec<HashMap<String, serde_json::Value>>>,
 }
 
 impl common::ResponseResult for CheckResponse {}
@@ -316,6 +327,9 @@ impl common::ResponseResult for ListResponse {}
 pub struct Statement {
     /// The relation identifies the use of the statement as intended by the source asset’s owner (that is, the person or entity who issued the statement). Every complete statement has a relation. We identify relations with strings of the format `/`, where `must be one of a set of pre-defined purpose categories, and` is a free-form lowercase alphanumeric string that describes the specific use case of the statement. Refer to [our API documentation](https://developers.google.com/digital-asset-links/v1/relation-strings) for the current list of supported relations. Example: `delegate_permission/common.handle_all_urls` REQUIRED
     pub relation: Option<String>,
+    /// Statements may specify relation level extensions/payloads to express more details when declaring permissions to grant from the source asset to the target asset. These relation extensions should be specified in the `relation_extensions` object, keyed by the relation type they're associated with. { relation: ["delegate_permission/common.handle_all_urls"], target: {...}, relation_extensions: { "delegate_permission/common.handle_all_urls": { ...handle_all_urls specific payload specified here... } } } When requested, and specified in the statement file, the API will return relation_extensions associated with the statement's relation type. i.e. the API will only return relation_extensions specified for "delegate_permission/common.handle_all_urls" if this statement object's relation type is "delegate_permission/common.handle_all_urls".
+    #[serde(rename = "relationExtensions")]
+    pub relation_extensions: Option<HashMap<String, serde_json::Value>>,
     /// Every statement has a source asset. REQUIRED
     pub source: Option<Asset>,
     /// Every statement has a target asset. REQUIRED
@@ -376,9 +390,20 @@ impl common::Part for WebAsset {}
 /// use digitalassetlinks1::{Digitalassetlinks, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let connector = hyper_rustls::HttpsConnectorBuilder::new()
+///     .with_native_roots()
+///     .unwrap()
+///     .https_only()
+///     .enable_http2()
+///     .build();
+///
+/// let executor = hyper_util::rt::TokioExecutor::new();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 ///     secret,
 ///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///     yup_oauth2::client::CustomHyperClientBuilder::from(
+///         hyper_util::client::legacy::Client::builder(executor).build(connector),
+///     ),
 /// ).build().await.unwrap();
 ///
 /// let client = hyper_util::client::legacy::Client::builder(
@@ -389,7 +414,7 @@ impl common::Part for WebAsset {}
 ///         .with_native_roots()
 ///         .unwrap()
 ///         .https_or_http()
-///         .enable_http1()
+///         .enable_http2()
 ///         .build()
 /// );
 /// let mut hub = Digitalassetlinks::new(client, auth);
@@ -437,6 +462,7 @@ impl<'a, C> AssetlinkMethods<'a, C> {
             _source_web_site: Default::default(),
             _source_android_app_package_name: Default::default(),
             _source_android_app_certificate_sha256_fingerprint: Default::default(),
+            _return_relation_extensions: Default::default(),
             _relation: Default::default(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
@@ -460,9 +486,20 @@ impl<'a, C> AssetlinkMethods<'a, C> {
 /// use digitalassetlinks1::{Digitalassetlinks, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let connector = hyper_rustls::HttpsConnectorBuilder::new()
+///     .with_native_roots()
+///     .unwrap()
+///     .https_only()
+///     .enable_http2()
+///     .build();
+///
+/// let executor = hyper_util::rt::TokioExecutor::new();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 ///     secret,
 ///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///     yup_oauth2::client::CustomHyperClientBuilder::from(
+///         hyper_util::client::legacy::Client::builder(executor).build(connector),
+///     ),
 /// ).build().await.unwrap();
 ///
 /// let client = hyper_util::client::legacy::Client::builder(
@@ -473,7 +510,7 @@ impl<'a, C> AssetlinkMethods<'a, C> {
 ///         .with_native_roots()
 ///         .unwrap()
 ///         .https_or_http()
-///         .enable_http1()
+///         .enable_http2()
 ///         .build()
 /// );
 /// let mut hub = Digitalassetlinks::new(client, auth);
@@ -502,6 +539,7 @@ impl<'a, C> StatementMethods<'a, C> {
             _source_web_site: Default::default(),
             _source_android_app_package_name: Default::default(),
             _source_android_app_certificate_sha256_fingerprint: Default::default(),
+            _return_relation_extensions: Default::default(),
             _relation: Default::default(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
@@ -531,9 +569,20 @@ impl<'a, C> StatementMethods<'a, C> {
 /// # use digitalassetlinks1::{Digitalassetlinks, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -544,7 +593,7 @@ impl<'a, C> StatementMethods<'a, C> {
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Digitalassetlinks::new(client, auth);
@@ -777,9 +826,20 @@ where
 /// # use digitalassetlinks1::{Digitalassetlinks, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -790,7 +850,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Digitalassetlinks::new(client, auth);
@@ -804,7 +864,8 @@ where
 ///              .source_web_site("ipsum")
 ///              .source_android_app_package_name("voluptua.")
 ///              .source_android_app_certificate_sha256_fingerprint("At")
-///              .relation("sanctus")
+///              .return_relation_extensions(false)
+///              .relation("amet.")
 ///              .doit().await;
 /// # }
 /// ```
@@ -819,6 +880,7 @@ where
     _source_web_site: Option<String>,
     _source_android_app_package_name: Option<String>,
     _source_android_app_certificate_sha256_fingerprint: Option<String>,
+    _return_relation_extensions: Option<bool>,
     _relation: Option<String>,
     _delegate: Option<&'a mut dyn common::Delegate>,
     _additional_params: HashMap<String, String>,
@@ -853,6 +915,7 @@ where
             "source.web.site",
             "source.androidApp.packageName",
             "source.androidApp.certificate.sha256Fingerprint",
+            "returnRelationExtensions",
             "relation",
         ]
         .iter()
@@ -863,7 +926,7 @@ where
             }
         }
 
-        let mut params = Params::with_capacity(9 + self._additional_params.len());
+        let mut params = Params::with_capacity(10 + self._additional_params.len());
         if let Some(value) = self._target_web_site.as_ref() {
             params.push("target.web.site", value);
         }
@@ -887,6 +950,9 @@ where
             .as_ref()
         {
             params.push("source.androidApp.certificate.sha256Fingerprint", value);
+        }
+        if let Some(value) = self._return_relation_extensions.as_ref() {
+            params.push("returnRelationExtensions", value.to_string());
         }
         if let Some(value) = self._relation.as_ref() {
             params.push("relation", value);
@@ -1024,6 +1090,13 @@ where
         self._source_android_app_certificate_sha256_fingerprint = Some(new_value.to_string());
         self
     }
+    /// Whether to return relation_extensions payloads specified in the source Digital Asset Links statements linking the requested source and target assets by the requested relation type. If this is set to `false` (default), relation_extensions specified will not be returned, even if they are specified in the DAL statement file. If set to `true`, the API will propagate any and all relation_extensions, across statements, linking the source and target assets by the requested relation type, if specified in the DAL statement file.
+    ///
+    /// Sets the *return relation extensions* query property to the given value.
+    pub fn return_relation_extensions(mut self, new_value: bool) -> AssetlinkCheckCall<'a, C> {
+        self._return_relation_extensions = Some(new_value);
+        self
+    }
     /// Query string for the relation. We identify relations with strings of the format `/`, where `must be one of a set of pre-defined purpose categories, and` is a free-form lowercase alphanumeric string that describes the specific use case of the statement. Refer to [our API documentation](https://developers.google.com/digital-asset-links/v1/relation-strings) for the current list of supported relations. For a query to match an asset link, both the query’s and the asset link’s relation strings must match exactly. Example: A query with relation `delegate_permission/common.handle_all_urls` matches an asset link with relation `delegate_permission/common.handle_all_urls`.
     ///
     /// Sets the *relation* query property to the given value.
@@ -1094,9 +1167,20 @@ where
 /// # use digitalassetlinks1::{Digitalassetlinks, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -1107,7 +1191,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Digitalassetlinks::new(client, auth);
@@ -1115,10 +1199,11 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.statements().list()
-///              .source_web_site("sed")
+///              .source_web_site("takimata")
 ///              .source_android_app_package_name("amet.")
-///              .source_android_app_certificate_sha256_fingerprint("takimata")
-///              .relation("amet.")
+///              .source_android_app_certificate_sha256_fingerprint("duo")
+///              .return_relation_extensions(true)
+///              .relation("gubergren")
 ///              .doit().await;
 /// # }
 /// ```
@@ -1130,6 +1215,7 @@ where
     _source_web_site: Option<String>,
     _source_android_app_package_name: Option<String>,
     _source_android_app_certificate_sha256_fingerprint: Option<String>,
+    _return_relation_extensions: Option<bool>,
     _relation: Option<String>,
     _delegate: Option<&'a mut dyn common::Delegate>,
     _additional_params: HashMap<String, String>,
@@ -1161,6 +1247,7 @@ where
             "source.web.site",
             "source.androidApp.packageName",
             "source.androidApp.certificate.sha256Fingerprint",
+            "returnRelationExtensions",
             "relation",
         ]
         .iter()
@@ -1171,7 +1258,7 @@ where
             }
         }
 
-        let mut params = Params::with_capacity(6 + self._additional_params.len());
+        let mut params = Params::with_capacity(7 + self._additional_params.len());
         if let Some(value) = self._source_web_site.as_ref() {
             params.push("source.web.site", value);
         }
@@ -1183,6 +1270,9 @@ where
             .as_ref()
         {
             params.push("source.androidApp.certificate.sha256Fingerprint", value);
+        }
+        if let Some(value) = self._return_relation_extensions.as_ref() {
+            params.push("returnRelationExtensions", value.to_string());
         }
         if let Some(value) = self._relation.as_ref() {
             params.push("relation", value);
@@ -1294,6 +1384,13 @@ where
         new_value: &str,
     ) -> StatementListCall<'a, C> {
         self._source_android_app_certificate_sha256_fingerprint = Some(new_value.to_string());
+        self
+    }
+    /// Whether to return any relation_extensions payloads specified in the source digital asset links statements. If this is set to `false` (default), relation_extensions specified will not be returned, even if they are specified in the DAL statement file. If set to `true`, the API will propagate relation_extensions associated with each statement's relation type, if specified in the DAL statement file.
+    ///
+    /// Sets the *return relation extensions* query property to the given value.
+    pub fn return_relation_extensions(mut self, new_value: bool) -> StatementListCall<'a, C> {
+        self._return_relation_extensions = Some(new_value);
         self
     }
     /// Use only associations that match the specified relation. See the [`Statement`](#Statement) message for a detailed definition of relation strings. For a query to match a statement, one of the following must be true: * both the query’s and the statement’s relation strings match exactly, or * the query’s relation string is empty or missing. Example: A query with relation `delegate_permission/common.handle_all_urls` matches an asset link with relation `delegate_permission/common.handle_all_urls`.

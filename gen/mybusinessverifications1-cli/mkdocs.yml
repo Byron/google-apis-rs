@@ -1,4 +1,4 @@
-site_name: My Business Verifications v6.0.0+20240625
+site_name: My Business Verifications v7.0.0+20251210
 site_url: http://byron.github.io/google-apis-rs/google-mybusinessverifications1-cli
 site_description: A complete library to interact with My Business Verifications (protocol v1)
 
@@ -15,6 +15,8 @@ nav:
     - 'Verifications Complete': 'locations_verifications-complete.md'
     - 'Verifications List': 'locations_verifications-list.md'
     - 'Verify': 'locations_verify.md'
+- 'Verification Tokens':
+    - 'Generate': 'verification-tokens_generate.md'
 
 theme: readthedocs
 

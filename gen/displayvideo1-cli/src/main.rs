@@ -101,10 +101,13 @@ where
             }
         }
         let mut request: api::CreateAssetRequest = serde_json::value::from_value(object).unwrap();
-        let mut call = self
-            .hub
-            .advertisers()
-            .assets_upload(request, opt.value_of("advertiser-id").unwrap_or(""));
+        let advertiser_id: i64 = arg_from_str(
+            &opt.value_of("advertiser-id").unwrap_or(""),
+            err,
+            "<advertiser-id>",
+            "int64",
+        );
+        let mut call = self.hub.advertisers().assets_upload(request, advertiser_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -194,10 +197,13 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self
-            .hub
-            .advertisers()
-            .audit(opt.value_of("advertiser-id").unwrap_or(""));
+        let advertiser_id: i64 = arg_from_str(
+            &opt.value_of("advertiser-id").unwrap_or(""),
+            err,
+            "<advertiser-id>",
+            "int64",
+        );
+        let mut call = self.hub.advertisers().audit(advertiser_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -330,13 +336,16 @@ where
         }
         let mut request: api::BulkEditAdvertiserAssignedTargetingOptionsRequest =
             serde_json::value::from_value(object).unwrap();
+        let advertiser_id: i64 = arg_from_str(
+            &opt.value_of("advertiser-id").unwrap_or(""),
+            err,
+            "<advertiser-id>",
+            "int64",
+        );
         let mut call = self
             .hub
             .advertisers()
-            .bulk_edit_advertiser_assigned_targeting_options(
-                request,
-                opt.value_of("advertiser-id").unwrap_or(""),
-            );
+            .bulk_edit_advertiser_assigned_targeting_options(request, advertiser_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -414,117 +423,16 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
+        let advertiser_id: i64 = arg_from_str(
+            &opt.value_of("advertiser-id").unwrap_or(""),
+            err,
+            "<advertiser-id>",
+            "int64",
+        );
         let mut call = self
             .hub
             .advertisers()
-            .bulk_list_advertiser_assigned_targeting_options(
-                opt.value_of("advertiser-id").unwrap_or(""),
-            );
-        for parg in opt
-            .values_of("v")
-            .map(|i| i.collect())
-            .unwrap_or(Vec::new())
-            .iter()
-        {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "page-token" => {
-                    call = call.page_token(value.unwrap_or(""));
-                }
-                "page-size" => {
-                    call = call.page_size(
-                        value
-                            .map(|v| arg_from_str(v, err, "page-size", "int32"))
-                            .unwrap_or(-0),
-                    );
-                }
-                "order-by" => {
-                    call = call.order_by(value.unwrap_or(""));
-                }
-                "filter" => {
-                    call = call.filter(value.unwrap_or(""));
-                }
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(
-                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
-                                value.unwrap_or("unset"),
-                            );
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues
-                            .push(CLIError::UnknownParameter(key.to_string(), {
-                                let mut v = Vec::new();
-                                v.extend(self.gp.iter().map(|v| *v));
-                                v.extend(
-                                    ["filter", "order-by", "page-size", "page-token"]
-                                        .iter()
-                                        .map(|v| *v),
-                                );
-                                v
-                            }));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self
-                .opt
-                .values_of("url")
-                .map(|i| i.collect())
-                .unwrap_or(Vec::new())
-                .iter()
-            {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => {
-                    return Err(DoitError::IoError(
-                        opt.value_of("out").unwrap_or("-").to_string(),
-                        io_err,
-                    ))
-                }
-            };
-            match match protocol {
-                CallType::Standard => call.doit().await,
-                _ => unreachable!(),
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value =
-                        serde_json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    async fn _advertisers_campaigns_bulk_list_campaign_assigned_targeting_options(
-        &self,
-        opt: &ArgMatches<'n>,
-        dry_run: bool,
-        err: &mut InvalidOptionsError,
-    ) -> Result<(), DoitError> {
-        let mut call = self
-            .hub
-            .advertisers()
-            .campaigns_bulk_list_campaign_assigned_targeting_options(
-                opt.value_of("advertiser-id").unwrap_or(""),
-                opt.value_of("campaign-id").unwrap_or(""),
-            );
+            .bulk_list_advertiser_assigned_targeting_options(advertiser_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -853,10 +761,16 @@ where
             }
         }
         let mut request: api::Campaign = serde_json::value::from_value(object).unwrap();
+        let advertiser_id: i64 = arg_from_str(
+            &opt.value_of("advertiser-id").unwrap_or(""),
+            err,
+            "<advertiser-id>",
+            "int64",
+        );
         let mut call = self
             .hub
             .advertisers()
-            .campaigns_create(request, opt.value_of("advertiser-id").unwrap_or(""));
+            .campaigns_create(request, advertiser_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -934,10 +848,22 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self.hub.advertisers().campaigns_delete(
-            opt.value_of("advertiser-id").unwrap_or(""),
-            opt.value_of("campaign-id").unwrap_or(""),
+        let advertiser_id: i64 = arg_from_str(
+            &opt.value_of("advertiser-id").unwrap_or(""),
+            err,
+            "<advertiser-id>",
+            "int64",
         );
+        let campaign_id: i64 = arg_from_str(
+            &opt.value_of("campaign-id").unwrap_or(""),
+            err,
+            "<campaign-id>",
+            "int64",
+        );
+        let mut call = self
+            .hub
+            .advertisers()
+            .campaigns_delete(advertiser_id, campaign_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -1015,10 +941,22 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self.hub.advertisers().campaigns_get(
-            opt.value_of("advertiser-id").unwrap_or(""),
-            opt.value_of("campaign-id").unwrap_or(""),
+        let advertiser_id: i64 = arg_from_str(
+            &opt.value_of("advertiser-id").unwrap_or(""),
+            err,
+            "<advertiser-id>",
+            "int64",
         );
+        let campaign_id: i64 = arg_from_str(
+            &opt.value_of("campaign-id").unwrap_or(""),
+            err,
+            "<campaign-id>",
+            "int64",
+        );
+        let mut call = self
+            .hub
+            .advertisers()
+            .campaigns_get(advertiser_id, campaign_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -1096,10 +1034,13 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self
-            .hub
-            .advertisers()
-            .campaigns_list(opt.value_of("advertiser-id").unwrap_or(""));
+        let advertiser_id: i64 = arg_from_str(
+            &opt.value_of("advertiser-id").unwrap_or(""),
+            err,
+            "<advertiser-id>",
+            "int64",
+        );
+        let mut call = self.hub.advertisers().campaigns_list(advertiser_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -1428,11 +1369,22 @@ where
             }
         }
         let mut request: api::Campaign = serde_json::value::from_value(object).unwrap();
-        let mut call = self.hub.advertisers().campaigns_patch(
-            request,
-            opt.value_of("advertiser-id").unwrap_or(""),
-            opt.value_of("campaign-id").unwrap_or(""),
+        let advertiser_id: i64 = arg_from_str(
+            &opt.value_of("advertiser-id").unwrap_or(""),
+            err,
+            "<advertiser-id>",
+            "int64",
         );
+        let campaign_id: i64 = arg_from_str(
+            &opt.value_of("campaign-id").unwrap_or(""),
+            err,
+            "<campaign-id>",
+            "int64",
+        );
+        let mut call = self
+            .hub
+            .advertisers()
+            .campaigns_patch(request, advertiser_id, campaign_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -1466,198 +1418,6 @@ where
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
                                 v.extend(["update-mask"].iter().map(|v| *v));
-                                v
-                            }));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self
-                .opt
-                .values_of("url")
-                .map(|i| i.collect())
-                .unwrap_or(Vec::new())
-                .iter()
-            {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => {
-                    return Err(DoitError::IoError(
-                        opt.value_of("out").unwrap_or("-").to_string(),
-                        io_err,
-                    ))
-                }
-            };
-            match match protocol {
-                CallType::Standard => call.doit().await,
-                _ => unreachable!(),
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value =
-                        serde_json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    async fn _advertisers_campaigns_targeting_types_assigned_targeting_options_get(
-        &self,
-        opt: &ArgMatches<'n>,
-        dry_run: bool,
-        err: &mut InvalidOptionsError,
-    ) -> Result<(), DoitError> {
-        let mut call = self
-            .hub
-            .advertisers()
-            .campaigns_targeting_types_assigned_targeting_options_get(
-                opt.value_of("advertiser-id").unwrap_or(""),
-                opt.value_of("campaign-id").unwrap_or(""),
-                opt.value_of("targeting-type").unwrap_or(""),
-                opt.value_of("assigned-targeting-option-id").unwrap_or(""),
-            );
-        for parg in opt
-            .values_of("v")
-            .map(|i| i.collect())
-            .unwrap_or(Vec::new())
-            .iter()
-        {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(
-                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
-                                value.unwrap_or("unset"),
-                            );
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues
-                            .push(CLIError::UnknownParameter(key.to_string(), {
-                                let mut v = Vec::new();
-                                v.extend(self.gp.iter().map(|v| *v));
-                                v
-                            }));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self
-                .opt
-                .values_of("url")
-                .map(|i| i.collect())
-                .unwrap_or(Vec::new())
-                .iter()
-            {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => {
-                    return Err(DoitError::IoError(
-                        opt.value_of("out").unwrap_or("-").to_string(),
-                        io_err,
-                    ))
-                }
-            };
-            match match protocol {
-                CallType::Standard => call.doit().await,
-                _ => unreachable!(),
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value =
-                        serde_json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    async fn _advertisers_campaigns_targeting_types_assigned_targeting_options_list(
-        &self,
-        opt: &ArgMatches<'n>,
-        dry_run: bool,
-        err: &mut InvalidOptionsError,
-    ) -> Result<(), DoitError> {
-        let mut call = self
-            .hub
-            .advertisers()
-            .campaigns_targeting_types_assigned_targeting_options_list(
-                opt.value_of("advertiser-id").unwrap_or(""),
-                opt.value_of("campaign-id").unwrap_or(""),
-                opt.value_of("targeting-type").unwrap_or(""),
-            );
-        for parg in opt
-            .values_of("v")
-            .map(|i| i.collect())
-            .unwrap_or(Vec::new())
-            .iter()
-        {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "page-token" => {
-                    call = call.page_token(value.unwrap_or(""));
-                }
-                "page-size" => {
-                    call = call.page_size(
-                        value
-                            .map(|v| arg_from_str(v, err, "page-size", "int32"))
-                            .unwrap_or(-0),
-                    );
-                }
-                "order-by" => {
-                    call = call.order_by(value.unwrap_or(""));
-                }
-                "filter" => {
-                    call = call.filter(value.unwrap_or(""));
-                }
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(
-                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
-                                value.unwrap_or("unset"),
-                            );
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues
-                            .push(CLIError::UnknownParameter(key.to_string(), {
-                                let mut v = Vec::new();
-                                v.extend(self.gp.iter().map(|v| *v));
-                                v.extend(
-                                    ["filter", "order-by", "page-size", "page-token"]
-                                        .iter()
-                                        .map(|v| *v),
-                                );
                                 v
                             }));
                     }
@@ -1816,10 +1576,16 @@ where
             }
         }
         let mut request: api::Channel = serde_json::value::from_value(object).unwrap();
+        let advertiser_id: i64 = arg_from_str(
+            &opt.value_of("advertiser-id").unwrap_or(""),
+            err,
+            "<advertiser-id>",
+            "int64",
+        );
         let mut call = self
             .hub
             .advertisers()
-            .channels_create(request, opt.value_of("advertiser-id").unwrap_or(""));
+            .channels_create(request, advertiser_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -1905,10 +1671,22 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self.hub.advertisers().channels_get(
-            opt.value_of("advertiser-id").unwrap_or(""),
-            opt.value_of("channel-id").unwrap_or(""),
+        let advertiser_id: i64 = arg_from_str(
+            &opt.value_of("advertiser-id").unwrap_or(""),
+            err,
+            "<advertiser-id>",
+            "int64",
         );
+        let channel_id: i64 = arg_from_str(
+            &opt.value_of("channel-id").unwrap_or(""),
+            err,
+            "<channel-id>",
+            "int64",
+        );
+        let mut call = self
+            .hub
+            .advertisers()
+            .channels_get(advertiser_id, channel_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -1994,10 +1772,13 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self
-            .hub
-            .advertisers()
-            .channels_list(opt.value_of("advertiser-id").unwrap_or(""));
+        let advertiser_id: i64 = arg_from_str(
+            &opt.value_of("advertiser-id").unwrap_or(""),
+            err,
+            "<advertiser-id>",
+            "int64",
+        );
+        let mut call = self.hub.advertisers().channels_list(advertiser_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -2215,11 +1996,22 @@ where
             }
         }
         let mut request: api::Channel = serde_json::value::from_value(object).unwrap();
-        let mut call = self.hub.advertisers().channels_patch(
-            request,
-            opt.value_of("advertiser-id").unwrap_or(""),
-            opt.value_of("channel-id").unwrap_or(""),
+        let advertiser_id: i64 = arg_from_str(
+            &opt.value_of("advertiser-id").unwrap_or(""),
+            err,
+            "<advertiser-id>",
+            "int64",
         );
+        let channel_id: i64 = arg_from_str(
+            &opt.value_of("channel-id").unwrap_or(""),
+            err,
+            "<channel-id>",
+            "int64",
+        );
+        let mut call = self
+            .hub
+            .advertisers()
+            .channels_patch(request, advertiser_id, channel_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -2382,11 +2174,22 @@ where
             }
         }
         let mut request: api::BulkEditSitesRequest = serde_json::value::from_value(object).unwrap();
-        let mut call = self.hub.advertisers().channels_sites_bulk_edit(
-            request,
-            opt.value_of("advertiser-id").unwrap_or(""),
-            opt.value_of("channel-id").unwrap_or(""),
+        let advertiser_id: i64 = arg_from_str(
+            &opt.value_of("advertiser-id").unwrap_or(""),
+            err,
+            "<advertiser-id>",
+            "int64",
         );
+        let channel_id: i64 = arg_from_str(
+            &opt.value_of("channel-id").unwrap_or(""),
+            err,
+            "<channel-id>",
+            "int64",
+        );
+        let mut call =
+            self.hub
+                .advertisers()
+                .channels_sites_bulk_edit(request, advertiser_id, channel_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -2524,11 +2327,22 @@ where
             }
         }
         let mut request: api::Site = serde_json::value::from_value(object).unwrap();
-        let mut call = self.hub.advertisers().channels_sites_create(
-            request,
-            opt.value_of("advertiser-id").unwrap_or(""),
-            opt.value_of("channel-id").unwrap_or(""),
+        let advertiser_id: i64 = arg_from_str(
+            &opt.value_of("advertiser-id").unwrap_or(""),
+            err,
+            "<advertiser-id>",
+            "int64",
         );
+        let channel_id: i64 = arg_from_str(
+            &opt.value_of("channel-id").unwrap_or(""),
+            err,
+            "<channel-id>",
+            "int64",
+        );
+        let mut call =
+            self.hub
+                .advertisers()
+                .channels_sites_create(request, advertiser_id, channel_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -2614,9 +2428,21 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
+        let advertiser_id: i64 = arg_from_str(
+            &opt.value_of("advertiser-id").unwrap_or(""),
+            err,
+            "<advertiser-id>",
+            "int64",
+        );
+        let channel_id: i64 = arg_from_str(
+            &opt.value_of("channel-id").unwrap_or(""),
+            err,
+            "<channel-id>",
+            "int64",
+        );
         let mut call = self.hub.advertisers().channels_sites_delete(
-            opt.value_of("advertiser-id").unwrap_or(""),
-            opt.value_of("channel-id").unwrap_or(""),
+            advertiser_id,
+            channel_id,
             opt.value_of("url-or-app-id").unwrap_or(""),
         );
         for parg in opt
@@ -2704,10 +2530,22 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self.hub.advertisers().channels_sites_list(
-            opt.value_of("advertiser-id").unwrap_or(""),
-            opt.value_of("channel-id").unwrap_or(""),
+        let advertiser_id: i64 = arg_from_str(
+            &opt.value_of("advertiser-id").unwrap_or(""),
+            err,
+            "<advertiser-id>",
+            "int64",
         );
+        let channel_id: i64 = arg_from_str(
+            &opt.value_of("channel-id").unwrap_or(""),
+            err,
+            "<channel-id>",
+            "int64",
+        );
+        let mut call = self
+            .hub
+            .advertisers()
+            .channels_sites_list(advertiser_id, channel_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -2880,11 +2718,22 @@ where
             }
         }
         let mut request: api::ReplaceSitesRequest = serde_json::value::from_value(object).unwrap();
-        let mut call = self.hub.advertisers().channels_sites_replace(
-            request,
-            opt.value_of("advertiser-id").unwrap_or(""),
-            opt.value_of("channel-id").unwrap_or(""),
+        let advertiser_id: i64 = arg_from_str(
+            &opt.value_of("advertiser-id").unwrap_or(""),
+            err,
+            "<advertiser-id>",
+            "int64",
         );
+        let channel_id: i64 = arg_from_str(
+            &opt.value_of("channel-id").unwrap_or(""),
+            err,
+            "<channel-id>",
+            "int64",
+        );
+        let mut call =
+            self.hub
+                .advertisers()
+                .channels_sites_replace(request, advertiser_id, channel_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -3052,6 +2901,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "contains-eu-political-ads" => Some((
+                    "containsEuPoliticalAds",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "creative-config.dynamic-creative-enabled" => Some((
                     "creativeConfig.dynamicCreativeEnabled",
                     JsonTypeInfo {
@@ -3198,6 +3054,7 @@ where
                             "cm-floodlight-linking-authorized",
                             "cm-hybrid-config",
                             "cm-syncable-site-ids",
+                            "contains-eu-political-ads",
                             "creative-config",
                             "currency-code",
                             "data-access-config",
@@ -3825,10 +3682,16 @@ where
             }
         }
         let mut request: api::Creative = serde_json::value::from_value(object).unwrap();
+        let advertiser_id: i64 = arg_from_str(
+            &opt.value_of("advertiser-id").unwrap_or(""),
+            err,
+            "<advertiser-id>",
+            "int64",
+        );
         let mut call = self
             .hub
             .advertisers()
-            .creatives_create(request, opt.value_of("advertiser-id").unwrap_or(""));
+            .creatives_create(request, advertiser_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -3906,10 +3769,22 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self.hub.advertisers().creatives_delete(
-            opt.value_of("advertiser-id").unwrap_or(""),
-            opt.value_of("creative-id").unwrap_or(""),
+        let advertiser_id: i64 = arg_from_str(
+            &opt.value_of("advertiser-id").unwrap_or(""),
+            err,
+            "<advertiser-id>",
+            "int64",
         );
+        let creative_id: i64 = arg_from_str(
+            &opt.value_of("creative-id").unwrap_or(""),
+            err,
+            "<creative-id>",
+            "int64",
+        );
+        let mut call = self
+            .hub
+            .advertisers()
+            .creatives_delete(advertiser_id, creative_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -3987,10 +3862,22 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self.hub.advertisers().creatives_get(
-            opt.value_of("advertiser-id").unwrap_or(""),
-            opt.value_of("creative-id").unwrap_or(""),
+        let advertiser_id: i64 = arg_from_str(
+            &opt.value_of("advertiser-id").unwrap_or(""),
+            err,
+            "<advertiser-id>",
+            "int64",
         );
+        let creative_id: i64 = arg_from_str(
+            &opt.value_of("creative-id").unwrap_or(""),
+            err,
+            "<creative-id>",
+            "int64",
+        );
+        let mut call = self
+            .hub
+            .advertisers()
+            .creatives_get(advertiser_id, creative_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -4068,10 +3955,13 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self
-            .hub
-            .advertisers()
-            .creatives_list(opt.value_of("advertiser-id").unwrap_or(""));
+        let advertiser_id: i64 = arg_from_str(
+            &opt.value_of("advertiser-id").unwrap_or(""),
+            err,
+            "<advertiser-id>",
+            "int64",
+        );
+        let mut call = self.hub.advertisers().creatives_list(advertiser_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -4670,11 +4560,22 @@ where
             }
         }
         let mut request: api::Creative = serde_json::value::from_value(object).unwrap();
-        let mut call = self.hub.advertisers().creatives_patch(
-            request,
-            opt.value_of("advertiser-id").unwrap_or(""),
-            opt.value_of("creative-id").unwrap_or(""),
+        let advertiser_id: i64 = arg_from_str(
+            &opt.value_of("advertiser-id").unwrap_or(""),
+            err,
+            "<advertiser-id>",
+            "int64",
         );
+        let creative_id: i64 = arg_from_str(
+            &opt.value_of("creative-id").unwrap_or(""),
+            err,
+            "<creative-id>",
+            "int64",
+        );
+        let mut call = self
+            .hub
+            .advertisers()
+            .creatives_patch(request, advertiser_id, creative_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -4760,10 +4661,13 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self
-            .hub
-            .advertisers()
-            .delete(opt.value_of("advertiser-id").unwrap_or(""));
+        let advertiser_id: i64 = arg_from_str(
+            &opt.value_of("advertiser-id").unwrap_or(""),
+            err,
+            "<advertiser-id>",
+            "int64",
+        );
+        let mut call = self.hub.advertisers().delete(advertiser_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -4841,10 +4745,13 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self
-            .hub
-            .advertisers()
-            .get(opt.value_of("advertiser-id").unwrap_or(""));
+        let advertiser_id: i64 = arg_from_str(
+            &opt.value_of("advertiser-id").unwrap_or(""),
+            err,
+            "<advertiser-id>",
+            "int64",
+        );
+        let mut call = self.hub.advertisers().get(advertiser_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -4870,111 +4777,6 @@ where
                             .push(CLIError::UnknownParameter(key.to_string(), {
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
-                                v
-                            }));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self
-                .opt
-                .values_of("url")
-                .map(|i| i.collect())
-                .unwrap_or(Vec::new())
-                .iter()
-            {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => {
-                    return Err(DoitError::IoError(
-                        opt.value_of("out").unwrap_or("-").to_string(),
-                        io_err,
-                    ))
-                }
-            };
-            match match protocol {
-                CallType::Standard => call.doit().await,
-                _ => unreachable!(),
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value =
-                        serde_json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    async fn _advertisers_insertion_orders_bulk_list_insertion_order_assigned_targeting_options(
-        &self,
-        opt: &ArgMatches<'n>,
-        dry_run: bool,
-        err: &mut InvalidOptionsError,
-    ) -> Result<(), DoitError> {
-        let mut call = self
-            .hub
-            .advertisers()
-            .insertion_orders_bulk_list_insertion_order_assigned_targeting_options(
-                opt.value_of("advertiser-id").unwrap_or(""),
-                opt.value_of("insertion-order-id").unwrap_or(""),
-            );
-        for parg in opt
-            .values_of("v")
-            .map(|i| i.collect())
-            .unwrap_or(Vec::new())
-            .iter()
-        {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "page-token" => {
-                    call = call.page_token(value.unwrap_or(""));
-                }
-                "page-size" => {
-                    call = call.page_size(
-                        value
-                            .map(|v| arg_from_str(v, err, "page-size", "int32"))
-                            .unwrap_or(-0),
-                    );
-                }
-                "order-by" => {
-                    call = call.order_by(value.unwrap_or(""));
-                }
-                "filter" => {
-                    call = call.filter(value.unwrap_or(""));
-                }
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(
-                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
-                                value.unwrap_or("unset"),
-                            );
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues
-                            .push(CLIError::UnknownParameter(key.to_string(), {
-                                let mut v = Vec::new();
-                                v.extend(self.gp.iter().map(|v| *v));
-                                v.extend(
-                                    ["filter", "order-by", "page-size", "page-token"]
-                                        .iter()
-                                        .map(|v| *v),
-                                );
                                 v
                             }));
                     }
@@ -5363,10 +5165,16 @@ where
             }
         }
         let mut request: api::InsertionOrder = serde_json::value::from_value(object).unwrap();
+        let advertiser_id: i64 = arg_from_str(
+            &opt.value_of("advertiser-id").unwrap_or(""),
+            err,
+            "<advertiser-id>",
+            "int64",
+        );
         let mut call = self
             .hub
             .advertisers()
-            .insertion_orders_create(request, opt.value_of("advertiser-id").unwrap_or(""));
+            .insertion_orders_create(request, advertiser_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -5444,10 +5252,22 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self.hub.advertisers().insertion_orders_delete(
-            opt.value_of("advertiser-id").unwrap_or(""),
-            opt.value_of("insertion-order-id").unwrap_or(""),
+        let advertiser_id: i64 = arg_from_str(
+            &opt.value_of("advertiser-id").unwrap_or(""),
+            err,
+            "<advertiser-id>",
+            "int64",
         );
+        let insertion_order_id: i64 = arg_from_str(
+            &opt.value_of("insertion-order-id").unwrap_or(""),
+            err,
+            "<insertion-order-id>",
+            "int64",
+        );
+        let mut call = self
+            .hub
+            .advertisers()
+            .insertion_orders_delete(advertiser_id, insertion_order_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -5525,10 +5345,22 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self.hub.advertisers().insertion_orders_get(
-            opt.value_of("advertiser-id").unwrap_or(""),
-            opt.value_of("insertion-order-id").unwrap_or(""),
+        let advertiser_id: i64 = arg_from_str(
+            &opt.value_of("advertiser-id").unwrap_or(""),
+            err,
+            "<advertiser-id>",
+            "int64",
         );
+        let insertion_order_id: i64 = arg_from_str(
+            &opt.value_of("insertion-order-id").unwrap_or(""),
+            err,
+            "<insertion-order-id>",
+            "int64",
+        );
+        let mut call = self
+            .hub
+            .advertisers()
+            .insertion_orders_get(advertiser_id, insertion_order_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -5606,10 +5438,13 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self
-            .hub
-            .advertisers()
-            .insertion_orders_list(opt.value_of("advertiser-id").unwrap_or(""));
+        let advertiser_id: i64 = arg_from_str(
+            &opt.value_of("advertiser-id").unwrap_or(""),
+            err,
+            "<advertiser-id>",
+            "int64",
+        );
+        let mut call = self.hub.advertisers().insertion_orders_list(advertiser_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -6044,10 +5879,22 @@ where
             }
         }
         let mut request: api::InsertionOrder = serde_json::value::from_value(object).unwrap();
+        let advertiser_id: i64 = arg_from_str(
+            &opt.value_of("advertiser-id").unwrap_or(""),
+            err,
+            "<advertiser-id>",
+            "int64",
+        );
+        let insertion_order_id: i64 = arg_from_str(
+            &opt.value_of("insertion-order-id").unwrap_or(""),
+            err,
+            "<insertion-order-id>",
+            "int64",
+        );
         let mut call = self.hub.advertisers().insertion_orders_patch(
             request,
-            opt.value_of("advertiser-id").unwrap_or(""),
-            opt.value_of("insertion-order-id").unwrap_or(""),
+            advertiser_id,
+            insertion_order_id,
         );
         for parg in opt
             .values_of("v")
@@ -6128,208 +5975,19 @@ where
         }
     }
 
-    async fn _advertisers_insertion_orders_targeting_types_assigned_targeting_options_get(
-        &self,
-        opt: &ArgMatches<'n>,
-        dry_run: bool,
-        err: &mut InvalidOptionsError,
-    ) -> Result<(), DoitError> {
-        let mut call = self
-            .hub
-            .advertisers()
-            .insertion_orders_targeting_types_assigned_targeting_options_get(
-                opt.value_of("advertiser-id").unwrap_or(""),
-                opt.value_of("insertion-order-id").unwrap_or(""),
-                opt.value_of("targeting-type").unwrap_or(""),
-                opt.value_of("assigned-targeting-option-id").unwrap_or(""),
-            );
-        for parg in opt
-            .values_of("v")
-            .map(|i| i.collect())
-            .unwrap_or(Vec::new())
-            .iter()
-        {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(
-                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
-                                value.unwrap_or("unset"),
-                            );
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues
-                            .push(CLIError::UnknownParameter(key.to_string(), {
-                                let mut v = Vec::new();
-                                v.extend(self.gp.iter().map(|v| *v));
-                                v
-                            }));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self
-                .opt
-                .values_of("url")
-                .map(|i| i.collect())
-                .unwrap_or(Vec::new())
-                .iter()
-            {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => {
-                    return Err(DoitError::IoError(
-                        opt.value_of("out").unwrap_or("-").to_string(),
-                        io_err,
-                    ))
-                }
-            };
-            match match protocol {
-                CallType::Standard => call.doit().await,
-                _ => unreachable!(),
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value =
-                        serde_json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    async fn _advertisers_insertion_orders_targeting_types_assigned_targeting_options_list(
-        &self,
-        opt: &ArgMatches<'n>,
-        dry_run: bool,
-        err: &mut InvalidOptionsError,
-    ) -> Result<(), DoitError> {
-        let mut call = self
-            .hub
-            .advertisers()
-            .insertion_orders_targeting_types_assigned_targeting_options_list(
-                opt.value_of("advertiser-id").unwrap_or(""),
-                opt.value_of("insertion-order-id").unwrap_or(""),
-                opt.value_of("targeting-type").unwrap_or(""),
-            );
-        for parg in opt
-            .values_of("v")
-            .map(|i| i.collect())
-            .unwrap_or(Vec::new())
-            .iter()
-        {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "page-token" => {
-                    call = call.page_token(value.unwrap_or(""));
-                }
-                "page-size" => {
-                    call = call.page_size(
-                        value
-                            .map(|v| arg_from_str(v, err, "page-size", "int32"))
-                            .unwrap_or(-0),
-                    );
-                }
-                "order-by" => {
-                    call = call.order_by(value.unwrap_or(""));
-                }
-                "filter" => {
-                    call = call.filter(value.unwrap_or(""));
-                }
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(
-                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
-                                value.unwrap_or("unset"),
-                            );
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues
-                            .push(CLIError::UnknownParameter(key.to_string(), {
-                                let mut v = Vec::new();
-                                v.extend(self.gp.iter().map(|v| *v));
-                                v.extend(
-                                    ["filter", "order-by", "page-size", "page-token"]
-                                        .iter()
-                                        .map(|v| *v),
-                                );
-                                v
-                            }));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self
-                .opt
-                .values_of("url")
-                .map(|i| i.collect())
-                .unwrap_or(Vec::new())
-                .iter()
-            {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => {
-                    return Err(DoitError::IoError(
-                        opt.value_of("out").unwrap_or("-").to_string(),
-                        io_err,
-                    ))
-                }
-            };
-            match match protocol {
-                CallType::Standard => call.doit().await,
-                _ => unreachable!(),
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value =
-                        serde_json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
     async fn _advertisers_invoices_list(
         &self,
         opt: &ArgMatches<'n>,
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self
-            .hub
-            .advertisers()
-            .invoices_list(opt.value_of("advertiser-id").unwrap_or(""));
+        let advertiser_id: i64 = arg_from_str(
+            &opt.value_of("advertiser-id").unwrap_or(""),
+            err,
+            "<advertiser-id>",
+            "int64",
+        );
+        let mut call = self.hub.advertisers().invoices_list(advertiser_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -6433,10 +6091,16 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
+        let advertiser_id: i64 = arg_from_str(
+            &opt.value_of("advertiser-id").unwrap_or(""),
+            err,
+            "<advertiser-id>",
+            "int64",
+        );
         let mut call = self
             .hub
             .advertisers()
-            .invoices_lookup_invoice_currency(opt.value_of("advertiser-id").unwrap_or(""));
+            .invoices_lookup_invoice_currency(advertiser_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -6565,13 +6229,25 @@ where
         }
         let mut request: api::BulkEditLineItemAssignedTargetingOptionsRequest =
             serde_json::value::from_value(object).unwrap();
+        let advertiser_id: i64 = arg_from_str(
+            &opt.value_of("advertiser-id").unwrap_or(""),
+            err,
+            "<advertiser-id>",
+            "int64",
+        );
+        let line_item_id: i64 = arg_from_str(
+            &opt.value_of("line-item-id").unwrap_or(""),
+            err,
+            "<line-item-id>",
+            "int64",
+        );
         let mut call = self
             .hub
             .advertisers()
             .line_items_bulk_edit_line_item_assigned_targeting_options(
                 request,
-                opt.value_of("advertiser-id").unwrap_or(""),
-                opt.value_of("line-item-id").unwrap_or(""),
+                advertiser_id,
+                line_item_id,
             );
         for parg in opt
             .values_of("v")
@@ -6650,13 +6326,22 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
+        let advertiser_id: i64 = arg_from_str(
+            &opt.value_of("advertiser-id").unwrap_or(""),
+            err,
+            "<advertiser-id>",
+            "int64",
+        );
+        let line_item_id: i64 = arg_from_str(
+            &opt.value_of("line-item-id").unwrap_or(""),
+            err,
+            "<line-item-id>",
+            "int64",
+        );
         let mut call = self
             .hub
             .advertisers()
-            .line_items_bulk_list_line_item_assigned_targeting_options(
-                opt.value_of("advertiser-id").unwrap_or(""),
-                opt.value_of("line-item-id").unwrap_or(""),
-            );
+            .line_items_bulk_list_line_item_assigned_targeting_options(advertiser_id, line_item_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -6880,6 +6565,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "contains-eu-political-ads" => Some((
+                    "containsEuPoliticalAds",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "conversion-counting.post-view-count-percentage-millis" => Some((
                     "conversionCounting.postViewCountPercentageMillis",
                     JsonTypeInfo {
@@ -7165,6 +6857,7 @@ where
                             "budget-allocation-type",
                             "budget-unit",
                             "campaign-id",
+                            "contains-eu-political-ads",
                             "conversion-counting",
                             "creative-ids",
                             "custom-bidding-algorithm-id",
@@ -7240,10 +6933,16 @@ where
             }
         }
         let mut request: api::LineItem = serde_json::value::from_value(object).unwrap();
+        let advertiser_id: i64 = arg_from_str(
+            &opt.value_of("advertiser-id").unwrap_or(""),
+            err,
+            "<advertiser-id>",
+            "int64",
+        );
         let mut call = self
             .hub
             .advertisers()
-            .line_items_create(request, opt.value_of("advertiser-id").unwrap_or(""));
+            .line_items_create(request, advertiser_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -7321,198 +7020,22 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self.hub.advertisers().line_items_delete(
-            opt.value_of("advertiser-id").unwrap_or(""),
-            opt.value_of("line-item-id").unwrap_or(""),
+        let advertiser_id: i64 = arg_from_str(
+            &opt.value_of("advertiser-id").unwrap_or(""),
+            err,
+            "<advertiser-id>",
+            "int64",
         );
-        for parg in opt
-            .values_of("v")
-            .map(|i| i.collect())
-            .unwrap_or(Vec::new())
-            .iter()
-        {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(
-                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
-                                value.unwrap_or("unset"),
-                            );
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues
-                            .push(CLIError::UnknownParameter(key.to_string(), {
-                                let mut v = Vec::new();
-                                v.extend(self.gp.iter().map(|v| *v));
-                                v
-                            }));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self
-                .opt
-                .values_of("url")
-                .map(|i| i.collect())
-                .unwrap_or(Vec::new())
-                .iter()
-            {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => {
-                    return Err(DoitError::IoError(
-                        opt.value_of("out").unwrap_or("-").to_string(),
-                        io_err,
-                    ))
-                }
-            };
-            match match protocol {
-                CallType::Standard => call.doit().await,
-                _ => unreachable!(),
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value =
-                        serde_json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    async fn _advertisers_line_items_generate_default(
-        &self,
-        opt: &ArgMatches<'n>,
-        dry_run: bool,
-        err: &mut InvalidOptionsError,
-    ) -> Result<(), DoitError> {
-        let mut field_cursor = FieldCursor::default();
-        let mut object = serde_json::value::Value::Object(Default::default());
-
-        for kvarg in opt
-            .values_of("kv")
-            .map(|i| i.collect())
-            .unwrap_or(Vec::new())
-            .iter()
-        {
-            let last_errc = err.issues.len();
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            let mut temp_cursor = field_cursor.clone();
-            if let Err(field_err) = temp_cursor.set(&*key) {
-                err.issues.push(field_err);
-            }
-            if value.is_none() {
-                field_cursor = temp_cursor.clone();
-                if err.issues.len() > last_errc {
-                    err.issues.remove(last_errc);
-                }
-                continue;
-            }
-
-            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
-            {
-                "display-name" => Some((
-                    "displayName",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "insertion-order-id" => Some((
-                    "insertionOrderId",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "line-item-type" => Some((
-                    "lineItemType",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "mobile-app.app-id" => Some((
-                    "mobileApp.appId",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "mobile-app.display-name" => Some((
-                    "mobileApp.displayName",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "mobile-app.platform" => Some((
-                    "mobileApp.platform",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "mobile-app.publisher" => Some((
-                    "mobileApp.publisher",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(
-                        key,
-                        &vec![
-                            "app-id",
-                            "display-name",
-                            "insertion-order-id",
-                            "line-item-type",
-                            "mobile-app",
-                            "platform",
-                            "publisher",
-                        ],
-                    );
-                    err.issues.push(CLIError::Field(FieldError::Unknown(
-                        temp_cursor.to_string(),
-                        suggestion,
-                        value.map(|v| v.to_string()),
-                    )));
-                    None
-                }
-            };
-            if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(
-                    &mut object,
-                    value.unwrap(),
-                    type_info,
-                    err,
-                    &temp_cursor,
-                );
-            }
-        }
-        let mut request: api::GenerateDefaultLineItemRequest =
-            serde_json::value::from_value(object).unwrap();
+        let line_item_id: i64 = arg_from_str(
+            &opt.value_of("line-item-id").unwrap_or(""),
+            err,
+            "<line-item-id>",
+            "int64",
+        );
         let mut call = self
             .hub
             .advertisers()
-            .line_items_generate_default(request, opt.value_of("advertiser-id").unwrap_or(""));
+            .line_items_delete(advertiser_id, line_item_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -7590,10 +7113,22 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self.hub.advertisers().line_items_get(
-            opt.value_of("advertiser-id").unwrap_or(""),
-            opt.value_of("line-item-id").unwrap_or(""),
+        let advertiser_id: i64 = arg_from_str(
+            &opt.value_of("advertiser-id").unwrap_or(""),
+            err,
+            "<advertiser-id>",
+            "int64",
         );
+        let line_item_id: i64 = arg_from_str(
+            &opt.value_of("line-item-id").unwrap_or(""),
+            err,
+            "<line-item-id>",
+            "int64",
+        );
+        let mut call = self
+            .hub
+            .advertisers()
+            .line_items_get(advertiser_id, line_item_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -7671,10 +7206,13 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self
-            .hub
-            .advertisers()
-            .line_items_list(opt.value_of("advertiser-id").unwrap_or(""));
+        let advertiser_id: i64 = arg_from_str(
+            &opt.value_of("advertiser-id").unwrap_or(""),
+            err,
+            "<advertiser-id>",
+            "int64",
+        );
+        let mut call = self.hub.advertisers().line_items_list(advertiser_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -7898,6 +7436,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "contains-eu-political-ads" => Some((
+                    "containsEuPoliticalAds",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "conversion-counting.post-view-count-percentage-millis" => Some((
                     "conversionCounting.postViewCountPercentageMillis",
                     JsonTypeInfo {
@@ -8183,6 +7728,7 @@ where
                             "budget-allocation-type",
                             "budget-unit",
                             "campaign-id",
+                            "contains-eu-political-ads",
                             "conversion-counting",
                             "creative-ids",
                             "custom-bidding-algorithm-id",
@@ -8258,11 +7804,22 @@ where
             }
         }
         let mut request: api::LineItem = serde_json::value::from_value(object).unwrap();
-        let mut call = self.hub.advertisers().line_items_patch(
-            request,
-            opt.value_of("advertiser-id").unwrap_or(""),
-            opt.value_of("line-item-id").unwrap_or(""),
+        let advertiser_id: i64 = arg_from_str(
+            &opt.value_of("advertiser-id").unwrap_or(""),
+            err,
+            "<advertiser-id>",
+            "int64",
         );
+        let line_item_id: i64 = arg_from_str(
+            &opt.value_of("line-item-id").unwrap_or(""),
+            err,
+            "<line-item-id>",
+            "int64",
+        );
+        let mut call =
+            self.hub
+                .advertisers()
+                .line_items_patch(request, advertiser_id, line_item_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -8528,13 +8085,25 @@ where
         }
         let mut request: api::AssignedTargetingOption =
             serde_json::value::from_value(object).unwrap();
+        let advertiser_id: i64 = arg_from_str(
+            &opt.value_of("advertiser-id").unwrap_or(""),
+            err,
+            "<advertiser-id>",
+            "int64",
+        );
+        let line_item_id: i64 = arg_from_str(
+            &opt.value_of("line-item-id").unwrap_or(""),
+            err,
+            "<line-item-id>",
+            "int64",
+        );
         let mut call = self
             .hub
             .advertisers()
             .line_items_targeting_types_assigned_targeting_options_create(
                 request,
-                opt.value_of("advertiser-id").unwrap_or(""),
-                opt.value_of("line-item-id").unwrap_or(""),
+                advertiser_id,
+                line_item_id,
                 opt.value_of("targeting-type").unwrap_or(""),
             );
         for parg in opt
@@ -8614,12 +8183,24 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
+        let advertiser_id: i64 = arg_from_str(
+            &opt.value_of("advertiser-id").unwrap_or(""),
+            err,
+            "<advertiser-id>",
+            "int64",
+        );
+        let line_item_id: i64 = arg_from_str(
+            &opt.value_of("line-item-id").unwrap_or(""),
+            err,
+            "<line-item-id>",
+            "int64",
+        );
         let mut call = self
             .hub
             .advertisers()
             .line_items_targeting_types_assigned_targeting_options_delete(
-                opt.value_of("advertiser-id").unwrap_or(""),
-                opt.value_of("line-item-id").unwrap_or(""),
+                advertiser_id,
+                line_item_id,
                 opt.value_of("targeting-type").unwrap_or(""),
                 opt.value_of("assigned-targeting-option-id").unwrap_or(""),
             );
@@ -8700,12 +8281,24 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
+        let advertiser_id: i64 = arg_from_str(
+            &opt.value_of("advertiser-id").unwrap_or(""),
+            err,
+            "<advertiser-id>",
+            "int64",
+        );
+        let line_item_id: i64 = arg_from_str(
+            &opt.value_of("line-item-id").unwrap_or(""),
+            err,
+            "<line-item-id>",
+            "int64",
+        );
         let mut call = self
             .hub
             .advertisers()
             .line_items_targeting_types_assigned_targeting_options_get(
-                opt.value_of("advertiser-id").unwrap_or(""),
-                opt.value_of("line-item-id").unwrap_or(""),
+                advertiser_id,
+                line_item_id,
                 opt.value_of("targeting-type").unwrap_or(""),
                 opt.value_of("assigned-targeting-option-id").unwrap_or(""),
             );
@@ -8786,12 +8379,24 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
+        let advertiser_id: i64 = arg_from_str(
+            &opt.value_of("advertiser-id").unwrap_or(""),
+            err,
+            "<advertiser-id>",
+            "int64",
+        );
+        let line_item_id: i64 = arg_from_str(
+            &opt.value_of("line-item-id").unwrap_or(""),
+            err,
+            "<line-item-id>",
+            "int64",
+        );
         let mut call = self
             .hub
             .advertisers()
             .line_items_targeting_types_assigned_targeting_options_list(
-                opt.value_of("advertiser-id").unwrap_or(""),
-                opt.value_of("line-item-id").unwrap_or(""),
+                advertiser_id,
+                line_item_id,
                 opt.value_of("targeting-type").unwrap_or(""),
             );
         for parg in opt
@@ -9059,14 +8664,22 @@ where
         }
         let mut request: api::BulkEditAssignedLocationsRequest =
             serde_json::value::from_value(object).unwrap();
+        let advertiser_id: i64 = arg_from_str(
+            &opt.value_of("advertiser-id").unwrap_or(""),
+            err,
+            "<advertiser-id>",
+            "int64",
+        );
+        let location_list_id: i64 = arg_from_str(
+            &opt.value_of("location-list-id").unwrap_or(""),
+            err,
+            "<location-list-id>",
+            "int64",
+        );
         let mut call = self
             .hub
             .advertisers()
-            .location_lists_assigned_locations_bulk_edit(
-                request,
-                opt.value_of("advertiser-id").unwrap_or(""),
-                opt.value_of("location-list-id").unwrap_or(""),
-            );
+            .location_lists_assigned_locations_bulk_edit(request, advertiser_id, location_list_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -9214,14 +8827,22 @@ where
             }
         }
         let mut request: api::AssignedLocation = serde_json::value::from_value(object).unwrap();
+        let advertiser_id: i64 = arg_from_str(
+            &opt.value_of("advertiser-id").unwrap_or(""),
+            err,
+            "<advertiser-id>",
+            "int64",
+        );
+        let location_list_id: i64 = arg_from_str(
+            &opt.value_of("location-list-id").unwrap_or(""),
+            err,
+            "<location-list-id>",
+            "int64",
+        );
         let mut call = self
             .hub
             .advertisers()
-            .location_lists_assigned_locations_create(
-                request,
-                opt.value_of("advertiser-id").unwrap_or(""),
-                opt.value_of("location-list-id").unwrap_or(""),
-            );
+            .location_lists_assigned_locations_create(request, advertiser_id, location_list_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -9299,13 +8920,31 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
+        let advertiser_id: i64 = arg_from_str(
+            &opt.value_of("advertiser-id").unwrap_or(""),
+            err,
+            "<advertiser-id>",
+            "int64",
+        );
+        let location_list_id: i64 = arg_from_str(
+            &opt.value_of("location-list-id").unwrap_or(""),
+            err,
+            "<location-list-id>",
+            "int64",
+        );
+        let assigned_location_id: i64 = arg_from_str(
+            &opt.value_of("assigned-location-id").unwrap_or(""),
+            err,
+            "<assigned-location-id>",
+            "int64",
+        );
         let mut call = self
             .hub
             .advertisers()
             .location_lists_assigned_locations_delete(
-                opt.value_of("advertiser-id").unwrap_or(""),
-                opt.value_of("location-list-id").unwrap_or(""),
-                opt.value_of("assigned-location-id").unwrap_or(""),
+                advertiser_id,
+                location_list_id,
+                assigned_location_id,
             );
         for parg in opt
             .values_of("v")
@@ -9384,13 +9023,22 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
+        let advertiser_id: i64 = arg_from_str(
+            &opt.value_of("advertiser-id").unwrap_or(""),
+            err,
+            "<advertiser-id>",
+            "int64",
+        );
+        let location_list_id: i64 = arg_from_str(
+            &opt.value_of("location-list-id").unwrap_or(""),
+            err,
+            "<location-list-id>",
+            "int64",
+        );
         let mut call = self
             .hub
             .advertisers()
-            .location_lists_assigned_locations_list(
-                opt.value_of("advertiser-id").unwrap_or(""),
-                opt.value_of("location-list-id").unwrap_or(""),
-            );
+            .location_lists_assigned_locations_list(advertiser_id, location_list_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -9579,10 +9227,16 @@ where
             }
         }
         let mut request: api::LocationList = serde_json::value::from_value(object).unwrap();
+        let advertiser_id: i64 = arg_from_str(
+            &opt.value_of("advertiser-id").unwrap_or(""),
+            err,
+            "<advertiser-id>",
+            "int64",
+        );
         let mut call = self
             .hub
             .advertisers()
-            .location_lists_create(request, opt.value_of("advertiser-id").unwrap_or(""));
+            .location_lists_create(request, advertiser_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -9660,10 +9314,22 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self.hub.advertisers().location_lists_get(
-            opt.value_of("advertiser-id").unwrap_or(""),
-            opt.value_of("location-list-id").unwrap_or(""),
+        let advertiser_id: i64 = arg_from_str(
+            &opt.value_of("advertiser-id").unwrap_or(""),
+            err,
+            "<advertiser-id>",
+            "int64",
         );
+        let location_list_id: i64 = arg_from_str(
+            &opt.value_of("location-list-id").unwrap_or(""),
+            err,
+            "<location-list-id>",
+            "int64",
+        );
+        let mut call = self
+            .hub
+            .advertisers()
+            .location_lists_get(advertiser_id, location_list_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -9741,10 +9407,13 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self
-            .hub
-            .advertisers()
-            .location_lists_list(opt.value_of("advertiser-id").unwrap_or(""));
+        let advertiser_id: i64 = arg_from_str(
+            &opt.value_of("advertiser-id").unwrap_or(""),
+            err,
+            "<advertiser-id>",
+            "int64",
+        );
+        let mut call = self.hub.advertisers().location_lists_list(advertiser_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -9933,11 +9602,22 @@ where
             }
         }
         let mut request: api::LocationList = serde_json::value::from_value(object).unwrap();
-        let mut call = self.hub.advertisers().location_lists_patch(
-            request,
-            opt.value_of("advertiser-id").unwrap_or(""),
-            opt.value_of("location-list-id").unwrap_or(""),
+        let advertiser_id: i64 = arg_from_str(
+            &opt.value_of("advertiser-id").unwrap_or(""),
+            err,
+            "<advertiser-id>",
+            "int64",
         );
+        let location_list_id: i64 = arg_from_str(
+            &opt.value_of("location-list-id").unwrap_or(""),
+            err,
+            "<location-list-id>",
+            "int64",
+        );
+        let mut call =
+            self.hub
+                .advertisers()
+                .location_lists_patch(request, advertiser_id, location_list_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -10070,11 +9750,22 @@ where
         }
         let mut request: api::ActivateManualTriggerRequest =
             serde_json::value::from_value(object).unwrap();
-        let mut call = self.hub.advertisers().manual_triggers_activate(
-            request,
-            opt.value_of("advertiser-id").unwrap_or(""),
-            opt.value_of("trigger-id").unwrap_or(""),
+        let advertiser_id: i64 = arg_from_str(
+            &opt.value_of("advertiser-id").unwrap_or(""),
+            err,
+            "<advertiser-id>",
+            "int64",
         );
+        let trigger_id: i64 = arg_from_str(
+            &opt.value_of("trigger-id").unwrap_or(""),
+            err,
+            "<trigger-id>",
+            "int64",
+        );
+        let mut call =
+            self.hub
+                .advertisers()
+                .manual_triggers_activate(request, advertiser_id, trigger_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -10258,10 +9949,16 @@ where
             }
         }
         let mut request: api::ManualTrigger = serde_json::value::from_value(object).unwrap();
+        let advertiser_id: i64 = arg_from_str(
+            &opt.value_of("advertiser-id").unwrap_or(""),
+            err,
+            "<advertiser-id>",
+            "int64",
+        );
         let mut call = self
             .hub
             .advertisers()
-            .manual_triggers_create(request, opt.value_of("advertiser-id").unwrap_or(""));
+            .manual_triggers_create(request, advertiser_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -10386,11 +10083,22 @@ where
         }
         let mut request: api::DeactivateManualTriggerRequest =
             serde_json::value::from_value(object).unwrap();
-        let mut call = self.hub.advertisers().manual_triggers_deactivate(
-            request,
-            opt.value_of("advertiser-id").unwrap_or(""),
-            opt.value_of("trigger-id").unwrap_or(""),
+        let advertiser_id: i64 = arg_from_str(
+            &opt.value_of("advertiser-id").unwrap_or(""),
+            err,
+            "<advertiser-id>",
+            "int64",
         );
+        let trigger_id: i64 = arg_from_str(
+            &opt.value_of("trigger-id").unwrap_or(""),
+            err,
+            "<trigger-id>",
+            "int64",
+        );
+        let mut call =
+            self.hub
+                .advertisers()
+                .manual_triggers_deactivate(request, advertiser_id, trigger_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -10468,10 +10176,22 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self.hub.advertisers().manual_triggers_get(
-            opt.value_of("advertiser-id").unwrap_or(""),
-            opt.value_of("trigger-id").unwrap_or(""),
+        let advertiser_id: i64 = arg_from_str(
+            &opt.value_of("advertiser-id").unwrap_or(""),
+            err,
+            "<advertiser-id>",
+            "int64",
         );
+        let trigger_id: i64 = arg_from_str(
+            &opt.value_of("trigger-id").unwrap_or(""),
+            err,
+            "<trigger-id>",
+            "int64",
+        );
+        let mut call = self
+            .hub
+            .advertisers()
+            .manual_triggers_get(advertiser_id, trigger_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -10549,10 +10269,13 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self
-            .hub
-            .advertisers()
-            .manual_triggers_list(opt.value_of("advertiser-id").unwrap_or(""));
+        let advertiser_id: i64 = arg_from_str(
+            &opt.value_of("advertiser-id").unwrap_or(""),
+            err,
+            "<advertiser-id>",
+            "int64",
+        );
+        let mut call = self.hub.advertisers().manual_triggers_list(advertiser_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -10757,11 +10480,22 @@ where
             }
         }
         let mut request: api::ManualTrigger = serde_json::value::from_value(object).unwrap();
-        let mut call = self.hub.advertisers().manual_triggers_patch(
-            request,
-            opt.value_of("advertiser-id").unwrap_or(""),
-            opt.value_of("trigger-id").unwrap_or(""),
+        let advertiser_id: i64 = arg_from_str(
+            &opt.value_of("advertiser-id").unwrap_or(""),
+            err,
+            "<advertiser-id>",
+            "int64",
         );
+        let trigger_id: i64 = arg_from_str(
+            &opt.value_of("trigger-id").unwrap_or(""),
+            err,
+            "<trigger-id>",
+            "int64",
+        );
+        let mut call =
+            self.hub
+                .advertisers()
+                .manual_triggers_patch(request, advertiser_id, trigger_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -10937,10 +10671,16 @@ where
             }
         }
         let mut request: api::NegativeKeywordList = serde_json::value::from_value(object).unwrap();
+        let advertiser_id: i64 = arg_from_str(
+            &opt.value_of("advertiser-id").unwrap_or(""),
+            err,
+            "<advertiser-id>",
+            "int64",
+        );
         let mut call = self
             .hub
             .advertisers()
-            .negative_keyword_lists_create(request, opt.value_of("advertiser-id").unwrap_or(""));
+            .negative_keyword_lists_create(request, advertiser_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -11018,10 +10758,22 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self.hub.advertisers().negative_keyword_lists_delete(
-            opt.value_of("advertiser-id").unwrap_or(""),
-            opt.value_of("negative-keyword-list-id").unwrap_or(""),
+        let advertiser_id: i64 = arg_from_str(
+            &opt.value_of("advertiser-id").unwrap_or(""),
+            err,
+            "<advertiser-id>",
+            "int64",
         );
+        let negative_keyword_list_id: i64 = arg_from_str(
+            &opt.value_of("negative-keyword-list-id").unwrap_or(""),
+            err,
+            "<negative-keyword-list-id>",
+            "int64",
+        );
+        let mut call = self
+            .hub
+            .advertisers()
+            .negative_keyword_lists_delete(advertiser_id, negative_keyword_list_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -11099,10 +10851,22 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self.hub.advertisers().negative_keyword_lists_get(
-            opt.value_of("advertiser-id").unwrap_or(""),
-            opt.value_of("negative-keyword-list-id").unwrap_or(""),
+        let advertiser_id: i64 = arg_from_str(
+            &opt.value_of("advertiser-id").unwrap_or(""),
+            err,
+            "<advertiser-id>",
+            "int64",
         );
+        let negative_keyword_list_id: i64 = arg_from_str(
+            &opt.value_of("negative-keyword-list-id").unwrap_or(""),
+            err,
+            "<negative-keyword-list-id>",
+            "int64",
+        );
+        let mut call = self
+            .hub
+            .advertisers()
+            .negative_keyword_lists_get(advertiser_id, negative_keyword_list_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -11180,10 +10944,16 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
+        let advertiser_id: i64 = arg_from_str(
+            &opt.value_of("advertiser-id").unwrap_or(""),
+            err,
+            "<advertiser-id>",
+            "int64",
+        );
         let mut call = self
             .hub
             .advertisers()
-            .negative_keyword_lists_list(opt.value_of("advertiser-id").unwrap_or(""));
+            .negative_keyword_lists_list(advertiser_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -11327,13 +11097,25 @@ where
         }
         let mut request: api::BulkEditNegativeKeywordsRequest =
             serde_json::value::from_value(object).unwrap();
+        let advertiser_id: i64 = arg_from_str(
+            &opt.value_of("advertiser-id").unwrap_or(""),
+            err,
+            "<advertiser-id>",
+            "int64",
+        );
+        let negative_keyword_list_id: i64 = arg_from_str(
+            &opt.value_of("negative-keyword-list-id").unwrap_or(""),
+            err,
+            "<negative-keyword-list-id>",
+            "int64",
+        );
         let mut call = self
             .hub
             .advertisers()
             .negative_keyword_lists_negative_keywords_bulk_edit(
                 request,
-                opt.value_of("advertiser-id").unwrap_or(""),
-                opt.value_of("negative-keyword-list-id").unwrap_or(""),
+                advertiser_id,
+                negative_keyword_list_id,
             );
         for parg in opt
             .values_of("v")
@@ -11472,13 +11254,25 @@ where
             }
         }
         let mut request: api::NegativeKeyword = serde_json::value::from_value(object).unwrap();
+        let advertiser_id: i64 = arg_from_str(
+            &opt.value_of("advertiser-id").unwrap_or(""),
+            err,
+            "<advertiser-id>",
+            "int64",
+        );
+        let negative_keyword_list_id: i64 = arg_from_str(
+            &opt.value_of("negative-keyword-list-id").unwrap_or(""),
+            err,
+            "<negative-keyword-list-id>",
+            "int64",
+        );
         let mut call = self
             .hub
             .advertisers()
             .negative_keyword_lists_negative_keywords_create(
                 request,
-                opt.value_of("advertiser-id").unwrap_or(""),
-                opt.value_of("negative-keyword-list-id").unwrap_or(""),
+                advertiser_id,
+                negative_keyword_list_id,
             );
         for parg in opt
             .values_of("v")
@@ -11557,12 +11351,24 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
+        let advertiser_id: i64 = arg_from_str(
+            &opt.value_of("advertiser-id").unwrap_or(""),
+            err,
+            "<advertiser-id>",
+            "int64",
+        );
+        let negative_keyword_list_id: i64 = arg_from_str(
+            &opt.value_of("negative-keyword-list-id").unwrap_or(""),
+            err,
+            "<negative-keyword-list-id>",
+            "int64",
+        );
         let mut call = self
             .hub
             .advertisers()
             .negative_keyword_lists_negative_keywords_delete(
-                opt.value_of("advertiser-id").unwrap_or(""),
-                opt.value_of("negative-keyword-list-id").unwrap_or(""),
+                advertiser_id,
+                negative_keyword_list_id,
                 opt.value_of("keyword-value").unwrap_or(""),
             );
         for parg in opt
@@ -11642,13 +11448,22 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
+        let advertiser_id: i64 = arg_from_str(
+            &opt.value_of("advertiser-id").unwrap_or(""),
+            err,
+            "<advertiser-id>",
+            "int64",
+        );
+        let negative_keyword_list_id: i64 = arg_from_str(
+            &opt.value_of("negative-keyword-list-id").unwrap_or(""),
+            err,
+            "<negative-keyword-list-id>",
+            "int64",
+        );
         let mut call = self
             .hub
             .advertisers()
-            .negative_keyword_lists_negative_keywords_list(
-                opt.value_of("advertiser-id").unwrap_or(""),
-                opt.value_of("negative-keyword-list-id").unwrap_or(""),
-            );
+            .negative_keyword_lists_negative_keywords_list(advertiser_id, negative_keyword_list_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -11794,13 +11609,25 @@ where
         }
         let mut request: api::ReplaceNegativeKeywordsRequest =
             serde_json::value::from_value(object).unwrap();
+        let advertiser_id: i64 = arg_from_str(
+            &opt.value_of("advertiser-id").unwrap_or(""),
+            err,
+            "<advertiser-id>",
+            "int64",
+        );
+        let negative_keyword_list_id: i64 = arg_from_str(
+            &opt.value_of("negative-keyword-list-id").unwrap_or(""),
+            err,
+            "<negative-keyword-list-id>",
+            "int64",
+        );
         let mut call = self
             .hub
             .advertisers()
             .negative_keyword_lists_negative_keywords_replace(
                 request,
-                opt.value_of("advertiser-id").unwrap_or(""),
-                opt.value_of("negative-keyword-list-id").unwrap_or(""),
+                advertiser_id,
+                negative_keyword_list_id,
             );
         for parg in opt
             .values_of("v")
@@ -11969,10 +11796,22 @@ where
             }
         }
         let mut request: api::NegativeKeywordList = serde_json::value::from_value(object).unwrap();
+        let advertiser_id: i64 = arg_from_str(
+            &opt.value_of("advertiser-id").unwrap_or(""),
+            err,
+            "<advertiser-id>",
+            "int64",
+        );
+        let negative_keyword_list_id: i64 = arg_from_str(
+            &opt.value_of("negative-keyword-list-id").unwrap_or(""),
+            err,
+            "<negative-keyword-list-id>",
+            "int64",
+        );
         let mut call = self.hub.advertisers().negative_keyword_lists_patch(
             request,
-            opt.value_of("advertiser-id").unwrap_or(""),
-            opt.value_of("negative-keyword-list-id").unwrap_or(""),
+            advertiser_id,
+            negative_keyword_list_id,
         );
         for parg in opt
             .values_of("v")
@@ -12149,6 +11988,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "contains-eu-political-ads" => Some((
+                    "containsEuPoliticalAds",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "creative-config.dynamic-creative-enabled" => Some((
                     "creativeConfig.dynamicCreativeEnabled",
                     JsonTypeInfo {
@@ -12295,6 +12141,7 @@ where
                             "cm-floodlight-linking-authorized",
                             "cm-hybrid-config",
                             "cm-syncable-site-ids",
+                            "contains-eu-political-ads",
                             "creative-config",
                             "currency-code",
                             "data-access-config",
@@ -12344,10 +12191,13 @@ where
             }
         }
         let mut request: api::Advertiser = serde_json::value::from_value(object).unwrap();
-        let mut call = self
-            .hub
-            .advertisers()
-            .patch(request, opt.value_of("advertiser-id").unwrap_or(""));
+        let advertiser_id: i64 = arg_from_str(
+            &opt.value_of("advertiser-id").unwrap_or(""),
+            err,
+            "<advertiser-id>",
+            "int64",
+        );
+        let mut call = self.hub.advertisers().patch(request, advertiser_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -12613,12 +12463,18 @@ where
         }
         let mut request: api::AssignedTargetingOption =
             serde_json::value::from_value(object).unwrap();
+        let advertiser_id: i64 = arg_from_str(
+            &opt.value_of("advertiser-id").unwrap_or(""),
+            err,
+            "<advertiser-id>",
+            "int64",
+        );
         let mut call = self
             .hub
             .advertisers()
             .targeting_types_assigned_targeting_options_create(
                 request,
-                opt.value_of("advertiser-id").unwrap_or(""),
+                advertiser_id,
                 opt.value_of("targeting-type").unwrap_or(""),
             );
         for parg in opt
@@ -12698,11 +12554,17 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
+        let advertiser_id: i64 = arg_from_str(
+            &opt.value_of("advertiser-id").unwrap_or(""),
+            err,
+            "<advertiser-id>",
+            "int64",
+        );
         let mut call = self
             .hub
             .advertisers()
             .targeting_types_assigned_targeting_options_delete(
-                opt.value_of("advertiser-id").unwrap_or(""),
+                advertiser_id,
                 opt.value_of("targeting-type").unwrap_or(""),
                 opt.value_of("assigned-targeting-option-id").unwrap_or(""),
             );
@@ -12783,11 +12645,17 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
+        let advertiser_id: i64 = arg_from_str(
+            &opt.value_of("advertiser-id").unwrap_or(""),
+            err,
+            "<advertiser-id>",
+            "int64",
+        );
         let mut call = self
             .hub
             .advertisers()
             .targeting_types_assigned_targeting_options_get(
-                opt.value_of("advertiser-id").unwrap_or(""),
+                advertiser_id,
                 opt.value_of("targeting-type").unwrap_or(""),
                 opt.value_of("assigned-targeting-option-id").unwrap_or(""),
             );
@@ -12868,11 +12736,17 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
+        let advertiser_id: i64 = arg_from_str(
+            &opt.value_of("advertiser-id").unwrap_or(""),
+            err,
+            "<advertiser-id>",
+            "int64",
+        );
         let mut call = self
             .hub
             .advertisers()
             .targeting_types_assigned_targeting_options_list(
-                opt.value_of("advertiser-id").unwrap_or(""),
+                advertiser_id,
                 opt.value_of("targeting-type").unwrap_or(""),
             );
         for parg in opt
@@ -12973,10 +12847,13 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self
-            .hub
-            .combined_audiences()
-            .get(opt.value_of("combined-audience-id").unwrap_or(""));
+        let combined_audience_id: i64 = arg_from_str(
+            &opt.value_of("combined-audience-id").unwrap_or(""),
+            err,
+            "<combined-audience-id>",
+            "int64",
+        );
+        let mut call = self.hub.combined_audiences().get(combined_audience_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -13390,10 +13267,16 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
+        let custom_bidding_algorithm_id: i64 = arg_from_str(
+            &opt.value_of("custom-bidding-algorithm-id").unwrap_or(""),
+            err,
+            "<custom-bidding-algorithm-id>",
+            "int64",
+        );
         let mut call = self
             .hub
             .custom_bidding_algorithms()
-            .get(opt.value_of("custom-bidding-algorithm-id").unwrap_or(""));
+            .get(custom_bidding_algorithm_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -13729,10 +13612,16 @@ where
         }
         let mut request: api::CustomBiddingAlgorithm =
             serde_json::value::from_value(object).unwrap();
-        let mut call = self.hub.custom_bidding_algorithms().patch(
-            request,
-            opt.value_of("custom-bidding-algorithm-id").unwrap_or(""),
+        let custom_bidding_algorithm_id: i64 = arg_from_str(
+            &opt.value_of("custom-bidding-algorithm-id").unwrap_or(""),
+            err,
+            "<custom-bidding-algorithm-id>",
+            "int64",
         );
+        let mut call = self
+            .hub
+            .custom_bidding_algorithms()
+            .patch(request, custom_bidding_algorithm_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -13925,10 +13814,16 @@ where
             }
         }
         let mut request: api::CustomBiddingScript = serde_json::value::from_value(object).unwrap();
-        let mut call = self.hub.custom_bidding_algorithms().scripts_create(
-            request,
-            opt.value_of("custom-bidding-algorithm-id").unwrap_or(""),
+        let custom_bidding_algorithm_id: i64 = arg_from_str(
+            &opt.value_of("custom-bidding-algorithm-id").unwrap_or(""),
+            err,
+            "<custom-bidding-algorithm-id>",
+            "int64",
         );
+        let mut call = self
+            .hub
+            .custom_bidding_algorithms()
+            .scripts_create(request, custom_bidding_algorithm_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -14021,10 +13916,22 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self.hub.custom_bidding_algorithms().scripts_get(
-            opt.value_of("custom-bidding-algorithm-id").unwrap_or(""),
-            opt.value_of("custom-bidding-script-id").unwrap_or(""),
+        let custom_bidding_algorithm_id: i64 = arg_from_str(
+            &opt.value_of("custom-bidding-algorithm-id").unwrap_or(""),
+            err,
+            "<custom-bidding-algorithm-id>",
+            "int64",
         );
+        let custom_bidding_script_id: i64 = arg_from_str(
+            &opt.value_of("custom-bidding-script-id").unwrap_or(""),
+            err,
+            "<custom-bidding-script-id>",
+            "int64",
+        );
+        let mut call = self
+            .hub
+            .custom_bidding_algorithms()
+            .scripts_get(custom_bidding_algorithm_id, custom_bidding_script_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -14117,10 +14024,16 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
+        let custom_bidding_algorithm_id: i64 = arg_from_str(
+            &opt.value_of("custom-bidding-algorithm-id").unwrap_or(""),
+            err,
+            "<custom-bidding-algorithm-id>",
+            "int64",
+        );
         let mut call = self
             .hub
             .custom_bidding_algorithms()
-            .scripts_list(opt.value_of("custom-bidding-algorithm-id").unwrap_or(""));
+            .scripts_list(custom_bidding_algorithm_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -14236,10 +14149,16 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
+        let custom_bidding_algorithm_id: i64 = arg_from_str(
+            &opt.value_of("custom-bidding-algorithm-id").unwrap_or(""),
+            err,
+            "<custom-bidding-algorithm-id>",
+            "int64",
+        );
         let mut call = self
             .hub
             .custom_bidding_algorithms()
-            .upload_script(opt.value_of("custom-bidding-algorithm-id").unwrap_or(""));
+            .upload_script(custom_bidding_algorithm_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -14332,10 +14251,13 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self
-            .hub
-            .custom_lists()
-            .get(opt.value_of("custom-list-id").unwrap_or(""));
+        let custom_list_id: i64 = arg_from_str(
+            &opt.value_of("custom-list-id").unwrap_or(""),
+            err,
+            "<custom-list-id>",
+            "int64",
+        );
+        let mut call = self.hub.custom_lists().get(custom_list_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -14527,1077 +14449,19 @@ where
         }
     }
 
-    async fn _first_and_third_party_audiences_create(
-        &self,
-        opt: &ArgMatches<'n>,
-        dry_run: bool,
-        err: &mut InvalidOptionsError,
-    ) -> Result<(), DoitError> {
-        let mut field_cursor = FieldCursor::default();
-        let mut object = serde_json::value::Value::Object(Default::default());
-
-        for kvarg in opt
-            .values_of("kv")
-            .map(|i| i.collect())
-            .unwrap_or(Vec::new())
-            .iter()
-        {
-            let last_errc = err.issues.len();
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            let mut temp_cursor = field_cursor.clone();
-            if let Err(field_err) = temp_cursor.set(&*key) {
-                err.issues.push(field_err);
-            }
-            if value.is_none() {
-                field_cursor = temp_cursor.clone();
-                if err.issues.len() > last_errc {
-                    err.issues.remove(last_errc);
-                }
-                continue;
-            }
-
-            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
-            {
-                "active-display-audience-size" => Some((
-                    "activeDisplayAudienceSize",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "app-id" => Some((
-                    "appId",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "audience-source" => Some((
-                    "audienceSource",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "audience-type" => Some((
-                    "audienceType",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "contact-info-list.consent.ad-personalization" => Some((
-                    "contactInfoList.consent.adPersonalization",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "contact-info-list.consent.ad-user-data" => Some((
-                    "contactInfoList.consent.adUserData",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "description" => Some((
-                    "description",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "display-audience-size" => Some((
-                    "displayAudienceSize",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "display-desktop-audience-size" => Some((
-                    "displayDesktopAudienceSize",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "display-mobile-app-audience-size" => Some((
-                    "displayMobileAppAudienceSize",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "display-mobile-web-audience-size" => Some((
-                    "displayMobileWebAudienceSize",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "display-name" => Some((
-                    "displayName",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "first-and-third-party-audience-id" => Some((
-                    "firstAndThirdPartyAudienceId",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "first-and-third-party-audience-type" => Some((
-                    "firstAndThirdPartyAudienceType",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "gmail-audience-size" => Some((
-                    "gmailAudienceSize",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "membership-duration-days" => Some((
-                    "membershipDurationDays",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "mobile-device-id-list.consent.ad-personalization" => Some((
-                    "mobileDeviceIdList.consent.adPersonalization",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "mobile-device-id-list.consent.ad-user-data" => Some((
-                    "mobileDeviceIdList.consent.adUserData",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "mobile-device-id-list.mobile-device-ids" => Some((
-                    "mobileDeviceIdList.mobileDeviceIds",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Vec,
-                    },
-                )),
-                "name" => Some((
-                    "name",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "youtube-audience-size" => Some((
-                    "youtubeAudienceSize",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(
-                        key,
-                        &vec![
-                            "active-display-audience-size",
-                            "ad-personalization",
-                            "ad-user-data",
-                            "app-id",
-                            "audience-source",
-                            "audience-type",
-                            "consent",
-                            "contact-info-list",
-                            "description",
-                            "display-audience-size",
-                            "display-desktop-audience-size",
-                            "display-mobile-app-audience-size",
-                            "display-mobile-web-audience-size",
-                            "display-name",
-                            "first-and-third-party-audience-id",
-                            "first-and-third-party-audience-type",
-                            "gmail-audience-size",
-                            "membership-duration-days",
-                            "mobile-device-id-list",
-                            "mobile-device-ids",
-                            "name",
-                            "youtube-audience-size",
-                        ],
-                    );
-                    err.issues.push(CLIError::Field(FieldError::Unknown(
-                        temp_cursor.to_string(),
-                        suggestion,
-                        value.map(|v| v.to_string()),
-                    )));
-                    None
-                }
-            };
-            if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(
-                    &mut object,
-                    value.unwrap(),
-                    type_info,
-                    err,
-                    &temp_cursor,
-                );
-            }
-        }
-        let mut request: api::FirstAndThirdPartyAudience =
-            serde_json::value::from_value(object).unwrap();
-        let mut call = self.hub.first_and_third_party_audiences().create(request);
-        for parg in opt
-            .values_of("v")
-            .map(|i| i.collect())
-            .unwrap_or(Vec::new())
-            .iter()
-        {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "advertiser-id" => {
-                    call = call.advertiser_id(
-                        value
-                            .map(|v| arg_from_str(v, err, "advertiser-id", "int64"))
-                            .unwrap_or(-0),
-                    );
-                }
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(
-                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
-                                value.unwrap_or("unset"),
-                            );
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues
-                            .push(CLIError::UnknownParameter(key.to_string(), {
-                                let mut v = Vec::new();
-                                v.extend(self.gp.iter().map(|v| *v));
-                                v.extend(["advertiser-id"].iter().map(|v| *v));
-                                v
-                            }));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self
-                .opt
-                .values_of("url")
-                .map(|i| i.collect())
-                .unwrap_or(Vec::new())
-                .iter()
-            {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => {
-                    return Err(DoitError::IoError(
-                        opt.value_of("out").unwrap_or("-").to_string(),
-                        io_err,
-                    ))
-                }
-            };
-            match match protocol {
-                CallType::Standard => call.doit().await,
-                _ => unreachable!(),
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value =
-                        serde_json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    async fn _first_and_third_party_audiences_edit_customer_match_members(
-        &self,
-        opt: &ArgMatches<'n>,
-        dry_run: bool,
-        err: &mut InvalidOptionsError,
-    ) -> Result<(), DoitError> {
-        let mut field_cursor = FieldCursor::default();
-        let mut object = serde_json::value::Value::Object(Default::default());
-
-        for kvarg in opt
-            .values_of("kv")
-            .map(|i| i.collect())
-            .unwrap_or(Vec::new())
-            .iter()
-        {
-            let last_errc = err.issues.len();
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            let mut temp_cursor = field_cursor.clone();
-            if let Err(field_err) = temp_cursor.set(&*key) {
-                err.issues.push(field_err);
-            }
-            if value.is_none() {
-                field_cursor = temp_cursor.clone();
-                if err.issues.len() > last_errc {
-                    err.issues.remove(last_errc);
-                }
-                continue;
-            }
-
-            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
-            {
-                "added-contact-info-list.consent.ad-personalization" => Some((
-                    "addedContactInfoList.consent.adPersonalization",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "added-contact-info-list.consent.ad-user-data" => Some((
-                    "addedContactInfoList.consent.adUserData",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "added-mobile-device-id-list.consent.ad-personalization" => Some((
-                    "addedMobileDeviceIdList.consent.adPersonalization",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "added-mobile-device-id-list.consent.ad-user-data" => Some((
-                    "addedMobileDeviceIdList.consent.adUserData",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "added-mobile-device-id-list.mobile-device-ids" => Some((
-                    "addedMobileDeviceIdList.mobileDeviceIds",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Vec,
-                    },
-                )),
-                "advertiser-id" => Some((
-                    "advertiserId",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "removed-contact-info-list.consent.ad-personalization" => Some((
-                    "removedContactInfoList.consent.adPersonalization",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "removed-contact-info-list.consent.ad-user-data" => Some((
-                    "removedContactInfoList.consent.adUserData",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "removed-mobile-device-id-list.consent.ad-personalization" => Some((
-                    "removedMobileDeviceIdList.consent.adPersonalization",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "removed-mobile-device-id-list.consent.ad-user-data" => Some((
-                    "removedMobileDeviceIdList.consent.adUserData",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "removed-mobile-device-id-list.mobile-device-ids" => Some((
-                    "removedMobileDeviceIdList.mobileDeviceIds",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Vec,
-                    },
-                )),
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(
-                        key,
-                        &vec![
-                            "ad-personalization",
-                            "ad-user-data",
-                            "added-contact-info-list",
-                            "added-mobile-device-id-list",
-                            "advertiser-id",
-                            "consent",
-                            "mobile-device-ids",
-                            "removed-contact-info-list",
-                            "removed-mobile-device-id-list",
-                        ],
-                    );
-                    err.issues.push(CLIError::Field(FieldError::Unknown(
-                        temp_cursor.to_string(),
-                        suggestion,
-                        value.map(|v| v.to_string()),
-                    )));
-                    None
-                }
-            };
-            if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(
-                    &mut object,
-                    value.unwrap(),
-                    type_info,
-                    err,
-                    &temp_cursor,
-                );
-            }
-        }
-        let mut request: api::EditCustomerMatchMembersRequest =
-            serde_json::value::from_value(object).unwrap();
-        let mut call = self
-            .hub
-            .first_and_third_party_audiences()
-            .edit_customer_match_members(
-                request,
-                opt.value_of("first-and-third-party-audience-id")
-                    .unwrap_or(""),
-            );
-        for parg in opt
-            .values_of("v")
-            .map(|i| i.collect())
-            .unwrap_or(Vec::new())
-            .iter()
-        {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(
-                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
-                                value.unwrap_or("unset"),
-                            );
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues
-                            .push(CLIError::UnknownParameter(key.to_string(), {
-                                let mut v = Vec::new();
-                                v.extend(self.gp.iter().map(|v| *v));
-                                v
-                            }));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self
-                .opt
-                .values_of("url")
-                .map(|i| i.collect())
-                .unwrap_or(Vec::new())
-                .iter()
-            {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => {
-                    return Err(DoitError::IoError(
-                        opt.value_of("out").unwrap_or("-").to_string(),
-                        io_err,
-                    ))
-                }
-            };
-            match match protocol {
-                CallType::Standard => call.doit().await,
-                _ => unreachable!(),
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value =
-                        serde_json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    async fn _first_and_third_party_audiences_get(
-        &self,
-        opt: &ArgMatches<'n>,
-        dry_run: bool,
-        err: &mut InvalidOptionsError,
-    ) -> Result<(), DoitError> {
-        let mut call = self.hub.first_and_third_party_audiences().get(
-            opt.value_of("first-and-third-party-audience-id")
-                .unwrap_or(""),
-        );
-        for parg in opt
-            .values_of("v")
-            .map(|i| i.collect())
-            .unwrap_or(Vec::new())
-            .iter()
-        {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "partner-id" => {
-                    call = call.partner_id(
-                        value
-                            .map(|v| arg_from_str(v, err, "partner-id", "int64"))
-                            .unwrap_or(-0),
-                    );
-                }
-                "advertiser-id" => {
-                    call = call.advertiser_id(
-                        value
-                            .map(|v| arg_from_str(v, err, "advertiser-id", "int64"))
-                            .unwrap_or(-0),
-                    );
-                }
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(
-                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
-                                value.unwrap_or("unset"),
-                            );
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues
-                            .push(CLIError::UnknownParameter(key.to_string(), {
-                                let mut v = Vec::new();
-                                v.extend(self.gp.iter().map(|v| *v));
-                                v.extend(["advertiser-id", "partner-id"].iter().map(|v| *v));
-                                v
-                            }));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self
-                .opt
-                .values_of("url")
-                .map(|i| i.collect())
-                .unwrap_or(Vec::new())
-                .iter()
-            {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => {
-                    return Err(DoitError::IoError(
-                        opt.value_of("out").unwrap_or("-").to_string(),
-                        io_err,
-                    ))
-                }
-            };
-            match match protocol {
-                CallType::Standard => call.doit().await,
-                _ => unreachable!(),
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value =
-                        serde_json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    async fn _first_and_third_party_audiences_list(
-        &self,
-        opt: &ArgMatches<'n>,
-        dry_run: bool,
-        err: &mut InvalidOptionsError,
-    ) -> Result<(), DoitError> {
-        let mut call = self.hub.first_and_third_party_audiences().list();
-        for parg in opt
-            .values_of("v")
-            .map(|i| i.collect())
-            .unwrap_or(Vec::new())
-            .iter()
-        {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "partner-id" => {
-                    call = call.partner_id(
-                        value
-                            .map(|v| arg_from_str(v, err, "partner-id", "int64"))
-                            .unwrap_or(-0),
-                    );
-                }
-                "page-token" => {
-                    call = call.page_token(value.unwrap_or(""));
-                }
-                "page-size" => {
-                    call = call.page_size(
-                        value
-                            .map(|v| arg_from_str(v, err, "page-size", "int32"))
-                            .unwrap_or(-0),
-                    );
-                }
-                "order-by" => {
-                    call = call.order_by(value.unwrap_or(""));
-                }
-                "filter" => {
-                    call = call.filter(value.unwrap_or(""));
-                }
-                "advertiser-id" => {
-                    call = call.advertiser_id(
-                        value
-                            .map(|v| arg_from_str(v, err, "advertiser-id", "int64"))
-                            .unwrap_or(-0),
-                    );
-                }
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(
-                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
-                                value.unwrap_or("unset"),
-                            );
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues
-                            .push(CLIError::UnknownParameter(key.to_string(), {
-                                let mut v = Vec::new();
-                                v.extend(self.gp.iter().map(|v| *v));
-                                v.extend(
-                                    [
-                                        "advertiser-id",
-                                        "filter",
-                                        "order-by",
-                                        "page-size",
-                                        "page-token",
-                                        "partner-id",
-                                    ]
-                                    .iter()
-                                    .map(|v| *v),
-                                );
-                                v
-                            }));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self
-                .opt
-                .values_of("url")
-                .map(|i| i.collect())
-                .unwrap_or(Vec::new())
-                .iter()
-            {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => {
-                    return Err(DoitError::IoError(
-                        opt.value_of("out").unwrap_or("-").to_string(),
-                        io_err,
-                    ))
-                }
-            };
-            match match protocol {
-                CallType::Standard => call.doit().await,
-                _ => unreachable!(),
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value =
-                        serde_json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    async fn _first_and_third_party_audiences_patch(
-        &self,
-        opt: &ArgMatches<'n>,
-        dry_run: bool,
-        err: &mut InvalidOptionsError,
-    ) -> Result<(), DoitError> {
-        let mut field_cursor = FieldCursor::default();
-        let mut object = serde_json::value::Value::Object(Default::default());
-
-        for kvarg in opt
-            .values_of("kv")
-            .map(|i| i.collect())
-            .unwrap_or(Vec::new())
-            .iter()
-        {
-            let last_errc = err.issues.len();
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            let mut temp_cursor = field_cursor.clone();
-            if let Err(field_err) = temp_cursor.set(&*key) {
-                err.issues.push(field_err);
-            }
-            if value.is_none() {
-                field_cursor = temp_cursor.clone();
-                if err.issues.len() > last_errc {
-                    err.issues.remove(last_errc);
-                }
-                continue;
-            }
-
-            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
-            {
-                "active-display-audience-size" => Some((
-                    "activeDisplayAudienceSize",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "app-id" => Some((
-                    "appId",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "audience-source" => Some((
-                    "audienceSource",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "audience-type" => Some((
-                    "audienceType",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "contact-info-list.consent.ad-personalization" => Some((
-                    "contactInfoList.consent.adPersonalization",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "contact-info-list.consent.ad-user-data" => Some((
-                    "contactInfoList.consent.adUserData",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "description" => Some((
-                    "description",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "display-audience-size" => Some((
-                    "displayAudienceSize",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "display-desktop-audience-size" => Some((
-                    "displayDesktopAudienceSize",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "display-mobile-app-audience-size" => Some((
-                    "displayMobileAppAudienceSize",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "display-mobile-web-audience-size" => Some((
-                    "displayMobileWebAudienceSize",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "display-name" => Some((
-                    "displayName",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "first-and-third-party-audience-id" => Some((
-                    "firstAndThirdPartyAudienceId",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "first-and-third-party-audience-type" => Some((
-                    "firstAndThirdPartyAudienceType",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "gmail-audience-size" => Some((
-                    "gmailAudienceSize",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "membership-duration-days" => Some((
-                    "membershipDurationDays",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "mobile-device-id-list.consent.ad-personalization" => Some((
-                    "mobileDeviceIdList.consent.adPersonalization",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "mobile-device-id-list.consent.ad-user-data" => Some((
-                    "mobileDeviceIdList.consent.adUserData",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "mobile-device-id-list.mobile-device-ids" => Some((
-                    "mobileDeviceIdList.mobileDeviceIds",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Vec,
-                    },
-                )),
-                "name" => Some((
-                    "name",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "youtube-audience-size" => Some((
-                    "youtubeAudienceSize",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(
-                        key,
-                        &vec![
-                            "active-display-audience-size",
-                            "ad-personalization",
-                            "ad-user-data",
-                            "app-id",
-                            "audience-source",
-                            "audience-type",
-                            "consent",
-                            "contact-info-list",
-                            "description",
-                            "display-audience-size",
-                            "display-desktop-audience-size",
-                            "display-mobile-app-audience-size",
-                            "display-mobile-web-audience-size",
-                            "display-name",
-                            "first-and-third-party-audience-id",
-                            "first-and-third-party-audience-type",
-                            "gmail-audience-size",
-                            "membership-duration-days",
-                            "mobile-device-id-list",
-                            "mobile-device-ids",
-                            "name",
-                            "youtube-audience-size",
-                        ],
-                    );
-                    err.issues.push(CLIError::Field(FieldError::Unknown(
-                        temp_cursor.to_string(),
-                        suggestion,
-                        value.map(|v| v.to_string()),
-                    )));
-                    None
-                }
-            };
-            if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(
-                    &mut object,
-                    value.unwrap(),
-                    type_info,
-                    err,
-                    &temp_cursor,
-                );
-            }
-        }
-        let mut request: api::FirstAndThirdPartyAudience =
-            serde_json::value::from_value(object).unwrap();
-        let mut call = self.hub.first_and_third_party_audiences().patch(
-            request,
-            opt.value_of("first-and-third-party-audience-id")
-                .unwrap_or(""),
-        );
-        for parg in opt
-            .values_of("v")
-            .map(|i| i.collect())
-            .unwrap_or(Vec::new())
-            .iter()
-        {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "update-mask" => {
-                    call = call.update_mask(
-                        value
-                            .map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask"))
-                            .unwrap_or(apis_common::FieldMask::default()),
-                    );
-                }
-                "advertiser-id" => {
-                    call = call.advertiser_id(
-                        value
-                            .map(|v| arg_from_str(v, err, "advertiser-id", "int64"))
-                            .unwrap_or(-0),
-                    );
-                }
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(
-                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
-                                value.unwrap_or("unset"),
-                            );
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues
-                            .push(CLIError::UnknownParameter(key.to_string(), {
-                                let mut v = Vec::new();
-                                v.extend(self.gp.iter().map(|v| *v));
-                                v.extend(["advertiser-id", "update-mask"].iter().map(|v| *v));
-                                v
-                            }));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self
-                .opt
-                .values_of("url")
-                .map(|i| i.collect())
-                .unwrap_or(Vec::new())
-                .iter()
-            {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => {
-                    return Err(DoitError::IoError(
-                        opt.value_of("out").unwrap_or("-").to_string(),
-                        io_err,
-                    ))
-                }
-            };
-            match match protocol {
-                CallType::Standard => call.doit().await,
-                _ => unreachable!(),
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value =
-                        serde_json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
     async fn _floodlight_groups_get(
         &self,
         opt: &ArgMatches<'n>,
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self
-            .hub
-            .floodlight_groups()
-            .get(opt.value_of("floodlight-group-id").unwrap_or(""));
+        let floodlight_group_id: i64 = arg_from_str(
+            &opt.value_of("floodlight-group-id").unwrap_or(""),
+            err,
+            "<floodlight-group-id>",
+            "int64",
+        );
+        let mut call = self.hub.floodlight_groups().get(floodlight_group_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -15822,10 +14686,16 @@ where
             }
         }
         let mut request: api::FloodlightGroup = serde_json::value::from_value(object).unwrap();
+        let floodlight_group_id: i64 = arg_from_str(
+            &opt.value_of("floodlight-group-id").unwrap_or(""),
+            err,
+            "<floodlight-group-id>",
+            "int64",
+        );
         let mut call = self
             .hub
             .floodlight_groups()
-            .patch(request, opt.value_of("floodlight-group-id").unwrap_or(""));
+            .patch(request, floodlight_group_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -15918,10 +14788,13 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self
-            .hub
-            .google_audiences()
-            .get(opt.value_of("google-audience-id").unwrap_or(""));
+        let google_audience_id: i64 = arg_from_str(
+            &opt.value_of("google-audience-id").unwrap_or(""),
+            err,
+            "<google-audience-id>",
+            "int64",
+        );
+        let mut call = self.hub.google_audiences().get(google_audience_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -17150,13 +16023,16 @@ where
         }
         let mut request: api::BulkEditAssignedInventorySourcesRequest =
             serde_json::value::from_value(object).unwrap();
+        let inventory_source_group_id: i64 = arg_from_str(
+            &opt.value_of("inventory-source-group-id").unwrap_or(""),
+            err,
+            "<inventory-source-group-id>",
+            "int64",
+        );
         let mut call = self
             .hub
             .inventory_source_groups()
-            .assigned_inventory_sources_bulk_edit(
-                request,
-                opt.value_of("inventory-source-group-id").unwrap_or(""),
-            );
+            .assigned_inventory_sources_bulk_edit(request, inventory_source_group_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -17309,13 +16185,16 @@ where
         }
         let mut request: api::AssignedInventorySource =
             serde_json::value::from_value(object).unwrap();
+        let inventory_source_group_id: i64 = arg_from_str(
+            &opt.value_of("inventory-source-group-id").unwrap_or(""),
+            err,
+            "<inventory-source-group-id>",
+            "int64",
+        );
         let mut call = self
             .hub
             .inventory_source_groups()
-            .assigned_inventory_sources_create(
-                request,
-                opt.value_of("inventory-source-group-id").unwrap_or(""),
-            );
+            .assigned_inventory_sources_create(request, inventory_source_group_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -17408,12 +16287,24 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
+        let inventory_source_group_id: i64 = arg_from_str(
+            &opt.value_of("inventory-source-group-id").unwrap_or(""),
+            err,
+            "<inventory-source-group-id>",
+            "int64",
+        );
+        let assigned_inventory_source_id: i64 = arg_from_str(
+            &opt.value_of("assigned-inventory-source-id").unwrap_or(""),
+            err,
+            "<assigned-inventory-source-id>",
+            "int64",
+        );
         let mut call = self
             .hub
             .inventory_source_groups()
             .assigned_inventory_sources_delete(
-                opt.value_of("inventory-source-group-id").unwrap_or(""),
-                opt.value_of("assigned-inventory-source-id").unwrap_or(""),
+                inventory_source_group_id,
+                assigned_inventory_source_id,
             );
         for parg in opt
             .values_of("v")
@@ -17507,12 +16398,16 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
+        let inventory_source_group_id: i64 = arg_from_str(
+            &opt.value_of("inventory-source-group-id").unwrap_or(""),
+            err,
+            "<inventory-source-group-id>",
+            "int64",
+        );
         let mut call = self
             .hub
             .inventory_source_groups()
-            .assigned_inventory_sources_list(
-                opt.value_of("inventory-source-group-id").unwrap_or(""),
-            );
+            .assigned_inventory_sources_list(inventory_source_group_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -17795,10 +16690,16 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
+        let inventory_source_group_id: i64 = arg_from_str(
+            &opt.value_of("inventory-source-group-id").unwrap_or(""),
+            err,
+            "<inventory-source-group-id>",
+            "int64",
+        );
         let mut call = self
             .hub
             .inventory_source_groups()
-            .delete(opt.value_of("inventory-source-group-id").unwrap_or(""));
+            .delete(inventory_source_group_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -17891,10 +16792,16 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
+        let inventory_source_group_id: i64 = arg_from_str(
+            &opt.value_of("inventory-source-group-id").unwrap_or(""),
+            err,
+            "<inventory-source-group-id>",
+            "int64",
+        );
         let mut call = self
             .hub
             .inventory_source_groups()
-            .get(opt.value_of("inventory-source-group-id").unwrap_or(""));
+            .get(inventory_source_group_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -18177,10 +17084,16 @@ where
             }
         }
         let mut request: api::InventorySourceGroup = serde_json::value::from_value(object).unwrap();
-        let mut call = self.hub.inventory_source_groups().patch(
-            request,
-            opt.value_of("inventory-source-group-id").unwrap_or(""),
+        let inventory_source_group_id: i64 = arg_from_str(
+            &opt.value_of("inventory-source-group-id").unwrap_or(""),
+            err,
+            "<inventory-source-group-id>",
+            "int64",
         );
+        let mut call = self
+            .hub
+            .inventory_source_groups()
+            .patch(request, inventory_source_group_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -18764,13 +17677,16 @@ where
         }
         let mut request: api::EditInventorySourceReadWriteAccessorsRequest =
             serde_json::value::from_value(object).unwrap();
+        let inventory_source_id: i64 = arg_from_str(
+            &opt.value_of("inventory-source-id").unwrap_or(""),
+            err,
+            "<inventory-source-id>",
+            "int64",
+        );
         let mut call = self
             .hub
             .inventory_sources()
-            .edit_inventory_source_read_write_accessors(
-                request,
-                opt.value_of("inventory-source-id").unwrap_or(""),
-            );
+            .edit_inventory_source_read_write_accessors(request, inventory_source_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -18848,10 +17764,13 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self
-            .hub
-            .inventory_sources()
-            .get(opt.value_of("inventory-source-id").unwrap_or(""));
+        let inventory_source_id: i64 = arg_from_str(
+            &opt.value_of("inventory-source-id").unwrap_or(""),
+            err,
+            "<inventory-source-id>",
+            "int64",
+        );
+        let mut call = self.hub.inventory_sources().get(inventory_source_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -19360,10 +18279,16 @@ where
             }
         }
         let mut request: api::InventorySource = serde_json::value::from_value(object).unwrap();
+        let inventory_source_id: i64 = arg_from_str(
+            &opt.value_of("inventory-source-id").unwrap_or(""),
+            err,
+            "<inventory-source-id>",
+            "int64",
+        );
         let mut call = self
             .hub
             .inventory_sources()
-            .patch(request, opt.value_of("inventory-source-id").unwrap_or(""));
+            .patch(request, inventory_source_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -19759,13 +18684,16 @@ where
         }
         let mut request: api::BulkEditPartnerAssignedTargetingOptionsRequest =
             serde_json::value::from_value(object).unwrap();
+        let partner_id: i64 = arg_from_str(
+            &opt.value_of("partner-id").unwrap_or(""),
+            err,
+            "<partner-id>",
+            "int64",
+        );
         let mut call = self
             .hub
             .partners()
-            .bulk_edit_partner_assigned_targeting_options(
-                request,
-                opt.value_of("partner-id").unwrap_or(""),
-            );
+            .bulk_edit_partner_assigned_targeting_options(request, partner_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -19949,10 +18877,13 @@ where
             }
         }
         let mut request: api::Channel = serde_json::value::from_value(object).unwrap();
-        let mut call = self
-            .hub
-            .partners()
-            .channels_create(request, opt.value_of("partner-id").unwrap_or(""));
+        let partner_id: i64 = arg_from_str(
+            &opt.value_of("partner-id").unwrap_or(""),
+            err,
+            "<partner-id>",
+            "int64",
+        );
+        let mut call = self.hub.partners().channels_create(request, partner_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -20038,10 +18969,19 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self.hub.partners().channels_get(
-            opt.value_of("partner-id").unwrap_or(""),
-            opt.value_of("channel-id").unwrap_or(""),
+        let partner_id: i64 = arg_from_str(
+            &opt.value_of("partner-id").unwrap_or(""),
+            err,
+            "<partner-id>",
+            "int64",
         );
+        let channel_id: i64 = arg_from_str(
+            &opt.value_of("channel-id").unwrap_or(""),
+            err,
+            "<channel-id>",
+            "int64",
+        );
+        let mut call = self.hub.partners().channels_get(partner_id, channel_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -20127,10 +19067,13 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self
-            .hub
-            .partners()
-            .channels_list(opt.value_of("partner-id").unwrap_or(""));
+        let partner_id: i64 = arg_from_str(
+            &opt.value_of("partner-id").unwrap_or(""),
+            err,
+            "<partner-id>",
+            "int64",
+        );
+        let mut call = self.hub.partners().channels_list(partner_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -20348,11 +19291,22 @@ where
             }
         }
         let mut request: api::Channel = serde_json::value::from_value(object).unwrap();
-        let mut call = self.hub.partners().channels_patch(
-            request,
-            opt.value_of("partner-id").unwrap_or(""),
-            opt.value_of("channel-id").unwrap_or(""),
+        let partner_id: i64 = arg_from_str(
+            &opt.value_of("partner-id").unwrap_or(""),
+            err,
+            "<partner-id>",
+            "int64",
         );
+        let channel_id: i64 = arg_from_str(
+            &opt.value_of("channel-id").unwrap_or(""),
+            err,
+            "<channel-id>",
+            "int64",
+        );
+        let mut call = self
+            .hub
+            .partners()
+            .channels_patch(request, partner_id, channel_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -20515,11 +19469,22 @@ where
             }
         }
         let mut request: api::BulkEditSitesRequest = serde_json::value::from_value(object).unwrap();
-        let mut call = self.hub.partners().channels_sites_bulk_edit(
-            request,
-            opt.value_of("partner-id").unwrap_or(""),
-            opt.value_of("channel-id").unwrap_or(""),
+        let partner_id: i64 = arg_from_str(
+            &opt.value_of("partner-id").unwrap_or(""),
+            err,
+            "<partner-id>",
+            "int64",
         );
+        let channel_id: i64 = arg_from_str(
+            &opt.value_of("channel-id").unwrap_or(""),
+            err,
+            "<channel-id>",
+            "int64",
+        );
+        let mut call = self
+            .hub
+            .partners()
+            .channels_sites_bulk_edit(request, partner_id, channel_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -20657,11 +19622,22 @@ where
             }
         }
         let mut request: api::Site = serde_json::value::from_value(object).unwrap();
-        let mut call = self.hub.partners().channels_sites_create(
-            request,
-            opt.value_of("partner-id").unwrap_or(""),
-            opt.value_of("channel-id").unwrap_or(""),
+        let partner_id: i64 = arg_from_str(
+            &opt.value_of("partner-id").unwrap_or(""),
+            err,
+            "<partner-id>",
+            "int64",
         );
+        let channel_id: i64 = arg_from_str(
+            &opt.value_of("channel-id").unwrap_or(""),
+            err,
+            "<channel-id>",
+            "int64",
+        );
+        let mut call = self
+            .hub
+            .partners()
+            .channels_sites_create(request, partner_id, channel_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -20747,9 +19723,21 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
+        let partner_id: i64 = arg_from_str(
+            &opt.value_of("partner-id").unwrap_or(""),
+            err,
+            "<partner-id>",
+            "int64",
+        );
+        let channel_id: i64 = arg_from_str(
+            &opt.value_of("channel-id").unwrap_or(""),
+            err,
+            "<channel-id>",
+            "int64",
+        );
         let mut call = self.hub.partners().channels_sites_delete(
-            opt.value_of("partner-id").unwrap_or(""),
-            opt.value_of("channel-id").unwrap_or(""),
+            partner_id,
+            channel_id,
             opt.value_of("url-or-app-id").unwrap_or(""),
         );
         for parg in opt
@@ -20837,10 +19825,22 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self.hub.partners().channels_sites_list(
-            opt.value_of("partner-id").unwrap_or(""),
-            opt.value_of("channel-id").unwrap_or(""),
+        let partner_id: i64 = arg_from_str(
+            &opt.value_of("partner-id").unwrap_or(""),
+            err,
+            "<partner-id>",
+            "int64",
         );
+        let channel_id: i64 = arg_from_str(
+            &opt.value_of("channel-id").unwrap_or(""),
+            err,
+            "<channel-id>",
+            "int64",
+        );
+        let mut call = self
+            .hub
+            .partners()
+            .channels_sites_list(partner_id, channel_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -21013,11 +20013,22 @@ where
             }
         }
         let mut request: api::ReplaceSitesRequest = serde_json::value::from_value(object).unwrap();
-        let mut call = self.hub.partners().channels_sites_replace(
-            request,
-            opt.value_of("partner-id").unwrap_or(""),
-            opt.value_of("channel-id").unwrap_or(""),
+        let partner_id: i64 = arg_from_str(
+            &opt.value_of("partner-id").unwrap_or(""),
+            err,
+            "<partner-id>",
+            "int64",
         );
+        let channel_id: i64 = arg_from_str(
+            &opt.value_of("channel-id").unwrap_or(""),
+            err,
+            "<channel-id>",
+            "int64",
+        );
+        let mut call = self
+            .hub
+            .partners()
+            .channels_sites_replace(request, partner_id, channel_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -21095,10 +20106,13 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self
-            .hub
-            .partners()
-            .get(opt.value_of("partner-id").unwrap_or(""));
+        let partner_id: i64 = arg_from_str(
+            &opt.value_of("partner-id").unwrap_or(""),
+            err,
+            "<partner-id>",
+            "int64",
+        );
+        let mut call = self.hub.partners().get(partner_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -21455,12 +20469,18 @@ where
         }
         let mut request: api::AssignedTargetingOption =
             serde_json::value::from_value(object).unwrap();
+        let partner_id: i64 = arg_from_str(
+            &opt.value_of("partner-id").unwrap_or(""),
+            err,
+            "<partner-id>",
+            "int64",
+        );
         let mut call = self
             .hub
             .partners()
             .targeting_types_assigned_targeting_options_create(
                 request,
-                opt.value_of("partner-id").unwrap_or(""),
+                partner_id,
                 opt.value_of("targeting-type").unwrap_or(""),
             );
         for parg in opt
@@ -21540,11 +20560,17 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
+        let partner_id: i64 = arg_from_str(
+            &opt.value_of("partner-id").unwrap_or(""),
+            err,
+            "<partner-id>",
+            "int64",
+        );
         let mut call = self
             .hub
             .partners()
             .targeting_types_assigned_targeting_options_delete(
-                opt.value_of("partner-id").unwrap_or(""),
+                partner_id,
                 opt.value_of("targeting-type").unwrap_or(""),
                 opt.value_of("assigned-targeting-option-id").unwrap_or(""),
             );
@@ -21625,11 +20651,17 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
+        let partner_id: i64 = arg_from_str(
+            &opt.value_of("partner-id").unwrap_or(""),
+            err,
+            "<partner-id>",
+            "int64",
+        );
         let mut call = self
             .hub
             .partners()
             .targeting_types_assigned_targeting_options_get(
-                opt.value_of("partner-id").unwrap_or(""),
+                partner_id,
                 opt.value_of("targeting-type").unwrap_or(""),
                 opt.value_of("assigned-targeting-option-id").unwrap_or(""),
             );
@@ -21710,11 +20742,17 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
+        let partner_id: i64 = arg_from_str(
+            &opt.value_of("partner-id").unwrap_or(""),
+            err,
+            "<partner-id>",
+            "int64",
+        );
         let mut call = self
             .hub
             .partners()
             .targeting_types_assigned_targeting_options_list(
-                opt.value_of("partner-id").unwrap_or(""),
+                partner_id,
                 opt.value_of("targeting-type").unwrap_or(""),
             );
         for parg in opt
@@ -22582,10 +21620,16 @@ where
         }
         let mut request: api::BulkEditAssignedUserRolesRequest =
             serde_json::value::from_value(object).unwrap();
+        let user_id: i64 = arg_from_str(
+            &opt.value_of("user-id").unwrap_or(""),
+            err,
+            "<user-id>",
+            "int64",
+        );
         let mut call = self
             .hub
             .users()
-            .bulk_edit_assigned_user_roles(request, opt.value_of("user-id").unwrap_or(""));
+            .bulk_edit_assigned_user_roles(request, user_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -22831,10 +21875,13 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self
-            .hub
-            .users()
-            .delete(opt.value_of("user-id").unwrap_or(""));
+        let user_id: i64 = arg_from_str(
+            &opt.value_of("user-id").unwrap_or(""),
+            err,
+            "<user-id>",
+            "int64",
+        );
+        let mut call = self.hub.users().delete(user_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -22912,7 +21959,13 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self.hub.users().get(opt.value_of("user-id").unwrap_or(""));
+        let user_id: i64 = arg_from_str(
+            &opt.value_of("user-id").unwrap_or(""),
+            err,
+            "<user-id>",
+            "int64",
+        );
+        let mut call = self.hub.users().get(user_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -23179,10 +22232,13 @@ where
             }
         }
         let mut request: api::User = serde_json::value::from_value(object).unwrap();
-        let mut call = self
-            .hub
-            .users()
-            .patch(request, opt.value_of("user-id").unwrap_or(""));
+        let user_id: i64 = arg_from_str(
+            &opt.value_of("user-id").unwrap_or(""),
+            err,
+            "<user-id>",
+            "int64",
+        );
+        let mut call = self.hub.users().patch(request, user_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -23294,13 +22350,6 @@ where
                             )
                             .await;
                     }
-                    ("campaigns-bulk-list-campaign-assigned-targeting-options", Some(opt)) => {
-                        call_result = self
-                            ._advertisers_campaigns_bulk_list_campaign_assigned_targeting_options(
-                                opt, dry_run, &mut err,
-                            )
-                            .await;
-                    }
                     ("campaigns-create", Some(opt)) => {
                         call_result = self
                             ._advertisers_campaigns_create(opt, dry_run, &mut err)
@@ -23324,20 +22373,6 @@ where
                     ("campaigns-patch", Some(opt)) => {
                         call_result = self
                             ._advertisers_campaigns_patch(opt, dry_run, &mut err)
-                            .await;
-                    }
-                    ("campaigns-targeting-types-assigned-targeting-options-get", Some(opt)) => {
-                        call_result = self
-                            ._advertisers_campaigns_targeting_types_assigned_targeting_options_get(
-                                opt, dry_run, &mut err,
-                            )
-                            .await;
-                    }
-                    ("campaigns-targeting-types-assigned-targeting-options-list", Some(opt)) => {
-                        call_result = self
-                            ._advertisers_campaigns_targeting_types_assigned_targeting_options_list(
-                                opt, dry_run, &mut err,
-                            )
                             .await;
                     }
                     ("channels-create", Some(opt)) => {
@@ -23417,12 +22452,6 @@ where
                     ("get", Some(opt)) => {
                         call_result = self._advertisers_get(opt, dry_run, &mut err).await;
                     }
-                    (
-                        "insertion-orders-bulk-list-insertion-order-assigned-targeting-options",
-                        Some(opt),
-                    ) => {
-                        call_result = self._advertisers_insertion_orders_bulk_list_insertion_order_assigned_targeting_options(opt, dry_run, &mut err).await;
-                    }
                     ("insertion-orders-create", Some(opt)) => {
                         call_result = self
                             ._advertisers_insertion_orders_create(opt, dry_run, &mut err)
@@ -23447,18 +22476,6 @@ where
                         call_result = self
                             ._advertisers_insertion_orders_patch(opt, dry_run, &mut err)
                             .await;
-                    }
-                    (
-                        "insertion-orders-targeting-types-assigned-targeting-options-get",
-                        Some(opt),
-                    ) => {
-                        call_result = self._advertisers_insertion_orders_targeting_types_assigned_targeting_options_get(opt, dry_run, &mut err).await;
-                    }
-                    (
-                        "insertion-orders-targeting-types-assigned-targeting-options-list",
-                        Some(opt),
-                    ) => {
-                        call_result = self._advertisers_insertion_orders_targeting_types_assigned_targeting_options_list(opt, dry_run, &mut err).await;
                     }
                     ("invoices-list", Some(opt)) => {
                         call_result = self
@@ -23492,11 +22509,6 @@ where
                     ("line-items-delete", Some(opt)) => {
                         call_result = self
                             ._advertisers_line_items_delete(opt, dry_run, &mut err)
-                            .await;
-                    }
-                    ("line-items-generate-default", Some(opt)) => {
-                        call_result = self
-                            ._advertisers_line_items_generate_default(opt, dry_run, &mut err)
                             .await;
                     }
                     ("line-items-get", Some(opt)) => {
@@ -23781,41 +22793,6 @@ where
                 _ => {
                     err.issues
                         .push(CLIError::MissingMethodError("custom-lists".to_string()));
-                    writeln!(std::io::stderr(), "{}\n", opt.usage()).ok();
-                }
-            },
-            ("first-and-third-party-audiences", Some(opt)) => match opt.subcommand() {
-                ("create", Some(opt)) => {
-                    call_result = self
-                        ._first_and_third_party_audiences_create(opt, dry_run, &mut err)
-                        .await;
-                }
-                ("edit-customer-match-members", Some(opt)) => {
-                    call_result = self
-                        ._first_and_third_party_audiences_edit_customer_match_members(
-                            opt, dry_run, &mut err,
-                        )
-                        .await;
-                }
-                ("get", Some(opt)) => {
-                    call_result = self
-                        ._first_and_third_party_audiences_get(opt, dry_run, &mut err)
-                        .await;
-                }
-                ("list", Some(opt)) => {
-                    call_result = self
-                        ._first_and_third_party_audiences_list(opt, dry_run, &mut err)
-                        .await;
-                }
-                ("patch", Some(opt)) => {
-                    call_result = self
-                        ._first_and_third_party_audiences_patch(opt, dry_run, &mut err)
-                        .await;
-                }
-                _ => {
-                    err.issues.push(CLIError::MissingMethodError(
-                        "first-and-third-party-audiences".to_string(),
-                    ));
                     writeln!(std::io::stderr(), "{}\n", opt.usage()).ok();
                 }
             },
@@ -24163,7 +23140,9 @@ where
         let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
             secret,
             yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-            hyper_util::client::legacy::Client::builder(executor).build(connector),
+            yup_oauth2::client::CustomHyperClientBuilder::from(
+                hyper_util::client::legacy::Client::builder(executor).build(connector),
+            ),
         )
         .persist_tokens_to_disk(format!("{}/displayvideo1", config_dir))
         .build()
@@ -24217,7 +23196,7 @@ async fn main() {
     let mut exit_status = 0i32;
     let upload_value_names = ["mode", "file"];
     let arg_data = [
-        ("advertisers", "methods: 'assets-upload', 'audit', 'bulk-edit-advertiser-assigned-targeting-options', 'bulk-list-advertiser-assigned-targeting-options', 'campaigns-bulk-list-campaign-assigned-targeting-options', 'campaigns-create', 'campaigns-delete', 'campaigns-get', 'campaigns-list', 'campaigns-patch', 'campaigns-targeting-types-assigned-targeting-options-get', 'campaigns-targeting-types-assigned-targeting-options-list', 'channels-create', 'channels-get', 'channels-list', 'channels-patch', 'channels-sites-bulk-edit', 'channels-sites-create', 'channels-sites-delete', 'channels-sites-list', 'channels-sites-replace', 'create', 'creatives-create', 'creatives-delete', 'creatives-get', 'creatives-list', 'creatives-patch', 'delete', 'get', 'insertion-orders-bulk-list-insertion-order-assigned-targeting-options', 'insertion-orders-create', 'insertion-orders-delete', 'insertion-orders-get', 'insertion-orders-list', 'insertion-orders-patch', 'insertion-orders-targeting-types-assigned-targeting-options-get', 'insertion-orders-targeting-types-assigned-targeting-options-list', 'invoices-list', 'invoices-lookup-invoice-currency', 'line-items-bulk-edit-line-item-assigned-targeting-options', 'line-items-bulk-list-line-item-assigned-targeting-options', 'line-items-create', 'line-items-delete', 'line-items-generate-default', 'line-items-get', 'line-items-list', 'line-items-patch', 'line-items-targeting-types-assigned-targeting-options-create', 'line-items-targeting-types-assigned-targeting-options-delete', 'line-items-targeting-types-assigned-targeting-options-get', 'line-items-targeting-types-assigned-targeting-options-list', 'list', 'location-lists-assigned-locations-bulk-edit', 'location-lists-assigned-locations-create', 'location-lists-assigned-locations-delete', 'location-lists-assigned-locations-list', 'location-lists-create', 'location-lists-get', 'location-lists-list', 'location-lists-patch', 'manual-triggers-activate', 'manual-triggers-create', 'manual-triggers-deactivate', 'manual-triggers-get', 'manual-triggers-list', 'manual-triggers-patch', 'negative-keyword-lists-create', 'negative-keyword-lists-delete', 'negative-keyword-lists-get', 'negative-keyword-lists-list', 'negative-keyword-lists-negative-keywords-bulk-edit', 'negative-keyword-lists-negative-keywords-create', 'negative-keyword-lists-negative-keywords-delete', 'negative-keyword-lists-negative-keywords-list', 'negative-keyword-lists-negative-keywords-replace', 'negative-keyword-lists-patch', 'patch', 'targeting-types-assigned-targeting-options-create', 'targeting-types-assigned-targeting-options-delete', 'targeting-types-assigned-targeting-options-get' and 'targeting-types-assigned-targeting-options-list'", vec![
+        ("advertisers", "methods: 'assets-upload', 'audit', 'bulk-edit-advertiser-assigned-targeting-options', 'bulk-list-advertiser-assigned-targeting-options', 'campaigns-create', 'campaigns-delete', 'campaigns-get', 'campaigns-list', 'campaigns-patch', 'channels-create', 'channels-get', 'channels-list', 'channels-patch', 'channels-sites-bulk-edit', 'channels-sites-create', 'channels-sites-delete', 'channels-sites-list', 'channels-sites-replace', 'create', 'creatives-create', 'creatives-delete', 'creatives-get', 'creatives-list', 'creatives-patch', 'delete', 'get', 'insertion-orders-create', 'insertion-orders-delete', 'insertion-orders-get', 'insertion-orders-list', 'insertion-orders-patch', 'invoices-list', 'invoices-lookup-invoice-currency', 'line-items-bulk-edit-line-item-assigned-targeting-options', 'line-items-bulk-list-line-item-assigned-targeting-options', 'line-items-create', 'line-items-delete', 'line-items-get', 'line-items-list', 'line-items-patch', 'line-items-targeting-types-assigned-targeting-options-create', 'line-items-targeting-types-assigned-targeting-options-delete', 'line-items-targeting-types-assigned-targeting-options-get', 'line-items-targeting-types-assigned-targeting-options-list', 'list', 'location-lists-assigned-locations-bulk-edit', 'location-lists-assigned-locations-create', 'location-lists-assigned-locations-delete', 'location-lists-assigned-locations-list', 'location-lists-create', 'location-lists-get', 'location-lists-list', 'location-lists-patch', 'manual-triggers-activate', 'manual-triggers-create', 'manual-triggers-deactivate', 'manual-triggers-get', 'manual-triggers-list', 'manual-triggers-patch', 'negative-keyword-lists-create', 'negative-keyword-lists-delete', 'negative-keyword-lists-get', 'negative-keyword-lists-list', 'negative-keyword-lists-negative-keywords-bulk-edit', 'negative-keyword-lists-negative-keywords-create', 'negative-keyword-lists-negative-keywords-delete', 'negative-keyword-lists-negative-keywords-list', 'negative-keyword-lists-negative-keywords-replace', 'negative-keyword-lists-patch', 'patch', 'targeting-types-assigned-targeting-options-create', 'targeting-types-assigned-targeting-options-delete', 'targeting-types-assigned-targeting-options-get' and 'targeting-types-assigned-targeting-options-list'", vec![
             ("assets-upload",
                     Some(r##"Uploads an asset. Returns the ID of the newly uploaded asset if successful. The asset file size should be no more than 10 MB for images, 200 MB for ZIP files, and 1 GB for videos. Must be used within the [multipart media upload process](/display-video/api/guides/how-tos/upload#multipart). Examples using provided client libraries can be found in our [Creating Creatives guide](/display-video/api/guides/creating-creatives/overview#upload_an_asset)."##),
                     "Details at http://byron.github.io/google-apis-rs/google_displayvideo1_cli/advertisers_assets-upload",
@@ -24300,31 +23279,6 @@ async fn main() {
                     (Some(r##"advertiser-id"##),
                      None,
                      Some(r##"Required. The ID of the advertiser the line item belongs to."##),
-                     Some(true),
-                     Some(false)),
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
-            ("campaigns-bulk-list-campaign-assigned-targeting-options",
-                    Some(r##"Lists assigned targeting options of a campaign across targeting types."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_displayvideo1_cli/advertisers_campaigns-bulk-list-campaign-assigned-targeting-options",
-                  vec![
-                    (Some(r##"advertiser-id"##),
-                     None,
-                     Some(r##"Required. The ID of the advertiser the campaign belongs to."##),
-                     Some(true),
-                     Some(false)),
-                    (Some(r##"campaign-id"##),
-                     None,
-                     Some(r##"Required. The ID of the campaign to list assigned targeting options for."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -24452,71 +23406,6 @@ async fn main() {
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
-            ("campaigns-targeting-types-assigned-targeting-options-get",
-                    Some(r##"Gets a single targeting option assigned to a campaign."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_displayvideo1_cli/advertisers_campaigns-targeting-types-assigned-targeting-options-get",
-                  vec![
-                    (Some(r##"advertiser-id"##),
-                     None,
-                     Some(r##"Required. The ID of the advertiser the campaign belongs to."##),
-                     Some(true),
-                     Some(false)),
-                    (Some(r##"campaign-id"##),
-                     None,
-                     Some(r##"Required. The ID of the campaign the assigned targeting option belongs to."##),
-                     Some(true),
-                     Some(false)),
-                    (Some(r##"targeting-type"##),
-                     None,
-                     Some(r##"Required. Identifies the type of this assigned targeting option. Supported targeting types: * `TARGETING_TYPE_AGE_RANGE` * `TARGETING_TYPE_AUTHORIZED_SELLER_STATUS` * `TARGETING_TYPE_CONTENT_INSTREAM_POSITION` * `TARGETING_TYPE_CONTENT_OUTSTREAM_POSITION` * `TARGETING_TYPE_DIGITAL_CONTENT_LABEL_EXCLUSION` * `TARGETING_TYPE_ENVIRONMENT` * `TARGETING_TYPE_EXCHANGE` * `TARGETING_TYPE_GENDER` * `TARGETING_TYPE_GEO_REGION` * `TARGETING_TYPE_HOUSEHOLD_INCOME` * `TARGETING_TYPE_INVENTORY_SOURCE` * `TARGETING_TYPE_INVENTORY_SOURCE_GROUP` * `TARGETING_TYPE_LANGUAGE` * `TARGETING_TYPE_ON_SCREEN_POSITION` * `TARGETING_TYPE_PARENTAL_STATUS` * `TARGETING_TYPE_SENSITIVE_CATEGORY_EXCLUSION` * `TARGETING_TYPE_SUB_EXCHANGE` * `TARGETING_TYPE_THIRD_PARTY_VERIFIER` * `TARGETING_TYPE_VIEWABILITY`"##),
-                     Some(true),
-                     Some(false)),
-                    (Some(r##"assigned-targeting-option-id"##),
-                     None,
-                     Some(r##"Required. An identifier unique to the targeting type in this campaign that identifies the assigned targeting option being requested."##),
-                     Some(true),
-                     Some(false)),
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
-            ("campaigns-targeting-types-assigned-targeting-options-list",
-                    Some(r##"Lists the targeting options assigned to a campaign for a specified targeting type."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_displayvideo1_cli/advertisers_campaigns-targeting-types-assigned-targeting-options-list",
-                  vec![
-                    (Some(r##"advertiser-id"##),
-                     None,
-                     Some(r##"Required. The ID of the advertiser the campaign belongs to."##),
-                     Some(true),
-                     Some(false)),
-                    (Some(r##"campaign-id"##),
-                     None,
-                     Some(r##"Required. The ID of the campaign to list assigned targeting options for."##),
-                     Some(true),
-                     Some(false)),
-                    (Some(r##"targeting-type"##),
-                     None,
-                     Some(r##"Required. Identifies the type of assigned targeting options to list. Supported targeting types: * `TARGETING_TYPE_AGE_RANGE` * `TARGETING_TYPE_AUTHORIZED_SELLER_STATUS` * `TARGETING_TYPE_CONTENT_INSTREAM_POSITION` * `TARGETING_TYPE_CONTENT_OUTSTREAM_POSITION` * `TARGETING_TYPE_DIGITAL_CONTENT_LABEL_EXCLUSION` * `TARGETING_TYPE_ENVIRONMENT` * `TARGETING_TYPE_EXCHANGE` * `TARGETING_TYPE_GENDER` * `TARGETING_TYPE_GEO_REGION` * `TARGETING_TYPE_HOUSEHOLD_INCOME` * `TARGETING_TYPE_INVENTORY_SOURCE` * `TARGETING_TYPE_INVENTORY_SOURCE_GROUP` * `TARGETING_TYPE_LANGUAGE` * `TARGETING_TYPE_ON_SCREEN_POSITION` * `TARGETING_TYPE_PARENTAL_STATUS` * `TARGETING_TYPE_SENSITIVE_CATEGORY_EXCLUSION` * `TARGETING_TYPE_SUB_EXCHANGE` * `TARGETING_TYPE_THIRD_PARTY_VERIFIER` * `TARGETING_TYPE_VIEWABILITY`"##),
-                     Some(true),
-                     Some(false)),
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
@@ -24958,31 +23847,6 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
-            ("insertion-orders-bulk-list-insertion-order-assigned-targeting-options",
-                    Some(r##"Lists assigned targeting options of an insertion order across targeting types."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_displayvideo1_cli/advertisers_insertion-orders-bulk-list-insertion-order-assigned-targeting-options",
-                  vec![
-                    (Some(r##"advertiser-id"##),
-                     None,
-                     Some(r##"Required. The ID of the advertiser the insertion order belongs to."##),
-                     Some(true),
-                     Some(false)),
-                    (Some(r##"insertion-order-id"##),
-                     None,
-                     Some(r##"Required. The ID of the insertion order to list assigned targeting options for."##),
-                     Some(true),
-                     Some(false)),
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
             ("insertion-orders-create",
                     Some(r##"Creates a new insertion order. Returns the newly created insertion order if successful."##),
                     "Details at http://byron.github.io/google-apis-rs/google_displayvideo1_cli/advertisers_insertion-orders-create",
@@ -25097,71 +23961,6 @@ async fn main() {
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
-            ("insertion-orders-targeting-types-assigned-targeting-options-get",
-                    Some(r##"Gets a single targeting option assigned to an insertion order."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_displayvideo1_cli/advertisers_insertion-orders-targeting-types-assigned-targeting-options-get",
-                  vec![
-                    (Some(r##"advertiser-id"##),
-                     None,
-                     Some(r##"Required. The ID of the advertiser the insertion order belongs to."##),
-                     Some(true),
-                     Some(false)),
-                    (Some(r##"insertion-order-id"##),
-                     None,
-                     Some(r##"Required. The ID of the insertion order the assigned targeting option belongs to."##),
-                     Some(true),
-                     Some(false)),
-                    (Some(r##"targeting-type"##),
-                     None,
-                     Some(r##"Required. Identifies the type of this assigned targeting option. Supported targeting types include: * `TARGETING_TYPE_AGE_RANGE` * `TARGETING_TYPE_APP` * `TARGETING_TYPE_APP_CATEGORY` * `TARGETING_TYPE_AUDIENCE_GROUP` * `TARGETING_TYPE_AUDIO_CONTENT_TYPE` * `TARGETING_TYPE_AUTHORIZED_SELLER_STATUS` * `TARGETING_TYPE_BROWSER` * `TARGETING_TYPE_BUSINESS_CHAIN` * `TARGETING_TYPE_CARRIER_AND_ISP` * `TARGETING_TYPE_CATEGORY` * `TARGETING_TYPE_CHANNEL` * `TARGETING_TYPE_CONTENT_DURATION` * `TARGETING_TYPE_CONTENT_GENRE` * `TARGETING_TYPE_CONTENT_INSTREAM_POSITION` * `TARGETING_TYPE_CONTENT_OUTSTREAM_POSITION` * `TARGETING_TYPE_CONTENT_STREAM_TYPE` * `TARGETING_TYPE_DAY_AND_TIME` * `TARGETING_TYPE_DEVICE_MAKE_MODEL` * `TARGETING_TYPE_DEVICE_TYPE` * `TARGETING_TYPE_DIGITAL_CONTENT_LABEL_EXCLUSION` * `TARGETING_TYPE_ENVIRONMENT` * `TARGETING_TYPE_EXCHANGE` * `TARGETING_TYPE_GENDER` * `TARGETING_TYPE_GEO_REGION` * `TARGETING_TYPE_HOUSEHOLD_INCOME` * `TARGETING_TYPE_INVENTORY_SOURCE` * `TARGETING_TYPE_INVENTORY_SOURCE_GROUP` * `TARGETING_TYPE_KEYWORD` * `TARGETING_TYPE_LANGUAGE` * `TARGETING_TYPE_NATIVE_CONTENT_POSITION` * `TARGETING_TYPE_NEGATIVE_KEYWORD_LIST` * `TARGETING_TYPE_OMID` * `TARGETING_TYPE_ON_SCREEN_POSITION` * `TARGETING_TYPE_OPERATING_SYSTEM` * `TARGETING_TYPE_PARENTAL_STATUS` * `TARGETING_TYPE_POI` * `TARGETING_TYPE_PROXIMITY_LOCATION_LIST` * `TARGETING_TYPE_REGIONAL_LOCATION_LIST` * `TARGETING_TYPE_SENSITIVE_CATEGORY_EXCLUSION` * `TARGETING_TYPE_SUB_EXCHANGE` * `TARGETING_TYPE_THIRD_PARTY_VERIFIER` * `TARGETING_TYPE_URL` * `TARGETING_TYPE_USER_REWARDED_CONTENT` * `TARGETING_TYPE_VIDEO_PLAYER_SIZE` * `TARGETING_TYPE_VIEWABILITY`"##),
-                     Some(true),
-                     Some(false)),
-                    (Some(r##"assigned-targeting-option-id"##),
-                     None,
-                     Some(r##"Required. An identifier unique to the targeting type in this insertion order that identifies the assigned targeting option being requested."##),
-                     Some(true),
-                     Some(false)),
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
-            ("insertion-orders-targeting-types-assigned-targeting-options-list",
-                    Some(r##"Lists the targeting options assigned to an insertion order."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_displayvideo1_cli/advertisers_insertion-orders-targeting-types-assigned-targeting-options-list",
-                  vec![
-                    (Some(r##"advertiser-id"##),
-                     None,
-                     Some(r##"Required. The ID of the advertiser the insertion order belongs to."##),
-                     Some(true),
-                     Some(false)),
-                    (Some(r##"insertion-order-id"##),
-                     None,
-                     Some(r##"Required. The ID of the insertion order to list assigned targeting options for."##),
-                     Some(true),
-                     Some(false)),
-                    (Some(r##"targeting-type"##),
-                     None,
-                     Some(r##"Required. Identifies the type of assigned targeting options to list. Supported targeting types include: * `TARGETING_TYPE_AGE_RANGE` * `TARGETING_TYPE_APP` * `TARGETING_TYPE_APP_CATEGORY` * `TARGETING_TYPE_AUDIENCE_GROUP` * `TARGETING_TYPE_AUDIO_CONTENT_TYPE` * `TARGETING_TYPE_AUTHORIZED_SELLER_STATUS` * `TARGETING_TYPE_BROWSER` * `TARGETING_TYPE_BUSINESS_CHAIN` * `TARGETING_TYPE_CARRIER_AND_ISP` * `TARGETING_TYPE_CATEGORY` * `TARGETING_TYPE_CHANNEL` * `TARGETING_TYPE_CONTENT_DURATION` * `TARGETING_TYPE_CONTENT_GENRE` * `TARGETING_TYPE_CONTENT_INSTREAM_POSITION` * `TARGETING_TYPE_CONTENT_OUTSTREAM_POSITION` * `TARGETING_TYPE_CONTENT_STREAM_TYPE` * `TARGETING_TYPE_DAY_AND_TIME` * `TARGETING_TYPE_DEVICE_MAKE_MODEL` * `TARGETING_TYPE_DEVICE_TYPE` * `TARGETING_TYPE_DIGITAL_CONTENT_LABEL_EXCLUSION` * `TARGETING_TYPE_ENVIRONMENT` * `TARGETING_TYPE_EXCHANGE` * `TARGETING_TYPE_GENDER` * `TARGETING_TYPE_GEO_REGION` * `TARGETING_TYPE_HOUSEHOLD_INCOME` * `TARGETING_TYPE_INVENTORY_SOURCE` * `TARGETING_TYPE_INVENTORY_SOURCE_GROUP` * `TARGETING_TYPE_KEYWORD` * `TARGETING_TYPE_LANGUAGE` * `TARGETING_TYPE_NATIVE_CONTENT_POSITION` * `TARGETING_TYPE_NEGATIVE_KEYWORD_LIST` * `TARGETING_TYPE_OMID` * `TARGETING_TYPE_ON_SCREEN_POSITION` * `TARGETING_TYPE_OPERATING_SYSTEM` * `TARGETING_TYPE_PARENTAL_STATUS` * `TARGETING_TYPE_POI` * `TARGETING_TYPE_PROXIMITY_LOCATION_LIST` * `TARGETING_TYPE_REGIONAL_LOCATION_LIST` * `TARGETING_TYPE_SENSITIVE_CATEGORY_EXCLUSION` * `TARGETING_TYPE_SUB_EXCHANGE` * `TARGETING_TYPE_THIRD_PARTY_VERIFIER` * `TARGETING_TYPE_URL` * `TARGETING_TYPE_USER_REWARDED_CONTENT` * `TARGETING_TYPE_VIDEO_PLAYER_SIZE` * `TARGETING_TYPE_VIEWABILITY`"##),
-                     Some(true),
-                     Some(false)),
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
@@ -25307,31 +24106,6 @@ async fn main() {
                      Some(r##"The ID of the line item to delete."##),
                      Some(true),
                      Some(false)),
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
-            ("line-items-generate-default",
-                    Some(r##"Creates a new line item with settings (including targeting) inherited from the insertion order and an `ENTITY_STATUS_DRAFT` entity_status. Returns the newly created line item if successful. There are default values based on the three fields: * The insertion order's insertion_order_type * The insertion order's automation_type * The given line_item_type YouTube & Partners line items cannot be created or updated using the API."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_displayvideo1_cli/advertisers_line-items-generate-default",
-                  vec![
-                    (Some(r##"advertiser-id"##),
-                     None,
-                     Some(r##"Required. The ID of the advertiser this line item belongs to."##),
-                     Some(true),
-                     Some(false)),
-                    (Some(r##"kv"##),
-                     Some(r##"r"##),
-                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
-                     Some(true),
-                     Some(true)),
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
@@ -25504,7 +24278,7 @@ async fn main() {
                      Some(false)),
                     (Some(r##"targeting-type"##),
                      None,
-                     Some(r##"Required. Identifies the type of this assigned targeting option. Supported targeting types include: * `TARGETING_TYPE_AGE_RANGE` * `TARGETING_TYPE_APP` * `TARGETING_TYPE_APP_CATEGORY` * `TARGETING_TYPE_AUDIENCE_GROUP` * `TARGETING_TYPE_AUDIO_CONTENT_TYPE` * `TARGETING_TYPE_AUTHORIZED_SELLER_STATUS` * `TARGETING_TYPE_BROWSER` * `TARGETING_TYPE_BUSINESS_CHAIN` * `TARGETING_TYPE_CARRIER_AND_ISP` * `TARGETING_TYPE_CATEGORY` * `TARGETING_TYPE_CHANNEL` * `TARGETING_TYPE_CONTENT_DURATION` * `TARGETING_TYPE_CONTENT_GENRE` * `TARGETING_TYPE_CONTENT_INSTREAM_POSITION` * `TARGETING_TYPE_CONTENT_OUTSTREAM_POSITION` * `TARGETING_TYPE_CONTENT_STREAM_TYPE` * `TARGETING_TYPE_DAY_AND_TIME` * `TARGETING_TYPE_DEVICE_MAKE_MODEL` * `TARGETING_TYPE_DEVICE_TYPE` * `TARGETING_TYPE_DIGITAL_CONTENT_LABEL_EXCLUSION` * `TARGETING_TYPE_ENVIRONMENT` * `TARGETING_TYPE_EXCHANGE` * `TARGETING_TYPE_GENDER` * `TARGETING_TYPE_GEO_REGION` * `TARGETING_TYPE_HOUSEHOLD_INCOME` * `TARGETING_TYPE_INVENTORY_SOURCE` * `TARGETING_TYPE_INVENTORY_SOURCE_GROUP` * `TARGETING_TYPE_KEYWORD` * `TARGETING_TYPE_LANGUAGE` * `TARGETING_TYPE_NATIVE_CONTENT_POSITION` * `TARGETING_TYPE_NEGATIVE_KEYWORD_LIST` * `TARGETING_TYPE_OMID` * `TARGETING_TYPE_ON_SCREEN_POSITION` * `TARGETING_TYPE_OPERATING_SYSTEM` * `TARGETING_TYPE_PARENTAL_STATUS` * `TARGETING_TYPE_POI` * `TARGETING_TYPE_PROXIMITY_LOCATION_LIST` * `TARGETING_TYPE_REGIONAL_LOCATION_LIST` * `TARGETING_TYPE_SENSITIVE_CATEGORY_EXCLUSION` * `TARGETING_TYPE_SUB_EXCHANGE` * `TARGETING_TYPE_THIRD_PARTY_VERIFIER` * `TARGETING_TYPE_URL` * `TARGETING_TYPE_USER_REWARDED_CONTENT` * `TARGETING_TYPE_VIDEO_PLAYER_SIZE` * `TARGETING_TYPE_VIEWABILITY` * `TARGETING_TYPE_YOUTUBE_CHANNEL` (only for `LINE_ITEM_TYPE_YOUTUBE_AND_PARTNERS_VIDEO_SEQUENCE` line items) * `TARGETING_TYPE_YOUTUBE_VIDEO` (only for `LINE_ITEM_TYPE_YOUTUBE_AND_PARTNERS_VIDEO_SEQUENCE` line items)"##),
+                     Some(r##"Required. Identifies the type of this assigned targeting option. Supported targeting types include: * `TARGETING_TYPE_AGE_RANGE` * `TARGETING_TYPE_APP` * `TARGETING_TYPE_APP_CATEGORY` * `TARGETING_TYPE_AUDIENCE_GROUP` * `TARGETING_TYPE_AUDIO_CONTENT_TYPE` * `TARGETING_TYPE_AUTHORIZED_SELLER_STATUS` * `TARGETING_TYPE_BROWSER` * `TARGETING_TYPE_BUSINESS_CHAIN` * `TARGETING_TYPE_CARRIER_AND_ISP` * `TARGETING_TYPE_CATEGORY` * `TARGETING_TYPE_CHANNEL` * `TARGETING_TYPE_CONTENT_DURATION` * `TARGETING_TYPE_CONTENT_GENRE` * `TARGETING_TYPE_CONTENT_INSTREAM_POSITION` * `TARGETING_TYPE_CONTENT_OUTSTREAM_POSITION` * `TARGETING_TYPE_CONTENT_STREAM_TYPE` * `TARGETING_TYPE_DAY_AND_TIME` * `TARGETING_TYPE_DEVICE_MAKE_MODEL` * `TARGETING_TYPE_DEVICE_TYPE` * `TARGETING_TYPE_DIGITAL_CONTENT_LABEL_EXCLUSION` * `TARGETING_TYPE_ENVIRONMENT` * `TARGETING_TYPE_EXCHANGE` * `TARGETING_TYPE_GENDER` * `TARGETING_TYPE_GEO_REGION` * `TARGETING_TYPE_HOUSEHOLD_INCOME` * `TARGETING_TYPE_INVENTORY_SOURCE` * `TARGETING_TYPE_INVENTORY_SOURCE_GROUP` * `TARGETING_TYPE_KEYWORD` * `TARGETING_TYPE_LANGUAGE` * `TARGETING_TYPE_NATIVE_CONTENT_POSITION` * `TARGETING_TYPE_NEGATIVE_KEYWORD_LIST` * `TARGETING_TYPE_OMID` * `TARGETING_TYPE_ON_SCREEN_POSITION` * `TARGETING_TYPE_OPERATING_SYSTEM` * `TARGETING_TYPE_PARENTAL_STATUS` * `TARGETING_TYPE_POI` * `TARGETING_TYPE_PROXIMITY_LOCATION_LIST` * `TARGETING_TYPE_REGIONAL_LOCATION_LIST` * `TARGETING_TYPE_SENSITIVE_CATEGORY_EXCLUSION` * `TARGETING_TYPE_SUB_EXCHANGE` * `TARGETING_TYPE_THIRD_PARTY_VERIFIER` * `TARGETING_TYPE_URL` * `TARGETING_TYPE_USER_REWARDED_CONTENT` * `TARGETING_TYPE_VIDEO_PLAYER_SIZE` * `TARGETING_TYPE_VIEWABILITY` * `TARGETING_TYPE_INVENTORY_MODE` * `TARGETING_TYPE_YOUTUBE_CHANNEL` (only for `LINE_ITEM_TYPE_YOUTUBE_AND_PARTNERS_VIDEO_SEQUENCE` line items) * `TARGETING_TYPE_YOUTUBE_VIDEO` (only for `LINE_ITEM_TYPE_YOUTUBE_AND_PARTNERS_VIDEO_SEQUENCE` line items)"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"assigned-targeting-option-id"##),
@@ -25539,7 +24313,7 @@ async fn main() {
                      Some(false)),
                     (Some(r##"targeting-type"##),
                      None,
-                     Some(r##"Required. Identifies the type of assigned targeting options to list. Supported targeting types include: * `TARGETING_TYPE_AGE_RANGE` * `TARGETING_TYPE_APP` * `TARGETING_TYPE_APP_CATEGORY` * `TARGETING_TYPE_AUDIENCE_GROUP` * `TARGETING_TYPE_AUDIO_CONTENT_TYPE` * `TARGETING_TYPE_AUTHORIZED_SELLER_STATUS` * `TARGETING_TYPE_BROWSER` * `TARGETING_TYPE_BUSINESS_CHAIN` * `TARGETING_TYPE_CARRIER_AND_ISP` * `TARGETING_TYPE_CATEGORY` * `TARGETING_TYPE_CHANNEL` * `TARGETING_TYPE_CONTENT_DURATION` * `TARGETING_TYPE_CONTENT_GENRE` * `TARGETING_TYPE_CONTENT_INSTREAM_POSITION` * `TARGETING_TYPE_CONTENT_OUTSTREAM_POSITION` * `TARGETING_TYPE_CONTENT_STREAM_TYPE` * `TARGETING_TYPE_DAY_AND_TIME` * `TARGETING_TYPE_DEVICE_MAKE_MODEL` * `TARGETING_TYPE_DEVICE_TYPE` * `TARGETING_TYPE_DIGITAL_CONTENT_LABEL_EXCLUSION` * `TARGETING_TYPE_ENVIRONMENT` * `TARGETING_TYPE_EXCHANGE` * `TARGETING_TYPE_GENDER` * `TARGETING_TYPE_GEO_REGION` * `TARGETING_TYPE_HOUSEHOLD_INCOME` * `TARGETING_TYPE_INVENTORY_SOURCE` * `TARGETING_TYPE_INVENTORY_SOURCE_GROUP` * `TARGETING_TYPE_KEYWORD` * `TARGETING_TYPE_LANGUAGE` * `TARGETING_TYPE_NATIVE_CONTENT_POSITION` * `TARGETING_TYPE_NEGATIVE_KEYWORD_LIST` * `TARGETING_TYPE_OMID` * `TARGETING_TYPE_ON_SCREEN_POSITION` * `TARGETING_TYPE_OPERATING_SYSTEM` * `TARGETING_TYPE_PARENTAL_STATUS` * `TARGETING_TYPE_POI` * `TARGETING_TYPE_PROXIMITY_LOCATION_LIST` * `TARGETING_TYPE_REGIONAL_LOCATION_LIST` * `TARGETING_TYPE_SENSITIVE_CATEGORY_EXCLUSION` * `TARGETING_TYPE_SUB_EXCHANGE` * `TARGETING_TYPE_THIRD_PARTY_VERIFIER` * `TARGETING_TYPE_URL` * `TARGETING_TYPE_USER_REWARDED_CONTENT` * `TARGETING_TYPE_VIDEO_PLAYER_SIZE` * `TARGETING_TYPE_VIEWABILITY` * `TARGETING_TYPE_YOUTUBE_CHANNEL` (only for `LINE_ITEM_TYPE_YOUTUBE_AND_PARTNERS_VIDEO_SEQUENCE` line items) * `TARGETING_TYPE_YOUTUBE_VIDEO` (only for `LINE_ITEM_TYPE_YOUTUBE_AND_PARTNERS_VIDEO_SEQUENCE` line items)"##),
+                     Some(r##"Required. Identifies the type of assigned targeting options to list. Supported targeting types include: * `TARGETING_TYPE_AGE_RANGE` * `TARGETING_TYPE_APP` * `TARGETING_TYPE_APP_CATEGORY` * `TARGETING_TYPE_AUDIENCE_GROUP` * `TARGETING_TYPE_AUDIO_CONTENT_TYPE` * `TARGETING_TYPE_AUTHORIZED_SELLER_STATUS` * `TARGETING_TYPE_BROWSER` * `TARGETING_TYPE_BUSINESS_CHAIN` * `TARGETING_TYPE_CARRIER_AND_ISP` * `TARGETING_TYPE_CATEGORY` * `TARGETING_TYPE_CHANNEL` * `TARGETING_TYPE_CONTENT_DURATION` * `TARGETING_TYPE_CONTENT_GENRE` * `TARGETING_TYPE_CONTENT_INSTREAM_POSITION` * `TARGETING_TYPE_CONTENT_OUTSTREAM_POSITION` * `TARGETING_TYPE_CONTENT_STREAM_TYPE` * `TARGETING_TYPE_DAY_AND_TIME` * `TARGETING_TYPE_DEVICE_MAKE_MODEL` * `TARGETING_TYPE_DEVICE_TYPE` * `TARGETING_TYPE_DIGITAL_CONTENT_LABEL_EXCLUSION` * `TARGETING_TYPE_ENVIRONMENT` * `TARGETING_TYPE_EXCHANGE` * `TARGETING_TYPE_GENDER` * `TARGETING_TYPE_GEO_REGION` * `TARGETING_TYPE_HOUSEHOLD_INCOME` * `TARGETING_TYPE_INVENTORY_SOURCE` * `TARGETING_TYPE_INVENTORY_SOURCE_GROUP` * `TARGETING_TYPE_KEYWORD` * `TARGETING_TYPE_LANGUAGE` * `TARGETING_TYPE_NATIVE_CONTENT_POSITION` * `TARGETING_TYPE_NEGATIVE_KEYWORD_LIST` * `TARGETING_TYPE_OMID` * `TARGETING_TYPE_ON_SCREEN_POSITION` * `TARGETING_TYPE_OPERATING_SYSTEM` * `TARGETING_TYPE_PARENTAL_STATUS` * `TARGETING_TYPE_POI` * `TARGETING_TYPE_PROXIMITY_LOCATION_LIST` * `TARGETING_TYPE_REGIONAL_LOCATION_LIST` * `TARGETING_TYPE_SENSITIVE_CATEGORY_EXCLUSION` * `TARGETING_TYPE_SUB_EXCHANGE` * `TARGETING_TYPE_THIRD_PARTY_VERIFIER` * `TARGETING_TYPE_URL` * `TARGETING_TYPE_USER_REWARDED_CONTENT` * `TARGETING_TYPE_VIDEO_PLAYER_SIZE` * `TARGETING_TYPE_VIEWABILITY` * `TARGETING_TYPE_INVENTORY_MODE` * `TARGETING_TYPE_YOUTUBE_CHANNEL` (only for `LINE_ITEM_TYPE_YOUTUBE_AND_PARTNERS_VIDEO_SEQUENCE` line items) * `TARGETING_TYPE_YOUTUBE_VIDEO` (only for `LINE_ITEM_TYPE_YOUTUBE_AND_PARTNERS_VIDEO_SEQUENCE` line items)"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -26249,7 +25023,7 @@ async fn main() {
                      Some(false)),
                     (Some(r##"targeting-type"##),
                      None,
-                     Some(r##"Required. Identifies the type of this assigned targeting option. Supported targeting types: * `TARGETING_TYPE_CHANNEL` * `TARGETING_TYPE_DIGITAL_CONTENT_LABEL_EXCLUSION` * `TARGETING_TYPE_OMID` * `TARGETING_TYPE_SENSITIVE_CATEGORY_EXCLUSION` * `TARGETING_TYPE_KEYWORD`"##),
+                     Some(r##"Required. Identifies the type of this assigned targeting option. Supported targeting types: * `TARGETING_TYPE_CHANNEL` * `TARGETING_TYPE_DIGITAL_CONTENT_LABEL_EXCLUSION` * `TARGETING_TYPE_OMID` * `TARGETING_TYPE_SENSITIVE_CATEGORY_EXCLUSION` * `TARGETING_TYPE_KEYWORD` * `TARGETING_TYPE_INVENTORY_MODE`"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -26279,7 +25053,7 @@ async fn main() {
                      Some(false)),
                     (Some(r##"targeting-type"##),
                      None,
-                     Some(r##"Required. Identifies the type of this assigned targeting option. Supported targeting types: * `TARGETING_TYPE_CHANNEL` * `TARGETING_TYPE_DIGITAL_CONTENT_LABEL_EXCLUSION` * `TARGETING_TYPE_OMID` * `TARGETING_TYPE_SENSITIVE_CATEGORY_EXCLUSION` * `TARGETING_TYPE_KEYWORD`"##),
+                     Some(r##"Required. Identifies the type of this assigned targeting option. Supported targeting types: * `TARGETING_TYPE_CHANNEL` * `TARGETING_TYPE_DIGITAL_CONTENT_LABEL_EXCLUSION` * `TARGETING_TYPE_OMID` * `TARGETING_TYPE_SENSITIVE_CATEGORY_EXCLUSION` * `TARGETING_TYPE_KEYWORD` * `TARGETING_TYPE_INVENTORY_MODE`"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"assigned-targeting-option-id"##),
@@ -26309,7 +25083,7 @@ async fn main() {
                      Some(false)),
                     (Some(r##"targeting-type"##),
                      None,
-                     Some(r##"Required. Identifies the type of this assigned targeting option. Supported targeting types: * `TARGETING_TYPE_CHANNEL` * `TARGETING_TYPE_DIGITAL_CONTENT_LABEL_EXCLUSION` * `TARGETING_TYPE_OMID` * `TARGETING_TYPE_SENSITIVE_CATEGORY_EXCLUSION` * `TARGETING_TYPE_YOUTUBE_VIDEO` * `TARGETING_TYPE_YOUTUBE_CHANNEL` * `TARGETING_TYPE_KEYWORD`"##),
+                     Some(r##"Required. Identifies the type of this assigned targeting option. Supported targeting types: * `TARGETING_TYPE_CHANNEL` * `TARGETING_TYPE_DIGITAL_CONTENT_LABEL_EXCLUSION` * `TARGETING_TYPE_OMID` * `TARGETING_TYPE_SENSITIVE_CATEGORY_EXCLUSION` * `TARGETING_TYPE_YOUTUBE_VIDEO` * `TARGETING_TYPE_YOUTUBE_CHANNEL` * `TARGETING_TYPE_KEYWORD` * `TARGETING_TYPE_CONTENT_THEME_EXCLUSION`"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"assigned-targeting-option-id"##),
@@ -26339,7 +25113,7 @@ async fn main() {
                      Some(false)),
                     (Some(r##"targeting-type"##),
                      None,
-                     Some(r##"Required. Identifies the type of assigned targeting options to list. Supported targeting types: * `TARGETING_TYPE_CHANNEL` * `TARGETING_TYPE_DIGITAL_CONTENT_LABEL_EXCLUSION` * `TARGETING_TYPE_OMID` * `TARGETING_TYPE_SENSITIVE_CATEGORY_EXCLUSION` * `TARGETING_TYPE_YOUTUBE_VIDEO` * `TARGETING_TYPE_YOUTUBE_CHANNEL` * `TARGETING_TYPE_KEYWORD`"##),
+                     Some(r##"Required. Identifies the type of assigned targeting options to list. Supported targeting types: * `TARGETING_TYPE_CHANNEL` * `TARGETING_TYPE_DIGITAL_CONTENT_LABEL_EXCLUSION` * `TARGETING_TYPE_OMID` * `TARGETING_TYPE_SENSITIVE_CATEGORY_EXCLUSION` * `TARGETING_TYPE_YOUTUBE_VIDEO` * `TARGETING_TYPE_YOUTUBE_CHANNEL` * `TARGETING_TYPE_KEYWORD` * `TARGETING_TYPE_CONTENT_THEME_EXCLUSION`"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -26448,7 +25222,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("patch",
-                    Some(r##"Updates an existing custom bidding algorithm. Returns the updated custom bidding algorithm if successful."##),
+                    Some(r##"Updates an existing custom bidding algorithm. Returns the updated custom bidding algorithm if successful. Requests updating a custom bidding algorithm assigned to a line item will return an error."##),
                     "Details at http://byron.github.io/google-apis-rs/google_displayvideo1_cli/custom-bidding-algorithms_patch",
                   vec![
                     (Some(r##"custom-bidding-algorithm-id"##),
@@ -26473,7 +25247,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("scripts-create",
-                    Some(r##"Creates a new custom bidding script. Returns the newly created script if successful."##),
+                    Some(r##"Creates a new custom bidding script. Returns the newly created script if successful. Requests creating a custom bidding script under an algorithm assigned to a line item will return an error."##),
                     "Details at http://byron.github.io/google-apis-rs/google_displayvideo1_cli/custom-bidding-algorithms_scripts-create",
                   vec![
                     (Some(r##"custom-bidding-algorithm-id"##),
@@ -26588,113 +25362,6 @@ async fn main() {
                     Some(r##"Lists custom lists. The order is defined by the order_by parameter."##),
                     "Details at http://byron.github.io/google-apis-rs/google_displayvideo1_cli/custom-lists_list",
                   vec![
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
-            ]),
-            ("first-and-third-party-audiences", "methods: 'create', 'edit-customer-match-members', 'get', 'list' and 'patch'", vec![
-            ("create",
-                    Some(r##"Creates a FirstAndThirdPartyAudience. Only supported for the following audience_type: * `CUSTOMER_MATCH_CONTACT_INFO` * `CUSTOMER_MATCH_DEVICE_ID`"##),
-                    "Details at http://byron.github.io/google-apis-rs/google_displayvideo1_cli/first-and-third-party-audiences_create",
-                  vec![
-                    (Some(r##"kv"##),
-                     Some(r##"r"##),
-                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
-                     Some(true),
-                     Some(true)),
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
-            ("edit-customer-match-members",
-                    Some(r##"Updates the member list of a Customer Match audience. Only supported for the following audience_type: * `CUSTOMER_MATCH_CONTACT_INFO` * `CUSTOMER_MATCH_DEVICE_ID`"##),
-                    "Details at http://byron.github.io/google-apis-rs/google_displayvideo1_cli/first-and-third-party-audiences_edit-customer-match-members",
-                  vec![
-                    (Some(r##"first-and-third-party-audience-id"##),
-                     None,
-                     Some(r##"Required. The ID of the Customer Match FirstAndThirdPartyAudience whose members will be edited."##),
-                     Some(true),
-                     Some(false)),
-                    (Some(r##"kv"##),
-                     Some(r##"r"##),
-                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
-                     Some(true),
-                     Some(true)),
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
-            ("get",
-                    Some(r##"Gets a first and third party audience."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_displayvideo1_cli/first-and-third-party-audiences_get",
-                  vec![
-                    (Some(r##"first-and-third-party-audience-id"##),
-                     None,
-                     Some(r##"Required. The ID of the first and third party audience to fetch."##),
-                     Some(true),
-                     Some(false)),
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
-            ("list",
-                    Some(r##"Lists first and third party audiences. The order is defined by the order_by parameter."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_displayvideo1_cli/first-and-third-party-audiences_list",
-                  vec![
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
-            ("patch",
-                    Some(r##"Updates an existing FirstAndThirdPartyAudience. Only supported for the following audience_type: * `CUSTOMER_MATCH_CONTACT_INFO` * `CUSTOMER_MATCH_DEVICE_ID`"##),
-                    "Details at http://byron.github.io/google-apis-rs/google_displayvideo1_cli/first-and-third-party-audiences_patch",
-                  vec![
-                    (Some(r##"first-and-third-party-audience-id"##),
-                     None,
-                     Some(r##"Output only. The unique ID of the first and third party audience. Assigned by the system."##),
-                     Some(true),
-                     Some(false)),
-                    (Some(r##"kv"##),
-                     Some(r##"r"##),
-                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
-                     Some(true),
-                     Some(true)),
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
@@ -27678,7 +26345,7 @@ async fn main() {
             ]),
             ("sdfdownloadtasks", "methods: 'create' and 'operations-get'", vec![
             ("create",
-                    Some(r##"Creates an SDF Download Task. Returns an Operation. An SDF Download Task is a long-running, asynchronous operation. The metadata type of this operation is SdfDownloadTaskMetadata. If the request is successful, the response type of the operation is SdfDownloadTask. The response will not include the download files, which must be retrieved with media.download. The state of operation can be retrieved with sdfdownloadtask.operations.get. Any errors can be found in the error.message. Note that error.details is expected to be empty."##),
+                    Some(r##"Creates an SDF Download Task. Returns an Operation. An SDF Download Task is a long-running, asynchronous operation. The metadata type of this operation is SdfDownloadTaskMetadata. If the request is successful, the response type of the operation is SdfDownloadTask. The response will not include the download files, which must be retrieved with media.download. The state of operation can be retrieved with `sdfdownloadtasks.operations.get`. Any errors can be found in the error.message. Note that error.details is expected to be empty."##),
                     "Details at http://byron.github.io/google-apis-rs/google_displayvideo1_cli/sdfdownloadtasks_create",
                   vec![
                     (Some(r##"kv"##),
@@ -27921,7 +26588,7 @@ async fn main() {
 
     let mut app = App::new("displayvideo1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("6.0.0+20240620")
+           .version("7.0.0+20251204")
            .about("Display & Video 360 API allows users to automate complex Display & Video 360 workflows, such as creating insertion orders and setting targeting options for individual line items.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_displayvideo1_cli")
            .arg(Arg::with_name("url")
@@ -27999,7 +26666,7 @@ async fn main() {
         .with_native_roots()
         .unwrap()
         .https_or_http()
-        .enable_http1()
+        .enable_http2()
         .build();
 
     match Engine::new(matches, connector).await {

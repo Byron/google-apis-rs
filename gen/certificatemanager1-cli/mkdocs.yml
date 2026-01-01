@@ -1,4 +1,4 @@
-site_name: Certificate Manager v6.0.0+20240617
+site_name: Certificate Manager v7.0.0+20251204
 site_url: http://byron.github.io/google-apis-rs/google-certificatemanager1-cli
 site_description: A complete library to interact with Certificate Manager (protocol v1)
 
@@ -14,6 +14,7 @@ nav:
     - 'Locations Certificate Issuance Configs Delete': 'projects_locations-certificate-issuance-configs-delete.md'
     - 'Locations Certificate Issuance Configs Get': 'projects_locations-certificate-issuance-configs-get.md'
     - 'Locations Certificate Issuance Configs List': 'projects_locations-certificate-issuance-configs-list.md'
+    - 'Locations Certificate Issuance Configs Patch': 'projects_locations-certificate-issuance-configs-patch.md'
     - 'Locations Certificate Maps Certificate Map Entries Create': 'projects_locations-certificate-maps-certificate-map-entries-create.md'
     - 'Locations Certificate Maps Certificate Map Entries Delete': 'projects_locations-certificate-maps-certificate-map-entries-delete.md'
     - 'Locations Certificate Maps Certificate Map Entries Get': 'projects_locations-certificate-maps-certificate-map-entries-get.md'

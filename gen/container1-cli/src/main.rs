@@ -416,15 +416,26 @@ where
                     "cluster.addons-config.gcp-filestore-csi-driver-config.enabled" => Some(("cluster.addonsConfig.gcpFilestoreCsiDriverConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "cluster.addons-config.gcs-fuse-csi-driver-config.enabled" => Some(("cluster.addonsConfig.gcsFuseCsiDriverConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "cluster.addons-config.gke-backup-agent-config.enabled" => Some(("cluster.addonsConfig.gkeBackupAgentConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "cluster.addons-config.high-scale-checkpointing-config.enabled" => Some(("cluster.addonsConfig.highScaleCheckpointingConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "cluster.addons-config.horizontal-pod-autoscaling.disabled" => Some(("cluster.addonsConfig.horizontalPodAutoscaling.disabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "cluster.addons-config.http-load-balancing.disabled" => Some(("cluster.addonsConfig.httpLoadBalancing.disabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "cluster.addons-config.kubernetes-dashboard.disabled" => Some(("cluster.addonsConfig.kubernetesDashboard.disabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "cluster.addons-config.lustre-csi-driver-config.enable-legacy-lustre-port" => Some(("cluster.addonsConfig.lustreCsiDriverConfig.enableLegacyLustrePort", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "cluster.addons-config.lustre-csi-driver-config.enabled" => Some(("cluster.addonsConfig.lustreCsiDriverConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "cluster.addons-config.network-policy-config.disabled" => Some(("cluster.addonsConfig.networkPolicyConfig.disabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "cluster.addons-config.parallelstore-csi-driver-config.enabled" => Some(("cluster.addonsConfig.parallelstoreCsiDriverConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "cluster.addons-config.ray-operator-config.enabled" => Some(("cluster.addonsConfig.rayOperatorConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "cluster.addons-config.ray-operator-config.ray-cluster-logging-config.enabled" => Some(("cluster.addonsConfig.rayOperatorConfig.rayClusterLoggingConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "cluster.addons-config.ray-operator-config.ray-cluster-monitoring-config.enabled" => Some(("cluster.addonsConfig.rayOperatorConfig.rayClusterMonitoringConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "cluster.addons-config.stateful-ha-config.enabled" => Some(("cluster.addonsConfig.statefulHaConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "cluster.alpha-cluster-feature-gates" => Some(("cluster.alphaClusterFeatureGates", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "cluster.anonymous-authentication-config.mode" => Some(("cluster.anonymousAuthenticationConfig.mode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.authenticator-groups-config.enabled" => Some(("cluster.authenticatorGroupsConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "cluster.authenticator-groups-config.security-group" => Some(("cluster.authenticatorGroupsConfig.securityGroup", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.autopilot.enabled" => Some(("cluster.autopilot.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "cluster.autopilot.privileged-admission-config.allowlist-paths" => Some(("cluster.autopilot.privilegedAdmissionConfig.allowlistPaths", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "cluster.autopilot.workload-policy-config.allow-net-admin" => Some(("cluster.autopilot.workloadPolicyConfig.allowNetAdmin", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "cluster.autopilot.workload-policy-config.autopilot-compatibility-auditing-enabled" => Some(("cluster.autopilot.workloadPolicyConfig.autopilotCompatibilityAuditingEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "cluster.autoscaling.autoprovisioning-locations" => Some(("cluster.autoscaling.autoprovisioningLocations", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "cluster.autoscaling.autoprovisioning-node-pool-defaults.boot-disk-kms-key" => Some(("cluster.autoscaling.autoprovisioningNodePoolDefaults.bootDiskKmsKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.autoscaling.autoprovisioning-node-pool-defaults.disk-size-gb" => Some(("cluster.autoscaling.autoprovisioningNodePoolDefaults.diskSizeGb", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
@@ -440,6 +451,7 @@ where
                     "cluster.autoscaling.autoprovisioning-node-pool-defaults.service-account" => Some(("cluster.autoscaling.autoprovisioningNodePoolDefaults.serviceAccount", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.autoscaling.autoprovisioning-node-pool-defaults.shielded-instance-config.enable-integrity-monitoring" => Some(("cluster.autoscaling.autoprovisioningNodePoolDefaults.shieldedInstanceConfig.enableIntegrityMonitoring", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "cluster.autoscaling.autoprovisioning-node-pool-defaults.shielded-instance-config.enable-secure-boot" => Some(("cluster.autoscaling.autoprovisioningNodePoolDefaults.shieldedInstanceConfig.enableSecureBoot", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "cluster.autoscaling.autoprovisioning-node-pool-defaults.upgrade-settings.blue-green-settings.autoscaled-rollout-policy.wait-for-drain-duration" => Some(("cluster.autoscaling.autoprovisioningNodePoolDefaults.upgradeSettings.blueGreenSettings.autoscaledRolloutPolicy.waitForDrainDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.autoscaling.autoprovisioning-node-pool-defaults.upgrade-settings.blue-green-settings.node-pool-soak-duration" => Some(("cluster.autoscaling.autoprovisioningNodePoolDefaults.upgradeSettings.blueGreenSettings.nodePoolSoakDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.autoscaling.autoprovisioning-node-pool-defaults.upgrade-settings.blue-green-settings.standard-rollout-policy.batch-node-count" => Some(("cluster.autoscaling.autoprovisioningNodePoolDefaults.upgradeSettings.blueGreenSettings.standardRolloutPolicy.batchNodeCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "cluster.autoscaling.autoprovisioning-node-pool-defaults.upgrade-settings.blue-green-settings.standard-rollout-policy.batch-percentage" => Some(("cluster.autoscaling.autoprovisioningNodePoolDefaults.upgradeSettings.blueGreenSettings.standardRolloutPolicy.batchPercentage", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
@@ -448,11 +460,27 @@ where
                     "cluster.autoscaling.autoprovisioning-node-pool-defaults.upgrade-settings.max-unavailable" => Some(("cluster.autoscaling.autoprovisioningNodePoolDefaults.upgradeSettings.maxUnavailable", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "cluster.autoscaling.autoprovisioning-node-pool-defaults.upgrade-settings.strategy" => Some(("cluster.autoscaling.autoprovisioningNodePoolDefaults.upgradeSettings.strategy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.autoscaling.autoscaling-profile" => Some(("cluster.autoscaling.autoscalingProfile", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.autoscaling.default-compute-class-config.enabled" => Some(("cluster.autoscaling.defaultComputeClassConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "cluster.autoscaling.enable-node-autoprovisioning" => Some(("cluster.autoscaling.enableNodeAutoprovisioning", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "cluster.binary-authorization.enabled" => Some(("cluster.binaryAuthorization.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "cluster.binary-authorization.evaluation-mode" => Some(("cluster.binaryAuthorization.evaluationMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.cluster-ipv4-cidr" => Some(("cluster.clusterIpv4Cidr", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.compliance-posture-config.mode" => Some(("cluster.compliancePostureConfig.mode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.confidential-nodes.confidential-instance-type" => Some(("cluster.confidentialNodes.confidentialInstanceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.confidential-nodes.enabled" => Some(("cluster.confidentialNodes.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "cluster.control-plane-endpoints-config.dns-endpoint-config.allow-external-traffic" => Some(("cluster.controlPlaneEndpointsConfig.dnsEndpointConfig.allowExternalTraffic", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "cluster.control-plane-endpoints-config.dns-endpoint-config.enable-k8s-certs-via-dns" => Some(("cluster.controlPlaneEndpointsConfig.dnsEndpointConfig.enableK8sCertsViaDns", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "cluster.control-plane-endpoints-config.dns-endpoint-config.enable-k8s-tokens-via-dns" => Some(("cluster.controlPlaneEndpointsConfig.dnsEndpointConfig.enableK8sTokensViaDns", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "cluster.control-plane-endpoints-config.dns-endpoint-config.endpoint" => Some(("cluster.controlPlaneEndpointsConfig.dnsEndpointConfig.endpoint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.control-plane-endpoints-config.ip-endpoints-config.authorized-networks-config.enabled" => Some(("cluster.controlPlaneEndpointsConfig.ipEndpointsConfig.authorizedNetworksConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "cluster.control-plane-endpoints-config.ip-endpoints-config.authorized-networks-config.gcp-public-cidrs-access-enabled" => Some(("cluster.controlPlaneEndpointsConfig.ipEndpointsConfig.authorizedNetworksConfig.gcpPublicCidrsAccessEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "cluster.control-plane-endpoints-config.ip-endpoints-config.authorized-networks-config.private-endpoint-enforcement-enabled" => Some(("cluster.controlPlaneEndpointsConfig.ipEndpointsConfig.authorizedNetworksConfig.privateEndpointEnforcementEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "cluster.control-plane-endpoints-config.ip-endpoints-config.enable-public-endpoint" => Some(("cluster.controlPlaneEndpointsConfig.ipEndpointsConfig.enablePublicEndpoint", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "cluster.control-plane-endpoints-config.ip-endpoints-config.enabled" => Some(("cluster.controlPlaneEndpointsConfig.ipEndpointsConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "cluster.control-plane-endpoints-config.ip-endpoints-config.global-access" => Some(("cluster.controlPlaneEndpointsConfig.ipEndpointsConfig.globalAccess", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "cluster.control-plane-endpoints-config.ip-endpoints-config.private-endpoint" => Some(("cluster.controlPlaneEndpointsConfig.ipEndpointsConfig.privateEndpoint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.control-plane-endpoints-config.ip-endpoints-config.private-endpoint-subnetwork" => Some(("cluster.controlPlaneEndpointsConfig.ipEndpointsConfig.privateEndpointSubnetwork", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.control-plane-endpoints-config.ip-endpoints-config.public-endpoint" => Some(("cluster.controlPlaneEndpointsConfig.ipEndpointsConfig.publicEndpoint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.cost-management-config.enabled" => Some(("cluster.costManagementConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "cluster.create-time" => Some(("cluster.createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.current-master-version" => Some(("cluster.currentMasterVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -469,23 +497,28 @@ where
                     "cluster.enable-tpu" => Some(("cluster.enableTpu", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "cluster.endpoint" => Some(("cluster.endpoint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.enterprise-config.cluster-tier" => Some(("cluster.enterpriseConfig.clusterTier", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.enterprise-config.desired-tier" => Some(("cluster.enterpriseConfig.desiredTier", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.etag" => Some(("cluster.etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.expire-time" => Some(("cluster.expireTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.fleet.membership" => Some(("cluster.fleet.membership", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.fleet.membership-type" => Some(("cluster.fleet.membershipType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.fleet.pre-registered" => Some(("cluster.fleet.preRegistered", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "cluster.fleet.project" => Some(("cluster.fleet.project", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.gke-auto-upgrade-config.patch-mode" => Some(("cluster.gkeAutoUpgradeConfig.patchMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.id" => Some(("cluster.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.identity-service-config.enabled" => Some(("cluster.identityServiceConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "cluster.initial-cluster-version" => Some(("cluster.initialClusterVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.initial-node-count" => Some(("cluster.initialNodeCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "cluster.instance-group-urls" => Some(("cluster.instanceGroupUrls", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "cluster.ip-allocation-policy.additional-pod-ranges-config.pod-range-names" => Some(("cluster.ipAllocationPolicy.additionalPodRangesConfig.podRangeNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "cluster.ip-allocation-policy.auto-ipam-config.enabled" => Some(("cluster.ipAllocationPolicy.autoIpamConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "cluster.ip-allocation-policy.cluster-ipv4-cidr" => Some(("cluster.ipAllocationPolicy.clusterIpv4Cidr", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.ip-allocation-policy.cluster-ipv4-cidr-block" => Some(("cluster.ipAllocationPolicy.clusterIpv4CidrBlock", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.ip-allocation-policy.cluster-secondary-range-name" => Some(("cluster.ipAllocationPolicy.clusterSecondaryRangeName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.ip-allocation-policy.create-subnetwork" => Some(("cluster.ipAllocationPolicy.createSubnetwork", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "cluster.ip-allocation-policy.default-pod-ipv4-range-utilization" => Some(("cluster.ipAllocationPolicy.defaultPodIpv4RangeUtilization", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "cluster.ip-allocation-policy.ipv6-access-type" => Some(("cluster.ipAllocationPolicy.ipv6AccessType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.ip-allocation-policy.network-tier-config.network-tier" => Some(("cluster.ipAllocationPolicy.networkTierConfig.networkTier", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.ip-allocation-policy.node-ipv4-cidr" => Some(("cluster.ipAllocationPolicy.nodeIpv4Cidr", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.ip-allocation-policy.node-ipv4-cidr-block" => Some(("cluster.ipAllocationPolicy.nodeIpv4CidrBlock", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.ip-allocation-policy.pod-cidr-overprovision-config.disable" => Some(("cluster.ipAllocationPolicy.podCidrOverprovisionConfig.disable", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -510,8 +543,10 @@ where
                     "cluster.maintenance-policy.window.daily-maintenance-window.start-time" => Some(("cluster.maintenancePolicy.window.dailyMaintenanceWindow.startTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.maintenance-policy.window.recurring-window.recurrence" => Some(("cluster.maintenancePolicy.window.recurringWindow.recurrence", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.maintenance-policy.window.recurring-window.window.end-time" => Some(("cluster.maintenancePolicy.window.recurringWindow.window.endTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.maintenance-policy.window.recurring-window.window.maintenance-exclusion-options.end-time-behavior" => Some(("cluster.maintenancePolicy.window.recurringWindow.window.maintenanceExclusionOptions.endTimeBehavior", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.maintenance-policy.window.recurring-window.window.maintenance-exclusion-options.scope" => Some(("cluster.maintenancePolicy.window.recurringWindow.window.maintenanceExclusionOptions.scope", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.maintenance-policy.window.recurring-window.window.start-time" => Some(("cluster.maintenancePolicy.window.recurringWindow.window.startTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.managed-opentelemetry-config.scope" => Some(("cluster.managedOpentelemetryConfig.scope", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.master-auth.client-certificate" => Some(("cluster.masterAuth.clientCertificate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.master-auth.client-certificate-config.issue-client-certificate" => Some(("cluster.masterAuth.clientCertificateConfig.issueClientCertificate", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "cluster.master-auth.client-key" => Some(("cluster.masterAuth.clientKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -520,17 +555,21 @@ where
                     "cluster.master-auth.username" => Some(("cluster.masterAuth.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.master-authorized-networks-config.enabled" => Some(("cluster.masterAuthorizedNetworksConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "cluster.master-authorized-networks-config.gcp-public-cidrs-access-enabled" => Some(("cluster.masterAuthorizedNetworksConfig.gcpPublicCidrsAccessEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "cluster.master-authorized-networks-config.private-endpoint-enforcement-enabled" => Some(("cluster.masterAuthorizedNetworksConfig.privateEndpointEnforcementEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "cluster.mesh-certificates.enable-certificates" => Some(("cluster.meshCertificates.enableCertificates", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "cluster.monitoring-config.advanced-datapath-observability-config.enable-metrics" => Some(("cluster.monitoringConfig.advancedDatapathObservabilityConfig.enableMetrics", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "cluster.monitoring-config.advanced-datapath-observability-config.enable-relay" => Some(("cluster.monitoringConfig.advancedDatapathObservabilityConfig.enableRelay", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "cluster.monitoring-config.advanced-datapath-observability-config.relay-mode" => Some(("cluster.monitoringConfig.advancedDatapathObservabilityConfig.relayMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.monitoring-config.component-config.enable-components" => Some(("cluster.monitoringConfig.componentConfig.enableComponents", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "cluster.monitoring-config.managed-prometheus-config.auto-monitoring-config.scope" => Some(("cluster.monitoringConfig.managedPrometheusConfig.autoMonitoringConfig.scope", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.monitoring-config.managed-prometheus-config.enabled" => Some(("cluster.monitoringConfig.managedPrometheusConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "cluster.monitoring-service" => Some(("cluster.monitoringService", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.name" => Some(("cluster.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.network" => Some(("cluster.network", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.network-config.datapath-provider" => Some(("cluster.networkConfig.datapathProvider", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.network-config.default-enable-private-nodes" => Some(("cluster.networkConfig.defaultEnablePrivateNodes", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "cluster.network-config.default-snat-status.disabled" => Some(("cluster.networkConfig.defaultSnatStatus.disabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "cluster.network-config.disable-l4-lb-firewall-reconciliation" => Some(("cluster.networkConfig.disableL4LbFirewallReconciliation", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "cluster.network-config.dns-config.additive-vpc-scope-dns-domain" => Some(("cluster.networkConfig.dnsConfig.additiveVpcScopeDnsDomain", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.network-config.dns-config.cluster-dns" => Some(("cluster.networkConfig.dnsConfig.clusterDns", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.network-config.dns-config.cluster-dns-domain" => Some(("cluster.networkConfig.dnsConfig.clusterDnsDomain", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -550,32 +589,78 @@ where
                     "cluster.network-policy.enabled" => Some(("cluster.networkPolicy.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "cluster.network-policy.provider" => Some(("cluster.networkPolicy.provider", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.node-config.advanced-machine-features.enable-nested-virtualization" => Some(("cluster.nodeConfig.advancedMachineFeatures.enableNestedVirtualization", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "cluster.node-config.advanced-machine-features.performance-monitoring-unit" => Some(("cluster.nodeConfig.advancedMachineFeatures.performanceMonitoringUnit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.node-config.advanced-machine-features.threads-per-core" => Some(("cluster.nodeConfig.advancedMachineFeatures.threadsPerCore", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-config.boot-disk.disk-type" => Some(("cluster.nodeConfig.bootDisk.diskType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-config.boot-disk.provisioned-iops" => Some(("cluster.nodeConfig.bootDisk.provisionedIops", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-config.boot-disk.provisioned-throughput" => Some(("cluster.nodeConfig.bootDisk.provisionedThroughput", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-config.boot-disk.size-gb" => Some(("cluster.nodeConfig.bootDisk.sizeGb", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.node-config.boot-disk-kms-key" => Some(("cluster.nodeConfig.bootDiskKmsKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-config.confidential-nodes.confidential-instance-type" => Some(("cluster.nodeConfig.confidentialNodes.confidentialInstanceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.node-config.confidential-nodes.enabled" => Some(("cluster.nodeConfig.confidentialNodes.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "cluster.node-config.containerd-config.private-registry-access-config.enabled" => Some(("cluster.nodeConfig.containerdConfig.privateRegistryAccessConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "cluster.node-config.containerd-config.writable-cgroups.enabled" => Some(("cluster.nodeConfig.containerdConfig.writableCgroups.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "cluster.node-config.disk-size-gb" => Some(("cluster.nodeConfig.diskSizeGb", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "cluster.node-config.disk-type" => Some(("cluster.nodeConfig.diskType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-config.effective-cgroup-mode" => Some(("cluster.nodeConfig.effectiveCgroupMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.node-config.enable-confidential-storage" => Some(("cluster.nodeConfig.enableConfidentialStorage", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "cluster.node-config.ephemeral-storage-local-ssd-config.data-cache-count" => Some(("cluster.nodeConfig.ephemeralStorageLocalSsdConfig.dataCacheCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "cluster.node-config.ephemeral-storage-local-ssd-config.local-ssd-count" => Some(("cluster.nodeConfig.ephemeralStorageLocalSsdConfig.localSsdCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "cluster.node-config.fast-socket.enabled" => Some(("cluster.nodeConfig.fastSocket.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "cluster.node-config.flex-start" => Some(("cluster.nodeConfig.flexStart", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "cluster.node-config.gcfs-config.enabled" => Some(("cluster.nodeConfig.gcfsConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "cluster.node-config.gvnic.enabled" => Some(("cluster.nodeConfig.gvnic.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "cluster.node-config.image-type" => Some(("cluster.nodeConfig.imageType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-config.kubelet-config.allowed-unsafe-sysctls" => Some(("cluster.nodeConfig.kubeletConfig.allowedUnsafeSysctls", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "cluster.node-config.kubelet-config.container-log-max-files" => Some(("cluster.nodeConfig.kubeletConfig.containerLogMaxFiles", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "cluster.node-config.kubelet-config.container-log-max-size" => Some(("cluster.nodeConfig.kubeletConfig.containerLogMaxSize", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.node-config.kubelet-config.cpu-cfs-quota" => Some(("cluster.nodeConfig.kubeletConfig.cpuCfsQuota", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "cluster.node-config.kubelet-config.cpu-cfs-quota-period" => Some(("cluster.nodeConfig.kubeletConfig.cpuCfsQuotaPeriod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.node-config.kubelet-config.cpu-manager-policy" => Some(("cluster.nodeConfig.kubeletConfig.cpuManagerPolicy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-config.kubelet-config.eviction-max-pod-grace-period-seconds" => Some(("cluster.nodeConfig.kubeletConfig.evictionMaxPodGracePeriodSeconds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "cluster.node-config.kubelet-config.eviction-minimum-reclaim.imagefs-available" => Some(("cluster.nodeConfig.kubeletConfig.evictionMinimumReclaim.imagefsAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-config.kubelet-config.eviction-minimum-reclaim.imagefs-inodes-free" => Some(("cluster.nodeConfig.kubeletConfig.evictionMinimumReclaim.imagefsInodesFree", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-config.kubelet-config.eviction-minimum-reclaim.memory-available" => Some(("cluster.nodeConfig.kubeletConfig.evictionMinimumReclaim.memoryAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-config.kubelet-config.eviction-minimum-reclaim.nodefs-available" => Some(("cluster.nodeConfig.kubeletConfig.evictionMinimumReclaim.nodefsAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-config.kubelet-config.eviction-minimum-reclaim.nodefs-inodes-free" => Some(("cluster.nodeConfig.kubeletConfig.evictionMinimumReclaim.nodefsInodesFree", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-config.kubelet-config.eviction-minimum-reclaim.pid-available" => Some(("cluster.nodeConfig.kubeletConfig.evictionMinimumReclaim.pidAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-config.kubelet-config.eviction-soft.imagefs-available" => Some(("cluster.nodeConfig.kubeletConfig.evictionSoft.imagefsAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-config.kubelet-config.eviction-soft.imagefs-inodes-free" => Some(("cluster.nodeConfig.kubeletConfig.evictionSoft.imagefsInodesFree", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-config.kubelet-config.eviction-soft.memory-available" => Some(("cluster.nodeConfig.kubeletConfig.evictionSoft.memoryAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-config.kubelet-config.eviction-soft.nodefs-available" => Some(("cluster.nodeConfig.kubeletConfig.evictionSoft.nodefsAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-config.kubelet-config.eviction-soft.nodefs-inodes-free" => Some(("cluster.nodeConfig.kubeletConfig.evictionSoft.nodefsInodesFree", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-config.kubelet-config.eviction-soft.pid-available" => Some(("cluster.nodeConfig.kubeletConfig.evictionSoft.pidAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-config.kubelet-config.eviction-soft-grace-period.imagefs-available" => Some(("cluster.nodeConfig.kubeletConfig.evictionSoftGracePeriod.imagefsAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-config.kubelet-config.eviction-soft-grace-period.imagefs-inodes-free" => Some(("cluster.nodeConfig.kubeletConfig.evictionSoftGracePeriod.imagefsInodesFree", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-config.kubelet-config.eviction-soft-grace-period.memory-available" => Some(("cluster.nodeConfig.kubeletConfig.evictionSoftGracePeriod.memoryAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-config.kubelet-config.eviction-soft-grace-period.nodefs-available" => Some(("cluster.nodeConfig.kubeletConfig.evictionSoftGracePeriod.nodefsAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-config.kubelet-config.eviction-soft-grace-period.nodefs-inodes-free" => Some(("cluster.nodeConfig.kubeletConfig.evictionSoftGracePeriod.nodefsInodesFree", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-config.kubelet-config.eviction-soft-grace-period.pid-available" => Some(("cluster.nodeConfig.kubeletConfig.evictionSoftGracePeriod.pidAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-config.kubelet-config.image-gc-high-threshold-percent" => Some(("cluster.nodeConfig.kubeletConfig.imageGcHighThresholdPercent", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "cluster.node-config.kubelet-config.image-gc-low-threshold-percent" => Some(("cluster.nodeConfig.kubeletConfig.imageGcLowThresholdPercent", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "cluster.node-config.kubelet-config.image-maximum-gc-age" => Some(("cluster.nodeConfig.kubeletConfig.imageMaximumGcAge", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-config.kubelet-config.image-minimum-gc-age" => Some(("cluster.nodeConfig.kubeletConfig.imageMinimumGcAge", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.node-config.kubelet-config.insecure-kubelet-readonly-port-enabled" => Some(("cluster.nodeConfig.kubeletConfig.insecureKubeletReadonlyPortEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "cluster.node-config.kubelet-config.max-parallel-image-pulls" => Some(("cluster.nodeConfig.kubeletConfig.maxParallelImagePulls", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "cluster.node-config.kubelet-config.memory-manager.policy" => Some(("cluster.nodeConfig.kubeletConfig.memoryManager.policy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.node-config.kubelet-config.pod-pids-limit" => Some(("cluster.nodeConfig.kubeletConfig.podPidsLimit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-config.kubelet-config.single-process-oom-kill" => Some(("cluster.nodeConfig.kubeletConfig.singleProcessOomKill", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "cluster.node-config.kubelet-config.topology-manager.policy" => Some(("cluster.nodeConfig.kubeletConfig.topologyManager.policy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-config.kubelet-config.topology-manager.scope" => Some(("cluster.nodeConfig.kubeletConfig.topologyManager.scope", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.node-config.labels" => Some(("cluster.nodeConfig.labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "cluster.node-config.linux-node-config.cgroup-mode" => Some(("cluster.nodeConfig.linuxNodeConfig.cgroupMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.node-config.linux-node-config.hugepages.hugepage-size1g" => Some(("cluster.nodeConfig.linuxNodeConfig.hugepages.hugepageSize1g", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "cluster.node-config.linux-node-config.hugepages.hugepage-size2m" => Some(("cluster.nodeConfig.linuxNodeConfig.hugepages.hugepageSize2m", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "cluster.node-config.linux-node-config.node-kernel-module-loading.policy" => Some(("cluster.nodeConfig.linuxNodeConfig.nodeKernelModuleLoading.policy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.node-config.linux-node-config.sysctls" => Some(("cluster.nodeConfig.linuxNodeConfig.sysctls", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "cluster.node-config.linux-node-config.transparent-hugepage-defrag" => Some(("cluster.nodeConfig.linuxNodeConfig.transparentHugepageDefrag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-config.linux-node-config.transparent-hugepage-enabled" => Some(("cluster.nodeConfig.linuxNodeConfig.transparentHugepageEnabled", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.node-config.local-nvme-ssd-block-config.local-ssd-count" => Some(("cluster.nodeConfig.localNvmeSsdBlockConfig.localSsdCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "cluster.node-config.local-ssd-count" => Some(("cluster.nodeConfig.localSsdCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "cluster.node-config.local-ssd-encryption-mode" => Some(("cluster.nodeConfig.localSsdEncryptionMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.node-config.logging-config.variant-config.variant" => Some(("cluster.nodeConfig.loggingConfig.variantConfig.variant", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.node-config.machine-type" => Some(("cluster.nodeConfig.machineType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-config.max-run-duration" => Some(("cluster.nodeConfig.maxRunDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.node-config.metadata" => Some(("cluster.nodeConfig.metadata", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "cluster.node-config.min-cpu-platform" => Some(("cluster.nodeConfig.minCpuPlatform", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.node-config.node-group" => Some(("cluster.nodeConfig.nodeGroup", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -590,31 +675,104 @@ where
                     "cluster.node-config.service-account" => Some(("cluster.nodeConfig.serviceAccount", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.node-config.shielded-instance-config.enable-integrity-monitoring" => Some(("cluster.nodeConfig.shieldedInstanceConfig.enableIntegrityMonitoring", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "cluster.node-config.shielded-instance-config.enable-secure-boot" => Some(("cluster.nodeConfig.shieldedInstanceConfig.enableSecureBoot", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "cluster.node-config.sole-tenant-config.min-node-cpus" => Some(("cluster.nodeConfig.soleTenantConfig.minNodeCpus", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "cluster.node-config.spot" => Some(("cluster.nodeConfig.spot", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "cluster.node-config.storage-pools" => Some(("cluster.nodeConfig.storagePools", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "cluster.node-config.tags" => Some(("cluster.nodeConfig.tags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "cluster.node-config.windows-node-config.os-version" => Some(("cluster.nodeConfig.windowsNodeConfig.osVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.node-config.workload-metadata-config.mode" => Some(("cluster.nodeConfig.workloadMetadataConfig.mode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.node-ipv4-cidr-size" => Some(("cluster.nodeIpv4CidrSize", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-auto-config.linux-node-config.cgroup-mode" => Some(("cluster.nodePoolAutoConfig.linuxNodeConfig.cgroupMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-auto-config.linux-node-config.hugepages.hugepage-size1g" => Some(("cluster.nodePoolAutoConfig.linuxNodeConfig.hugepages.hugepageSize1g", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-auto-config.linux-node-config.hugepages.hugepage-size2m" => Some(("cluster.nodePoolAutoConfig.linuxNodeConfig.hugepages.hugepageSize2m", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-auto-config.linux-node-config.node-kernel-module-loading.policy" => Some(("cluster.nodePoolAutoConfig.linuxNodeConfig.nodeKernelModuleLoading.policy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-auto-config.linux-node-config.sysctls" => Some(("cluster.nodePoolAutoConfig.linuxNodeConfig.sysctls", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "cluster.node-pool-auto-config.linux-node-config.transparent-hugepage-defrag" => Some(("cluster.nodePoolAutoConfig.linuxNodeConfig.transparentHugepageDefrag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-auto-config.linux-node-config.transparent-hugepage-enabled" => Some(("cluster.nodePoolAutoConfig.linuxNodeConfig.transparentHugepageEnabled", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.node-pool-auto-config.network-tags.tags" => Some(("cluster.nodePoolAutoConfig.networkTags.tags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "cluster.node-pool-auto-config.node-kubelet-config.allowed-unsafe-sysctls" => Some(("cluster.nodePoolAutoConfig.nodeKubeletConfig.allowedUnsafeSysctls", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "cluster.node-pool-auto-config.node-kubelet-config.container-log-max-files" => Some(("cluster.nodePoolAutoConfig.nodeKubeletConfig.containerLogMaxFiles", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-auto-config.node-kubelet-config.container-log-max-size" => Some(("cluster.nodePoolAutoConfig.nodeKubeletConfig.containerLogMaxSize", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.node-pool-auto-config.node-kubelet-config.cpu-cfs-quota" => Some(("cluster.nodePoolAutoConfig.nodeKubeletConfig.cpuCfsQuota", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "cluster.node-pool-auto-config.node-kubelet-config.cpu-cfs-quota-period" => Some(("cluster.nodePoolAutoConfig.nodeKubeletConfig.cpuCfsQuotaPeriod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.node-pool-auto-config.node-kubelet-config.cpu-manager-policy" => Some(("cluster.nodePoolAutoConfig.nodeKubeletConfig.cpuManagerPolicy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-auto-config.node-kubelet-config.eviction-max-pod-grace-period-seconds" => Some(("cluster.nodePoolAutoConfig.nodeKubeletConfig.evictionMaxPodGracePeriodSeconds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-auto-config.node-kubelet-config.eviction-minimum-reclaim.imagefs-available" => Some(("cluster.nodePoolAutoConfig.nodeKubeletConfig.evictionMinimumReclaim.imagefsAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-auto-config.node-kubelet-config.eviction-minimum-reclaim.imagefs-inodes-free" => Some(("cluster.nodePoolAutoConfig.nodeKubeletConfig.evictionMinimumReclaim.imagefsInodesFree", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-auto-config.node-kubelet-config.eviction-minimum-reclaim.memory-available" => Some(("cluster.nodePoolAutoConfig.nodeKubeletConfig.evictionMinimumReclaim.memoryAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-auto-config.node-kubelet-config.eviction-minimum-reclaim.nodefs-available" => Some(("cluster.nodePoolAutoConfig.nodeKubeletConfig.evictionMinimumReclaim.nodefsAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-auto-config.node-kubelet-config.eviction-minimum-reclaim.nodefs-inodes-free" => Some(("cluster.nodePoolAutoConfig.nodeKubeletConfig.evictionMinimumReclaim.nodefsInodesFree", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-auto-config.node-kubelet-config.eviction-minimum-reclaim.pid-available" => Some(("cluster.nodePoolAutoConfig.nodeKubeletConfig.evictionMinimumReclaim.pidAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-auto-config.node-kubelet-config.eviction-soft.imagefs-available" => Some(("cluster.nodePoolAutoConfig.nodeKubeletConfig.evictionSoft.imagefsAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-auto-config.node-kubelet-config.eviction-soft.imagefs-inodes-free" => Some(("cluster.nodePoolAutoConfig.nodeKubeletConfig.evictionSoft.imagefsInodesFree", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-auto-config.node-kubelet-config.eviction-soft.memory-available" => Some(("cluster.nodePoolAutoConfig.nodeKubeletConfig.evictionSoft.memoryAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-auto-config.node-kubelet-config.eviction-soft.nodefs-available" => Some(("cluster.nodePoolAutoConfig.nodeKubeletConfig.evictionSoft.nodefsAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-auto-config.node-kubelet-config.eviction-soft.nodefs-inodes-free" => Some(("cluster.nodePoolAutoConfig.nodeKubeletConfig.evictionSoft.nodefsInodesFree", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-auto-config.node-kubelet-config.eviction-soft.pid-available" => Some(("cluster.nodePoolAutoConfig.nodeKubeletConfig.evictionSoft.pidAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-auto-config.node-kubelet-config.eviction-soft-grace-period.imagefs-available" => Some(("cluster.nodePoolAutoConfig.nodeKubeletConfig.evictionSoftGracePeriod.imagefsAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-auto-config.node-kubelet-config.eviction-soft-grace-period.imagefs-inodes-free" => Some(("cluster.nodePoolAutoConfig.nodeKubeletConfig.evictionSoftGracePeriod.imagefsInodesFree", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-auto-config.node-kubelet-config.eviction-soft-grace-period.memory-available" => Some(("cluster.nodePoolAutoConfig.nodeKubeletConfig.evictionSoftGracePeriod.memoryAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-auto-config.node-kubelet-config.eviction-soft-grace-period.nodefs-available" => Some(("cluster.nodePoolAutoConfig.nodeKubeletConfig.evictionSoftGracePeriod.nodefsAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-auto-config.node-kubelet-config.eviction-soft-grace-period.nodefs-inodes-free" => Some(("cluster.nodePoolAutoConfig.nodeKubeletConfig.evictionSoftGracePeriod.nodefsInodesFree", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-auto-config.node-kubelet-config.eviction-soft-grace-period.pid-available" => Some(("cluster.nodePoolAutoConfig.nodeKubeletConfig.evictionSoftGracePeriod.pidAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-auto-config.node-kubelet-config.image-gc-high-threshold-percent" => Some(("cluster.nodePoolAutoConfig.nodeKubeletConfig.imageGcHighThresholdPercent", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-auto-config.node-kubelet-config.image-gc-low-threshold-percent" => Some(("cluster.nodePoolAutoConfig.nodeKubeletConfig.imageGcLowThresholdPercent", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-auto-config.node-kubelet-config.image-maximum-gc-age" => Some(("cluster.nodePoolAutoConfig.nodeKubeletConfig.imageMaximumGcAge", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-auto-config.node-kubelet-config.image-minimum-gc-age" => Some(("cluster.nodePoolAutoConfig.nodeKubeletConfig.imageMinimumGcAge", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.node-pool-auto-config.node-kubelet-config.insecure-kubelet-readonly-port-enabled" => Some(("cluster.nodePoolAutoConfig.nodeKubeletConfig.insecureKubeletReadonlyPortEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-auto-config.node-kubelet-config.max-parallel-image-pulls" => Some(("cluster.nodePoolAutoConfig.nodeKubeletConfig.maxParallelImagePulls", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-auto-config.node-kubelet-config.memory-manager.policy" => Some(("cluster.nodePoolAutoConfig.nodeKubeletConfig.memoryManager.policy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.node-pool-auto-config.node-kubelet-config.pod-pids-limit" => Some(("cluster.nodePoolAutoConfig.nodeKubeletConfig.podPidsLimit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-auto-config.node-kubelet-config.single-process-oom-kill" => Some(("cluster.nodePoolAutoConfig.nodeKubeletConfig.singleProcessOomKill", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-auto-config.node-kubelet-config.topology-manager.policy" => Some(("cluster.nodePoolAutoConfig.nodeKubeletConfig.topologyManager.policy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-auto-config.node-kubelet-config.topology-manager.scope" => Some(("cluster.nodePoolAutoConfig.nodeKubeletConfig.topologyManager.scope", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.node-pool-auto-config.resource-manager-tags.tags" => Some(("cluster.nodePoolAutoConfig.resourceManagerTags.tags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "cluster.node-pool-defaults.node-config-defaults.containerd-config.private-registry-access-config.enabled" => Some(("cluster.nodePoolDefaults.nodeConfigDefaults.containerdConfig.privateRegistryAccessConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-defaults.node-config-defaults.containerd-config.writable-cgroups.enabled" => Some(("cluster.nodePoolDefaults.nodeConfigDefaults.containerdConfig.writableCgroups.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "cluster.node-pool-defaults.node-config-defaults.gcfs-config.enabled" => Some(("cluster.nodePoolDefaults.nodeConfigDefaults.gcfsConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "cluster.node-pool-defaults.node-config-defaults.logging-config.variant-config.variant" => Some(("cluster.nodePoolDefaults.nodeConfigDefaults.loggingConfig.variantConfig.variant", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-defaults.node-config-defaults.node-kubelet-config.allowed-unsafe-sysctls" => Some(("cluster.nodePoolDefaults.nodeConfigDefaults.nodeKubeletConfig.allowedUnsafeSysctls", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "cluster.node-pool-defaults.node-config-defaults.node-kubelet-config.container-log-max-files" => Some(("cluster.nodePoolDefaults.nodeConfigDefaults.nodeKubeletConfig.containerLogMaxFiles", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-defaults.node-config-defaults.node-kubelet-config.container-log-max-size" => Some(("cluster.nodePoolDefaults.nodeConfigDefaults.nodeKubeletConfig.containerLogMaxSize", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.node-pool-defaults.node-config-defaults.node-kubelet-config.cpu-cfs-quota" => Some(("cluster.nodePoolDefaults.nodeConfigDefaults.nodeKubeletConfig.cpuCfsQuota", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "cluster.node-pool-defaults.node-config-defaults.node-kubelet-config.cpu-cfs-quota-period" => Some(("cluster.nodePoolDefaults.nodeConfigDefaults.nodeKubeletConfig.cpuCfsQuotaPeriod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.node-pool-defaults.node-config-defaults.node-kubelet-config.cpu-manager-policy" => Some(("cluster.nodePoolDefaults.nodeConfigDefaults.nodeKubeletConfig.cpuManagerPolicy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-defaults.node-config-defaults.node-kubelet-config.eviction-max-pod-grace-period-seconds" => Some(("cluster.nodePoolDefaults.nodeConfigDefaults.nodeKubeletConfig.evictionMaxPodGracePeriodSeconds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-defaults.node-config-defaults.node-kubelet-config.eviction-minimum-reclaim.imagefs-available" => Some(("cluster.nodePoolDefaults.nodeConfigDefaults.nodeKubeletConfig.evictionMinimumReclaim.imagefsAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-defaults.node-config-defaults.node-kubelet-config.eviction-minimum-reclaim.imagefs-inodes-free" => Some(("cluster.nodePoolDefaults.nodeConfigDefaults.nodeKubeletConfig.evictionMinimumReclaim.imagefsInodesFree", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-defaults.node-config-defaults.node-kubelet-config.eviction-minimum-reclaim.memory-available" => Some(("cluster.nodePoolDefaults.nodeConfigDefaults.nodeKubeletConfig.evictionMinimumReclaim.memoryAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-defaults.node-config-defaults.node-kubelet-config.eviction-minimum-reclaim.nodefs-available" => Some(("cluster.nodePoolDefaults.nodeConfigDefaults.nodeKubeletConfig.evictionMinimumReclaim.nodefsAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-defaults.node-config-defaults.node-kubelet-config.eviction-minimum-reclaim.nodefs-inodes-free" => Some(("cluster.nodePoolDefaults.nodeConfigDefaults.nodeKubeletConfig.evictionMinimumReclaim.nodefsInodesFree", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-defaults.node-config-defaults.node-kubelet-config.eviction-minimum-reclaim.pid-available" => Some(("cluster.nodePoolDefaults.nodeConfigDefaults.nodeKubeletConfig.evictionMinimumReclaim.pidAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-defaults.node-config-defaults.node-kubelet-config.eviction-soft.imagefs-available" => Some(("cluster.nodePoolDefaults.nodeConfigDefaults.nodeKubeletConfig.evictionSoft.imagefsAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-defaults.node-config-defaults.node-kubelet-config.eviction-soft.imagefs-inodes-free" => Some(("cluster.nodePoolDefaults.nodeConfigDefaults.nodeKubeletConfig.evictionSoft.imagefsInodesFree", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-defaults.node-config-defaults.node-kubelet-config.eviction-soft.memory-available" => Some(("cluster.nodePoolDefaults.nodeConfigDefaults.nodeKubeletConfig.evictionSoft.memoryAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-defaults.node-config-defaults.node-kubelet-config.eviction-soft.nodefs-available" => Some(("cluster.nodePoolDefaults.nodeConfigDefaults.nodeKubeletConfig.evictionSoft.nodefsAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-defaults.node-config-defaults.node-kubelet-config.eviction-soft.nodefs-inodes-free" => Some(("cluster.nodePoolDefaults.nodeConfigDefaults.nodeKubeletConfig.evictionSoft.nodefsInodesFree", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-defaults.node-config-defaults.node-kubelet-config.eviction-soft.pid-available" => Some(("cluster.nodePoolDefaults.nodeConfigDefaults.nodeKubeletConfig.evictionSoft.pidAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-defaults.node-config-defaults.node-kubelet-config.eviction-soft-grace-period.imagefs-available" => Some(("cluster.nodePoolDefaults.nodeConfigDefaults.nodeKubeletConfig.evictionSoftGracePeriod.imagefsAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-defaults.node-config-defaults.node-kubelet-config.eviction-soft-grace-period.imagefs-inodes-free" => Some(("cluster.nodePoolDefaults.nodeConfigDefaults.nodeKubeletConfig.evictionSoftGracePeriod.imagefsInodesFree", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-defaults.node-config-defaults.node-kubelet-config.eviction-soft-grace-period.memory-available" => Some(("cluster.nodePoolDefaults.nodeConfigDefaults.nodeKubeletConfig.evictionSoftGracePeriod.memoryAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-defaults.node-config-defaults.node-kubelet-config.eviction-soft-grace-period.nodefs-available" => Some(("cluster.nodePoolDefaults.nodeConfigDefaults.nodeKubeletConfig.evictionSoftGracePeriod.nodefsAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-defaults.node-config-defaults.node-kubelet-config.eviction-soft-grace-period.nodefs-inodes-free" => Some(("cluster.nodePoolDefaults.nodeConfigDefaults.nodeKubeletConfig.evictionSoftGracePeriod.nodefsInodesFree", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-defaults.node-config-defaults.node-kubelet-config.eviction-soft-grace-period.pid-available" => Some(("cluster.nodePoolDefaults.nodeConfigDefaults.nodeKubeletConfig.evictionSoftGracePeriod.pidAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-defaults.node-config-defaults.node-kubelet-config.image-gc-high-threshold-percent" => Some(("cluster.nodePoolDefaults.nodeConfigDefaults.nodeKubeletConfig.imageGcHighThresholdPercent", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-defaults.node-config-defaults.node-kubelet-config.image-gc-low-threshold-percent" => Some(("cluster.nodePoolDefaults.nodeConfigDefaults.nodeKubeletConfig.imageGcLowThresholdPercent", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-defaults.node-config-defaults.node-kubelet-config.image-maximum-gc-age" => Some(("cluster.nodePoolDefaults.nodeConfigDefaults.nodeKubeletConfig.imageMaximumGcAge", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-defaults.node-config-defaults.node-kubelet-config.image-minimum-gc-age" => Some(("cluster.nodePoolDefaults.nodeConfigDefaults.nodeKubeletConfig.imageMinimumGcAge", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.node-pool-defaults.node-config-defaults.node-kubelet-config.insecure-kubelet-readonly-port-enabled" => Some(("cluster.nodePoolDefaults.nodeConfigDefaults.nodeKubeletConfig.insecureKubeletReadonlyPortEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-defaults.node-config-defaults.node-kubelet-config.max-parallel-image-pulls" => Some(("cluster.nodePoolDefaults.nodeConfigDefaults.nodeKubeletConfig.maxParallelImagePulls", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-defaults.node-config-defaults.node-kubelet-config.memory-manager.policy" => Some(("cluster.nodePoolDefaults.nodeConfigDefaults.nodeKubeletConfig.memoryManager.policy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.node-pool-defaults.node-config-defaults.node-kubelet-config.pod-pids-limit" => Some(("cluster.nodePoolDefaults.nodeConfigDefaults.nodeKubeletConfig.podPidsLimit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-defaults.node-config-defaults.node-kubelet-config.single-process-oom-kill" => Some(("cluster.nodePoolDefaults.nodeConfigDefaults.nodeKubeletConfig.singleProcessOomKill", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-defaults.node-config-defaults.node-kubelet-config.topology-manager.policy" => Some(("cluster.nodePoolDefaults.nodeConfigDefaults.nodeKubeletConfig.topologyManager.policy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-defaults.node-config-defaults.node-kubelet-config.topology-manager.scope" => Some(("cluster.nodePoolDefaults.nodeConfigDefaults.nodeKubeletConfig.topologyManager.scope", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.notification-config.pubsub.enabled" => Some(("cluster.notificationConfig.pubsub.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "cluster.notification-config.pubsub.filter.event-type" => Some(("cluster.notificationConfig.pubsub.filter.eventType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "cluster.notification-config.pubsub.topic" => Some(("cluster.notificationConfig.pubsub.topic", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.parent-product-config.labels" => Some(("cluster.parentProductConfig.labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "cluster.parent-product-config.product-name" => Some(("cluster.parentProductConfig.productName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.pod-autoscaling.hpa-profile" => Some(("cluster.podAutoscaling.hpaProfile", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.private-cluster-config.enable-private-endpoint" => Some(("cluster.privateClusterConfig.enablePrivateEndpoint", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "cluster.private-cluster-config.enable-private-nodes" => Some(("cluster.privateClusterConfig.enablePrivateNodes", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "cluster.private-cluster-config.master-global-access-config.enabled" => Some(("cluster.privateClusterConfig.masterGlobalAccessConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -623,6 +781,8 @@ where
                     "cluster.private-cluster-config.private-endpoint" => Some(("cluster.privateClusterConfig.privateEndpoint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.private-cluster-config.private-endpoint-subnetwork" => Some(("cluster.privateClusterConfig.privateEndpointSubnetwork", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.private-cluster-config.public-endpoint" => Some(("cluster.privateClusterConfig.publicEndpoint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.rbac-binding-config.enable-insecure-binding-system-authenticated" => Some(("cluster.rbacBindingConfig.enableInsecureBindingSystemAuthenticated", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "cluster.rbac-binding-config.enable-insecure-binding-system-unauthenticated" => Some(("cluster.rbacBindingConfig.enableInsecureBindingSystemUnauthenticated", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "cluster.release-channel.channel" => Some(("cluster.releaseChannel.channel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.resource-labels" => Some(("cluster.resourceLabels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "cluster.resource-usage-export-config.bigquery-destination.dataset-id" => Some(("cluster.resourceUsageExportConfig.bigqueryDestination.datasetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -630,6 +790,9 @@ where
                     "cluster.resource-usage-export-config.enable-network-egress-metering" => Some(("cluster.resourceUsageExportConfig.enableNetworkEgressMetering", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "cluster.satisfies-pzi" => Some(("cluster.satisfiesPzi", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "cluster.satisfies-pzs" => Some(("cluster.satisfiesPzs", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "cluster.secret-manager-config.enabled" => Some(("cluster.secretManagerConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "cluster.secret-manager-config.rotation-config.enabled" => Some(("cluster.secretManagerConfig.rotationConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "cluster.secret-manager-config.rotation-config.rotation-interval" => Some(("cluster.secretManagerConfig.rotationConfig.rotationInterval", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.security-posture-config.mode" => Some(("cluster.securityPostureConfig.mode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.security-posture-config.vulnerability-mode" => Some(("cluster.securityPostureConfig.vulnerabilityMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.self-link" => Some(("cluster.selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -639,6 +802,15 @@ where
                     "cluster.status-message" => Some(("cluster.statusMessage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.subnetwork" => Some(("cluster.subnetwork", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.tpu-ipv4-cidr-block" => Some(("cluster.tpuIpv4CidrBlock", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.user-managed-keys-config.aggregation-ca" => Some(("cluster.userManagedKeysConfig.aggregationCa", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.user-managed-keys-config.cluster-ca" => Some(("cluster.userManagedKeysConfig.clusterCa", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.user-managed-keys-config.control-plane-disk-encryption-key" => Some(("cluster.userManagedKeysConfig.controlPlaneDiskEncryptionKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.user-managed-keys-config.control-plane-disk-encryption-key-versions" => Some(("cluster.userManagedKeysConfig.controlPlaneDiskEncryptionKeyVersions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "cluster.user-managed-keys-config.etcd-api-ca" => Some(("cluster.userManagedKeysConfig.etcdApiCa", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.user-managed-keys-config.etcd-peer-ca" => Some(("cluster.userManagedKeysConfig.etcdPeerCa", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.user-managed-keys-config.gkeops-etcd-backup-encryption-key" => Some(("cluster.userManagedKeysConfig.gkeopsEtcdBackupEncryptionKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.user-managed-keys-config.service-account-signing-keys" => Some(("cluster.userManagedKeysConfig.serviceAccountSigningKeys", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "cluster.user-managed-keys-config.service-account-verification-keys" => Some(("cluster.userManagedKeysConfig.serviceAccountVerificationKeys", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "cluster.vertical-pod-autoscaling.enabled" => Some(("cluster.verticalPodAutoscaling.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "cluster.workload-identity-config.workload-pool" => Some(("cluster.workloadIdentityConfig.workloadPool", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.zone" => Some(("cluster.zone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -646,7 +818,7 @@ where
                     "project-id" => Some(("projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "zone" => Some(("zone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["additional-pod-ranges-config", "additive-vpc-scope-dns-domain", "addons-config", "advanced-datapath-observability-config", "advanced-machine-features", "allow-net-admin", "authenticator-groups-config", "auto-repair", "auto-upgrade", "auto-upgrade-start-time", "autopilot", "autoprovisioning-locations", "autoprovisioning-node-pool-defaults", "autoscaling", "autoscaling-profile", "batch-node-count", "batch-percentage", "batch-soak-duration", "bigquery-destination", "binary-authorization", "blue-green-settings", "boot-disk-kms-key", "cgroup-mode", "channel", "client-certificate", "client-certificate-config", "client-key", "cloud-run-config", "cluster", "cluster-ca-certificate", "cluster-dns", "cluster-dns-domain", "cluster-dns-scope", "cluster-ipv4-cidr", "cluster-ipv4-cidr-block", "cluster-secondary-range-name", "cluster-tier", "component-config", "confidential-nodes", "config-connector-config", "consume-reservation-type", "consumption-metering-config", "containerd-config", "cost-management-config", "cpu-cfs-quota", "cpu-cfs-quota-period", "cpu-manager-policy", "create-subnetwork", "create-time", "current-master-version", "current-node-count", "current-node-version", "current-state", "daily-maintenance-window", "database-encryption", "datapath-provider", "dataset-id", "decryption-keys", "default-max-pods-constraint", "default-pod-ipv4-range-utilization", "default-snat-status", "description", "disable", "disabled", "disk-size-gb", "disk-type", "dns-cache-config", "dns-config", "duration", "enable-certificates", "enable-cilium-clusterwide-network-policy", "enable-components", "enable-confidential-storage", "enable-fqdn-network-policy", "enable-integrity-monitoring", "enable-intra-node-visibility", "enable-k8s-beta-apis", "enable-kubernetes-alpha", "enable-l4ilb-subsetting", "enable-metrics", "enable-multi-networking", "enable-nested-virtualization", "enable-network-egress-metering", "enable-node-autoprovisioning", "enable-private-endpoint", "enable-private-nodes", "enable-relay", "enable-secure-boot", "enable-tpu", "enabled", "enabled-apis", "end-time", "endpoint", "enterprise-config", "ephemeral-storage-local-ssd-config", "etag", "evaluation-mode", "event-type", "expire-time", "fast-socket", "filter", "fleet", "gateway-api-config", "gce-persistent-disk-csi-driver-config", "gcfs-config", "gcp-filestore-csi-driver-config", "gcp-public-cidrs-access-enabled", "gcs-fuse-csi-driver-config", "gke-backup-agent-config", "gvnic", "horizontal-pod-autoscaling", "http-load-balancing", "hugepage-size1g", "hugepage-size2m", "hugepages", "id", "identity-service-config", "image-type", "in-transit-encryption-config", "initial-cluster-version", "initial-node-count", "insecure-kubelet-readonly-port-enabled", "instance-group-urls", "ip-allocation-policy", "ipv6-access-type", "issue-client-certificate", "key", "key-name", "kubelet-config", "kubernetes-dashboard", "label-fingerprint", "labels", "legacy-abac", "linux-node-config", "load-balancer-type", "local-nvme-ssd-block-config", "local-ssd-count", "location", "locations", "logging-config", "logging-service", "machine-type", "maintenance-exclusion-options", "maintenance-policy", "managed-prometheus-config", "management", "master-auth", "master-authorized-networks-config", "master-global-access-config", "master-ipv4-cidr-block", "max-pods-per-node", "max-surge", "max-unavailable", "membership", "mesh-certificates", "metadata", "min-cpu-platform", "mode", "monitoring-config", "monitoring-service", "name", "network", "network-config", "network-performance-config", "network-policy", "network-policy-config", "network-tags", "node-config", "node-config-defaults", "node-group", "node-ipv4-cidr", "node-ipv4-cidr-block", "node-ipv4-cidr-size", "node-kubelet-config", "node-pool-auto-config", "node-pool-defaults", "node-pool-soak-duration", "notification-config", "oauth-scopes", "os-version", "parent", "parent-product-config", "password", "peering-name", "pod-cidr-overprovision-config", "pod-pids-limit", "pod-range-names", "pre-registered", "preemptible", "private-cluster-config", "private-endpoint", "private-endpoint-subnetwork", "private-ipv6-google-access", "private-registry-access-config", "product-name", "project", "project-id", "provider", "public-endpoint", "pubsub", "recurrence", "recurring-window", "relay-mode", "release-channel", "reservation-affinity", "resource-labels", "resource-manager-tags", "resource-usage-export-config", "resource-version", "sandbox-config", "satisfies-pzi", "satisfies-pzs", "scope", "security-group", "security-posture-config", "self-link", "service-account", "service-external-ips-config", "services-ipv4-cidr", "services-ipv4-cidr-block", "services-ipv6-cidr-block", "services-secondary-range-name", "shielded-instance-config", "shielded-nodes", "spot", "stack-type", "standard-rollout-policy", "start-time", "state", "stateful-ha-config", "status", "status-message", "strategy", "subnet-ipv6-cidr-block", "subnetwork", "subnetwork-name", "sysctls", "tags", "threads-per-core", "topic", "total-egress-bandwidth-tier", "tpu-ipv4-cidr-block", "type", "upgrade-options", "upgrade-settings", "use-ip-aliases", "use-routes", "username", "values", "variant", "variant-config", "vertical-pod-autoscaling", "vulnerability-mode", "window", "windows-node-config", "workload-identity-config", "workload-metadata-config", "workload-policy-config", "workload-pool", "zone"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["additional-pod-ranges-config", "additive-vpc-scope-dns-domain", "addons-config", "advanced-datapath-observability-config", "advanced-machine-features", "aggregation-ca", "allow-external-traffic", "allow-net-admin", "allowed-unsafe-sysctls", "allowlist-paths", "alpha-cluster-feature-gates", "anonymous-authentication-config", "authenticator-groups-config", "authorized-networks-config", "auto-ipam-config", "auto-monitoring-config", "auto-repair", "auto-upgrade", "auto-upgrade-start-time", "autopilot", "autopilot-compatibility-auditing-enabled", "autoprovisioning-locations", "autoprovisioning-node-pool-defaults", "autoscaled-rollout-policy", "autoscaling", "autoscaling-profile", "batch-node-count", "batch-percentage", "batch-soak-duration", "bigquery-destination", "binary-authorization", "blue-green-settings", "boot-disk", "boot-disk-kms-key", "cgroup-mode", "channel", "client-certificate", "client-certificate-config", "client-key", "cloud-run-config", "cluster", "cluster-ca", "cluster-ca-certificate", "cluster-dns", "cluster-dns-domain", "cluster-dns-scope", "cluster-ipv4-cidr", "cluster-ipv4-cidr-block", "cluster-secondary-range-name", "cluster-tier", "compliance-posture-config", "component-config", "confidential-instance-type", "confidential-nodes", "config-connector-config", "consume-reservation-type", "consumption-metering-config", "container-log-max-files", "container-log-max-size", "containerd-config", "control-plane-disk-encryption-key", "control-plane-disk-encryption-key-versions", "control-plane-endpoints-config", "cost-management-config", "cpu-cfs-quota", "cpu-cfs-quota-period", "cpu-manager-policy", "create-subnetwork", "create-time", "current-master-version", "current-node-count", "current-node-version", "current-state", "daily-maintenance-window", "data-cache-count", "database-encryption", "datapath-provider", "dataset-id", "decryption-keys", "default-compute-class-config", "default-enable-private-nodes", "default-max-pods-constraint", "default-pod-ipv4-range-utilization", "default-snat-status", "description", "desired-tier", "disable", "disable-l4-lb-firewall-reconciliation", "disabled", "disk-size-gb", "disk-type", "dns-cache-config", "dns-config", "dns-endpoint-config", "duration", "effective-cgroup-mode", "enable-certificates", "enable-cilium-clusterwide-network-policy", "enable-components", "enable-confidential-storage", "enable-fqdn-network-policy", "enable-insecure-binding-system-authenticated", "enable-insecure-binding-system-unauthenticated", "enable-integrity-monitoring", "enable-intra-node-visibility", "enable-k8s-beta-apis", "enable-k8s-certs-via-dns", "enable-k8s-tokens-via-dns", "enable-kubernetes-alpha", "enable-l4ilb-subsetting", "enable-legacy-lustre-port", "enable-metrics", "enable-multi-networking", "enable-nested-virtualization", "enable-network-egress-metering", "enable-node-autoprovisioning", "enable-private-endpoint", "enable-private-nodes", "enable-public-endpoint", "enable-relay", "enable-secure-boot", "enable-tpu", "enabled", "enabled-apis", "end-time", "end-time-behavior", "endpoint", "enterprise-config", "ephemeral-storage-local-ssd-config", "etag", "etcd-api-ca", "etcd-peer-ca", "evaluation-mode", "event-type", "eviction-max-pod-grace-period-seconds", "eviction-minimum-reclaim", "eviction-soft", "eviction-soft-grace-period", "expire-time", "fast-socket", "filter", "fleet", "flex-start", "gateway-api-config", "gce-persistent-disk-csi-driver-config", "gcfs-config", "gcp-filestore-csi-driver-config", "gcp-public-cidrs-access-enabled", "gcs-fuse-csi-driver-config", "gke-auto-upgrade-config", "gke-backup-agent-config", "gkeops-etcd-backup-encryption-key", "global-access", "gvnic", "high-scale-checkpointing-config", "horizontal-pod-autoscaling", "hpa-profile", "http-load-balancing", "hugepage-size1g", "hugepage-size2m", "hugepages", "id", "identity-service-config", "image-gc-high-threshold-percent", "image-gc-low-threshold-percent", "image-maximum-gc-age", "image-minimum-gc-age", "image-type", "imagefs-available", "imagefs-inodes-free", "in-transit-encryption-config", "initial-cluster-version", "initial-node-count", "insecure-kubelet-readonly-port-enabled", "instance-group-urls", "ip-allocation-policy", "ip-endpoints-config", "ipv6-access-type", "issue-client-certificate", "key", "key-name", "kubelet-config", "kubernetes-dashboard", "label-fingerprint", "labels", "legacy-abac", "linux-node-config", "load-balancer-type", "local-nvme-ssd-block-config", "local-ssd-count", "local-ssd-encryption-mode", "location", "locations", "logging-config", "logging-service", "lustre-csi-driver-config", "machine-type", "maintenance-exclusion-options", "maintenance-policy", "managed-opentelemetry-config", "managed-prometheus-config", "management", "master-auth", "master-authorized-networks-config", "master-global-access-config", "master-ipv4-cidr-block", "max-parallel-image-pulls", "max-pods-per-node", "max-run-duration", "max-surge", "max-unavailable", "membership", "membership-type", "memory-available", "memory-manager", "mesh-certificates", "metadata", "min-cpu-platform", "min-node-cpus", "mode", "monitoring-config", "monitoring-service", "name", "network", "network-config", "network-performance-config", "network-policy", "network-policy-config", "network-tags", "network-tier", "network-tier-config", "node-config", "node-config-defaults", "node-group", "node-ipv4-cidr", "node-ipv4-cidr-block", "node-ipv4-cidr-size", "node-kernel-module-loading", "node-kubelet-config", "node-pool-auto-config", "node-pool-defaults", "node-pool-soak-duration", "nodefs-available", "nodefs-inodes-free", "notification-config", "oauth-scopes", "os-version", "parallelstore-csi-driver-config", "parent", "parent-product-config", "password", "patch-mode", "peering-name", "performance-monitoring-unit", "pid-available", "pod-autoscaling", "pod-cidr-overprovision-config", "pod-pids-limit", "pod-range-names", "policy", "pre-registered", "preemptible", "private-cluster-config", "private-endpoint", "private-endpoint-enforcement-enabled", "private-endpoint-subnetwork", "private-ipv6-google-access", "private-registry-access-config", "privileged-admission-config", "product-name", "project", "project-id", "provider", "provisioned-iops", "provisioned-throughput", "public-endpoint", "pubsub", "ray-cluster-logging-config", "ray-cluster-monitoring-config", "ray-operator-config", "rbac-binding-config", "recurrence", "recurring-window", "relay-mode", "release-channel", "reservation-affinity", "resource-labels", "resource-manager-tags", "resource-usage-export-config", "resource-version", "rotation-config", "rotation-interval", "sandbox-config", "satisfies-pzi", "satisfies-pzs", "scope", "secret-manager-config", "security-group", "security-posture-config", "self-link", "service-account", "service-account-signing-keys", "service-account-verification-keys", "service-external-ips-config", "services-ipv4-cidr", "services-ipv4-cidr-block", "services-ipv6-cidr-block", "services-secondary-range-name", "shielded-instance-config", "shielded-nodes", "single-process-oom-kill", "size-gb", "sole-tenant-config", "spot", "stack-type", "standard-rollout-policy", "start-time", "state", "stateful-ha-config", "status", "status-message", "storage-pools", "strategy", "subnet-ipv6-cidr-block", "subnetwork", "subnetwork-name", "sysctls", "tags", "threads-per-core", "topic", "topology-manager", "total-egress-bandwidth-tier", "tpu-ipv4-cidr-block", "transparent-hugepage-defrag", "transparent-hugepage-enabled", "type", "upgrade-options", "upgrade-settings", "use-ip-aliases", "use-routes", "user-managed-keys-config", "username", "values", "variant", "variant-config", "vertical-pod-autoscaling", "vulnerability-mode", "wait-for-drain-duration", "window", "windows-node-config", "workload-identity-config", "workload-metadata-config", "workload-policy-config", "workload-pool", "writable-cgroups", "zone"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -782,6 +954,91 @@ where
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
                                 v.extend(["cluster-id", "project-id", "zone"].iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_clusters_fetch_cluster_upgrade_info(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .locations_clusters_fetch_cluster_upgrade_info(opt.value_of("name").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "version" => {
+                    call = call.version(value.unwrap_or(""));
+                }
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["version"].iter().map(|v| *v));
                                 v
                             }));
                     }
@@ -1242,6 +1499,7 @@ where
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "cluster-id" => Some(("clusterId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "node-pool.autopilot-config.enabled" => Some(("nodePool.autopilotConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "node-pool.autoscaling.autoprovisioned" => Some(("nodePool.autoscaling.autoprovisioned", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "node-pool.autoscaling.enabled" => Some(("nodePool.autoscaling.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "node-pool.autoscaling.location-policy" => Some(("nodePool.autoscaling.locationPolicy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1252,32 +1510,78 @@ where
                     "node-pool.best-effort-provisioning.enabled" => Some(("nodePool.bestEffortProvisioning.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "node-pool.best-effort-provisioning.min-provision-nodes" => Some(("nodePool.bestEffortProvisioning.minProvisionNodes", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "node-pool.config.advanced-machine-features.enable-nested-virtualization" => Some(("nodePool.config.advancedMachineFeatures.enableNestedVirtualization", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "node-pool.config.advanced-machine-features.performance-monitoring-unit" => Some(("nodePool.config.advancedMachineFeatures.performanceMonitoringUnit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "node-pool.config.advanced-machine-features.threads-per-core" => Some(("nodePool.config.advancedMachineFeatures.threadsPerCore", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "node-pool.config.boot-disk.disk-type" => Some(("nodePool.config.bootDisk.diskType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "node-pool.config.boot-disk.provisioned-iops" => Some(("nodePool.config.bootDisk.provisionedIops", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "node-pool.config.boot-disk.provisioned-throughput" => Some(("nodePool.config.bootDisk.provisionedThroughput", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "node-pool.config.boot-disk.size-gb" => Some(("nodePool.config.bootDisk.sizeGb", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "node-pool.config.boot-disk-kms-key" => Some(("nodePool.config.bootDiskKmsKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "node-pool.config.confidential-nodes.confidential-instance-type" => Some(("nodePool.config.confidentialNodes.confidentialInstanceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "node-pool.config.confidential-nodes.enabled" => Some(("nodePool.config.confidentialNodes.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "node-pool.config.containerd-config.private-registry-access-config.enabled" => Some(("nodePool.config.containerdConfig.privateRegistryAccessConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "node-pool.config.containerd-config.writable-cgroups.enabled" => Some(("nodePool.config.containerdConfig.writableCgroups.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "node-pool.config.disk-size-gb" => Some(("nodePool.config.diskSizeGb", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "node-pool.config.disk-type" => Some(("nodePool.config.diskType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "node-pool.config.effective-cgroup-mode" => Some(("nodePool.config.effectiveCgroupMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "node-pool.config.enable-confidential-storage" => Some(("nodePool.config.enableConfidentialStorage", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "node-pool.config.ephemeral-storage-local-ssd-config.data-cache-count" => Some(("nodePool.config.ephemeralStorageLocalSsdConfig.dataCacheCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "node-pool.config.ephemeral-storage-local-ssd-config.local-ssd-count" => Some(("nodePool.config.ephemeralStorageLocalSsdConfig.localSsdCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "node-pool.config.fast-socket.enabled" => Some(("nodePool.config.fastSocket.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "node-pool.config.flex-start" => Some(("nodePool.config.flexStart", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "node-pool.config.gcfs-config.enabled" => Some(("nodePool.config.gcfsConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "node-pool.config.gvnic.enabled" => Some(("nodePool.config.gvnic.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "node-pool.config.image-type" => Some(("nodePool.config.imageType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "node-pool.config.kubelet-config.allowed-unsafe-sysctls" => Some(("nodePool.config.kubeletConfig.allowedUnsafeSysctls", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "node-pool.config.kubelet-config.container-log-max-files" => Some(("nodePool.config.kubeletConfig.containerLogMaxFiles", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "node-pool.config.kubelet-config.container-log-max-size" => Some(("nodePool.config.kubeletConfig.containerLogMaxSize", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "node-pool.config.kubelet-config.cpu-cfs-quota" => Some(("nodePool.config.kubeletConfig.cpuCfsQuota", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "node-pool.config.kubelet-config.cpu-cfs-quota-period" => Some(("nodePool.config.kubeletConfig.cpuCfsQuotaPeriod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "node-pool.config.kubelet-config.cpu-manager-policy" => Some(("nodePool.config.kubeletConfig.cpuManagerPolicy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "node-pool.config.kubelet-config.eviction-max-pod-grace-period-seconds" => Some(("nodePool.config.kubeletConfig.evictionMaxPodGracePeriodSeconds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "node-pool.config.kubelet-config.eviction-minimum-reclaim.imagefs-available" => Some(("nodePool.config.kubeletConfig.evictionMinimumReclaim.imagefsAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "node-pool.config.kubelet-config.eviction-minimum-reclaim.imagefs-inodes-free" => Some(("nodePool.config.kubeletConfig.evictionMinimumReclaim.imagefsInodesFree", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "node-pool.config.kubelet-config.eviction-minimum-reclaim.memory-available" => Some(("nodePool.config.kubeletConfig.evictionMinimumReclaim.memoryAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "node-pool.config.kubelet-config.eviction-minimum-reclaim.nodefs-available" => Some(("nodePool.config.kubeletConfig.evictionMinimumReclaim.nodefsAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "node-pool.config.kubelet-config.eviction-minimum-reclaim.nodefs-inodes-free" => Some(("nodePool.config.kubeletConfig.evictionMinimumReclaim.nodefsInodesFree", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "node-pool.config.kubelet-config.eviction-minimum-reclaim.pid-available" => Some(("nodePool.config.kubeletConfig.evictionMinimumReclaim.pidAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "node-pool.config.kubelet-config.eviction-soft.imagefs-available" => Some(("nodePool.config.kubeletConfig.evictionSoft.imagefsAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "node-pool.config.kubelet-config.eviction-soft.imagefs-inodes-free" => Some(("nodePool.config.kubeletConfig.evictionSoft.imagefsInodesFree", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "node-pool.config.kubelet-config.eviction-soft.memory-available" => Some(("nodePool.config.kubeletConfig.evictionSoft.memoryAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "node-pool.config.kubelet-config.eviction-soft.nodefs-available" => Some(("nodePool.config.kubeletConfig.evictionSoft.nodefsAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "node-pool.config.kubelet-config.eviction-soft.nodefs-inodes-free" => Some(("nodePool.config.kubeletConfig.evictionSoft.nodefsInodesFree", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "node-pool.config.kubelet-config.eviction-soft.pid-available" => Some(("nodePool.config.kubeletConfig.evictionSoft.pidAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "node-pool.config.kubelet-config.eviction-soft-grace-period.imagefs-available" => Some(("nodePool.config.kubeletConfig.evictionSoftGracePeriod.imagefsAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "node-pool.config.kubelet-config.eviction-soft-grace-period.imagefs-inodes-free" => Some(("nodePool.config.kubeletConfig.evictionSoftGracePeriod.imagefsInodesFree", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "node-pool.config.kubelet-config.eviction-soft-grace-period.memory-available" => Some(("nodePool.config.kubeletConfig.evictionSoftGracePeriod.memoryAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "node-pool.config.kubelet-config.eviction-soft-grace-period.nodefs-available" => Some(("nodePool.config.kubeletConfig.evictionSoftGracePeriod.nodefsAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "node-pool.config.kubelet-config.eviction-soft-grace-period.nodefs-inodes-free" => Some(("nodePool.config.kubeletConfig.evictionSoftGracePeriod.nodefsInodesFree", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "node-pool.config.kubelet-config.eviction-soft-grace-period.pid-available" => Some(("nodePool.config.kubeletConfig.evictionSoftGracePeriod.pidAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "node-pool.config.kubelet-config.image-gc-high-threshold-percent" => Some(("nodePool.config.kubeletConfig.imageGcHighThresholdPercent", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "node-pool.config.kubelet-config.image-gc-low-threshold-percent" => Some(("nodePool.config.kubeletConfig.imageGcLowThresholdPercent", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "node-pool.config.kubelet-config.image-maximum-gc-age" => Some(("nodePool.config.kubeletConfig.imageMaximumGcAge", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "node-pool.config.kubelet-config.image-minimum-gc-age" => Some(("nodePool.config.kubeletConfig.imageMinimumGcAge", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "node-pool.config.kubelet-config.insecure-kubelet-readonly-port-enabled" => Some(("nodePool.config.kubeletConfig.insecureKubeletReadonlyPortEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "node-pool.config.kubelet-config.max-parallel-image-pulls" => Some(("nodePool.config.kubeletConfig.maxParallelImagePulls", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "node-pool.config.kubelet-config.memory-manager.policy" => Some(("nodePool.config.kubeletConfig.memoryManager.policy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "node-pool.config.kubelet-config.pod-pids-limit" => Some(("nodePool.config.kubeletConfig.podPidsLimit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "node-pool.config.kubelet-config.single-process-oom-kill" => Some(("nodePool.config.kubeletConfig.singleProcessOomKill", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "node-pool.config.kubelet-config.topology-manager.policy" => Some(("nodePool.config.kubeletConfig.topologyManager.policy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "node-pool.config.kubelet-config.topology-manager.scope" => Some(("nodePool.config.kubeletConfig.topologyManager.scope", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "node-pool.config.labels" => Some(("nodePool.config.labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "node-pool.config.linux-node-config.cgroup-mode" => Some(("nodePool.config.linuxNodeConfig.cgroupMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "node-pool.config.linux-node-config.hugepages.hugepage-size1g" => Some(("nodePool.config.linuxNodeConfig.hugepages.hugepageSize1g", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "node-pool.config.linux-node-config.hugepages.hugepage-size2m" => Some(("nodePool.config.linuxNodeConfig.hugepages.hugepageSize2m", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "node-pool.config.linux-node-config.node-kernel-module-loading.policy" => Some(("nodePool.config.linuxNodeConfig.nodeKernelModuleLoading.policy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "node-pool.config.linux-node-config.sysctls" => Some(("nodePool.config.linuxNodeConfig.sysctls", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "node-pool.config.linux-node-config.transparent-hugepage-defrag" => Some(("nodePool.config.linuxNodeConfig.transparentHugepageDefrag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "node-pool.config.linux-node-config.transparent-hugepage-enabled" => Some(("nodePool.config.linuxNodeConfig.transparentHugepageEnabled", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "node-pool.config.local-nvme-ssd-block-config.local-ssd-count" => Some(("nodePool.config.localNvmeSsdBlockConfig.localSsdCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "node-pool.config.local-ssd-count" => Some(("nodePool.config.localSsdCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "node-pool.config.local-ssd-encryption-mode" => Some(("nodePool.config.localSsdEncryptionMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "node-pool.config.logging-config.variant-config.variant" => Some(("nodePool.config.loggingConfig.variantConfig.variant", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "node-pool.config.machine-type" => Some(("nodePool.config.machineType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "node-pool.config.max-run-duration" => Some(("nodePool.config.maxRunDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "node-pool.config.metadata" => Some(("nodePool.config.metadata", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "node-pool.config.min-cpu-platform" => Some(("nodePool.config.minCpuPlatform", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "node-pool.config.node-group" => Some(("nodePool.config.nodeGroup", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1292,7 +1596,9 @@ where
                     "node-pool.config.service-account" => Some(("nodePool.config.serviceAccount", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "node-pool.config.shielded-instance-config.enable-integrity-monitoring" => Some(("nodePool.config.shieldedInstanceConfig.enableIntegrityMonitoring", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "node-pool.config.shielded-instance-config.enable-secure-boot" => Some(("nodePool.config.shieldedInstanceConfig.enableSecureBoot", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "node-pool.config.sole-tenant-config.min-node-cpus" => Some(("nodePool.config.soleTenantConfig.minNodeCpus", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "node-pool.config.spot" => Some(("nodePool.config.spot", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "node-pool.config.storage-pools" => Some(("nodePool.config.storagePools", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "node-pool.config.tags" => Some(("nodePool.config.tags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "node-pool.config.windows-node-config.os-version" => Some(("nodePool.config.windowsNodeConfig.osVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "node-pool.config.workload-metadata-config.mode" => Some(("nodePool.config.workloadMetadataConfig.mode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1309,10 +1615,13 @@ where
                     "node-pool.network-config.create-pod-range" => Some(("nodePool.networkConfig.createPodRange", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "node-pool.network-config.enable-private-nodes" => Some(("nodePool.networkConfig.enablePrivateNodes", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "node-pool.network-config.network-performance-config.total-egress-bandwidth-tier" => Some(("nodePool.networkConfig.networkPerformanceConfig.totalEgressBandwidthTier", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "node-pool.network-config.network-tier-config.network-tier" => Some(("nodePool.networkConfig.networkTierConfig.networkTier", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "node-pool.network-config.pod-cidr-overprovision-config.disable" => Some(("nodePool.networkConfig.podCidrOverprovisionConfig.disable", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "node-pool.network-config.pod-ipv4-cidr-block" => Some(("nodePool.networkConfig.podIpv4CidrBlock", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "node-pool.network-config.pod-ipv4-range-utilization" => Some(("nodePool.networkConfig.podIpv4RangeUtilization", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "node-pool.network-config.pod-range" => Some(("nodePool.networkConfig.podRange", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "node-pool.network-config.subnetwork" => Some(("nodePool.networkConfig.subnetwork", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "node-pool.node-drain-config.respect-pdb-during-node-pool-deletion" => Some(("nodePool.nodeDrainConfig.respectPdbDuringNodePoolDeletion", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "node-pool.placement-policy.policy-name" => Some(("nodePool.placementPolicy.policyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "node-pool.placement-policy.tpu-topology" => Some(("nodePool.placementPolicy.tpuTopology", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "node-pool.placement-policy.type" => Some(("nodePool.placementPolicy.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1326,6 +1635,7 @@ where
                     "node-pool.update-info.blue-green-info.green-instance-group-urls" => Some(("nodePool.updateInfo.blueGreenInfo.greenInstanceGroupUrls", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "node-pool.update-info.blue-green-info.green-pool-version" => Some(("nodePool.updateInfo.blueGreenInfo.greenPoolVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "node-pool.update-info.blue-green-info.phase" => Some(("nodePool.updateInfo.blueGreenInfo.phase", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "node-pool.upgrade-settings.blue-green-settings.autoscaled-rollout-policy.wait-for-drain-duration" => Some(("nodePool.upgradeSettings.blueGreenSettings.autoscaledRolloutPolicy.waitForDrainDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "node-pool.upgrade-settings.blue-green-settings.node-pool-soak-duration" => Some(("nodePool.upgradeSettings.blueGreenSettings.nodePoolSoakDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "node-pool.upgrade-settings.blue-green-settings.standard-rollout-policy.batch-node-count" => Some(("nodePool.upgradeSettings.blueGreenSettings.standardRolloutPolicy.batchNodeCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "node-pool.upgrade-settings.blue-green-settings.standard-rollout-policy.batch-percentage" => Some(("nodePool.upgradeSettings.blueGreenSettings.standardRolloutPolicy.batchPercentage", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
@@ -1338,7 +1648,7 @@ where
                     "project-id" => Some(("projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "zone" => Some(("zone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["advanced-machine-features", "auto-repair", "auto-upgrade", "auto-upgrade-start-time", "autoprovisioned", "autoscaling", "batch-node-count", "batch-percentage", "batch-soak-duration", "best-effort-provisioning", "blue-green-info", "blue-green-settings", "blue-instance-group-urls", "blue-pool-deletion-start-time", "boot-disk-kms-key", "cgroup-mode", "cluster-id", "confidential-nodes", "config", "consume-reservation-type", "containerd-config", "cpu-cfs-quota", "cpu-cfs-quota-period", "cpu-manager-policy", "create-pod-range", "description", "disable", "disk-size-gb", "disk-type", "enable-confidential-storage", "enable-integrity-monitoring", "enable-nested-virtualization", "enable-private-nodes", "enable-secure-boot", "enabled", "ephemeral-storage-local-ssd-config", "etag", "fast-socket", "gcfs-config", "green-instance-group-urls", "green-pool-version", "gvnic", "hugepage-size1g", "hugepage-size2m", "hugepages", "image-type", "initial-node-count", "insecure-kubelet-readonly-port-enabled", "instance-group-urls", "key", "kubelet-config", "labels", "linux-node-config", "local-nvme-ssd-block-config", "local-ssd-count", "location-policy", "locations", "logging-config", "machine-type", "management", "max-node-count", "max-pods-constraint", "max-pods-per-node", "max-surge", "max-unavailable", "metadata", "min-cpu-platform", "min-node-count", "min-provision-nodes", "mode", "name", "network-config", "network-performance-config", "node-group", "node-pool", "node-pool-soak-duration", "oauth-scopes", "os-version", "parent", "phase", "placement-policy", "pod-cidr-overprovision-config", "pod-ipv4-cidr-block", "pod-ipv4-cidr-size", "pod-ipv4-range-utilization", "pod-pids-limit", "pod-range", "policy-name", "preemptible", "private-registry-access-config", "project-id", "queued-provisioning", "reservation-affinity", "resource-labels", "resource-manager-tags", "sandbox-config", "self-link", "service-account", "shielded-instance-config", "spot", "standard-rollout-policy", "status", "status-message", "strategy", "sysctls", "tags", "threads-per-core", "total-egress-bandwidth-tier", "total-max-node-count", "total-min-node-count", "tpu-topology", "type", "update-info", "upgrade-options", "upgrade-settings", "values", "variant", "variant-config", "version", "windows-node-config", "workload-metadata-config", "zone"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["advanced-machine-features", "allowed-unsafe-sysctls", "auto-repair", "auto-upgrade", "auto-upgrade-start-time", "autopilot-config", "autoprovisioned", "autoscaled-rollout-policy", "autoscaling", "batch-node-count", "batch-percentage", "batch-soak-duration", "best-effort-provisioning", "blue-green-info", "blue-green-settings", "blue-instance-group-urls", "blue-pool-deletion-start-time", "boot-disk", "boot-disk-kms-key", "cgroup-mode", "cluster-id", "confidential-instance-type", "confidential-nodes", "config", "consume-reservation-type", "container-log-max-files", "container-log-max-size", "containerd-config", "cpu-cfs-quota", "cpu-cfs-quota-period", "cpu-manager-policy", "create-pod-range", "data-cache-count", "description", "disable", "disk-size-gb", "disk-type", "effective-cgroup-mode", "enable-confidential-storage", "enable-integrity-monitoring", "enable-nested-virtualization", "enable-private-nodes", "enable-secure-boot", "enabled", "ephemeral-storage-local-ssd-config", "etag", "eviction-max-pod-grace-period-seconds", "eviction-minimum-reclaim", "eviction-soft", "eviction-soft-grace-period", "fast-socket", "flex-start", "gcfs-config", "green-instance-group-urls", "green-pool-version", "gvnic", "hugepage-size1g", "hugepage-size2m", "hugepages", "image-gc-high-threshold-percent", "image-gc-low-threshold-percent", "image-maximum-gc-age", "image-minimum-gc-age", "image-type", "imagefs-available", "imagefs-inodes-free", "initial-node-count", "insecure-kubelet-readonly-port-enabled", "instance-group-urls", "key", "kubelet-config", "labels", "linux-node-config", "local-nvme-ssd-block-config", "local-ssd-count", "local-ssd-encryption-mode", "location-policy", "locations", "logging-config", "machine-type", "management", "max-node-count", "max-parallel-image-pulls", "max-pods-constraint", "max-pods-per-node", "max-run-duration", "max-surge", "max-unavailable", "memory-available", "memory-manager", "metadata", "min-cpu-platform", "min-node-count", "min-node-cpus", "min-provision-nodes", "mode", "name", "network-config", "network-performance-config", "network-tier", "network-tier-config", "node-drain-config", "node-group", "node-kernel-module-loading", "node-pool", "node-pool-soak-duration", "nodefs-available", "nodefs-inodes-free", "oauth-scopes", "os-version", "parent", "performance-monitoring-unit", "phase", "pid-available", "placement-policy", "pod-cidr-overprovision-config", "pod-ipv4-cidr-block", "pod-ipv4-cidr-size", "pod-ipv4-range-utilization", "pod-pids-limit", "pod-range", "policy", "policy-name", "preemptible", "private-registry-access-config", "project-id", "provisioned-iops", "provisioned-throughput", "queued-provisioning", "reservation-affinity", "resource-labels", "resource-manager-tags", "respect-pdb-during-node-pool-deletion", "sandbox-config", "scope", "self-link", "service-account", "shielded-instance-config", "single-process-oom-kill", "size-gb", "sole-tenant-config", "spot", "standard-rollout-policy", "status", "status-message", "storage-pools", "strategy", "subnetwork", "sysctls", "tags", "threads-per-core", "topology-manager", "total-egress-bandwidth-tier", "total-max-node-count", "total-min-node-count", "tpu-topology", "transparent-hugepage-defrag", "transparent-hugepage-enabled", "type", "update-info", "upgrade-options", "upgrade-settings", "values", "variant", "variant-config", "version", "wait-for-drain-duration", "windows-node-config", "workload-metadata-config", "writable-cgroups", "zone"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1482,6 +1792,93 @@ where
                                         .iter()
                                         .map(|v| *v),
                                 );
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_clusters_node_pools_fetch_node_pool_upgrade_info(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .locations_clusters_node_pools_fetch_node_pool_upgrade_info(
+                opt.value_of("name").unwrap_or(""),
+            );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "version" => {
+                    call = call.version(value.unwrap_or(""));
+                }
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["version"].iter().map(|v| *v));
                                 v
                             }));
                     }
@@ -2549,44 +2946,91 @@ where
 
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "boot-disk.disk-type" => Some(("bootDisk.diskType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "boot-disk.provisioned-iops" => Some(("bootDisk.provisionedIops", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "boot-disk.provisioned-throughput" => Some(("bootDisk.provisionedThroughput", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "boot-disk.size-gb" => Some(("bootDisk.sizeGb", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster-id" => Some(("clusterId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "confidential-nodes.confidential-instance-type" => Some(("confidentialNodes.confidentialInstanceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "confidential-nodes.enabled" => Some(("confidentialNodes.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "containerd-config.private-registry-access-config.enabled" => Some(("containerdConfig.privateRegistryAccessConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "containerd-config.writable-cgroups.enabled" => Some(("containerdConfig.writableCgroups.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "disk-size-gb" => Some(("diskSizeGb", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "disk-type" => Some(("diskType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "fast-socket.enabled" => Some(("fastSocket.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "flex-start" => Some(("flexStart", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "gcfs-config.enabled" => Some(("gcfsConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "gvnic.enabled" => Some(("gvnic.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "image-type" => Some(("imageType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kubelet-config.allowed-unsafe-sysctls" => Some(("kubeletConfig.allowedUnsafeSysctls", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "kubelet-config.container-log-max-files" => Some(("kubeletConfig.containerLogMaxFiles", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "kubelet-config.container-log-max-size" => Some(("kubeletConfig.containerLogMaxSize", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "kubelet-config.cpu-cfs-quota" => Some(("kubeletConfig.cpuCfsQuota", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "kubelet-config.cpu-cfs-quota-period" => Some(("kubeletConfig.cpuCfsQuotaPeriod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "kubelet-config.cpu-manager-policy" => Some(("kubeletConfig.cpuManagerPolicy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kubelet-config.eviction-max-pod-grace-period-seconds" => Some(("kubeletConfig.evictionMaxPodGracePeriodSeconds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "kubelet-config.eviction-minimum-reclaim.imagefs-available" => Some(("kubeletConfig.evictionMinimumReclaim.imagefsAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kubelet-config.eviction-minimum-reclaim.imagefs-inodes-free" => Some(("kubeletConfig.evictionMinimumReclaim.imagefsInodesFree", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kubelet-config.eviction-minimum-reclaim.memory-available" => Some(("kubeletConfig.evictionMinimumReclaim.memoryAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kubelet-config.eviction-minimum-reclaim.nodefs-available" => Some(("kubeletConfig.evictionMinimumReclaim.nodefsAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kubelet-config.eviction-minimum-reclaim.nodefs-inodes-free" => Some(("kubeletConfig.evictionMinimumReclaim.nodefsInodesFree", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kubelet-config.eviction-minimum-reclaim.pid-available" => Some(("kubeletConfig.evictionMinimumReclaim.pidAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kubelet-config.eviction-soft.imagefs-available" => Some(("kubeletConfig.evictionSoft.imagefsAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kubelet-config.eviction-soft.imagefs-inodes-free" => Some(("kubeletConfig.evictionSoft.imagefsInodesFree", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kubelet-config.eviction-soft.memory-available" => Some(("kubeletConfig.evictionSoft.memoryAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kubelet-config.eviction-soft.nodefs-available" => Some(("kubeletConfig.evictionSoft.nodefsAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kubelet-config.eviction-soft.nodefs-inodes-free" => Some(("kubeletConfig.evictionSoft.nodefsInodesFree", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kubelet-config.eviction-soft.pid-available" => Some(("kubeletConfig.evictionSoft.pidAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kubelet-config.eviction-soft-grace-period.imagefs-available" => Some(("kubeletConfig.evictionSoftGracePeriod.imagefsAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kubelet-config.eviction-soft-grace-period.imagefs-inodes-free" => Some(("kubeletConfig.evictionSoftGracePeriod.imagefsInodesFree", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kubelet-config.eviction-soft-grace-period.memory-available" => Some(("kubeletConfig.evictionSoftGracePeriod.memoryAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kubelet-config.eviction-soft-grace-period.nodefs-available" => Some(("kubeletConfig.evictionSoftGracePeriod.nodefsAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kubelet-config.eviction-soft-grace-period.nodefs-inodes-free" => Some(("kubeletConfig.evictionSoftGracePeriod.nodefsInodesFree", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kubelet-config.eviction-soft-grace-period.pid-available" => Some(("kubeletConfig.evictionSoftGracePeriod.pidAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kubelet-config.image-gc-high-threshold-percent" => Some(("kubeletConfig.imageGcHighThresholdPercent", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "kubelet-config.image-gc-low-threshold-percent" => Some(("kubeletConfig.imageGcLowThresholdPercent", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "kubelet-config.image-maximum-gc-age" => Some(("kubeletConfig.imageMaximumGcAge", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kubelet-config.image-minimum-gc-age" => Some(("kubeletConfig.imageMinimumGcAge", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "kubelet-config.insecure-kubelet-readonly-port-enabled" => Some(("kubeletConfig.insecureKubeletReadonlyPortEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "kubelet-config.max-parallel-image-pulls" => Some(("kubeletConfig.maxParallelImagePulls", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "kubelet-config.memory-manager.policy" => Some(("kubeletConfig.memoryManager.policy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "kubelet-config.pod-pids-limit" => Some(("kubeletConfig.podPidsLimit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kubelet-config.single-process-oom-kill" => Some(("kubeletConfig.singleProcessOomKill", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "kubelet-config.topology-manager.policy" => Some(("kubeletConfig.topologyManager.policy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kubelet-config.topology-manager.scope" => Some(("kubeletConfig.topologyManager.scope", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "labels.labels" => Some(("labels.labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "linux-node-config.cgroup-mode" => Some(("linuxNodeConfig.cgroupMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "linux-node-config.hugepages.hugepage-size1g" => Some(("linuxNodeConfig.hugepages.hugepageSize1g", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "linux-node-config.hugepages.hugepage-size2m" => Some(("linuxNodeConfig.hugepages.hugepageSize2m", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "linux-node-config.node-kernel-module-loading.policy" => Some(("linuxNodeConfig.nodeKernelModuleLoading.policy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "linux-node-config.sysctls" => Some(("linuxNodeConfig.sysctls", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "linux-node-config.transparent-hugepage-defrag" => Some(("linuxNodeConfig.transparentHugepageDefrag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "linux-node-config.transparent-hugepage-enabled" => Some(("linuxNodeConfig.transparentHugepageEnabled", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "locations" => Some(("locations", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "logging-config.variant-config.variant" => Some(("loggingConfig.variantConfig.variant", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "machine-type" => Some(("machineType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "max-run-duration" => Some(("maxRunDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "node-drain-config.respect-pdb-during-node-pool-deletion" => Some(("nodeDrainConfig.respectPdbDuringNodePoolDeletion", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "node-network-config.create-pod-range" => Some(("nodeNetworkConfig.createPodRange", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "node-network-config.enable-private-nodes" => Some(("nodeNetworkConfig.enablePrivateNodes", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "node-network-config.network-performance-config.total-egress-bandwidth-tier" => Some(("nodeNetworkConfig.networkPerformanceConfig.totalEgressBandwidthTier", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "node-network-config.network-tier-config.network-tier" => Some(("nodeNetworkConfig.networkTierConfig.networkTier", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "node-network-config.pod-cidr-overprovision-config.disable" => Some(("nodeNetworkConfig.podCidrOverprovisionConfig.disable", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "node-network-config.pod-ipv4-cidr-block" => Some(("nodeNetworkConfig.podIpv4CidrBlock", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "node-network-config.pod-ipv4-range-utilization" => Some(("nodeNetworkConfig.podIpv4RangeUtilization", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "node-network-config.pod-range" => Some(("nodeNetworkConfig.podRange", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "node-network-config.subnetwork" => Some(("nodeNetworkConfig.subnetwork", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "node-pool-id" => Some(("nodePoolId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "node-version" => Some(("nodeVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "project-id" => Some(("projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "queued-provisioning.enabled" => Some(("queuedProvisioning.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "resource-labels.labels" => Some(("resourceLabels.labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "resource-manager-tags.tags" => Some(("resourceManagerTags.tags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "storage-pools" => Some(("storagePools", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "tags.tags" => Some(("tags.tags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "upgrade-settings.blue-green-settings.autoscaled-rollout-policy.wait-for-drain-duration" => Some(("upgradeSettings.blueGreenSettings.autoscaledRolloutPolicy.waitForDrainDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "upgrade-settings.blue-green-settings.node-pool-soak-duration" => Some(("upgradeSettings.blueGreenSettings.nodePoolSoakDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "upgrade-settings.blue-green-settings.standard-rollout-policy.batch-node-count" => Some(("upgradeSettings.blueGreenSettings.standardRolloutPolicy.batchNodeCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "upgrade-settings.blue-green-settings.standard-rollout-policy.batch-percentage" => Some(("upgradeSettings.blueGreenSettings.standardRolloutPolicy.batchPercentage", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
@@ -2598,7 +3042,7 @@ where
                     "workload-metadata-config.mode" => Some(("workloadMetadataConfig.mode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "zone" => Some(("zone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["batch-node-count", "batch-percentage", "batch-soak-duration", "blue-green-settings", "cgroup-mode", "cluster-id", "confidential-nodes", "containerd-config", "cpu-cfs-quota", "cpu-cfs-quota-period", "cpu-manager-policy", "create-pod-range", "disable", "disk-size-gb", "disk-type", "enable-private-nodes", "enabled", "etag", "fast-socket", "gcfs-config", "gvnic", "hugepage-size1g", "hugepage-size2m", "hugepages", "image-type", "insecure-kubelet-readonly-port-enabled", "kubelet-config", "labels", "linux-node-config", "locations", "logging-config", "machine-type", "max-surge", "max-unavailable", "mode", "name", "network-performance-config", "node-network-config", "node-pool-id", "node-pool-soak-duration", "node-version", "os-version", "pod-cidr-overprovision-config", "pod-ipv4-cidr-block", "pod-ipv4-range-utilization", "pod-pids-limit", "pod-range", "private-registry-access-config", "project-id", "queued-provisioning", "resource-labels", "resource-manager-tags", "standard-rollout-policy", "strategy", "sysctls", "tags", "total-egress-bandwidth-tier", "upgrade-settings", "variant", "variant-config", "windows-node-config", "workload-metadata-config", "zone"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["allowed-unsafe-sysctls", "autoscaled-rollout-policy", "batch-node-count", "batch-percentage", "batch-soak-duration", "blue-green-settings", "boot-disk", "cgroup-mode", "cluster-id", "confidential-instance-type", "confidential-nodes", "container-log-max-files", "container-log-max-size", "containerd-config", "cpu-cfs-quota", "cpu-cfs-quota-period", "cpu-manager-policy", "create-pod-range", "disable", "disk-size-gb", "disk-type", "enable-private-nodes", "enabled", "etag", "eviction-max-pod-grace-period-seconds", "eviction-minimum-reclaim", "eviction-soft", "eviction-soft-grace-period", "fast-socket", "flex-start", "gcfs-config", "gvnic", "hugepage-size1g", "hugepage-size2m", "hugepages", "image-gc-high-threshold-percent", "image-gc-low-threshold-percent", "image-maximum-gc-age", "image-minimum-gc-age", "image-type", "imagefs-available", "imagefs-inodes-free", "insecure-kubelet-readonly-port-enabled", "kubelet-config", "labels", "linux-node-config", "locations", "logging-config", "machine-type", "max-parallel-image-pulls", "max-run-duration", "max-surge", "max-unavailable", "memory-available", "memory-manager", "mode", "name", "network-performance-config", "network-tier", "network-tier-config", "node-drain-config", "node-kernel-module-loading", "node-network-config", "node-pool-id", "node-pool-soak-duration", "node-version", "nodefs-available", "nodefs-inodes-free", "os-version", "pid-available", "pod-cidr-overprovision-config", "pod-ipv4-cidr-block", "pod-ipv4-range-utilization", "pod-pids-limit", "pod-range", "policy", "private-registry-access-config", "project-id", "provisioned-iops", "provisioned-throughput", "queued-provisioning", "resource-labels", "resource-manager-tags", "respect-pdb-during-node-pool-deletion", "scope", "single-process-oom-kill", "size-gb", "standard-rollout-policy", "storage-pools", "strategy", "subnetwork", "sysctls", "tags", "topology-manager", "total-egress-bandwidth-tier", "transparent-hugepage-defrag", "transparent-hugepage-enabled", "upgrade-settings", "variant", "variant-config", "wait-for-drain-duration", "windows-node-config", "workload-metadata-config", "writable-cgroups", "zone"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2777,6 +3221,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "addons-config.high-scale-checkpointing-config.enabled" => Some((
+                    "addonsConfig.highScaleCheckpointingConfig.enabled",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "addons-config.horizontal-pod-autoscaling.disabled" => Some((
                     "addonsConfig.horizontalPodAutoscaling.disabled",
                     JsonTypeInfo {
@@ -2798,6 +3249,20 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "addons-config.lustre-csi-driver-config.enable-legacy-lustre-port" => Some((
+                    "addonsConfig.lustreCsiDriverConfig.enableLegacyLustrePort",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "addons-config.lustre-csi-driver-config.enabled" => Some((
+                    "addonsConfig.lustreCsiDriverConfig.enabled",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "addons-config.network-policy-config.disabled" => Some((
                     "addonsConfig.networkPolicyConfig.disabled",
                     JsonTypeInfo {
@@ -2805,6 +3270,36 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "addons-config.parallelstore-csi-driver-config.enabled" => Some((
+                    "addonsConfig.parallelstoreCsiDriverConfig.enabled",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "addons-config.ray-operator-config.enabled" => Some((
+                    "addonsConfig.rayOperatorConfig.enabled",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "addons-config.ray-operator-config.ray-cluster-logging-config.enabled" => Some((
+                    "addonsConfig.rayOperatorConfig.rayClusterLoggingConfig.enabled",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "addons-config.ray-operator-config.ray-cluster-monitoring-config.enabled" => {
+                    Some((
+                        "addonsConfig.rayOperatorConfig.rayClusterMonitoringConfig.enabled",
+                        JsonTypeInfo {
+                            jtype: JsonType::Boolean,
+                            ctype: ComplexType::Pod,
+                        },
+                    ))
+                }
                 "addons-config.stateful-ha-config.enabled" => Some((
                     "addonsConfig.statefulHaConfig.enabled",
                     JsonTypeInfo {
@@ -2850,18 +3345,25 @@ where
                             "config-connector-config",
                             "disabled",
                             "dns-cache-config",
+                            "enable-legacy-lustre-port",
                             "enabled",
                             "gce-persistent-disk-csi-driver-config",
                             "gcp-filestore-csi-driver-config",
                             "gcs-fuse-csi-driver-config",
                             "gke-backup-agent-config",
+                            "high-scale-checkpointing-config",
                             "horizontal-pod-autoscaling",
                             "http-load-balancing",
                             "kubernetes-dashboard",
                             "load-balancer-type",
+                            "lustre-csi-driver-config",
                             "name",
                             "network-policy-config",
+                            "parallelstore-csi-driver-config",
                             "project-id",
+                            "ray-cluster-logging-config",
+                            "ray-cluster-monitoring-config",
+                            "ray-operator-config",
                             "stateful-ha-config",
                             "zone",
                         ],
@@ -3500,13 +4002,14 @@ where
                     "maintenance-policy.window.daily-maintenance-window.start-time" => Some(("maintenancePolicy.window.dailyMaintenanceWindow.startTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "maintenance-policy.window.recurring-window.recurrence" => Some(("maintenancePolicy.window.recurringWindow.recurrence", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "maintenance-policy.window.recurring-window.window.end-time" => Some(("maintenancePolicy.window.recurringWindow.window.endTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "maintenance-policy.window.recurring-window.window.maintenance-exclusion-options.end-time-behavior" => Some(("maintenancePolicy.window.recurringWindow.window.maintenanceExclusionOptions.endTimeBehavior", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "maintenance-policy.window.recurring-window.window.maintenance-exclusion-options.scope" => Some(("maintenancePolicy.window.recurringWindow.window.maintenanceExclusionOptions.scope", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "maintenance-policy.window.recurring-window.window.start-time" => Some(("maintenancePolicy.window.recurringWindow.window.startTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "project-id" => Some(("projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "zone" => Some(("zone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["cluster-id", "daily-maintenance-window", "duration", "end-time", "maintenance-exclusion-options", "maintenance-policy", "name", "project-id", "recurrence", "recurring-window", "resource-version", "scope", "start-time", "window", "zone"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["cluster-id", "daily-maintenance-window", "duration", "end-time", "end-time-behavior", "maintenance-exclusion-options", "maintenance-policy", "name", "project-id", "recurrence", "recurring-window", "resource-version", "scope", "start-time", "window", "zone"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -4566,14 +5069,24 @@ where
                     "update.desired-addons-config.gcp-filestore-csi-driver-config.enabled" => Some(("update.desiredAddonsConfig.gcpFilestoreCsiDriverConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "update.desired-addons-config.gcs-fuse-csi-driver-config.enabled" => Some(("update.desiredAddonsConfig.gcsFuseCsiDriverConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "update.desired-addons-config.gke-backup-agent-config.enabled" => Some(("update.desiredAddonsConfig.gkeBackupAgentConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "update.desired-addons-config.high-scale-checkpointing-config.enabled" => Some(("update.desiredAddonsConfig.highScaleCheckpointingConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "update.desired-addons-config.horizontal-pod-autoscaling.disabled" => Some(("update.desiredAddonsConfig.horizontalPodAutoscaling.disabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "update.desired-addons-config.http-load-balancing.disabled" => Some(("update.desiredAddonsConfig.httpLoadBalancing.disabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "update.desired-addons-config.kubernetes-dashboard.disabled" => Some(("update.desiredAddonsConfig.kubernetesDashboard.disabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "update.desired-addons-config.lustre-csi-driver-config.enable-legacy-lustre-port" => Some(("update.desiredAddonsConfig.lustreCsiDriverConfig.enableLegacyLustrePort", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "update.desired-addons-config.lustre-csi-driver-config.enabled" => Some(("update.desiredAddonsConfig.lustreCsiDriverConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "update.desired-addons-config.network-policy-config.disabled" => Some(("update.desiredAddonsConfig.networkPolicyConfig.disabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "update.desired-addons-config.parallelstore-csi-driver-config.enabled" => Some(("update.desiredAddonsConfig.parallelstoreCsiDriverConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "update.desired-addons-config.ray-operator-config.enabled" => Some(("update.desiredAddonsConfig.rayOperatorConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "update.desired-addons-config.ray-operator-config.ray-cluster-logging-config.enabled" => Some(("update.desiredAddonsConfig.rayOperatorConfig.rayClusterLoggingConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "update.desired-addons-config.ray-operator-config.ray-cluster-monitoring-config.enabled" => Some(("update.desiredAddonsConfig.rayOperatorConfig.rayClusterMonitoringConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "update.desired-addons-config.stateful-ha-config.enabled" => Some(("update.desiredAddonsConfig.statefulHaConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "update.desired-anonymous-authentication-config.mode" => Some(("update.desiredAnonymousAuthenticationConfig.mode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update.desired-authenticator-groups-config.enabled" => Some(("update.desiredAuthenticatorGroupsConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "update.desired-authenticator-groups-config.security-group" => Some(("update.desiredAuthenticatorGroupsConfig.securityGroup", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-auto-ipam-config.enabled" => Some(("update.desiredAutoIpamConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "update.desired-autopilot-workload-policy-config.allow-net-admin" => Some(("update.desiredAutopilotWorkloadPolicyConfig.allowNetAdmin", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "update.desired-autopilot-workload-policy-config.autopilot-compatibility-auditing-enabled" => Some(("update.desiredAutopilotWorkloadPolicyConfig.autopilotCompatibilityAuditingEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "update.desired-binary-authorization.enabled" => Some(("update.desiredBinaryAuthorization.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "update.desired-binary-authorization.evaluation-mode" => Some(("update.desiredBinaryAuthorization.evaluationMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update.desired-cluster-autoscaling.autoprovisioning-locations" => Some(("update.desiredClusterAutoscaling.autoprovisioningLocations", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
@@ -4591,6 +5104,7 @@ where
                     "update.desired-cluster-autoscaling.autoprovisioning-node-pool-defaults.service-account" => Some(("update.desiredClusterAutoscaling.autoprovisioningNodePoolDefaults.serviceAccount", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update.desired-cluster-autoscaling.autoprovisioning-node-pool-defaults.shielded-instance-config.enable-integrity-monitoring" => Some(("update.desiredClusterAutoscaling.autoprovisioningNodePoolDefaults.shieldedInstanceConfig.enableIntegrityMonitoring", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "update.desired-cluster-autoscaling.autoprovisioning-node-pool-defaults.shielded-instance-config.enable-secure-boot" => Some(("update.desiredClusterAutoscaling.autoprovisioningNodePoolDefaults.shieldedInstanceConfig.enableSecureBoot", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "update.desired-cluster-autoscaling.autoprovisioning-node-pool-defaults.upgrade-settings.blue-green-settings.autoscaled-rollout-policy.wait-for-drain-duration" => Some(("update.desiredClusterAutoscaling.autoprovisioningNodePoolDefaults.upgradeSettings.blueGreenSettings.autoscaledRolloutPolicy.waitForDrainDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update.desired-cluster-autoscaling.autoprovisioning-node-pool-defaults.upgrade-settings.blue-green-settings.node-pool-soak-duration" => Some(("update.desiredClusterAutoscaling.autoprovisioningNodePoolDefaults.upgradeSettings.blueGreenSettings.nodePoolSoakDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update.desired-cluster-autoscaling.autoprovisioning-node-pool-defaults.upgrade-settings.blue-green-settings.standard-rollout-policy.batch-node-count" => Some(("update.desiredClusterAutoscaling.autoprovisioningNodePoolDefaults.upgradeSettings.blueGreenSettings.standardRolloutPolicy.batchNodeCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "update.desired-cluster-autoscaling.autoprovisioning-node-pool-defaults.upgrade-settings.blue-green-settings.standard-rollout-policy.batch-percentage" => Some(("update.desiredClusterAutoscaling.autoprovisioningNodePoolDefaults.upgradeSettings.blueGreenSettings.standardRolloutPolicy.batchPercentage", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
@@ -4599,15 +5113,33 @@ where
                     "update.desired-cluster-autoscaling.autoprovisioning-node-pool-defaults.upgrade-settings.max-unavailable" => Some(("update.desiredClusterAutoscaling.autoprovisioningNodePoolDefaults.upgradeSettings.maxUnavailable", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "update.desired-cluster-autoscaling.autoprovisioning-node-pool-defaults.upgrade-settings.strategy" => Some(("update.desiredClusterAutoscaling.autoprovisioningNodePoolDefaults.upgradeSettings.strategy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update.desired-cluster-autoscaling.autoscaling-profile" => Some(("update.desiredClusterAutoscaling.autoscalingProfile", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-cluster-autoscaling.default-compute-class-config.enabled" => Some(("update.desiredClusterAutoscaling.defaultComputeClassConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "update.desired-cluster-autoscaling.enable-node-autoprovisioning" => Some(("update.desiredClusterAutoscaling.enableNodeAutoprovisioning", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "update.desired-compliance-posture-config.mode" => Some(("update.desiredCompliancePostureConfig.mode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update.desired-containerd-config.private-registry-access-config.enabled" => Some(("update.desiredContainerdConfig.privateRegistryAccessConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "update.desired-containerd-config.writable-cgroups.enabled" => Some(("update.desiredContainerdConfig.writableCgroups.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "update.desired-control-plane-endpoints-config.dns-endpoint-config.allow-external-traffic" => Some(("update.desiredControlPlaneEndpointsConfig.dnsEndpointConfig.allowExternalTraffic", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "update.desired-control-plane-endpoints-config.dns-endpoint-config.enable-k8s-certs-via-dns" => Some(("update.desiredControlPlaneEndpointsConfig.dnsEndpointConfig.enableK8sCertsViaDns", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "update.desired-control-plane-endpoints-config.dns-endpoint-config.enable-k8s-tokens-via-dns" => Some(("update.desiredControlPlaneEndpointsConfig.dnsEndpointConfig.enableK8sTokensViaDns", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "update.desired-control-plane-endpoints-config.dns-endpoint-config.endpoint" => Some(("update.desiredControlPlaneEndpointsConfig.dnsEndpointConfig.endpoint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-control-plane-endpoints-config.ip-endpoints-config.authorized-networks-config.enabled" => Some(("update.desiredControlPlaneEndpointsConfig.ipEndpointsConfig.authorizedNetworksConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "update.desired-control-plane-endpoints-config.ip-endpoints-config.authorized-networks-config.gcp-public-cidrs-access-enabled" => Some(("update.desiredControlPlaneEndpointsConfig.ipEndpointsConfig.authorizedNetworksConfig.gcpPublicCidrsAccessEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "update.desired-control-plane-endpoints-config.ip-endpoints-config.authorized-networks-config.private-endpoint-enforcement-enabled" => Some(("update.desiredControlPlaneEndpointsConfig.ipEndpointsConfig.authorizedNetworksConfig.privateEndpointEnforcementEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "update.desired-control-plane-endpoints-config.ip-endpoints-config.enable-public-endpoint" => Some(("update.desiredControlPlaneEndpointsConfig.ipEndpointsConfig.enablePublicEndpoint", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "update.desired-control-plane-endpoints-config.ip-endpoints-config.enabled" => Some(("update.desiredControlPlaneEndpointsConfig.ipEndpointsConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "update.desired-control-plane-endpoints-config.ip-endpoints-config.global-access" => Some(("update.desiredControlPlaneEndpointsConfig.ipEndpointsConfig.globalAccess", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "update.desired-control-plane-endpoints-config.ip-endpoints-config.private-endpoint" => Some(("update.desiredControlPlaneEndpointsConfig.ipEndpointsConfig.privateEndpoint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-control-plane-endpoints-config.ip-endpoints-config.private-endpoint-subnetwork" => Some(("update.desiredControlPlaneEndpointsConfig.ipEndpointsConfig.privateEndpointSubnetwork", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-control-plane-endpoints-config.ip-endpoints-config.public-endpoint" => Some(("update.desiredControlPlaneEndpointsConfig.ipEndpointsConfig.publicEndpoint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update.desired-cost-management-config.enabled" => Some(("update.desiredCostManagementConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "update.desired-database-encryption.current-state" => Some(("update.desiredDatabaseEncryption.currentState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update.desired-database-encryption.decryption-keys" => Some(("update.desiredDatabaseEncryption.decryptionKeys", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "update.desired-database-encryption.key-name" => Some(("update.desiredDatabaseEncryption.keyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update.desired-database-encryption.state" => Some(("update.desiredDatabaseEncryption.state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update.desired-datapath-provider" => Some(("update.desiredDatapathProvider", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-default-enable-private-nodes" => Some(("update.desiredDefaultEnablePrivateNodes", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "update.desired-default-snat-status.disabled" => Some(("update.desiredDefaultSnatStatus.disabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "update.desired-disable-l4-lb-firewall-reconciliation" => Some(("update.desiredDisableL4LbFirewallReconciliation", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "update.desired-dns-config.additive-vpc-scope-dns-domain" => Some(("update.desiredDnsConfig.additiveVpcScopeDnsDomain", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update.desired-dns-config.cluster-dns" => Some(("update.desiredDnsConfig.clusterDns", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update.desired-dns-config.cluster-dns-domain" => Some(("update.desiredDnsConfig.clusterDnsDomain", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -4616,7 +5148,9 @@ where
                     "update.desired-enable-fqdn-network-policy" => Some(("update.desiredEnableFqdnNetworkPolicy", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "update.desired-enable-multi-networking" => Some(("update.desiredEnableMultiNetworking", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "update.desired-enable-private-endpoint" => Some(("update.desiredEnablePrivateEndpoint", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "update.desired-enterprise-config.desired-tier" => Some(("update.desiredEnterpriseConfig.desiredTier", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update.desired-fleet.membership" => Some(("update.desiredFleet.membership", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-fleet.membership-type" => Some(("update.desiredFleet.membershipType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update.desired-fleet.pre-registered" => Some(("update.desiredFleet.preRegistered", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "update.desired-fleet.project" => Some(("update.desiredFleet.project", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update.desired-gateway-api-config.channel" => Some(("update.desiredGatewayApiConfig.channel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -4630,27 +5164,100 @@ where
                     "update.desired-locations" => Some(("update.desiredLocations", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "update.desired-logging-config.component-config.enable-components" => Some(("update.desiredLoggingConfig.componentConfig.enableComponents", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "update.desired-logging-service" => Some(("update.desiredLoggingService", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-managed-opentelemetry-config.scope" => Some(("update.desiredManagedOpentelemetryConfig.scope", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update.desired-master-authorized-networks-config.enabled" => Some(("update.desiredMasterAuthorizedNetworksConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "update.desired-master-authorized-networks-config.gcp-public-cidrs-access-enabled" => Some(("update.desiredMasterAuthorizedNetworksConfig.gcpPublicCidrsAccessEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "update.desired-master-authorized-networks-config.private-endpoint-enforcement-enabled" => Some(("update.desiredMasterAuthorizedNetworksConfig.privateEndpointEnforcementEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "update.desired-master-version" => Some(("update.desiredMasterVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update.desired-mesh-certificates.enable-certificates" => Some(("update.desiredMeshCertificates.enableCertificates", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "update.desired-monitoring-config.advanced-datapath-observability-config.enable-metrics" => Some(("update.desiredMonitoringConfig.advancedDatapathObservabilityConfig.enableMetrics", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "update.desired-monitoring-config.advanced-datapath-observability-config.enable-relay" => Some(("update.desiredMonitoringConfig.advancedDatapathObservabilityConfig.enableRelay", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "update.desired-monitoring-config.advanced-datapath-observability-config.relay-mode" => Some(("update.desiredMonitoringConfig.advancedDatapathObservabilityConfig.relayMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update.desired-monitoring-config.component-config.enable-components" => Some(("update.desiredMonitoringConfig.componentConfig.enableComponents", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "update.desired-monitoring-config.managed-prometheus-config.auto-monitoring-config.scope" => Some(("update.desiredMonitoringConfig.managedPrometheusConfig.autoMonitoringConfig.scope", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update.desired-monitoring-config.managed-prometheus-config.enabled" => Some(("update.desiredMonitoringConfig.managedPrometheusConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "update.desired-monitoring-service" => Some(("update.desiredMonitoringService", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update.desired-network-performance-config.total-egress-bandwidth-tier" => Some(("update.desiredNetworkPerformanceConfig.totalEgressBandwidthTier", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-network-tier-config.network-tier" => Some(("update.desiredNetworkTierConfig.networkTier", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-node-kubelet-config.allowed-unsafe-sysctls" => Some(("update.desiredNodeKubeletConfig.allowedUnsafeSysctls", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "update.desired-node-kubelet-config.container-log-max-files" => Some(("update.desiredNodeKubeletConfig.containerLogMaxFiles", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "update.desired-node-kubelet-config.container-log-max-size" => Some(("update.desiredNodeKubeletConfig.containerLogMaxSize", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update.desired-node-kubelet-config.cpu-cfs-quota" => Some(("update.desiredNodeKubeletConfig.cpuCfsQuota", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "update.desired-node-kubelet-config.cpu-cfs-quota-period" => Some(("update.desiredNodeKubeletConfig.cpuCfsQuotaPeriod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update.desired-node-kubelet-config.cpu-manager-policy" => Some(("update.desiredNodeKubeletConfig.cpuManagerPolicy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-node-kubelet-config.eviction-max-pod-grace-period-seconds" => Some(("update.desiredNodeKubeletConfig.evictionMaxPodGracePeriodSeconds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "update.desired-node-kubelet-config.eviction-minimum-reclaim.imagefs-available" => Some(("update.desiredNodeKubeletConfig.evictionMinimumReclaim.imagefsAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-node-kubelet-config.eviction-minimum-reclaim.imagefs-inodes-free" => Some(("update.desiredNodeKubeletConfig.evictionMinimumReclaim.imagefsInodesFree", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-node-kubelet-config.eviction-minimum-reclaim.memory-available" => Some(("update.desiredNodeKubeletConfig.evictionMinimumReclaim.memoryAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-node-kubelet-config.eviction-minimum-reclaim.nodefs-available" => Some(("update.desiredNodeKubeletConfig.evictionMinimumReclaim.nodefsAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-node-kubelet-config.eviction-minimum-reclaim.nodefs-inodes-free" => Some(("update.desiredNodeKubeletConfig.evictionMinimumReclaim.nodefsInodesFree", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-node-kubelet-config.eviction-minimum-reclaim.pid-available" => Some(("update.desiredNodeKubeletConfig.evictionMinimumReclaim.pidAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-node-kubelet-config.eviction-soft.imagefs-available" => Some(("update.desiredNodeKubeletConfig.evictionSoft.imagefsAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-node-kubelet-config.eviction-soft.imagefs-inodes-free" => Some(("update.desiredNodeKubeletConfig.evictionSoft.imagefsInodesFree", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-node-kubelet-config.eviction-soft.memory-available" => Some(("update.desiredNodeKubeletConfig.evictionSoft.memoryAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-node-kubelet-config.eviction-soft.nodefs-available" => Some(("update.desiredNodeKubeletConfig.evictionSoft.nodefsAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-node-kubelet-config.eviction-soft.nodefs-inodes-free" => Some(("update.desiredNodeKubeletConfig.evictionSoft.nodefsInodesFree", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-node-kubelet-config.eviction-soft.pid-available" => Some(("update.desiredNodeKubeletConfig.evictionSoft.pidAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-node-kubelet-config.eviction-soft-grace-period.imagefs-available" => Some(("update.desiredNodeKubeletConfig.evictionSoftGracePeriod.imagefsAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-node-kubelet-config.eviction-soft-grace-period.imagefs-inodes-free" => Some(("update.desiredNodeKubeletConfig.evictionSoftGracePeriod.imagefsInodesFree", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-node-kubelet-config.eviction-soft-grace-period.memory-available" => Some(("update.desiredNodeKubeletConfig.evictionSoftGracePeriod.memoryAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-node-kubelet-config.eviction-soft-grace-period.nodefs-available" => Some(("update.desiredNodeKubeletConfig.evictionSoftGracePeriod.nodefsAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-node-kubelet-config.eviction-soft-grace-period.nodefs-inodes-free" => Some(("update.desiredNodeKubeletConfig.evictionSoftGracePeriod.nodefsInodesFree", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-node-kubelet-config.eviction-soft-grace-period.pid-available" => Some(("update.desiredNodeKubeletConfig.evictionSoftGracePeriod.pidAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-node-kubelet-config.image-gc-high-threshold-percent" => Some(("update.desiredNodeKubeletConfig.imageGcHighThresholdPercent", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "update.desired-node-kubelet-config.image-gc-low-threshold-percent" => Some(("update.desiredNodeKubeletConfig.imageGcLowThresholdPercent", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "update.desired-node-kubelet-config.image-maximum-gc-age" => Some(("update.desiredNodeKubeletConfig.imageMaximumGcAge", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-node-kubelet-config.image-minimum-gc-age" => Some(("update.desiredNodeKubeletConfig.imageMinimumGcAge", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update.desired-node-kubelet-config.insecure-kubelet-readonly-port-enabled" => Some(("update.desiredNodeKubeletConfig.insecureKubeletReadonlyPortEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "update.desired-node-kubelet-config.max-parallel-image-pulls" => Some(("update.desiredNodeKubeletConfig.maxParallelImagePulls", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "update.desired-node-kubelet-config.memory-manager.policy" => Some(("update.desiredNodeKubeletConfig.memoryManager.policy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update.desired-node-kubelet-config.pod-pids-limit" => Some(("update.desiredNodeKubeletConfig.podPidsLimit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-node-kubelet-config.single-process-oom-kill" => Some(("update.desiredNodeKubeletConfig.singleProcessOomKill", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "update.desired-node-kubelet-config.topology-manager.policy" => Some(("update.desiredNodeKubeletConfig.topologyManager.policy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-node-kubelet-config.topology-manager.scope" => Some(("update.desiredNodeKubeletConfig.topologyManager.scope", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-node-pool-auto-config-kubelet-config.allowed-unsafe-sysctls" => Some(("update.desiredNodePoolAutoConfigKubeletConfig.allowedUnsafeSysctls", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "update.desired-node-pool-auto-config-kubelet-config.container-log-max-files" => Some(("update.desiredNodePoolAutoConfigKubeletConfig.containerLogMaxFiles", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "update.desired-node-pool-auto-config-kubelet-config.container-log-max-size" => Some(("update.desiredNodePoolAutoConfigKubeletConfig.containerLogMaxSize", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update.desired-node-pool-auto-config-kubelet-config.cpu-cfs-quota" => Some(("update.desiredNodePoolAutoConfigKubeletConfig.cpuCfsQuota", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "update.desired-node-pool-auto-config-kubelet-config.cpu-cfs-quota-period" => Some(("update.desiredNodePoolAutoConfigKubeletConfig.cpuCfsQuotaPeriod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update.desired-node-pool-auto-config-kubelet-config.cpu-manager-policy" => Some(("update.desiredNodePoolAutoConfigKubeletConfig.cpuManagerPolicy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-node-pool-auto-config-kubelet-config.eviction-max-pod-grace-period-seconds" => Some(("update.desiredNodePoolAutoConfigKubeletConfig.evictionMaxPodGracePeriodSeconds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "update.desired-node-pool-auto-config-kubelet-config.eviction-minimum-reclaim.imagefs-available" => Some(("update.desiredNodePoolAutoConfigKubeletConfig.evictionMinimumReclaim.imagefsAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-node-pool-auto-config-kubelet-config.eviction-minimum-reclaim.imagefs-inodes-free" => Some(("update.desiredNodePoolAutoConfigKubeletConfig.evictionMinimumReclaim.imagefsInodesFree", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-node-pool-auto-config-kubelet-config.eviction-minimum-reclaim.memory-available" => Some(("update.desiredNodePoolAutoConfigKubeletConfig.evictionMinimumReclaim.memoryAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-node-pool-auto-config-kubelet-config.eviction-minimum-reclaim.nodefs-available" => Some(("update.desiredNodePoolAutoConfigKubeletConfig.evictionMinimumReclaim.nodefsAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-node-pool-auto-config-kubelet-config.eviction-minimum-reclaim.nodefs-inodes-free" => Some(("update.desiredNodePoolAutoConfigKubeletConfig.evictionMinimumReclaim.nodefsInodesFree", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-node-pool-auto-config-kubelet-config.eviction-minimum-reclaim.pid-available" => Some(("update.desiredNodePoolAutoConfigKubeletConfig.evictionMinimumReclaim.pidAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-node-pool-auto-config-kubelet-config.eviction-soft.imagefs-available" => Some(("update.desiredNodePoolAutoConfigKubeletConfig.evictionSoft.imagefsAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-node-pool-auto-config-kubelet-config.eviction-soft.imagefs-inodes-free" => Some(("update.desiredNodePoolAutoConfigKubeletConfig.evictionSoft.imagefsInodesFree", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-node-pool-auto-config-kubelet-config.eviction-soft.memory-available" => Some(("update.desiredNodePoolAutoConfigKubeletConfig.evictionSoft.memoryAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-node-pool-auto-config-kubelet-config.eviction-soft.nodefs-available" => Some(("update.desiredNodePoolAutoConfigKubeletConfig.evictionSoft.nodefsAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-node-pool-auto-config-kubelet-config.eviction-soft.nodefs-inodes-free" => Some(("update.desiredNodePoolAutoConfigKubeletConfig.evictionSoft.nodefsInodesFree", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-node-pool-auto-config-kubelet-config.eviction-soft.pid-available" => Some(("update.desiredNodePoolAutoConfigKubeletConfig.evictionSoft.pidAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-node-pool-auto-config-kubelet-config.eviction-soft-grace-period.imagefs-available" => Some(("update.desiredNodePoolAutoConfigKubeletConfig.evictionSoftGracePeriod.imagefsAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-node-pool-auto-config-kubelet-config.eviction-soft-grace-period.imagefs-inodes-free" => Some(("update.desiredNodePoolAutoConfigKubeletConfig.evictionSoftGracePeriod.imagefsInodesFree", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-node-pool-auto-config-kubelet-config.eviction-soft-grace-period.memory-available" => Some(("update.desiredNodePoolAutoConfigKubeletConfig.evictionSoftGracePeriod.memoryAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-node-pool-auto-config-kubelet-config.eviction-soft-grace-period.nodefs-available" => Some(("update.desiredNodePoolAutoConfigKubeletConfig.evictionSoftGracePeriod.nodefsAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-node-pool-auto-config-kubelet-config.eviction-soft-grace-period.nodefs-inodes-free" => Some(("update.desiredNodePoolAutoConfigKubeletConfig.evictionSoftGracePeriod.nodefsInodesFree", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-node-pool-auto-config-kubelet-config.eviction-soft-grace-period.pid-available" => Some(("update.desiredNodePoolAutoConfigKubeletConfig.evictionSoftGracePeriod.pidAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-node-pool-auto-config-kubelet-config.image-gc-high-threshold-percent" => Some(("update.desiredNodePoolAutoConfigKubeletConfig.imageGcHighThresholdPercent", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "update.desired-node-pool-auto-config-kubelet-config.image-gc-low-threshold-percent" => Some(("update.desiredNodePoolAutoConfigKubeletConfig.imageGcLowThresholdPercent", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "update.desired-node-pool-auto-config-kubelet-config.image-maximum-gc-age" => Some(("update.desiredNodePoolAutoConfigKubeletConfig.imageMaximumGcAge", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-node-pool-auto-config-kubelet-config.image-minimum-gc-age" => Some(("update.desiredNodePoolAutoConfigKubeletConfig.imageMinimumGcAge", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update.desired-node-pool-auto-config-kubelet-config.insecure-kubelet-readonly-port-enabled" => Some(("update.desiredNodePoolAutoConfigKubeletConfig.insecureKubeletReadonlyPortEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "update.desired-node-pool-auto-config-kubelet-config.max-parallel-image-pulls" => Some(("update.desiredNodePoolAutoConfigKubeletConfig.maxParallelImagePulls", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "update.desired-node-pool-auto-config-kubelet-config.memory-manager.policy" => Some(("update.desiredNodePoolAutoConfigKubeletConfig.memoryManager.policy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update.desired-node-pool-auto-config-kubelet-config.pod-pids-limit" => Some(("update.desiredNodePoolAutoConfigKubeletConfig.podPidsLimit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-node-pool-auto-config-kubelet-config.single-process-oom-kill" => Some(("update.desiredNodePoolAutoConfigKubeletConfig.singleProcessOomKill", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "update.desired-node-pool-auto-config-kubelet-config.topology-manager.policy" => Some(("update.desiredNodePoolAutoConfigKubeletConfig.topologyManager.policy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-node-pool-auto-config-kubelet-config.topology-manager.scope" => Some(("update.desiredNodePoolAutoConfigKubeletConfig.topologyManager.scope", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-node-pool-auto-config-linux-node-config.cgroup-mode" => Some(("update.desiredNodePoolAutoConfigLinuxNodeConfig.cgroupMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-node-pool-auto-config-linux-node-config.hugepages.hugepage-size1g" => Some(("update.desiredNodePoolAutoConfigLinuxNodeConfig.hugepages.hugepageSize1g", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "update.desired-node-pool-auto-config-linux-node-config.hugepages.hugepage-size2m" => Some(("update.desiredNodePoolAutoConfigLinuxNodeConfig.hugepages.hugepageSize2m", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "update.desired-node-pool-auto-config-linux-node-config.node-kernel-module-loading.policy" => Some(("update.desiredNodePoolAutoConfigLinuxNodeConfig.nodeKernelModuleLoading.policy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-node-pool-auto-config-linux-node-config.sysctls" => Some(("update.desiredNodePoolAutoConfigLinuxNodeConfig.sysctls", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "update.desired-node-pool-auto-config-linux-node-config.transparent-hugepage-defrag" => Some(("update.desiredNodePoolAutoConfigLinuxNodeConfig.transparentHugepageDefrag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-node-pool-auto-config-linux-node-config.transparent-hugepage-enabled" => Some(("update.desiredNodePoolAutoConfigLinuxNodeConfig.transparentHugepageEnabled", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update.desired-node-pool-auto-config-network-tags.tags" => Some(("update.desiredNodePoolAutoConfigNetworkTags.tags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "update.desired-node-pool-auto-config-resource-manager-tags.tags" => Some(("update.desiredNodePoolAutoConfigResourceManagerTags.tags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "update.desired-node-pool-autoscaling.autoprovisioned" => Some(("update.desiredNodePoolAutoscaling.autoprovisioned", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -4668,6 +5275,7 @@ where
                     "update.desired-notification-config.pubsub.topic" => Some(("update.desiredNotificationConfig.pubsub.topic", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update.desired-parent-product-config.labels" => Some(("update.desiredParentProductConfig.labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "update.desired-parent-product-config.product-name" => Some(("update.desiredParentProductConfig.productName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-pod-autoscaling.hpa-profile" => Some(("update.desiredPodAutoscaling.hpaProfile", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update.desired-private-cluster-config.enable-private-endpoint" => Some(("update.desiredPrivateClusterConfig.enablePrivateEndpoint", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "update.desired-private-cluster-config.enable-private-nodes" => Some(("update.desiredPrivateClusterConfig.enablePrivateNodes", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "update.desired-private-cluster-config.master-global-access-config.enabled" => Some(("update.desiredPrivateClusterConfig.masterGlobalAccessConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -4677,23 +5285,48 @@ where
                     "update.desired-private-cluster-config.private-endpoint-subnetwork" => Some(("update.desiredPrivateClusterConfig.privateEndpointSubnetwork", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update.desired-private-cluster-config.public-endpoint" => Some(("update.desiredPrivateClusterConfig.publicEndpoint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update.desired-private-ipv6-google-access" => Some(("update.desiredPrivateIpv6GoogleAccess", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-privileged-admission-config.allowlist-paths" => Some(("update.desiredPrivilegedAdmissionConfig.allowlistPaths", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "update.desired-rbac-binding-config.enable-insecure-binding-system-authenticated" => Some(("update.desiredRbacBindingConfig.enableInsecureBindingSystemAuthenticated", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "update.desired-rbac-binding-config.enable-insecure-binding-system-unauthenticated" => Some(("update.desiredRbacBindingConfig.enableInsecureBindingSystemUnauthenticated", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "update.desired-release-channel.channel" => Some(("update.desiredReleaseChannel.channel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update.desired-resource-usage-export-config.bigquery-destination.dataset-id" => Some(("update.desiredResourceUsageExportConfig.bigqueryDestination.datasetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update.desired-resource-usage-export-config.consumption-metering-config.enabled" => Some(("update.desiredResourceUsageExportConfig.consumptionMeteringConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "update.desired-resource-usage-export-config.enable-network-egress-metering" => Some(("update.desiredResourceUsageExportConfig.enableNetworkEgressMetering", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "update.desired-secret-manager-config.enabled" => Some(("update.desiredSecretManagerConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "update.desired-secret-manager-config.rotation-config.enabled" => Some(("update.desiredSecretManagerConfig.rotationConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "update.desired-secret-manager-config.rotation-config.rotation-interval" => Some(("update.desiredSecretManagerConfig.rotationConfig.rotationInterval", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update.desired-security-posture-config.mode" => Some(("update.desiredSecurityPostureConfig.mode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update.desired-security-posture-config.vulnerability-mode" => Some(("update.desiredSecurityPostureConfig.vulnerabilityMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update.desired-service-external-ips-config.enabled" => Some(("update.desiredServiceExternalIpsConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "update.desired-shielded-nodes.enabled" => Some(("update.desiredShieldedNodes.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "update.desired-stack-type" => Some(("update.desiredStackType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-user-managed-keys-config.aggregation-ca" => Some(("update.desiredUserManagedKeysConfig.aggregationCa", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-user-managed-keys-config.cluster-ca" => Some(("update.desiredUserManagedKeysConfig.clusterCa", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-user-managed-keys-config.control-plane-disk-encryption-key" => Some(("update.desiredUserManagedKeysConfig.controlPlaneDiskEncryptionKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-user-managed-keys-config.control-plane-disk-encryption-key-versions" => Some(("update.desiredUserManagedKeysConfig.controlPlaneDiskEncryptionKeyVersions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "update.desired-user-managed-keys-config.etcd-api-ca" => Some(("update.desiredUserManagedKeysConfig.etcdApiCa", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-user-managed-keys-config.etcd-peer-ca" => Some(("update.desiredUserManagedKeysConfig.etcdPeerCa", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-user-managed-keys-config.gkeops-etcd-backup-encryption-key" => Some(("update.desiredUserManagedKeysConfig.gkeopsEtcdBackupEncryptionKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-user-managed-keys-config.service-account-signing-keys" => Some(("update.desiredUserManagedKeysConfig.serviceAccountSigningKeys", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "update.desired-user-managed-keys-config.service-account-verification-keys" => Some(("update.desiredUserManagedKeysConfig.serviceAccountVerificationKeys", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "update.desired-vertical-pod-autoscaling.enabled" => Some(("update.desiredVerticalPodAutoscaling.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "update.desired-workload-identity-config.workload-pool" => Some(("update.desiredWorkloadIdentityConfig.workloadPool", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update.enable-k8s-beta-apis.enabled-apis" => Some(("update.enableK8sBetaApis.enabledApis", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "update.etag" => Some(("update.etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.gke-auto-upgrade-config.patch-mode" => Some(("update.gkeAutoUpgradeConfig.patchMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update.removed-additional-pod-ranges-config.pod-range-names" => Some(("update.removedAdditionalPodRangesConfig.podRangeNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "update.user-managed-keys-config.aggregation-ca" => Some(("update.userManagedKeysConfig.aggregationCa", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.user-managed-keys-config.cluster-ca" => Some(("update.userManagedKeysConfig.clusterCa", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.user-managed-keys-config.control-plane-disk-encryption-key" => Some(("update.userManagedKeysConfig.controlPlaneDiskEncryptionKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.user-managed-keys-config.control-plane-disk-encryption-key-versions" => Some(("update.userManagedKeysConfig.controlPlaneDiskEncryptionKeyVersions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "update.user-managed-keys-config.etcd-api-ca" => Some(("update.userManagedKeysConfig.etcdApiCa", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.user-managed-keys-config.etcd-peer-ca" => Some(("update.userManagedKeysConfig.etcdPeerCa", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.user-managed-keys-config.gkeops-etcd-backup-encryption-key" => Some(("update.userManagedKeysConfig.gkeopsEtcdBackupEncryptionKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.user-managed-keys-config.service-account-signing-keys" => Some(("update.userManagedKeysConfig.serviceAccountSigningKeys", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "update.user-managed-keys-config.service-account-verification-keys" => Some(("update.userManagedKeysConfig.serviceAccountVerificationKeys", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "zone" => Some(("zone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["additional-pod-ranges-config", "additive-vpc-scope-dns-domain", "advanced-datapath-observability-config", "allow-net-admin", "auto-repair", "auto-upgrade", "auto-upgrade-start-time", "autoprovisioned", "autoprovisioning-locations", "autoprovisioning-node-pool-defaults", "autoscaling-profile", "batch-node-count", "batch-percentage", "batch-soak-duration", "bigquery-destination", "blue-green-settings", "boot-disk-kms-key", "channel", "cloud-run-config", "cluster-dns", "cluster-dns-domain", "cluster-dns-scope", "cluster-id", "component-config", "config-connector-config", "consumption-metering-config", "cpu-cfs-quota", "cpu-cfs-quota-period", "cpu-manager-policy", "current-state", "dataset-id", "decryption-keys", "description", "desired-addons-config", "desired-authenticator-groups-config", "desired-autopilot-workload-policy-config", "desired-binary-authorization", "desired-cluster-autoscaling", "desired-containerd-config", "desired-cost-management-config", "desired-database-encryption", "desired-datapath-provider", "desired-default-snat-status", "desired-dns-config", "desired-enable-cilium-clusterwide-network-policy", "desired-enable-fqdn-network-policy", "desired-enable-multi-networking", "desired-enable-private-endpoint", "desired-fleet", "desired-gateway-api-config", "desired-gcfs-config", "desired-identity-service-config", "desired-image-type", "desired-in-transit-encryption-config", "desired-intra-node-visibility-config", "desired-k8s-beta-apis", "desired-l4ilb-subsetting-config", "desired-locations", "desired-logging-config", "desired-logging-service", "desired-master-authorized-networks-config", "desired-master-version", "desired-mesh-certificates", "desired-monitoring-config", "desired-monitoring-service", "desired-network-performance-config", "desired-node-kubelet-config", "desired-node-pool-auto-config-kubelet-config", "desired-node-pool-auto-config-network-tags", "desired-node-pool-auto-config-resource-manager-tags", "desired-node-pool-autoscaling", "desired-node-pool-id", "desired-node-pool-logging-config", "desired-node-version", "desired-notification-config", "desired-parent-product-config", "desired-private-cluster-config", "desired-private-ipv6-google-access", "desired-release-channel", "desired-resource-usage-export-config", "desired-security-posture-config", "desired-service-external-ips-config", "desired-shielded-nodes", "desired-stack-type", "desired-vertical-pod-autoscaling", "desired-workload-identity-config", "disabled", "disk-size-gb", "disk-type", "dns-cache-config", "enable-certificates", "enable-components", "enable-integrity-monitoring", "enable-k8s-beta-apis", "enable-metrics", "enable-network-egress-metering", "enable-node-autoprovisioning", "enable-private-endpoint", "enable-private-nodes", "enable-relay", "enable-secure-boot", "enabled", "enabled-apis", "etag", "evaluation-mode", "event-type", "filter", "gce-persistent-disk-csi-driver-config", "gcp-filestore-csi-driver-config", "gcp-public-cidrs-access-enabled", "gcs-fuse-csi-driver-config", "gke-backup-agent-config", "horizontal-pod-autoscaling", "http-load-balancing", "image-type", "insecure-kubelet-readonly-port-enabled", "key-name", "kubernetes-dashboard", "labels", "load-balancer-type", "location-policy", "managed-prometheus-config", "management", "master-global-access-config", "master-ipv4-cidr-block", "max-node-count", "max-surge", "max-unavailable", "membership", "min-cpu-platform", "min-node-count", "mode", "name", "network-policy-config", "node-pool-soak-duration", "oauth-scopes", "peering-name", "pod-pids-limit", "pod-range-names", "pre-registered", "private-endpoint", "private-endpoint-subnetwork", "private-registry-access-config", "product-name", "project", "project-id", "public-endpoint", "pubsub", "relay-mode", "removed-additional-pod-ranges-config", "security-group", "service-account", "shielded-instance-config", "standard-rollout-policy", "state", "stateful-ha-config", "strategy", "tags", "topic", "total-egress-bandwidth-tier", "total-max-node-count", "total-min-node-count", "update", "upgrade-options", "upgrade-settings", "variant", "variant-config", "vulnerability-mode", "workload-pool", "zone"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["additional-pod-ranges-config", "additive-vpc-scope-dns-domain", "advanced-datapath-observability-config", "aggregation-ca", "allow-external-traffic", "allow-net-admin", "allowed-unsafe-sysctls", "allowlist-paths", "authorized-networks-config", "auto-monitoring-config", "auto-repair", "auto-upgrade", "auto-upgrade-start-time", "autopilot-compatibility-auditing-enabled", "autoprovisioned", "autoprovisioning-locations", "autoprovisioning-node-pool-defaults", "autoscaled-rollout-policy", "autoscaling-profile", "batch-node-count", "batch-percentage", "batch-soak-duration", "bigquery-destination", "blue-green-settings", "boot-disk-kms-key", "cgroup-mode", "channel", "cloud-run-config", "cluster-ca", "cluster-dns", "cluster-dns-domain", "cluster-dns-scope", "cluster-id", "component-config", "config-connector-config", "consumption-metering-config", "container-log-max-files", "container-log-max-size", "control-plane-disk-encryption-key", "control-plane-disk-encryption-key-versions", "cpu-cfs-quota", "cpu-cfs-quota-period", "cpu-manager-policy", "current-state", "dataset-id", "decryption-keys", "default-compute-class-config", "description", "desired-addons-config", "desired-anonymous-authentication-config", "desired-authenticator-groups-config", "desired-auto-ipam-config", "desired-autopilot-workload-policy-config", "desired-binary-authorization", "desired-cluster-autoscaling", "desired-compliance-posture-config", "desired-containerd-config", "desired-control-plane-endpoints-config", "desired-cost-management-config", "desired-database-encryption", "desired-datapath-provider", "desired-default-enable-private-nodes", "desired-default-snat-status", "desired-disable-l4-lb-firewall-reconciliation", "desired-dns-config", "desired-enable-cilium-clusterwide-network-policy", "desired-enable-fqdn-network-policy", "desired-enable-multi-networking", "desired-enable-private-endpoint", "desired-enterprise-config", "desired-fleet", "desired-gateway-api-config", "desired-gcfs-config", "desired-identity-service-config", "desired-image-type", "desired-in-transit-encryption-config", "desired-intra-node-visibility-config", "desired-k8s-beta-apis", "desired-l4ilb-subsetting-config", "desired-locations", "desired-logging-config", "desired-logging-service", "desired-managed-opentelemetry-config", "desired-master-authorized-networks-config", "desired-master-version", "desired-mesh-certificates", "desired-monitoring-config", "desired-monitoring-service", "desired-network-performance-config", "desired-network-tier-config", "desired-node-kubelet-config", "desired-node-pool-auto-config-kubelet-config", "desired-node-pool-auto-config-linux-node-config", "desired-node-pool-auto-config-network-tags", "desired-node-pool-auto-config-resource-manager-tags", "desired-node-pool-autoscaling", "desired-node-pool-id", "desired-node-pool-logging-config", "desired-node-version", "desired-notification-config", "desired-parent-product-config", "desired-pod-autoscaling", "desired-private-cluster-config", "desired-private-ipv6-google-access", "desired-privileged-admission-config", "desired-rbac-binding-config", "desired-release-channel", "desired-resource-usage-export-config", "desired-secret-manager-config", "desired-security-posture-config", "desired-service-external-ips-config", "desired-shielded-nodes", "desired-stack-type", "desired-tier", "desired-user-managed-keys-config", "desired-vertical-pod-autoscaling", "desired-workload-identity-config", "disabled", "disk-size-gb", "disk-type", "dns-cache-config", "dns-endpoint-config", "enable-certificates", "enable-components", "enable-insecure-binding-system-authenticated", "enable-insecure-binding-system-unauthenticated", "enable-integrity-monitoring", "enable-k8s-beta-apis", "enable-k8s-certs-via-dns", "enable-k8s-tokens-via-dns", "enable-legacy-lustre-port", "enable-metrics", "enable-network-egress-metering", "enable-node-autoprovisioning", "enable-private-endpoint", "enable-private-nodes", "enable-public-endpoint", "enable-relay", "enable-secure-boot", "enabled", "enabled-apis", "endpoint", "etag", "etcd-api-ca", "etcd-peer-ca", "evaluation-mode", "event-type", "eviction-max-pod-grace-period-seconds", "eviction-minimum-reclaim", "eviction-soft", "eviction-soft-grace-period", "filter", "gce-persistent-disk-csi-driver-config", "gcp-filestore-csi-driver-config", "gcp-public-cidrs-access-enabled", "gcs-fuse-csi-driver-config", "gke-auto-upgrade-config", "gke-backup-agent-config", "gkeops-etcd-backup-encryption-key", "global-access", "high-scale-checkpointing-config", "horizontal-pod-autoscaling", "hpa-profile", "http-load-balancing", "hugepage-size1g", "hugepage-size2m", "hugepages", "image-gc-high-threshold-percent", "image-gc-low-threshold-percent", "image-maximum-gc-age", "image-minimum-gc-age", "image-type", "imagefs-available", "imagefs-inodes-free", "insecure-kubelet-readonly-port-enabled", "ip-endpoints-config", "key-name", "kubernetes-dashboard", "labels", "load-balancer-type", "location-policy", "lustre-csi-driver-config", "managed-prometheus-config", "management", "master-global-access-config", "master-ipv4-cidr-block", "max-node-count", "max-parallel-image-pulls", "max-surge", "max-unavailable", "membership", "membership-type", "memory-available", "memory-manager", "min-cpu-platform", "min-node-count", "mode", "name", "network-policy-config", "network-tier", "node-kernel-module-loading", "node-pool-soak-duration", "nodefs-available", "nodefs-inodes-free", "oauth-scopes", "parallelstore-csi-driver-config", "patch-mode", "peering-name", "pid-available", "pod-pids-limit", "pod-range-names", "policy", "pre-registered", "private-endpoint", "private-endpoint-enforcement-enabled", "private-endpoint-subnetwork", "private-registry-access-config", "product-name", "project", "project-id", "public-endpoint", "pubsub", "ray-cluster-logging-config", "ray-cluster-monitoring-config", "ray-operator-config", "relay-mode", "removed-additional-pod-ranges-config", "rotation-config", "rotation-interval", "scope", "security-group", "service-account", "service-account-signing-keys", "service-account-verification-keys", "shielded-instance-config", "single-process-oom-kill", "standard-rollout-policy", "state", "stateful-ha-config", "strategy", "sysctls", "tags", "topic", "topology-manager", "total-egress-bandwidth-tier", "total-max-node-count", "total-min-node-count", "transparent-hugepage-defrag", "transparent-hugepage-enabled", "update", "upgrade-options", "upgrade-settings", "user-managed-keys-config", "variant", "variant-config", "vulnerability-mode", "wait-for-drain-duration", "workload-pool", "writable-cgroups", "zone"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -5536,6 +6169,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "addons-config.high-scale-checkpointing-config.enabled" => Some((
+                    "addonsConfig.highScaleCheckpointingConfig.enabled",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "addons-config.horizontal-pod-autoscaling.disabled" => Some((
                     "addonsConfig.horizontalPodAutoscaling.disabled",
                     JsonTypeInfo {
@@ -5557,6 +6197,20 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "addons-config.lustre-csi-driver-config.enable-legacy-lustre-port" => Some((
+                    "addonsConfig.lustreCsiDriverConfig.enableLegacyLustrePort",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "addons-config.lustre-csi-driver-config.enabled" => Some((
+                    "addonsConfig.lustreCsiDriverConfig.enabled",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "addons-config.network-policy-config.disabled" => Some((
                     "addonsConfig.networkPolicyConfig.disabled",
                     JsonTypeInfo {
@@ -5564,6 +6218,36 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "addons-config.parallelstore-csi-driver-config.enabled" => Some((
+                    "addonsConfig.parallelstoreCsiDriverConfig.enabled",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "addons-config.ray-operator-config.enabled" => Some((
+                    "addonsConfig.rayOperatorConfig.enabled",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "addons-config.ray-operator-config.ray-cluster-logging-config.enabled" => Some((
+                    "addonsConfig.rayOperatorConfig.rayClusterLoggingConfig.enabled",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "addons-config.ray-operator-config.ray-cluster-monitoring-config.enabled" => {
+                    Some((
+                        "addonsConfig.rayOperatorConfig.rayClusterMonitoringConfig.enabled",
+                        JsonTypeInfo {
+                            jtype: JsonType::Boolean,
+                            ctype: ComplexType::Pod,
+                        },
+                    ))
+                }
                 "addons-config.stateful-ha-config.enabled" => Some((
                     "addonsConfig.statefulHaConfig.enabled",
                     JsonTypeInfo {
@@ -5609,18 +6293,25 @@ where
                             "config-connector-config",
                             "disabled",
                             "dns-cache-config",
+                            "enable-legacy-lustre-port",
                             "enabled",
                             "gce-persistent-disk-csi-driver-config",
                             "gcp-filestore-csi-driver-config",
                             "gcs-fuse-csi-driver-config",
                             "gke-backup-agent-config",
+                            "high-scale-checkpointing-config",
                             "horizontal-pod-autoscaling",
                             "http-load-balancing",
                             "kubernetes-dashboard",
                             "load-balancer-type",
+                            "lustre-csi-driver-config",
                             "name",
                             "network-policy-config",
+                            "parallelstore-csi-driver-config",
                             "project-id",
+                            "ray-cluster-logging-config",
+                            "ray-cluster-monitoring-config",
+                            "ray-operator-config",
                             "stateful-ha-config",
                             "zone",
                         ],
@@ -5922,15 +6613,26 @@ where
                     "cluster.addons-config.gcp-filestore-csi-driver-config.enabled" => Some(("cluster.addonsConfig.gcpFilestoreCsiDriverConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "cluster.addons-config.gcs-fuse-csi-driver-config.enabled" => Some(("cluster.addonsConfig.gcsFuseCsiDriverConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "cluster.addons-config.gke-backup-agent-config.enabled" => Some(("cluster.addonsConfig.gkeBackupAgentConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "cluster.addons-config.high-scale-checkpointing-config.enabled" => Some(("cluster.addonsConfig.highScaleCheckpointingConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "cluster.addons-config.horizontal-pod-autoscaling.disabled" => Some(("cluster.addonsConfig.horizontalPodAutoscaling.disabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "cluster.addons-config.http-load-balancing.disabled" => Some(("cluster.addonsConfig.httpLoadBalancing.disabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "cluster.addons-config.kubernetes-dashboard.disabled" => Some(("cluster.addonsConfig.kubernetesDashboard.disabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "cluster.addons-config.lustre-csi-driver-config.enable-legacy-lustre-port" => Some(("cluster.addonsConfig.lustreCsiDriverConfig.enableLegacyLustrePort", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "cluster.addons-config.lustre-csi-driver-config.enabled" => Some(("cluster.addonsConfig.lustreCsiDriverConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "cluster.addons-config.network-policy-config.disabled" => Some(("cluster.addonsConfig.networkPolicyConfig.disabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "cluster.addons-config.parallelstore-csi-driver-config.enabled" => Some(("cluster.addonsConfig.parallelstoreCsiDriverConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "cluster.addons-config.ray-operator-config.enabled" => Some(("cluster.addonsConfig.rayOperatorConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "cluster.addons-config.ray-operator-config.ray-cluster-logging-config.enabled" => Some(("cluster.addonsConfig.rayOperatorConfig.rayClusterLoggingConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "cluster.addons-config.ray-operator-config.ray-cluster-monitoring-config.enabled" => Some(("cluster.addonsConfig.rayOperatorConfig.rayClusterMonitoringConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "cluster.addons-config.stateful-ha-config.enabled" => Some(("cluster.addonsConfig.statefulHaConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "cluster.alpha-cluster-feature-gates" => Some(("cluster.alphaClusterFeatureGates", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "cluster.anonymous-authentication-config.mode" => Some(("cluster.anonymousAuthenticationConfig.mode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.authenticator-groups-config.enabled" => Some(("cluster.authenticatorGroupsConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "cluster.authenticator-groups-config.security-group" => Some(("cluster.authenticatorGroupsConfig.securityGroup", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.autopilot.enabled" => Some(("cluster.autopilot.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "cluster.autopilot.privileged-admission-config.allowlist-paths" => Some(("cluster.autopilot.privilegedAdmissionConfig.allowlistPaths", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "cluster.autopilot.workload-policy-config.allow-net-admin" => Some(("cluster.autopilot.workloadPolicyConfig.allowNetAdmin", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "cluster.autopilot.workload-policy-config.autopilot-compatibility-auditing-enabled" => Some(("cluster.autopilot.workloadPolicyConfig.autopilotCompatibilityAuditingEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "cluster.autoscaling.autoprovisioning-locations" => Some(("cluster.autoscaling.autoprovisioningLocations", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "cluster.autoscaling.autoprovisioning-node-pool-defaults.boot-disk-kms-key" => Some(("cluster.autoscaling.autoprovisioningNodePoolDefaults.bootDiskKmsKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.autoscaling.autoprovisioning-node-pool-defaults.disk-size-gb" => Some(("cluster.autoscaling.autoprovisioningNodePoolDefaults.diskSizeGb", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
@@ -5946,6 +6648,7 @@ where
                     "cluster.autoscaling.autoprovisioning-node-pool-defaults.service-account" => Some(("cluster.autoscaling.autoprovisioningNodePoolDefaults.serviceAccount", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.autoscaling.autoprovisioning-node-pool-defaults.shielded-instance-config.enable-integrity-monitoring" => Some(("cluster.autoscaling.autoprovisioningNodePoolDefaults.shieldedInstanceConfig.enableIntegrityMonitoring", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "cluster.autoscaling.autoprovisioning-node-pool-defaults.shielded-instance-config.enable-secure-boot" => Some(("cluster.autoscaling.autoprovisioningNodePoolDefaults.shieldedInstanceConfig.enableSecureBoot", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "cluster.autoscaling.autoprovisioning-node-pool-defaults.upgrade-settings.blue-green-settings.autoscaled-rollout-policy.wait-for-drain-duration" => Some(("cluster.autoscaling.autoprovisioningNodePoolDefaults.upgradeSettings.blueGreenSettings.autoscaledRolloutPolicy.waitForDrainDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.autoscaling.autoprovisioning-node-pool-defaults.upgrade-settings.blue-green-settings.node-pool-soak-duration" => Some(("cluster.autoscaling.autoprovisioningNodePoolDefaults.upgradeSettings.blueGreenSettings.nodePoolSoakDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.autoscaling.autoprovisioning-node-pool-defaults.upgrade-settings.blue-green-settings.standard-rollout-policy.batch-node-count" => Some(("cluster.autoscaling.autoprovisioningNodePoolDefaults.upgradeSettings.blueGreenSettings.standardRolloutPolicy.batchNodeCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "cluster.autoscaling.autoprovisioning-node-pool-defaults.upgrade-settings.blue-green-settings.standard-rollout-policy.batch-percentage" => Some(("cluster.autoscaling.autoprovisioningNodePoolDefaults.upgradeSettings.blueGreenSettings.standardRolloutPolicy.batchPercentage", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
@@ -5954,11 +6657,27 @@ where
                     "cluster.autoscaling.autoprovisioning-node-pool-defaults.upgrade-settings.max-unavailable" => Some(("cluster.autoscaling.autoprovisioningNodePoolDefaults.upgradeSettings.maxUnavailable", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "cluster.autoscaling.autoprovisioning-node-pool-defaults.upgrade-settings.strategy" => Some(("cluster.autoscaling.autoprovisioningNodePoolDefaults.upgradeSettings.strategy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.autoscaling.autoscaling-profile" => Some(("cluster.autoscaling.autoscalingProfile", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.autoscaling.default-compute-class-config.enabled" => Some(("cluster.autoscaling.defaultComputeClassConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "cluster.autoscaling.enable-node-autoprovisioning" => Some(("cluster.autoscaling.enableNodeAutoprovisioning", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "cluster.binary-authorization.enabled" => Some(("cluster.binaryAuthorization.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "cluster.binary-authorization.evaluation-mode" => Some(("cluster.binaryAuthorization.evaluationMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.cluster-ipv4-cidr" => Some(("cluster.clusterIpv4Cidr", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.compliance-posture-config.mode" => Some(("cluster.compliancePostureConfig.mode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.confidential-nodes.confidential-instance-type" => Some(("cluster.confidentialNodes.confidentialInstanceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.confidential-nodes.enabled" => Some(("cluster.confidentialNodes.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "cluster.control-plane-endpoints-config.dns-endpoint-config.allow-external-traffic" => Some(("cluster.controlPlaneEndpointsConfig.dnsEndpointConfig.allowExternalTraffic", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "cluster.control-plane-endpoints-config.dns-endpoint-config.enable-k8s-certs-via-dns" => Some(("cluster.controlPlaneEndpointsConfig.dnsEndpointConfig.enableK8sCertsViaDns", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "cluster.control-plane-endpoints-config.dns-endpoint-config.enable-k8s-tokens-via-dns" => Some(("cluster.controlPlaneEndpointsConfig.dnsEndpointConfig.enableK8sTokensViaDns", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "cluster.control-plane-endpoints-config.dns-endpoint-config.endpoint" => Some(("cluster.controlPlaneEndpointsConfig.dnsEndpointConfig.endpoint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.control-plane-endpoints-config.ip-endpoints-config.authorized-networks-config.enabled" => Some(("cluster.controlPlaneEndpointsConfig.ipEndpointsConfig.authorizedNetworksConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "cluster.control-plane-endpoints-config.ip-endpoints-config.authorized-networks-config.gcp-public-cidrs-access-enabled" => Some(("cluster.controlPlaneEndpointsConfig.ipEndpointsConfig.authorizedNetworksConfig.gcpPublicCidrsAccessEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "cluster.control-plane-endpoints-config.ip-endpoints-config.authorized-networks-config.private-endpoint-enforcement-enabled" => Some(("cluster.controlPlaneEndpointsConfig.ipEndpointsConfig.authorizedNetworksConfig.privateEndpointEnforcementEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "cluster.control-plane-endpoints-config.ip-endpoints-config.enable-public-endpoint" => Some(("cluster.controlPlaneEndpointsConfig.ipEndpointsConfig.enablePublicEndpoint", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "cluster.control-plane-endpoints-config.ip-endpoints-config.enabled" => Some(("cluster.controlPlaneEndpointsConfig.ipEndpointsConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "cluster.control-plane-endpoints-config.ip-endpoints-config.global-access" => Some(("cluster.controlPlaneEndpointsConfig.ipEndpointsConfig.globalAccess", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "cluster.control-plane-endpoints-config.ip-endpoints-config.private-endpoint" => Some(("cluster.controlPlaneEndpointsConfig.ipEndpointsConfig.privateEndpoint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.control-plane-endpoints-config.ip-endpoints-config.private-endpoint-subnetwork" => Some(("cluster.controlPlaneEndpointsConfig.ipEndpointsConfig.privateEndpointSubnetwork", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.control-plane-endpoints-config.ip-endpoints-config.public-endpoint" => Some(("cluster.controlPlaneEndpointsConfig.ipEndpointsConfig.publicEndpoint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.cost-management-config.enabled" => Some(("cluster.costManagementConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "cluster.create-time" => Some(("cluster.createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.current-master-version" => Some(("cluster.currentMasterVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -5975,23 +6694,28 @@ where
                     "cluster.enable-tpu" => Some(("cluster.enableTpu", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "cluster.endpoint" => Some(("cluster.endpoint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.enterprise-config.cluster-tier" => Some(("cluster.enterpriseConfig.clusterTier", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.enterprise-config.desired-tier" => Some(("cluster.enterpriseConfig.desiredTier", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.etag" => Some(("cluster.etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.expire-time" => Some(("cluster.expireTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.fleet.membership" => Some(("cluster.fleet.membership", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.fleet.membership-type" => Some(("cluster.fleet.membershipType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.fleet.pre-registered" => Some(("cluster.fleet.preRegistered", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "cluster.fleet.project" => Some(("cluster.fleet.project", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.gke-auto-upgrade-config.patch-mode" => Some(("cluster.gkeAutoUpgradeConfig.patchMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.id" => Some(("cluster.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.identity-service-config.enabled" => Some(("cluster.identityServiceConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "cluster.initial-cluster-version" => Some(("cluster.initialClusterVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.initial-node-count" => Some(("cluster.initialNodeCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "cluster.instance-group-urls" => Some(("cluster.instanceGroupUrls", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "cluster.ip-allocation-policy.additional-pod-ranges-config.pod-range-names" => Some(("cluster.ipAllocationPolicy.additionalPodRangesConfig.podRangeNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "cluster.ip-allocation-policy.auto-ipam-config.enabled" => Some(("cluster.ipAllocationPolicy.autoIpamConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "cluster.ip-allocation-policy.cluster-ipv4-cidr" => Some(("cluster.ipAllocationPolicy.clusterIpv4Cidr", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.ip-allocation-policy.cluster-ipv4-cidr-block" => Some(("cluster.ipAllocationPolicy.clusterIpv4CidrBlock", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.ip-allocation-policy.cluster-secondary-range-name" => Some(("cluster.ipAllocationPolicy.clusterSecondaryRangeName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.ip-allocation-policy.create-subnetwork" => Some(("cluster.ipAllocationPolicy.createSubnetwork", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "cluster.ip-allocation-policy.default-pod-ipv4-range-utilization" => Some(("cluster.ipAllocationPolicy.defaultPodIpv4RangeUtilization", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "cluster.ip-allocation-policy.ipv6-access-type" => Some(("cluster.ipAllocationPolicy.ipv6AccessType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.ip-allocation-policy.network-tier-config.network-tier" => Some(("cluster.ipAllocationPolicy.networkTierConfig.networkTier", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.ip-allocation-policy.node-ipv4-cidr" => Some(("cluster.ipAllocationPolicy.nodeIpv4Cidr", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.ip-allocation-policy.node-ipv4-cidr-block" => Some(("cluster.ipAllocationPolicy.nodeIpv4CidrBlock", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.ip-allocation-policy.pod-cidr-overprovision-config.disable" => Some(("cluster.ipAllocationPolicy.podCidrOverprovisionConfig.disable", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -6016,8 +6740,10 @@ where
                     "cluster.maintenance-policy.window.daily-maintenance-window.start-time" => Some(("cluster.maintenancePolicy.window.dailyMaintenanceWindow.startTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.maintenance-policy.window.recurring-window.recurrence" => Some(("cluster.maintenancePolicy.window.recurringWindow.recurrence", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.maintenance-policy.window.recurring-window.window.end-time" => Some(("cluster.maintenancePolicy.window.recurringWindow.window.endTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.maintenance-policy.window.recurring-window.window.maintenance-exclusion-options.end-time-behavior" => Some(("cluster.maintenancePolicy.window.recurringWindow.window.maintenanceExclusionOptions.endTimeBehavior", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.maintenance-policy.window.recurring-window.window.maintenance-exclusion-options.scope" => Some(("cluster.maintenancePolicy.window.recurringWindow.window.maintenanceExclusionOptions.scope", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.maintenance-policy.window.recurring-window.window.start-time" => Some(("cluster.maintenancePolicy.window.recurringWindow.window.startTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.managed-opentelemetry-config.scope" => Some(("cluster.managedOpentelemetryConfig.scope", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.master-auth.client-certificate" => Some(("cluster.masterAuth.clientCertificate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.master-auth.client-certificate-config.issue-client-certificate" => Some(("cluster.masterAuth.clientCertificateConfig.issueClientCertificate", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "cluster.master-auth.client-key" => Some(("cluster.masterAuth.clientKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -6026,17 +6752,21 @@ where
                     "cluster.master-auth.username" => Some(("cluster.masterAuth.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.master-authorized-networks-config.enabled" => Some(("cluster.masterAuthorizedNetworksConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "cluster.master-authorized-networks-config.gcp-public-cidrs-access-enabled" => Some(("cluster.masterAuthorizedNetworksConfig.gcpPublicCidrsAccessEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "cluster.master-authorized-networks-config.private-endpoint-enforcement-enabled" => Some(("cluster.masterAuthorizedNetworksConfig.privateEndpointEnforcementEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "cluster.mesh-certificates.enable-certificates" => Some(("cluster.meshCertificates.enableCertificates", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "cluster.monitoring-config.advanced-datapath-observability-config.enable-metrics" => Some(("cluster.monitoringConfig.advancedDatapathObservabilityConfig.enableMetrics", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "cluster.monitoring-config.advanced-datapath-observability-config.enable-relay" => Some(("cluster.monitoringConfig.advancedDatapathObservabilityConfig.enableRelay", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "cluster.monitoring-config.advanced-datapath-observability-config.relay-mode" => Some(("cluster.monitoringConfig.advancedDatapathObservabilityConfig.relayMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.monitoring-config.component-config.enable-components" => Some(("cluster.monitoringConfig.componentConfig.enableComponents", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "cluster.monitoring-config.managed-prometheus-config.auto-monitoring-config.scope" => Some(("cluster.monitoringConfig.managedPrometheusConfig.autoMonitoringConfig.scope", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.monitoring-config.managed-prometheus-config.enabled" => Some(("cluster.monitoringConfig.managedPrometheusConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "cluster.monitoring-service" => Some(("cluster.monitoringService", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.name" => Some(("cluster.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.network" => Some(("cluster.network", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.network-config.datapath-provider" => Some(("cluster.networkConfig.datapathProvider", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.network-config.default-enable-private-nodes" => Some(("cluster.networkConfig.defaultEnablePrivateNodes", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "cluster.network-config.default-snat-status.disabled" => Some(("cluster.networkConfig.defaultSnatStatus.disabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "cluster.network-config.disable-l4-lb-firewall-reconciliation" => Some(("cluster.networkConfig.disableL4LbFirewallReconciliation", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "cluster.network-config.dns-config.additive-vpc-scope-dns-domain" => Some(("cluster.networkConfig.dnsConfig.additiveVpcScopeDnsDomain", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.network-config.dns-config.cluster-dns" => Some(("cluster.networkConfig.dnsConfig.clusterDns", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.network-config.dns-config.cluster-dns-domain" => Some(("cluster.networkConfig.dnsConfig.clusterDnsDomain", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -6056,32 +6786,78 @@ where
                     "cluster.network-policy.enabled" => Some(("cluster.networkPolicy.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "cluster.network-policy.provider" => Some(("cluster.networkPolicy.provider", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.node-config.advanced-machine-features.enable-nested-virtualization" => Some(("cluster.nodeConfig.advancedMachineFeatures.enableNestedVirtualization", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "cluster.node-config.advanced-machine-features.performance-monitoring-unit" => Some(("cluster.nodeConfig.advancedMachineFeatures.performanceMonitoringUnit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.node-config.advanced-machine-features.threads-per-core" => Some(("cluster.nodeConfig.advancedMachineFeatures.threadsPerCore", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-config.boot-disk.disk-type" => Some(("cluster.nodeConfig.bootDisk.diskType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-config.boot-disk.provisioned-iops" => Some(("cluster.nodeConfig.bootDisk.provisionedIops", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-config.boot-disk.provisioned-throughput" => Some(("cluster.nodeConfig.bootDisk.provisionedThroughput", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-config.boot-disk.size-gb" => Some(("cluster.nodeConfig.bootDisk.sizeGb", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.node-config.boot-disk-kms-key" => Some(("cluster.nodeConfig.bootDiskKmsKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-config.confidential-nodes.confidential-instance-type" => Some(("cluster.nodeConfig.confidentialNodes.confidentialInstanceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.node-config.confidential-nodes.enabled" => Some(("cluster.nodeConfig.confidentialNodes.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "cluster.node-config.containerd-config.private-registry-access-config.enabled" => Some(("cluster.nodeConfig.containerdConfig.privateRegistryAccessConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "cluster.node-config.containerd-config.writable-cgroups.enabled" => Some(("cluster.nodeConfig.containerdConfig.writableCgroups.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "cluster.node-config.disk-size-gb" => Some(("cluster.nodeConfig.diskSizeGb", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "cluster.node-config.disk-type" => Some(("cluster.nodeConfig.diskType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-config.effective-cgroup-mode" => Some(("cluster.nodeConfig.effectiveCgroupMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.node-config.enable-confidential-storage" => Some(("cluster.nodeConfig.enableConfidentialStorage", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "cluster.node-config.ephemeral-storage-local-ssd-config.data-cache-count" => Some(("cluster.nodeConfig.ephemeralStorageLocalSsdConfig.dataCacheCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "cluster.node-config.ephemeral-storage-local-ssd-config.local-ssd-count" => Some(("cluster.nodeConfig.ephemeralStorageLocalSsdConfig.localSsdCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "cluster.node-config.fast-socket.enabled" => Some(("cluster.nodeConfig.fastSocket.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "cluster.node-config.flex-start" => Some(("cluster.nodeConfig.flexStart", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "cluster.node-config.gcfs-config.enabled" => Some(("cluster.nodeConfig.gcfsConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "cluster.node-config.gvnic.enabled" => Some(("cluster.nodeConfig.gvnic.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "cluster.node-config.image-type" => Some(("cluster.nodeConfig.imageType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-config.kubelet-config.allowed-unsafe-sysctls" => Some(("cluster.nodeConfig.kubeletConfig.allowedUnsafeSysctls", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "cluster.node-config.kubelet-config.container-log-max-files" => Some(("cluster.nodeConfig.kubeletConfig.containerLogMaxFiles", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "cluster.node-config.kubelet-config.container-log-max-size" => Some(("cluster.nodeConfig.kubeletConfig.containerLogMaxSize", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.node-config.kubelet-config.cpu-cfs-quota" => Some(("cluster.nodeConfig.kubeletConfig.cpuCfsQuota", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "cluster.node-config.kubelet-config.cpu-cfs-quota-period" => Some(("cluster.nodeConfig.kubeletConfig.cpuCfsQuotaPeriod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.node-config.kubelet-config.cpu-manager-policy" => Some(("cluster.nodeConfig.kubeletConfig.cpuManagerPolicy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-config.kubelet-config.eviction-max-pod-grace-period-seconds" => Some(("cluster.nodeConfig.kubeletConfig.evictionMaxPodGracePeriodSeconds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "cluster.node-config.kubelet-config.eviction-minimum-reclaim.imagefs-available" => Some(("cluster.nodeConfig.kubeletConfig.evictionMinimumReclaim.imagefsAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-config.kubelet-config.eviction-minimum-reclaim.imagefs-inodes-free" => Some(("cluster.nodeConfig.kubeletConfig.evictionMinimumReclaim.imagefsInodesFree", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-config.kubelet-config.eviction-minimum-reclaim.memory-available" => Some(("cluster.nodeConfig.kubeletConfig.evictionMinimumReclaim.memoryAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-config.kubelet-config.eviction-minimum-reclaim.nodefs-available" => Some(("cluster.nodeConfig.kubeletConfig.evictionMinimumReclaim.nodefsAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-config.kubelet-config.eviction-minimum-reclaim.nodefs-inodes-free" => Some(("cluster.nodeConfig.kubeletConfig.evictionMinimumReclaim.nodefsInodesFree", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-config.kubelet-config.eviction-minimum-reclaim.pid-available" => Some(("cluster.nodeConfig.kubeletConfig.evictionMinimumReclaim.pidAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-config.kubelet-config.eviction-soft.imagefs-available" => Some(("cluster.nodeConfig.kubeletConfig.evictionSoft.imagefsAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-config.kubelet-config.eviction-soft.imagefs-inodes-free" => Some(("cluster.nodeConfig.kubeletConfig.evictionSoft.imagefsInodesFree", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-config.kubelet-config.eviction-soft.memory-available" => Some(("cluster.nodeConfig.kubeletConfig.evictionSoft.memoryAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-config.kubelet-config.eviction-soft.nodefs-available" => Some(("cluster.nodeConfig.kubeletConfig.evictionSoft.nodefsAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-config.kubelet-config.eviction-soft.nodefs-inodes-free" => Some(("cluster.nodeConfig.kubeletConfig.evictionSoft.nodefsInodesFree", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-config.kubelet-config.eviction-soft.pid-available" => Some(("cluster.nodeConfig.kubeletConfig.evictionSoft.pidAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-config.kubelet-config.eviction-soft-grace-period.imagefs-available" => Some(("cluster.nodeConfig.kubeletConfig.evictionSoftGracePeriod.imagefsAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-config.kubelet-config.eviction-soft-grace-period.imagefs-inodes-free" => Some(("cluster.nodeConfig.kubeletConfig.evictionSoftGracePeriod.imagefsInodesFree", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-config.kubelet-config.eviction-soft-grace-period.memory-available" => Some(("cluster.nodeConfig.kubeletConfig.evictionSoftGracePeriod.memoryAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-config.kubelet-config.eviction-soft-grace-period.nodefs-available" => Some(("cluster.nodeConfig.kubeletConfig.evictionSoftGracePeriod.nodefsAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-config.kubelet-config.eviction-soft-grace-period.nodefs-inodes-free" => Some(("cluster.nodeConfig.kubeletConfig.evictionSoftGracePeriod.nodefsInodesFree", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-config.kubelet-config.eviction-soft-grace-period.pid-available" => Some(("cluster.nodeConfig.kubeletConfig.evictionSoftGracePeriod.pidAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-config.kubelet-config.image-gc-high-threshold-percent" => Some(("cluster.nodeConfig.kubeletConfig.imageGcHighThresholdPercent", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "cluster.node-config.kubelet-config.image-gc-low-threshold-percent" => Some(("cluster.nodeConfig.kubeletConfig.imageGcLowThresholdPercent", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "cluster.node-config.kubelet-config.image-maximum-gc-age" => Some(("cluster.nodeConfig.kubeletConfig.imageMaximumGcAge", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-config.kubelet-config.image-minimum-gc-age" => Some(("cluster.nodeConfig.kubeletConfig.imageMinimumGcAge", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.node-config.kubelet-config.insecure-kubelet-readonly-port-enabled" => Some(("cluster.nodeConfig.kubeletConfig.insecureKubeletReadonlyPortEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "cluster.node-config.kubelet-config.max-parallel-image-pulls" => Some(("cluster.nodeConfig.kubeletConfig.maxParallelImagePulls", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "cluster.node-config.kubelet-config.memory-manager.policy" => Some(("cluster.nodeConfig.kubeletConfig.memoryManager.policy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.node-config.kubelet-config.pod-pids-limit" => Some(("cluster.nodeConfig.kubeletConfig.podPidsLimit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-config.kubelet-config.single-process-oom-kill" => Some(("cluster.nodeConfig.kubeletConfig.singleProcessOomKill", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "cluster.node-config.kubelet-config.topology-manager.policy" => Some(("cluster.nodeConfig.kubeletConfig.topologyManager.policy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-config.kubelet-config.topology-manager.scope" => Some(("cluster.nodeConfig.kubeletConfig.topologyManager.scope", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.node-config.labels" => Some(("cluster.nodeConfig.labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "cluster.node-config.linux-node-config.cgroup-mode" => Some(("cluster.nodeConfig.linuxNodeConfig.cgroupMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.node-config.linux-node-config.hugepages.hugepage-size1g" => Some(("cluster.nodeConfig.linuxNodeConfig.hugepages.hugepageSize1g", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "cluster.node-config.linux-node-config.hugepages.hugepage-size2m" => Some(("cluster.nodeConfig.linuxNodeConfig.hugepages.hugepageSize2m", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "cluster.node-config.linux-node-config.node-kernel-module-loading.policy" => Some(("cluster.nodeConfig.linuxNodeConfig.nodeKernelModuleLoading.policy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.node-config.linux-node-config.sysctls" => Some(("cluster.nodeConfig.linuxNodeConfig.sysctls", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "cluster.node-config.linux-node-config.transparent-hugepage-defrag" => Some(("cluster.nodeConfig.linuxNodeConfig.transparentHugepageDefrag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-config.linux-node-config.transparent-hugepage-enabled" => Some(("cluster.nodeConfig.linuxNodeConfig.transparentHugepageEnabled", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.node-config.local-nvme-ssd-block-config.local-ssd-count" => Some(("cluster.nodeConfig.localNvmeSsdBlockConfig.localSsdCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "cluster.node-config.local-ssd-count" => Some(("cluster.nodeConfig.localSsdCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "cluster.node-config.local-ssd-encryption-mode" => Some(("cluster.nodeConfig.localSsdEncryptionMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.node-config.logging-config.variant-config.variant" => Some(("cluster.nodeConfig.loggingConfig.variantConfig.variant", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.node-config.machine-type" => Some(("cluster.nodeConfig.machineType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-config.max-run-duration" => Some(("cluster.nodeConfig.maxRunDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.node-config.metadata" => Some(("cluster.nodeConfig.metadata", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "cluster.node-config.min-cpu-platform" => Some(("cluster.nodeConfig.minCpuPlatform", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.node-config.node-group" => Some(("cluster.nodeConfig.nodeGroup", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -6096,31 +6872,104 @@ where
                     "cluster.node-config.service-account" => Some(("cluster.nodeConfig.serviceAccount", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.node-config.shielded-instance-config.enable-integrity-monitoring" => Some(("cluster.nodeConfig.shieldedInstanceConfig.enableIntegrityMonitoring", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "cluster.node-config.shielded-instance-config.enable-secure-boot" => Some(("cluster.nodeConfig.shieldedInstanceConfig.enableSecureBoot", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "cluster.node-config.sole-tenant-config.min-node-cpus" => Some(("cluster.nodeConfig.soleTenantConfig.minNodeCpus", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "cluster.node-config.spot" => Some(("cluster.nodeConfig.spot", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "cluster.node-config.storage-pools" => Some(("cluster.nodeConfig.storagePools", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "cluster.node-config.tags" => Some(("cluster.nodeConfig.tags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "cluster.node-config.windows-node-config.os-version" => Some(("cluster.nodeConfig.windowsNodeConfig.osVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.node-config.workload-metadata-config.mode" => Some(("cluster.nodeConfig.workloadMetadataConfig.mode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.node-ipv4-cidr-size" => Some(("cluster.nodeIpv4CidrSize", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-auto-config.linux-node-config.cgroup-mode" => Some(("cluster.nodePoolAutoConfig.linuxNodeConfig.cgroupMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-auto-config.linux-node-config.hugepages.hugepage-size1g" => Some(("cluster.nodePoolAutoConfig.linuxNodeConfig.hugepages.hugepageSize1g", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-auto-config.linux-node-config.hugepages.hugepage-size2m" => Some(("cluster.nodePoolAutoConfig.linuxNodeConfig.hugepages.hugepageSize2m", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-auto-config.linux-node-config.node-kernel-module-loading.policy" => Some(("cluster.nodePoolAutoConfig.linuxNodeConfig.nodeKernelModuleLoading.policy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-auto-config.linux-node-config.sysctls" => Some(("cluster.nodePoolAutoConfig.linuxNodeConfig.sysctls", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "cluster.node-pool-auto-config.linux-node-config.transparent-hugepage-defrag" => Some(("cluster.nodePoolAutoConfig.linuxNodeConfig.transparentHugepageDefrag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-auto-config.linux-node-config.transparent-hugepage-enabled" => Some(("cluster.nodePoolAutoConfig.linuxNodeConfig.transparentHugepageEnabled", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.node-pool-auto-config.network-tags.tags" => Some(("cluster.nodePoolAutoConfig.networkTags.tags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "cluster.node-pool-auto-config.node-kubelet-config.allowed-unsafe-sysctls" => Some(("cluster.nodePoolAutoConfig.nodeKubeletConfig.allowedUnsafeSysctls", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "cluster.node-pool-auto-config.node-kubelet-config.container-log-max-files" => Some(("cluster.nodePoolAutoConfig.nodeKubeletConfig.containerLogMaxFiles", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-auto-config.node-kubelet-config.container-log-max-size" => Some(("cluster.nodePoolAutoConfig.nodeKubeletConfig.containerLogMaxSize", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.node-pool-auto-config.node-kubelet-config.cpu-cfs-quota" => Some(("cluster.nodePoolAutoConfig.nodeKubeletConfig.cpuCfsQuota", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "cluster.node-pool-auto-config.node-kubelet-config.cpu-cfs-quota-period" => Some(("cluster.nodePoolAutoConfig.nodeKubeletConfig.cpuCfsQuotaPeriod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.node-pool-auto-config.node-kubelet-config.cpu-manager-policy" => Some(("cluster.nodePoolAutoConfig.nodeKubeletConfig.cpuManagerPolicy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-auto-config.node-kubelet-config.eviction-max-pod-grace-period-seconds" => Some(("cluster.nodePoolAutoConfig.nodeKubeletConfig.evictionMaxPodGracePeriodSeconds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-auto-config.node-kubelet-config.eviction-minimum-reclaim.imagefs-available" => Some(("cluster.nodePoolAutoConfig.nodeKubeletConfig.evictionMinimumReclaim.imagefsAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-auto-config.node-kubelet-config.eviction-minimum-reclaim.imagefs-inodes-free" => Some(("cluster.nodePoolAutoConfig.nodeKubeletConfig.evictionMinimumReclaim.imagefsInodesFree", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-auto-config.node-kubelet-config.eviction-minimum-reclaim.memory-available" => Some(("cluster.nodePoolAutoConfig.nodeKubeletConfig.evictionMinimumReclaim.memoryAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-auto-config.node-kubelet-config.eviction-minimum-reclaim.nodefs-available" => Some(("cluster.nodePoolAutoConfig.nodeKubeletConfig.evictionMinimumReclaim.nodefsAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-auto-config.node-kubelet-config.eviction-minimum-reclaim.nodefs-inodes-free" => Some(("cluster.nodePoolAutoConfig.nodeKubeletConfig.evictionMinimumReclaim.nodefsInodesFree", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-auto-config.node-kubelet-config.eviction-minimum-reclaim.pid-available" => Some(("cluster.nodePoolAutoConfig.nodeKubeletConfig.evictionMinimumReclaim.pidAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-auto-config.node-kubelet-config.eviction-soft.imagefs-available" => Some(("cluster.nodePoolAutoConfig.nodeKubeletConfig.evictionSoft.imagefsAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-auto-config.node-kubelet-config.eviction-soft.imagefs-inodes-free" => Some(("cluster.nodePoolAutoConfig.nodeKubeletConfig.evictionSoft.imagefsInodesFree", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-auto-config.node-kubelet-config.eviction-soft.memory-available" => Some(("cluster.nodePoolAutoConfig.nodeKubeletConfig.evictionSoft.memoryAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-auto-config.node-kubelet-config.eviction-soft.nodefs-available" => Some(("cluster.nodePoolAutoConfig.nodeKubeletConfig.evictionSoft.nodefsAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-auto-config.node-kubelet-config.eviction-soft.nodefs-inodes-free" => Some(("cluster.nodePoolAutoConfig.nodeKubeletConfig.evictionSoft.nodefsInodesFree", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-auto-config.node-kubelet-config.eviction-soft.pid-available" => Some(("cluster.nodePoolAutoConfig.nodeKubeletConfig.evictionSoft.pidAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-auto-config.node-kubelet-config.eviction-soft-grace-period.imagefs-available" => Some(("cluster.nodePoolAutoConfig.nodeKubeletConfig.evictionSoftGracePeriod.imagefsAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-auto-config.node-kubelet-config.eviction-soft-grace-period.imagefs-inodes-free" => Some(("cluster.nodePoolAutoConfig.nodeKubeletConfig.evictionSoftGracePeriod.imagefsInodesFree", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-auto-config.node-kubelet-config.eviction-soft-grace-period.memory-available" => Some(("cluster.nodePoolAutoConfig.nodeKubeletConfig.evictionSoftGracePeriod.memoryAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-auto-config.node-kubelet-config.eviction-soft-grace-period.nodefs-available" => Some(("cluster.nodePoolAutoConfig.nodeKubeletConfig.evictionSoftGracePeriod.nodefsAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-auto-config.node-kubelet-config.eviction-soft-grace-period.nodefs-inodes-free" => Some(("cluster.nodePoolAutoConfig.nodeKubeletConfig.evictionSoftGracePeriod.nodefsInodesFree", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-auto-config.node-kubelet-config.eviction-soft-grace-period.pid-available" => Some(("cluster.nodePoolAutoConfig.nodeKubeletConfig.evictionSoftGracePeriod.pidAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-auto-config.node-kubelet-config.image-gc-high-threshold-percent" => Some(("cluster.nodePoolAutoConfig.nodeKubeletConfig.imageGcHighThresholdPercent", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-auto-config.node-kubelet-config.image-gc-low-threshold-percent" => Some(("cluster.nodePoolAutoConfig.nodeKubeletConfig.imageGcLowThresholdPercent", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-auto-config.node-kubelet-config.image-maximum-gc-age" => Some(("cluster.nodePoolAutoConfig.nodeKubeletConfig.imageMaximumGcAge", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-auto-config.node-kubelet-config.image-minimum-gc-age" => Some(("cluster.nodePoolAutoConfig.nodeKubeletConfig.imageMinimumGcAge", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.node-pool-auto-config.node-kubelet-config.insecure-kubelet-readonly-port-enabled" => Some(("cluster.nodePoolAutoConfig.nodeKubeletConfig.insecureKubeletReadonlyPortEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-auto-config.node-kubelet-config.max-parallel-image-pulls" => Some(("cluster.nodePoolAutoConfig.nodeKubeletConfig.maxParallelImagePulls", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-auto-config.node-kubelet-config.memory-manager.policy" => Some(("cluster.nodePoolAutoConfig.nodeKubeletConfig.memoryManager.policy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.node-pool-auto-config.node-kubelet-config.pod-pids-limit" => Some(("cluster.nodePoolAutoConfig.nodeKubeletConfig.podPidsLimit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-auto-config.node-kubelet-config.single-process-oom-kill" => Some(("cluster.nodePoolAutoConfig.nodeKubeletConfig.singleProcessOomKill", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-auto-config.node-kubelet-config.topology-manager.policy" => Some(("cluster.nodePoolAutoConfig.nodeKubeletConfig.topologyManager.policy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-auto-config.node-kubelet-config.topology-manager.scope" => Some(("cluster.nodePoolAutoConfig.nodeKubeletConfig.topologyManager.scope", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.node-pool-auto-config.resource-manager-tags.tags" => Some(("cluster.nodePoolAutoConfig.resourceManagerTags.tags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "cluster.node-pool-defaults.node-config-defaults.containerd-config.private-registry-access-config.enabled" => Some(("cluster.nodePoolDefaults.nodeConfigDefaults.containerdConfig.privateRegistryAccessConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-defaults.node-config-defaults.containerd-config.writable-cgroups.enabled" => Some(("cluster.nodePoolDefaults.nodeConfigDefaults.containerdConfig.writableCgroups.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "cluster.node-pool-defaults.node-config-defaults.gcfs-config.enabled" => Some(("cluster.nodePoolDefaults.nodeConfigDefaults.gcfsConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "cluster.node-pool-defaults.node-config-defaults.logging-config.variant-config.variant" => Some(("cluster.nodePoolDefaults.nodeConfigDefaults.loggingConfig.variantConfig.variant", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-defaults.node-config-defaults.node-kubelet-config.allowed-unsafe-sysctls" => Some(("cluster.nodePoolDefaults.nodeConfigDefaults.nodeKubeletConfig.allowedUnsafeSysctls", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "cluster.node-pool-defaults.node-config-defaults.node-kubelet-config.container-log-max-files" => Some(("cluster.nodePoolDefaults.nodeConfigDefaults.nodeKubeletConfig.containerLogMaxFiles", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-defaults.node-config-defaults.node-kubelet-config.container-log-max-size" => Some(("cluster.nodePoolDefaults.nodeConfigDefaults.nodeKubeletConfig.containerLogMaxSize", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.node-pool-defaults.node-config-defaults.node-kubelet-config.cpu-cfs-quota" => Some(("cluster.nodePoolDefaults.nodeConfigDefaults.nodeKubeletConfig.cpuCfsQuota", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "cluster.node-pool-defaults.node-config-defaults.node-kubelet-config.cpu-cfs-quota-period" => Some(("cluster.nodePoolDefaults.nodeConfigDefaults.nodeKubeletConfig.cpuCfsQuotaPeriod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.node-pool-defaults.node-config-defaults.node-kubelet-config.cpu-manager-policy" => Some(("cluster.nodePoolDefaults.nodeConfigDefaults.nodeKubeletConfig.cpuManagerPolicy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-defaults.node-config-defaults.node-kubelet-config.eviction-max-pod-grace-period-seconds" => Some(("cluster.nodePoolDefaults.nodeConfigDefaults.nodeKubeletConfig.evictionMaxPodGracePeriodSeconds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-defaults.node-config-defaults.node-kubelet-config.eviction-minimum-reclaim.imagefs-available" => Some(("cluster.nodePoolDefaults.nodeConfigDefaults.nodeKubeletConfig.evictionMinimumReclaim.imagefsAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-defaults.node-config-defaults.node-kubelet-config.eviction-minimum-reclaim.imagefs-inodes-free" => Some(("cluster.nodePoolDefaults.nodeConfigDefaults.nodeKubeletConfig.evictionMinimumReclaim.imagefsInodesFree", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-defaults.node-config-defaults.node-kubelet-config.eviction-minimum-reclaim.memory-available" => Some(("cluster.nodePoolDefaults.nodeConfigDefaults.nodeKubeletConfig.evictionMinimumReclaim.memoryAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-defaults.node-config-defaults.node-kubelet-config.eviction-minimum-reclaim.nodefs-available" => Some(("cluster.nodePoolDefaults.nodeConfigDefaults.nodeKubeletConfig.evictionMinimumReclaim.nodefsAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-defaults.node-config-defaults.node-kubelet-config.eviction-minimum-reclaim.nodefs-inodes-free" => Some(("cluster.nodePoolDefaults.nodeConfigDefaults.nodeKubeletConfig.evictionMinimumReclaim.nodefsInodesFree", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-defaults.node-config-defaults.node-kubelet-config.eviction-minimum-reclaim.pid-available" => Some(("cluster.nodePoolDefaults.nodeConfigDefaults.nodeKubeletConfig.evictionMinimumReclaim.pidAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-defaults.node-config-defaults.node-kubelet-config.eviction-soft.imagefs-available" => Some(("cluster.nodePoolDefaults.nodeConfigDefaults.nodeKubeletConfig.evictionSoft.imagefsAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-defaults.node-config-defaults.node-kubelet-config.eviction-soft.imagefs-inodes-free" => Some(("cluster.nodePoolDefaults.nodeConfigDefaults.nodeKubeletConfig.evictionSoft.imagefsInodesFree", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-defaults.node-config-defaults.node-kubelet-config.eviction-soft.memory-available" => Some(("cluster.nodePoolDefaults.nodeConfigDefaults.nodeKubeletConfig.evictionSoft.memoryAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-defaults.node-config-defaults.node-kubelet-config.eviction-soft.nodefs-available" => Some(("cluster.nodePoolDefaults.nodeConfigDefaults.nodeKubeletConfig.evictionSoft.nodefsAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-defaults.node-config-defaults.node-kubelet-config.eviction-soft.nodefs-inodes-free" => Some(("cluster.nodePoolDefaults.nodeConfigDefaults.nodeKubeletConfig.evictionSoft.nodefsInodesFree", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-defaults.node-config-defaults.node-kubelet-config.eviction-soft.pid-available" => Some(("cluster.nodePoolDefaults.nodeConfigDefaults.nodeKubeletConfig.evictionSoft.pidAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-defaults.node-config-defaults.node-kubelet-config.eviction-soft-grace-period.imagefs-available" => Some(("cluster.nodePoolDefaults.nodeConfigDefaults.nodeKubeletConfig.evictionSoftGracePeriod.imagefsAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-defaults.node-config-defaults.node-kubelet-config.eviction-soft-grace-period.imagefs-inodes-free" => Some(("cluster.nodePoolDefaults.nodeConfigDefaults.nodeKubeletConfig.evictionSoftGracePeriod.imagefsInodesFree", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-defaults.node-config-defaults.node-kubelet-config.eviction-soft-grace-period.memory-available" => Some(("cluster.nodePoolDefaults.nodeConfigDefaults.nodeKubeletConfig.evictionSoftGracePeriod.memoryAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-defaults.node-config-defaults.node-kubelet-config.eviction-soft-grace-period.nodefs-available" => Some(("cluster.nodePoolDefaults.nodeConfigDefaults.nodeKubeletConfig.evictionSoftGracePeriod.nodefsAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-defaults.node-config-defaults.node-kubelet-config.eviction-soft-grace-period.nodefs-inodes-free" => Some(("cluster.nodePoolDefaults.nodeConfigDefaults.nodeKubeletConfig.evictionSoftGracePeriod.nodefsInodesFree", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-defaults.node-config-defaults.node-kubelet-config.eviction-soft-grace-period.pid-available" => Some(("cluster.nodePoolDefaults.nodeConfigDefaults.nodeKubeletConfig.evictionSoftGracePeriod.pidAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-defaults.node-config-defaults.node-kubelet-config.image-gc-high-threshold-percent" => Some(("cluster.nodePoolDefaults.nodeConfigDefaults.nodeKubeletConfig.imageGcHighThresholdPercent", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-defaults.node-config-defaults.node-kubelet-config.image-gc-low-threshold-percent" => Some(("cluster.nodePoolDefaults.nodeConfigDefaults.nodeKubeletConfig.imageGcLowThresholdPercent", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-defaults.node-config-defaults.node-kubelet-config.image-maximum-gc-age" => Some(("cluster.nodePoolDefaults.nodeConfigDefaults.nodeKubeletConfig.imageMaximumGcAge", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-defaults.node-config-defaults.node-kubelet-config.image-minimum-gc-age" => Some(("cluster.nodePoolDefaults.nodeConfigDefaults.nodeKubeletConfig.imageMinimumGcAge", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.node-pool-defaults.node-config-defaults.node-kubelet-config.insecure-kubelet-readonly-port-enabled" => Some(("cluster.nodePoolDefaults.nodeConfigDefaults.nodeKubeletConfig.insecureKubeletReadonlyPortEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-defaults.node-config-defaults.node-kubelet-config.max-parallel-image-pulls" => Some(("cluster.nodePoolDefaults.nodeConfigDefaults.nodeKubeletConfig.maxParallelImagePulls", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-defaults.node-config-defaults.node-kubelet-config.memory-manager.policy" => Some(("cluster.nodePoolDefaults.nodeConfigDefaults.nodeKubeletConfig.memoryManager.policy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.node-pool-defaults.node-config-defaults.node-kubelet-config.pod-pids-limit" => Some(("cluster.nodePoolDefaults.nodeConfigDefaults.nodeKubeletConfig.podPidsLimit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-defaults.node-config-defaults.node-kubelet-config.single-process-oom-kill" => Some(("cluster.nodePoolDefaults.nodeConfigDefaults.nodeKubeletConfig.singleProcessOomKill", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-defaults.node-config-defaults.node-kubelet-config.topology-manager.policy" => Some(("cluster.nodePoolDefaults.nodeConfigDefaults.nodeKubeletConfig.topologyManager.policy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-pool-defaults.node-config-defaults.node-kubelet-config.topology-manager.scope" => Some(("cluster.nodePoolDefaults.nodeConfigDefaults.nodeKubeletConfig.topologyManager.scope", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.notification-config.pubsub.enabled" => Some(("cluster.notificationConfig.pubsub.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "cluster.notification-config.pubsub.filter.event-type" => Some(("cluster.notificationConfig.pubsub.filter.eventType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "cluster.notification-config.pubsub.topic" => Some(("cluster.notificationConfig.pubsub.topic", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.parent-product-config.labels" => Some(("cluster.parentProductConfig.labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "cluster.parent-product-config.product-name" => Some(("cluster.parentProductConfig.productName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.pod-autoscaling.hpa-profile" => Some(("cluster.podAutoscaling.hpaProfile", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.private-cluster-config.enable-private-endpoint" => Some(("cluster.privateClusterConfig.enablePrivateEndpoint", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "cluster.private-cluster-config.enable-private-nodes" => Some(("cluster.privateClusterConfig.enablePrivateNodes", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "cluster.private-cluster-config.master-global-access-config.enabled" => Some(("cluster.privateClusterConfig.masterGlobalAccessConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -6129,6 +6978,8 @@ where
                     "cluster.private-cluster-config.private-endpoint" => Some(("cluster.privateClusterConfig.privateEndpoint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.private-cluster-config.private-endpoint-subnetwork" => Some(("cluster.privateClusterConfig.privateEndpointSubnetwork", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.private-cluster-config.public-endpoint" => Some(("cluster.privateClusterConfig.publicEndpoint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.rbac-binding-config.enable-insecure-binding-system-authenticated" => Some(("cluster.rbacBindingConfig.enableInsecureBindingSystemAuthenticated", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "cluster.rbac-binding-config.enable-insecure-binding-system-unauthenticated" => Some(("cluster.rbacBindingConfig.enableInsecureBindingSystemUnauthenticated", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "cluster.release-channel.channel" => Some(("cluster.releaseChannel.channel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.resource-labels" => Some(("cluster.resourceLabels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "cluster.resource-usage-export-config.bigquery-destination.dataset-id" => Some(("cluster.resourceUsageExportConfig.bigqueryDestination.datasetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -6136,6 +6987,9 @@ where
                     "cluster.resource-usage-export-config.enable-network-egress-metering" => Some(("cluster.resourceUsageExportConfig.enableNetworkEgressMetering", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "cluster.satisfies-pzi" => Some(("cluster.satisfiesPzi", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "cluster.satisfies-pzs" => Some(("cluster.satisfiesPzs", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "cluster.secret-manager-config.enabled" => Some(("cluster.secretManagerConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "cluster.secret-manager-config.rotation-config.enabled" => Some(("cluster.secretManagerConfig.rotationConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "cluster.secret-manager-config.rotation-config.rotation-interval" => Some(("cluster.secretManagerConfig.rotationConfig.rotationInterval", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.security-posture-config.mode" => Some(("cluster.securityPostureConfig.mode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.security-posture-config.vulnerability-mode" => Some(("cluster.securityPostureConfig.vulnerabilityMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.self-link" => Some(("cluster.selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -6145,6 +6999,15 @@ where
                     "cluster.status-message" => Some(("cluster.statusMessage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.subnetwork" => Some(("cluster.subnetwork", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.tpu-ipv4-cidr-block" => Some(("cluster.tpuIpv4CidrBlock", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.user-managed-keys-config.aggregation-ca" => Some(("cluster.userManagedKeysConfig.aggregationCa", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.user-managed-keys-config.cluster-ca" => Some(("cluster.userManagedKeysConfig.clusterCa", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.user-managed-keys-config.control-plane-disk-encryption-key" => Some(("cluster.userManagedKeysConfig.controlPlaneDiskEncryptionKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.user-managed-keys-config.control-plane-disk-encryption-key-versions" => Some(("cluster.userManagedKeysConfig.controlPlaneDiskEncryptionKeyVersions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "cluster.user-managed-keys-config.etcd-api-ca" => Some(("cluster.userManagedKeysConfig.etcdApiCa", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.user-managed-keys-config.etcd-peer-ca" => Some(("cluster.userManagedKeysConfig.etcdPeerCa", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.user-managed-keys-config.gkeops-etcd-backup-encryption-key" => Some(("cluster.userManagedKeysConfig.gkeopsEtcdBackupEncryptionKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.user-managed-keys-config.service-account-signing-keys" => Some(("cluster.userManagedKeysConfig.serviceAccountSigningKeys", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "cluster.user-managed-keys-config.service-account-verification-keys" => Some(("cluster.userManagedKeysConfig.serviceAccountVerificationKeys", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "cluster.vertical-pod-autoscaling.enabled" => Some(("cluster.verticalPodAutoscaling.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "cluster.workload-identity-config.workload-pool" => Some(("cluster.workloadIdentityConfig.workloadPool", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.zone" => Some(("cluster.zone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -6152,7 +7015,7 @@ where
                     "project-id" => Some(("projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "zone" => Some(("zone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["additional-pod-ranges-config", "additive-vpc-scope-dns-domain", "addons-config", "advanced-datapath-observability-config", "advanced-machine-features", "allow-net-admin", "authenticator-groups-config", "auto-repair", "auto-upgrade", "auto-upgrade-start-time", "autopilot", "autoprovisioning-locations", "autoprovisioning-node-pool-defaults", "autoscaling", "autoscaling-profile", "batch-node-count", "batch-percentage", "batch-soak-duration", "bigquery-destination", "binary-authorization", "blue-green-settings", "boot-disk-kms-key", "cgroup-mode", "channel", "client-certificate", "client-certificate-config", "client-key", "cloud-run-config", "cluster", "cluster-ca-certificate", "cluster-dns", "cluster-dns-domain", "cluster-dns-scope", "cluster-ipv4-cidr", "cluster-ipv4-cidr-block", "cluster-secondary-range-name", "cluster-tier", "component-config", "confidential-nodes", "config-connector-config", "consume-reservation-type", "consumption-metering-config", "containerd-config", "cost-management-config", "cpu-cfs-quota", "cpu-cfs-quota-period", "cpu-manager-policy", "create-subnetwork", "create-time", "current-master-version", "current-node-count", "current-node-version", "current-state", "daily-maintenance-window", "database-encryption", "datapath-provider", "dataset-id", "decryption-keys", "default-max-pods-constraint", "default-pod-ipv4-range-utilization", "default-snat-status", "description", "disable", "disabled", "disk-size-gb", "disk-type", "dns-cache-config", "dns-config", "duration", "enable-certificates", "enable-cilium-clusterwide-network-policy", "enable-components", "enable-confidential-storage", "enable-fqdn-network-policy", "enable-integrity-monitoring", "enable-intra-node-visibility", "enable-k8s-beta-apis", "enable-kubernetes-alpha", "enable-l4ilb-subsetting", "enable-metrics", "enable-multi-networking", "enable-nested-virtualization", "enable-network-egress-metering", "enable-node-autoprovisioning", "enable-private-endpoint", "enable-private-nodes", "enable-relay", "enable-secure-boot", "enable-tpu", "enabled", "enabled-apis", "end-time", "endpoint", "enterprise-config", "ephemeral-storage-local-ssd-config", "etag", "evaluation-mode", "event-type", "expire-time", "fast-socket", "filter", "fleet", "gateway-api-config", "gce-persistent-disk-csi-driver-config", "gcfs-config", "gcp-filestore-csi-driver-config", "gcp-public-cidrs-access-enabled", "gcs-fuse-csi-driver-config", "gke-backup-agent-config", "gvnic", "horizontal-pod-autoscaling", "http-load-balancing", "hugepage-size1g", "hugepage-size2m", "hugepages", "id", "identity-service-config", "image-type", "in-transit-encryption-config", "initial-cluster-version", "initial-node-count", "insecure-kubelet-readonly-port-enabled", "instance-group-urls", "ip-allocation-policy", "ipv6-access-type", "issue-client-certificate", "key", "key-name", "kubelet-config", "kubernetes-dashboard", "label-fingerprint", "labels", "legacy-abac", "linux-node-config", "load-balancer-type", "local-nvme-ssd-block-config", "local-ssd-count", "location", "locations", "logging-config", "logging-service", "machine-type", "maintenance-exclusion-options", "maintenance-policy", "managed-prometheus-config", "management", "master-auth", "master-authorized-networks-config", "master-global-access-config", "master-ipv4-cidr-block", "max-pods-per-node", "max-surge", "max-unavailable", "membership", "mesh-certificates", "metadata", "min-cpu-platform", "mode", "monitoring-config", "monitoring-service", "name", "network", "network-config", "network-performance-config", "network-policy", "network-policy-config", "network-tags", "node-config", "node-config-defaults", "node-group", "node-ipv4-cidr", "node-ipv4-cidr-block", "node-ipv4-cidr-size", "node-kubelet-config", "node-pool-auto-config", "node-pool-defaults", "node-pool-soak-duration", "notification-config", "oauth-scopes", "os-version", "parent", "parent-product-config", "password", "peering-name", "pod-cidr-overprovision-config", "pod-pids-limit", "pod-range-names", "pre-registered", "preemptible", "private-cluster-config", "private-endpoint", "private-endpoint-subnetwork", "private-ipv6-google-access", "private-registry-access-config", "product-name", "project", "project-id", "provider", "public-endpoint", "pubsub", "recurrence", "recurring-window", "relay-mode", "release-channel", "reservation-affinity", "resource-labels", "resource-manager-tags", "resource-usage-export-config", "resource-version", "sandbox-config", "satisfies-pzi", "satisfies-pzs", "scope", "security-group", "security-posture-config", "self-link", "service-account", "service-external-ips-config", "services-ipv4-cidr", "services-ipv4-cidr-block", "services-ipv6-cidr-block", "services-secondary-range-name", "shielded-instance-config", "shielded-nodes", "spot", "stack-type", "standard-rollout-policy", "start-time", "state", "stateful-ha-config", "status", "status-message", "strategy", "subnet-ipv6-cidr-block", "subnetwork", "subnetwork-name", "sysctls", "tags", "threads-per-core", "topic", "total-egress-bandwidth-tier", "tpu-ipv4-cidr-block", "type", "upgrade-options", "upgrade-settings", "use-ip-aliases", "use-routes", "username", "values", "variant", "variant-config", "vertical-pod-autoscaling", "vulnerability-mode", "window", "windows-node-config", "workload-identity-config", "workload-metadata-config", "workload-policy-config", "workload-pool", "zone"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["additional-pod-ranges-config", "additive-vpc-scope-dns-domain", "addons-config", "advanced-datapath-observability-config", "advanced-machine-features", "aggregation-ca", "allow-external-traffic", "allow-net-admin", "allowed-unsafe-sysctls", "allowlist-paths", "alpha-cluster-feature-gates", "anonymous-authentication-config", "authenticator-groups-config", "authorized-networks-config", "auto-ipam-config", "auto-monitoring-config", "auto-repair", "auto-upgrade", "auto-upgrade-start-time", "autopilot", "autopilot-compatibility-auditing-enabled", "autoprovisioning-locations", "autoprovisioning-node-pool-defaults", "autoscaled-rollout-policy", "autoscaling", "autoscaling-profile", "batch-node-count", "batch-percentage", "batch-soak-duration", "bigquery-destination", "binary-authorization", "blue-green-settings", "boot-disk", "boot-disk-kms-key", "cgroup-mode", "channel", "client-certificate", "client-certificate-config", "client-key", "cloud-run-config", "cluster", "cluster-ca", "cluster-ca-certificate", "cluster-dns", "cluster-dns-domain", "cluster-dns-scope", "cluster-ipv4-cidr", "cluster-ipv4-cidr-block", "cluster-secondary-range-name", "cluster-tier", "compliance-posture-config", "component-config", "confidential-instance-type", "confidential-nodes", "config-connector-config", "consume-reservation-type", "consumption-metering-config", "container-log-max-files", "container-log-max-size", "containerd-config", "control-plane-disk-encryption-key", "control-plane-disk-encryption-key-versions", "control-plane-endpoints-config", "cost-management-config", "cpu-cfs-quota", "cpu-cfs-quota-period", "cpu-manager-policy", "create-subnetwork", "create-time", "current-master-version", "current-node-count", "current-node-version", "current-state", "daily-maintenance-window", "data-cache-count", "database-encryption", "datapath-provider", "dataset-id", "decryption-keys", "default-compute-class-config", "default-enable-private-nodes", "default-max-pods-constraint", "default-pod-ipv4-range-utilization", "default-snat-status", "description", "desired-tier", "disable", "disable-l4-lb-firewall-reconciliation", "disabled", "disk-size-gb", "disk-type", "dns-cache-config", "dns-config", "dns-endpoint-config", "duration", "effective-cgroup-mode", "enable-certificates", "enable-cilium-clusterwide-network-policy", "enable-components", "enable-confidential-storage", "enable-fqdn-network-policy", "enable-insecure-binding-system-authenticated", "enable-insecure-binding-system-unauthenticated", "enable-integrity-monitoring", "enable-intra-node-visibility", "enable-k8s-beta-apis", "enable-k8s-certs-via-dns", "enable-k8s-tokens-via-dns", "enable-kubernetes-alpha", "enable-l4ilb-subsetting", "enable-legacy-lustre-port", "enable-metrics", "enable-multi-networking", "enable-nested-virtualization", "enable-network-egress-metering", "enable-node-autoprovisioning", "enable-private-endpoint", "enable-private-nodes", "enable-public-endpoint", "enable-relay", "enable-secure-boot", "enable-tpu", "enabled", "enabled-apis", "end-time", "end-time-behavior", "endpoint", "enterprise-config", "ephemeral-storage-local-ssd-config", "etag", "etcd-api-ca", "etcd-peer-ca", "evaluation-mode", "event-type", "eviction-max-pod-grace-period-seconds", "eviction-minimum-reclaim", "eviction-soft", "eviction-soft-grace-period", "expire-time", "fast-socket", "filter", "fleet", "flex-start", "gateway-api-config", "gce-persistent-disk-csi-driver-config", "gcfs-config", "gcp-filestore-csi-driver-config", "gcp-public-cidrs-access-enabled", "gcs-fuse-csi-driver-config", "gke-auto-upgrade-config", "gke-backup-agent-config", "gkeops-etcd-backup-encryption-key", "global-access", "gvnic", "high-scale-checkpointing-config", "horizontal-pod-autoscaling", "hpa-profile", "http-load-balancing", "hugepage-size1g", "hugepage-size2m", "hugepages", "id", "identity-service-config", "image-gc-high-threshold-percent", "image-gc-low-threshold-percent", "image-maximum-gc-age", "image-minimum-gc-age", "image-type", "imagefs-available", "imagefs-inodes-free", "in-transit-encryption-config", "initial-cluster-version", "initial-node-count", "insecure-kubelet-readonly-port-enabled", "instance-group-urls", "ip-allocation-policy", "ip-endpoints-config", "ipv6-access-type", "issue-client-certificate", "key", "key-name", "kubelet-config", "kubernetes-dashboard", "label-fingerprint", "labels", "legacy-abac", "linux-node-config", "load-balancer-type", "local-nvme-ssd-block-config", "local-ssd-count", "local-ssd-encryption-mode", "location", "locations", "logging-config", "logging-service", "lustre-csi-driver-config", "machine-type", "maintenance-exclusion-options", "maintenance-policy", "managed-opentelemetry-config", "managed-prometheus-config", "management", "master-auth", "master-authorized-networks-config", "master-global-access-config", "master-ipv4-cidr-block", "max-parallel-image-pulls", "max-pods-per-node", "max-run-duration", "max-surge", "max-unavailable", "membership", "membership-type", "memory-available", "memory-manager", "mesh-certificates", "metadata", "min-cpu-platform", "min-node-cpus", "mode", "monitoring-config", "monitoring-service", "name", "network", "network-config", "network-performance-config", "network-policy", "network-policy-config", "network-tags", "network-tier", "network-tier-config", "node-config", "node-config-defaults", "node-group", "node-ipv4-cidr", "node-ipv4-cidr-block", "node-ipv4-cidr-size", "node-kernel-module-loading", "node-kubelet-config", "node-pool-auto-config", "node-pool-defaults", "node-pool-soak-duration", "nodefs-available", "nodefs-inodes-free", "notification-config", "oauth-scopes", "os-version", "parallelstore-csi-driver-config", "parent", "parent-product-config", "password", "patch-mode", "peering-name", "performance-monitoring-unit", "pid-available", "pod-autoscaling", "pod-cidr-overprovision-config", "pod-pids-limit", "pod-range-names", "policy", "pre-registered", "preemptible", "private-cluster-config", "private-endpoint", "private-endpoint-enforcement-enabled", "private-endpoint-subnetwork", "private-ipv6-google-access", "private-registry-access-config", "privileged-admission-config", "product-name", "project", "project-id", "provider", "provisioned-iops", "provisioned-throughput", "public-endpoint", "pubsub", "ray-cluster-logging-config", "ray-cluster-monitoring-config", "ray-operator-config", "rbac-binding-config", "recurrence", "recurring-window", "relay-mode", "release-channel", "reservation-affinity", "resource-labels", "resource-manager-tags", "resource-usage-export-config", "resource-version", "rotation-config", "rotation-interval", "sandbox-config", "satisfies-pzi", "satisfies-pzs", "scope", "secret-manager-config", "security-group", "security-posture-config", "self-link", "service-account", "service-account-signing-keys", "service-account-verification-keys", "service-external-ips-config", "services-ipv4-cidr", "services-ipv4-cidr-block", "services-ipv6-cidr-block", "services-secondary-range-name", "shielded-instance-config", "shielded-nodes", "single-process-oom-kill", "size-gb", "sole-tenant-config", "spot", "stack-type", "standard-rollout-policy", "start-time", "state", "stateful-ha-config", "status", "status-message", "storage-pools", "strategy", "subnet-ipv6-cidr-block", "subnetwork", "subnetwork-name", "sysctls", "tags", "threads-per-core", "topic", "topology-manager", "total-egress-bandwidth-tier", "tpu-ipv4-cidr-block", "transparent-hugepage-defrag", "transparent-hugepage-enabled", "type", "upgrade-options", "upgrade-settings", "use-ip-aliases", "use-routes", "user-managed-keys-config", "username", "values", "variant", "variant-config", "vertical-pod-autoscaling", "vulnerability-mode", "wait-for-drain-duration", "window", "windows-node-config", "workload-identity-config", "workload-metadata-config", "workload-policy-config", "workload-pool", "writable-cgroups", "zone"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -6284,6 +7147,91 @@ where
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
                                 v.extend(["name"].iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_zones_clusters_fetch_cluster_upgrade_info(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .zones_clusters_fetch_cluster_upgrade_info(opt.value_of("name").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "version" => {
+                    call = call.version(value.unwrap_or(""));
+                }
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["version"].iter().map(|v| *v));
                                 v
                             }));
                     }
@@ -7614,6 +8562,7 @@ where
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "cluster-id" => Some(("clusterId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "node-pool.autopilot-config.enabled" => Some(("nodePool.autopilotConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "node-pool.autoscaling.autoprovisioned" => Some(("nodePool.autoscaling.autoprovisioned", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "node-pool.autoscaling.enabled" => Some(("nodePool.autoscaling.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "node-pool.autoscaling.location-policy" => Some(("nodePool.autoscaling.locationPolicy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -7624,32 +8573,78 @@ where
                     "node-pool.best-effort-provisioning.enabled" => Some(("nodePool.bestEffortProvisioning.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "node-pool.best-effort-provisioning.min-provision-nodes" => Some(("nodePool.bestEffortProvisioning.minProvisionNodes", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "node-pool.config.advanced-machine-features.enable-nested-virtualization" => Some(("nodePool.config.advancedMachineFeatures.enableNestedVirtualization", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "node-pool.config.advanced-machine-features.performance-monitoring-unit" => Some(("nodePool.config.advancedMachineFeatures.performanceMonitoringUnit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "node-pool.config.advanced-machine-features.threads-per-core" => Some(("nodePool.config.advancedMachineFeatures.threadsPerCore", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "node-pool.config.boot-disk.disk-type" => Some(("nodePool.config.bootDisk.diskType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "node-pool.config.boot-disk.provisioned-iops" => Some(("nodePool.config.bootDisk.provisionedIops", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "node-pool.config.boot-disk.provisioned-throughput" => Some(("nodePool.config.bootDisk.provisionedThroughput", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "node-pool.config.boot-disk.size-gb" => Some(("nodePool.config.bootDisk.sizeGb", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "node-pool.config.boot-disk-kms-key" => Some(("nodePool.config.bootDiskKmsKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "node-pool.config.confidential-nodes.confidential-instance-type" => Some(("nodePool.config.confidentialNodes.confidentialInstanceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "node-pool.config.confidential-nodes.enabled" => Some(("nodePool.config.confidentialNodes.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "node-pool.config.containerd-config.private-registry-access-config.enabled" => Some(("nodePool.config.containerdConfig.privateRegistryAccessConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "node-pool.config.containerd-config.writable-cgroups.enabled" => Some(("nodePool.config.containerdConfig.writableCgroups.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "node-pool.config.disk-size-gb" => Some(("nodePool.config.diskSizeGb", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "node-pool.config.disk-type" => Some(("nodePool.config.diskType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "node-pool.config.effective-cgroup-mode" => Some(("nodePool.config.effectiveCgroupMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "node-pool.config.enable-confidential-storage" => Some(("nodePool.config.enableConfidentialStorage", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "node-pool.config.ephemeral-storage-local-ssd-config.data-cache-count" => Some(("nodePool.config.ephemeralStorageLocalSsdConfig.dataCacheCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "node-pool.config.ephemeral-storage-local-ssd-config.local-ssd-count" => Some(("nodePool.config.ephemeralStorageLocalSsdConfig.localSsdCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "node-pool.config.fast-socket.enabled" => Some(("nodePool.config.fastSocket.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "node-pool.config.flex-start" => Some(("nodePool.config.flexStart", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "node-pool.config.gcfs-config.enabled" => Some(("nodePool.config.gcfsConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "node-pool.config.gvnic.enabled" => Some(("nodePool.config.gvnic.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "node-pool.config.image-type" => Some(("nodePool.config.imageType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "node-pool.config.kubelet-config.allowed-unsafe-sysctls" => Some(("nodePool.config.kubeletConfig.allowedUnsafeSysctls", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "node-pool.config.kubelet-config.container-log-max-files" => Some(("nodePool.config.kubeletConfig.containerLogMaxFiles", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "node-pool.config.kubelet-config.container-log-max-size" => Some(("nodePool.config.kubeletConfig.containerLogMaxSize", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "node-pool.config.kubelet-config.cpu-cfs-quota" => Some(("nodePool.config.kubeletConfig.cpuCfsQuota", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "node-pool.config.kubelet-config.cpu-cfs-quota-period" => Some(("nodePool.config.kubeletConfig.cpuCfsQuotaPeriod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "node-pool.config.kubelet-config.cpu-manager-policy" => Some(("nodePool.config.kubeletConfig.cpuManagerPolicy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "node-pool.config.kubelet-config.eviction-max-pod-grace-period-seconds" => Some(("nodePool.config.kubeletConfig.evictionMaxPodGracePeriodSeconds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "node-pool.config.kubelet-config.eviction-minimum-reclaim.imagefs-available" => Some(("nodePool.config.kubeletConfig.evictionMinimumReclaim.imagefsAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "node-pool.config.kubelet-config.eviction-minimum-reclaim.imagefs-inodes-free" => Some(("nodePool.config.kubeletConfig.evictionMinimumReclaim.imagefsInodesFree", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "node-pool.config.kubelet-config.eviction-minimum-reclaim.memory-available" => Some(("nodePool.config.kubeletConfig.evictionMinimumReclaim.memoryAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "node-pool.config.kubelet-config.eviction-minimum-reclaim.nodefs-available" => Some(("nodePool.config.kubeletConfig.evictionMinimumReclaim.nodefsAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "node-pool.config.kubelet-config.eviction-minimum-reclaim.nodefs-inodes-free" => Some(("nodePool.config.kubeletConfig.evictionMinimumReclaim.nodefsInodesFree", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "node-pool.config.kubelet-config.eviction-minimum-reclaim.pid-available" => Some(("nodePool.config.kubeletConfig.evictionMinimumReclaim.pidAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "node-pool.config.kubelet-config.eviction-soft.imagefs-available" => Some(("nodePool.config.kubeletConfig.evictionSoft.imagefsAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "node-pool.config.kubelet-config.eviction-soft.imagefs-inodes-free" => Some(("nodePool.config.kubeletConfig.evictionSoft.imagefsInodesFree", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "node-pool.config.kubelet-config.eviction-soft.memory-available" => Some(("nodePool.config.kubeletConfig.evictionSoft.memoryAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "node-pool.config.kubelet-config.eviction-soft.nodefs-available" => Some(("nodePool.config.kubeletConfig.evictionSoft.nodefsAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "node-pool.config.kubelet-config.eviction-soft.nodefs-inodes-free" => Some(("nodePool.config.kubeletConfig.evictionSoft.nodefsInodesFree", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "node-pool.config.kubelet-config.eviction-soft.pid-available" => Some(("nodePool.config.kubeletConfig.evictionSoft.pidAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "node-pool.config.kubelet-config.eviction-soft-grace-period.imagefs-available" => Some(("nodePool.config.kubeletConfig.evictionSoftGracePeriod.imagefsAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "node-pool.config.kubelet-config.eviction-soft-grace-period.imagefs-inodes-free" => Some(("nodePool.config.kubeletConfig.evictionSoftGracePeriod.imagefsInodesFree", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "node-pool.config.kubelet-config.eviction-soft-grace-period.memory-available" => Some(("nodePool.config.kubeletConfig.evictionSoftGracePeriod.memoryAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "node-pool.config.kubelet-config.eviction-soft-grace-period.nodefs-available" => Some(("nodePool.config.kubeletConfig.evictionSoftGracePeriod.nodefsAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "node-pool.config.kubelet-config.eviction-soft-grace-period.nodefs-inodes-free" => Some(("nodePool.config.kubeletConfig.evictionSoftGracePeriod.nodefsInodesFree", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "node-pool.config.kubelet-config.eviction-soft-grace-period.pid-available" => Some(("nodePool.config.kubeletConfig.evictionSoftGracePeriod.pidAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "node-pool.config.kubelet-config.image-gc-high-threshold-percent" => Some(("nodePool.config.kubeletConfig.imageGcHighThresholdPercent", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "node-pool.config.kubelet-config.image-gc-low-threshold-percent" => Some(("nodePool.config.kubeletConfig.imageGcLowThresholdPercent", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "node-pool.config.kubelet-config.image-maximum-gc-age" => Some(("nodePool.config.kubeletConfig.imageMaximumGcAge", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "node-pool.config.kubelet-config.image-minimum-gc-age" => Some(("nodePool.config.kubeletConfig.imageMinimumGcAge", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "node-pool.config.kubelet-config.insecure-kubelet-readonly-port-enabled" => Some(("nodePool.config.kubeletConfig.insecureKubeletReadonlyPortEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "node-pool.config.kubelet-config.max-parallel-image-pulls" => Some(("nodePool.config.kubeletConfig.maxParallelImagePulls", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "node-pool.config.kubelet-config.memory-manager.policy" => Some(("nodePool.config.kubeletConfig.memoryManager.policy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "node-pool.config.kubelet-config.pod-pids-limit" => Some(("nodePool.config.kubeletConfig.podPidsLimit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "node-pool.config.kubelet-config.single-process-oom-kill" => Some(("nodePool.config.kubeletConfig.singleProcessOomKill", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "node-pool.config.kubelet-config.topology-manager.policy" => Some(("nodePool.config.kubeletConfig.topologyManager.policy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "node-pool.config.kubelet-config.topology-manager.scope" => Some(("nodePool.config.kubeletConfig.topologyManager.scope", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "node-pool.config.labels" => Some(("nodePool.config.labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "node-pool.config.linux-node-config.cgroup-mode" => Some(("nodePool.config.linuxNodeConfig.cgroupMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "node-pool.config.linux-node-config.hugepages.hugepage-size1g" => Some(("nodePool.config.linuxNodeConfig.hugepages.hugepageSize1g", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "node-pool.config.linux-node-config.hugepages.hugepage-size2m" => Some(("nodePool.config.linuxNodeConfig.hugepages.hugepageSize2m", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "node-pool.config.linux-node-config.node-kernel-module-loading.policy" => Some(("nodePool.config.linuxNodeConfig.nodeKernelModuleLoading.policy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "node-pool.config.linux-node-config.sysctls" => Some(("nodePool.config.linuxNodeConfig.sysctls", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "node-pool.config.linux-node-config.transparent-hugepage-defrag" => Some(("nodePool.config.linuxNodeConfig.transparentHugepageDefrag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "node-pool.config.linux-node-config.transparent-hugepage-enabled" => Some(("nodePool.config.linuxNodeConfig.transparentHugepageEnabled", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "node-pool.config.local-nvme-ssd-block-config.local-ssd-count" => Some(("nodePool.config.localNvmeSsdBlockConfig.localSsdCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "node-pool.config.local-ssd-count" => Some(("nodePool.config.localSsdCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "node-pool.config.local-ssd-encryption-mode" => Some(("nodePool.config.localSsdEncryptionMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "node-pool.config.logging-config.variant-config.variant" => Some(("nodePool.config.loggingConfig.variantConfig.variant", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "node-pool.config.machine-type" => Some(("nodePool.config.machineType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "node-pool.config.max-run-duration" => Some(("nodePool.config.maxRunDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "node-pool.config.metadata" => Some(("nodePool.config.metadata", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "node-pool.config.min-cpu-platform" => Some(("nodePool.config.minCpuPlatform", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "node-pool.config.node-group" => Some(("nodePool.config.nodeGroup", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -7664,7 +8659,9 @@ where
                     "node-pool.config.service-account" => Some(("nodePool.config.serviceAccount", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "node-pool.config.shielded-instance-config.enable-integrity-monitoring" => Some(("nodePool.config.shieldedInstanceConfig.enableIntegrityMonitoring", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "node-pool.config.shielded-instance-config.enable-secure-boot" => Some(("nodePool.config.shieldedInstanceConfig.enableSecureBoot", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "node-pool.config.sole-tenant-config.min-node-cpus" => Some(("nodePool.config.soleTenantConfig.minNodeCpus", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "node-pool.config.spot" => Some(("nodePool.config.spot", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "node-pool.config.storage-pools" => Some(("nodePool.config.storagePools", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "node-pool.config.tags" => Some(("nodePool.config.tags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "node-pool.config.windows-node-config.os-version" => Some(("nodePool.config.windowsNodeConfig.osVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "node-pool.config.workload-metadata-config.mode" => Some(("nodePool.config.workloadMetadataConfig.mode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -7681,10 +8678,13 @@ where
                     "node-pool.network-config.create-pod-range" => Some(("nodePool.networkConfig.createPodRange", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "node-pool.network-config.enable-private-nodes" => Some(("nodePool.networkConfig.enablePrivateNodes", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "node-pool.network-config.network-performance-config.total-egress-bandwidth-tier" => Some(("nodePool.networkConfig.networkPerformanceConfig.totalEgressBandwidthTier", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "node-pool.network-config.network-tier-config.network-tier" => Some(("nodePool.networkConfig.networkTierConfig.networkTier", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "node-pool.network-config.pod-cidr-overprovision-config.disable" => Some(("nodePool.networkConfig.podCidrOverprovisionConfig.disable", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "node-pool.network-config.pod-ipv4-cidr-block" => Some(("nodePool.networkConfig.podIpv4CidrBlock", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "node-pool.network-config.pod-ipv4-range-utilization" => Some(("nodePool.networkConfig.podIpv4RangeUtilization", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "node-pool.network-config.pod-range" => Some(("nodePool.networkConfig.podRange", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "node-pool.network-config.subnetwork" => Some(("nodePool.networkConfig.subnetwork", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "node-pool.node-drain-config.respect-pdb-during-node-pool-deletion" => Some(("nodePool.nodeDrainConfig.respectPdbDuringNodePoolDeletion", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "node-pool.placement-policy.policy-name" => Some(("nodePool.placementPolicy.policyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "node-pool.placement-policy.tpu-topology" => Some(("nodePool.placementPolicy.tpuTopology", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "node-pool.placement-policy.type" => Some(("nodePool.placementPolicy.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -7698,6 +8698,7 @@ where
                     "node-pool.update-info.blue-green-info.green-instance-group-urls" => Some(("nodePool.updateInfo.blueGreenInfo.greenInstanceGroupUrls", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "node-pool.update-info.blue-green-info.green-pool-version" => Some(("nodePool.updateInfo.blueGreenInfo.greenPoolVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "node-pool.update-info.blue-green-info.phase" => Some(("nodePool.updateInfo.blueGreenInfo.phase", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "node-pool.upgrade-settings.blue-green-settings.autoscaled-rollout-policy.wait-for-drain-duration" => Some(("nodePool.upgradeSettings.blueGreenSettings.autoscaledRolloutPolicy.waitForDrainDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "node-pool.upgrade-settings.blue-green-settings.node-pool-soak-duration" => Some(("nodePool.upgradeSettings.blueGreenSettings.nodePoolSoakDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "node-pool.upgrade-settings.blue-green-settings.standard-rollout-policy.batch-node-count" => Some(("nodePool.upgradeSettings.blueGreenSettings.standardRolloutPolicy.batchNodeCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "node-pool.upgrade-settings.blue-green-settings.standard-rollout-policy.batch-percentage" => Some(("nodePool.upgradeSettings.blueGreenSettings.standardRolloutPolicy.batchPercentage", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
@@ -7710,7 +8711,7 @@ where
                     "project-id" => Some(("projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "zone" => Some(("zone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["advanced-machine-features", "auto-repair", "auto-upgrade", "auto-upgrade-start-time", "autoprovisioned", "autoscaling", "batch-node-count", "batch-percentage", "batch-soak-duration", "best-effort-provisioning", "blue-green-info", "blue-green-settings", "blue-instance-group-urls", "blue-pool-deletion-start-time", "boot-disk-kms-key", "cgroup-mode", "cluster-id", "confidential-nodes", "config", "consume-reservation-type", "containerd-config", "cpu-cfs-quota", "cpu-cfs-quota-period", "cpu-manager-policy", "create-pod-range", "description", "disable", "disk-size-gb", "disk-type", "enable-confidential-storage", "enable-integrity-monitoring", "enable-nested-virtualization", "enable-private-nodes", "enable-secure-boot", "enabled", "ephemeral-storage-local-ssd-config", "etag", "fast-socket", "gcfs-config", "green-instance-group-urls", "green-pool-version", "gvnic", "hugepage-size1g", "hugepage-size2m", "hugepages", "image-type", "initial-node-count", "insecure-kubelet-readonly-port-enabled", "instance-group-urls", "key", "kubelet-config", "labels", "linux-node-config", "local-nvme-ssd-block-config", "local-ssd-count", "location-policy", "locations", "logging-config", "machine-type", "management", "max-node-count", "max-pods-constraint", "max-pods-per-node", "max-surge", "max-unavailable", "metadata", "min-cpu-platform", "min-node-count", "min-provision-nodes", "mode", "name", "network-config", "network-performance-config", "node-group", "node-pool", "node-pool-soak-duration", "oauth-scopes", "os-version", "parent", "phase", "placement-policy", "pod-cidr-overprovision-config", "pod-ipv4-cidr-block", "pod-ipv4-cidr-size", "pod-ipv4-range-utilization", "pod-pids-limit", "pod-range", "policy-name", "preemptible", "private-registry-access-config", "project-id", "queued-provisioning", "reservation-affinity", "resource-labels", "resource-manager-tags", "sandbox-config", "self-link", "service-account", "shielded-instance-config", "spot", "standard-rollout-policy", "status", "status-message", "strategy", "sysctls", "tags", "threads-per-core", "total-egress-bandwidth-tier", "total-max-node-count", "total-min-node-count", "tpu-topology", "type", "update-info", "upgrade-options", "upgrade-settings", "values", "variant", "variant-config", "version", "windows-node-config", "workload-metadata-config", "zone"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["advanced-machine-features", "allowed-unsafe-sysctls", "auto-repair", "auto-upgrade", "auto-upgrade-start-time", "autopilot-config", "autoprovisioned", "autoscaled-rollout-policy", "autoscaling", "batch-node-count", "batch-percentage", "batch-soak-duration", "best-effort-provisioning", "blue-green-info", "blue-green-settings", "blue-instance-group-urls", "blue-pool-deletion-start-time", "boot-disk", "boot-disk-kms-key", "cgroup-mode", "cluster-id", "confidential-instance-type", "confidential-nodes", "config", "consume-reservation-type", "container-log-max-files", "container-log-max-size", "containerd-config", "cpu-cfs-quota", "cpu-cfs-quota-period", "cpu-manager-policy", "create-pod-range", "data-cache-count", "description", "disable", "disk-size-gb", "disk-type", "effective-cgroup-mode", "enable-confidential-storage", "enable-integrity-monitoring", "enable-nested-virtualization", "enable-private-nodes", "enable-secure-boot", "enabled", "ephemeral-storage-local-ssd-config", "etag", "eviction-max-pod-grace-period-seconds", "eviction-minimum-reclaim", "eviction-soft", "eviction-soft-grace-period", "fast-socket", "flex-start", "gcfs-config", "green-instance-group-urls", "green-pool-version", "gvnic", "hugepage-size1g", "hugepage-size2m", "hugepages", "image-gc-high-threshold-percent", "image-gc-low-threshold-percent", "image-maximum-gc-age", "image-minimum-gc-age", "image-type", "imagefs-available", "imagefs-inodes-free", "initial-node-count", "insecure-kubelet-readonly-port-enabled", "instance-group-urls", "key", "kubelet-config", "labels", "linux-node-config", "local-nvme-ssd-block-config", "local-ssd-count", "local-ssd-encryption-mode", "location-policy", "locations", "logging-config", "machine-type", "management", "max-node-count", "max-parallel-image-pulls", "max-pods-constraint", "max-pods-per-node", "max-run-duration", "max-surge", "max-unavailable", "memory-available", "memory-manager", "metadata", "min-cpu-platform", "min-node-count", "min-node-cpus", "min-provision-nodes", "mode", "name", "network-config", "network-performance-config", "network-tier", "network-tier-config", "node-drain-config", "node-group", "node-kernel-module-loading", "node-pool", "node-pool-soak-duration", "nodefs-available", "nodefs-inodes-free", "oauth-scopes", "os-version", "parent", "performance-monitoring-unit", "phase", "pid-available", "placement-policy", "pod-cidr-overprovision-config", "pod-ipv4-cidr-block", "pod-ipv4-cidr-size", "pod-ipv4-range-utilization", "pod-pids-limit", "pod-range", "policy", "policy-name", "preemptible", "private-registry-access-config", "project-id", "provisioned-iops", "provisioned-throughput", "queued-provisioning", "reservation-affinity", "resource-labels", "resource-manager-tags", "respect-pdb-during-node-pool-deletion", "sandbox-config", "scope", "self-link", "service-account", "shielded-instance-config", "single-process-oom-kill", "size-gb", "sole-tenant-config", "spot", "standard-rollout-policy", "status", "status-message", "storage-pools", "strategy", "subnetwork", "sysctls", "tags", "threads-per-core", "topology-manager", "total-egress-bandwidth-tier", "total-max-node-count", "total-min-node-count", "tpu-topology", "transparent-hugepage-defrag", "transparent-hugepage-enabled", "type", "update-info", "upgrade-options", "upgrade-settings", "values", "variant", "variant-config", "version", "wait-for-drain-duration", "windows-node-config", "workload-metadata-config", "writable-cgroups", "zone"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -7845,6 +8846,93 @@ where
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
                                 v.extend(["name"].iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_zones_clusters_node_pools_fetch_node_pool_upgrade_info(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .zones_clusters_node_pools_fetch_node_pool_upgrade_info(
+                opt.value_of("name").unwrap_or(""),
+            );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "version" => {
+                    call = call.version(value.unwrap_or(""));
+                }
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["version"].iter().map(|v| *v));
                                 v
                             }));
                     }
@@ -8673,44 +9761,91 @@ where
 
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "boot-disk.disk-type" => Some(("bootDisk.diskType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "boot-disk.provisioned-iops" => Some(("bootDisk.provisionedIops", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "boot-disk.provisioned-throughput" => Some(("bootDisk.provisionedThroughput", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "boot-disk.size-gb" => Some(("bootDisk.sizeGb", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster-id" => Some(("clusterId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "confidential-nodes.confidential-instance-type" => Some(("confidentialNodes.confidentialInstanceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "confidential-nodes.enabled" => Some(("confidentialNodes.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "containerd-config.private-registry-access-config.enabled" => Some(("containerdConfig.privateRegistryAccessConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "containerd-config.writable-cgroups.enabled" => Some(("containerdConfig.writableCgroups.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "disk-size-gb" => Some(("diskSizeGb", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "disk-type" => Some(("diskType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "fast-socket.enabled" => Some(("fastSocket.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "flex-start" => Some(("flexStart", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "gcfs-config.enabled" => Some(("gcfsConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "gvnic.enabled" => Some(("gvnic.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "image-type" => Some(("imageType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kubelet-config.allowed-unsafe-sysctls" => Some(("kubeletConfig.allowedUnsafeSysctls", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "kubelet-config.container-log-max-files" => Some(("kubeletConfig.containerLogMaxFiles", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "kubelet-config.container-log-max-size" => Some(("kubeletConfig.containerLogMaxSize", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "kubelet-config.cpu-cfs-quota" => Some(("kubeletConfig.cpuCfsQuota", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "kubelet-config.cpu-cfs-quota-period" => Some(("kubeletConfig.cpuCfsQuotaPeriod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "kubelet-config.cpu-manager-policy" => Some(("kubeletConfig.cpuManagerPolicy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kubelet-config.eviction-max-pod-grace-period-seconds" => Some(("kubeletConfig.evictionMaxPodGracePeriodSeconds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "kubelet-config.eviction-minimum-reclaim.imagefs-available" => Some(("kubeletConfig.evictionMinimumReclaim.imagefsAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kubelet-config.eviction-minimum-reclaim.imagefs-inodes-free" => Some(("kubeletConfig.evictionMinimumReclaim.imagefsInodesFree", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kubelet-config.eviction-minimum-reclaim.memory-available" => Some(("kubeletConfig.evictionMinimumReclaim.memoryAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kubelet-config.eviction-minimum-reclaim.nodefs-available" => Some(("kubeletConfig.evictionMinimumReclaim.nodefsAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kubelet-config.eviction-minimum-reclaim.nodefs-inodes-free" => Some(("kubeletConfig.evictionMinimumReclaim.nodefsInodesFree", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kubelet-config.eviction-minimum-reclaim.pid-available" => Some(("kubeletConfig.evictionMinimumReclaim.pidAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kubelet-config.eviction-soft.imagefs-available" => Some(("kubeletConfig.evictionSoft.imagefsAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kubelet-config.eviction-soft.imagefs-inodes-free" => Some(("kubeletConfig.evictionSoft.imagefsInodesFree", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kubelet-config.eviction-soft.memory-available" => Some(("kubeletConfig.evictionSoft.memoryAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kubelet-config.eviction-soft.nodefs-available" => Some(("kubeletConfig.evictionSoft.nodefsAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kubelet-config.eviction-soft.nodefs-inodes-free" => Some(("kubeletConfig.evictionSoft.nodefsInodesFree", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kubelet-config.eviction-soft.pid-available" => Some(("kubeletConfig.evictionSoft.pidAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kubelet-config.eviction-soft-grace-period.imagefs-available" => Some(("kubeletConfig.evictionSoftGracePeriod.imagefsAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kubelet-config.eviction-soft-grace-period.imagefs-inodes-free" => Some(("kubeletConfig.evictionSoftGracePeriod.imagefsInodesFree", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kubelet-config.eviction-soft-grace-period.memory-available" => Some(("kubeletConfig.evictionSoftGracePeriod.memoryAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kubelet-config.eviction-soft-grace-period.nodefs-available" => Some(("kubeletConfig.evictionSoftGracePeriod.nodefsAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kubelet-config.eviction-soft-grace-period.nodefs-inodes-free" => Some(("kubeletConfig.evictionSoftGracePeriod.nodefsInodesFree", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kubelet-config.eviction-soft-grace-period.pid-available" => Some(("kubeletConfig.evictionSoftGracePeriod.pidAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kubelet-config.image-gc-high-threshold-percent" => Some(("kubeletConfig.imageGcHighThresholdPercent", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "kubelet-config.image-gc-low-threshold-percent" => Some(("kubeletConfig.imageGcLowThresholdPercent", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "kubelet-config.image-maximum-gc-age" => Some(("kubeletConfig.imageMaximumGcAge", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kubelet-config.image-minimum-gc-age" => Some(("kubeletConfig.imageMinimumGcAge", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "kubelet-config.insecure-kubelet-readonly-port-enabled" => Some(("kubeletConfig.insecureKubeletReadonlyPortEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "kubelet-config.max-parallel-image-pulls" => Some(("kubeletConfig.maxParallelImagePulls", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "kubelet-config.memory-manager.policy" => Some(("kubeletConfig.memoryManager.policy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "kubelet-config.pod-pids-limit" => Some(("kubeletConfig.podPidsLimit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kubelet-config.single-process-oom-kill" => Some(("kubeletConfig.singleProcessOomKill", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "kubelet-config.topology-manager.policy" => Some(("kubeletConfig.topologyManager.policy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kubelet-config.topology-manager.scope" => Some(("kubeletConfig.topologyManager.scope", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "labels.labels" => Some(("labels.labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "linux-node-config.cgroup-mode" => Some(("linuxNodeConfig.cgroupMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "linux-node-config.hugepages.hugepage-size1g" => Some(("linuxNodeConfig.hugepages.hugepageSize1g", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "linux-node-config.hugepages.hugepage-size2m" => Some(("linuxNodeConfig.hugepages.hugepageSize2m", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "linux-node-config.node-kernel-module-loading.policy" => Some(("linuxNodeConfig.nodeKernelModuleLoading.policy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "linux-node-config.sysctls" => Some(("linuxNodeConfig.sysctls", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "linux-node-config.transparent-hugepage-defrag" => Some(("linuxNodeConfig.transparentHugepageDefrag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "linux-node-config.transparent-hugepage-enabled" => Some(("linuxNodeConfig.transparentHugepageEnabled", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "locations" => Some(("locations", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "logging-config.variant-config.variant" => Some(("loggingConfig.variantConfig.variant", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "machine-type" => Some(("machineType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "max-run-duration" => Some(("maxRunDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "node-drain-config.respect-pdb-during-node-pool-deletion" => Some(("nodeDrainConfig.respectPdbDuringNodePoolDeletion", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "node-network-config.create-pod-range" => Some(("nodeNetworkConfig.createPodRange", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "node-network-config.enable-private-nodes" => Some(("nodeNetworkConfig.enablePrivateNodes", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "node-network-config.network-performance-config.total-egress-bandwidth-tier" => Some(("nodeNetworkConfig.networkPerformanceConfig.totalEgressBandwidthTier", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "node-network-config.network-tier-config.network-tier" => Some(("nodeNetworkConfig.networkTierConfig.networkTier", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "node-network-config.pod-cidr-overprovision-config.disable" => Some(("nodeNetworkConfig.podCidrOverprovisionConfig.disable", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "node-network-config.pod-ipv4-cidr-block" => Some(("nodeNetworkConfig.podIpv4CidrBlock", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "node-network-config.pod-ipv4-range-utilization" => Some(("nodeNetworkConfig.podIpv4RangeUtilization", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "node-network-config.pod-range" => Some(("nodeNetworkConfig.podRange", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "node-network-config.subnetwork" => Some(("nodeNetworkConfig.subnetwork", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "node-pool-id" => Some(("nodePoolId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "node-version" => Some(("nodeVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "project-id" => Some(("projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "queued-provisioning.enabled" => Some(("queuedProvisioning.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "resource-labels.labels" => Some(("resourceLabels.labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "resource-manager-tags.tags" => Some(("resourceManagerTags.tags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "storage-pools" => Some(("storagePools", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "tags.tags" => Some(("tags.tags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "upgrade-settings.blue-green-settings.autoscaled-rollout-policy.wait-for-drain-duration" => Some(("upgradeSettings.blueGreenSettings.autoscaledRolloutPolicy.waitForDrainDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "upgrade-settings.blue-green-settings.node-pool-soak-duration" => Some(("upgradeSettings.blueGreenSettings.nodePoolSoakDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "upgrade-settings.blue-green-settings.standard-rollout-policy.batch-node-count" => Some(("upgradeSettings.blueGreenSettings.standardRolloutPolicy.batchNodeCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "upgrade-settings.blue-green-settings.standard-rollout-policy.batch-percentage" => Some(("upgradeSettings.blueGreenSettings.standardRolloutPolicy.batchPercentage", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
@@ -8722,7 +9857,7 @@ where
                     "workload-metadata-config.mode" => Some(("workloadMetadataConfig.mode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "zone" => Some(("zone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["batch-node-count", "batch-percentage", "batch-soak-duration", "blue-green-settings", "cgroup-mode", "cluster-id", "confidential-nodes", "containerd-config", "cpu-cfs-quota", "cpu-cfs-quota-period", "cpu-manager-policy", "create-pod-range", "disable", "disk-size-gb", "disk-type", "enable-private-nodes", "enabled", "etag", "fast-socket", "gcfs-config", "gvnic", "hugepage-size1g", "hugepage-size2m", "hugepages", "image-type", "insecure-kubelet-readonly-port-enabled", "kubelet-config", "labels", "linux-node-config", "locations", "logging-config", "machine-type", "max-surge", "max-unavailable", "mode", "name", "network-performance-config", "node-network-config", "node-pool-id", "node-pool-soak-duration", "node-version", "os-version", "pod-cidr-overprovision-config", "pod-ipv4-cidr-block", "pod-ipv4-range-utilization", "pod-pids-limit", "pod-range", "private-registry-access-config", "project-id", "queued-provisioning", "resource-labels", "resource-manager-tags", "standard-rollout-policy", "strategy", "sysctls", "tags", "total-egress-bandwidth-tier", "upgrade-settings", "variant", "variant-config", "windows-node-config", "workload-metadata-config", "zone"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["allowed-unsafe-sysctls", "autoscaled-rollout-policy", "batch-node-count", "batch-percentage", "batch-soak-duration", "blue-green-settings", "boot-disk", "cgroup-mode", "cluster-id", "confidential-instance-type", "confidential-nodes", "container-log-max-files", "container-log-max-size", "containerd-config", "cpu-cfs-quota", "cpu-cfs-quota-period", "cpu-manager-policy", "create-pod-range", "disable", "disk-size-gb", "disk-type", "enable-private-nodes", "enabled", "etag", "eviction-max-pod-grace-period-seconds", "eviction-minimum-reclaim", "eviction-soft", "eviction-soft-grace-period", "fast-socket", "flex-start", "gcfs-config", "gvnic", "hugepage-size1g", "hugepage-size2m", "hugepages", "image-gc-high-threshold-percent", "image-gc-low-threshold-percent", "image-maximum-gc-age", "image-minimum-gc-age", "image-type", "imagefs-available", "imagefs-inodes-free", "insecure-kubelet-readonly-port-enabled", "kubelet-config", "labels", "linux-node-config", "locations", "logging-config", "machine-type", "max-parallel-image-pulls", "max-run-duration", "max-surge", "max-unavailable", "memory-available", "memory-manager", "mode", "name", "network-performance-config", "network-tier", "network-tier-config", "node-drain-config", "node-kernel-module-loading", "node-network-config", "node-pool-id", "node-pool-soak-duration", "node-version", "nodefs-available", "nodefs-inodes-free", "os-version", "pid-available", "pod-cidr-overprovision-config", "pod-ipv4-cidr-block", "pod-ipv4-range-utilization", "pod-pids-limit", "pod-range", "policy", "private-registry-access-config", "project-id", "provisioned-iops", "provisioned-throughput", "queued-provisioning", "resource-labels", "resource-manager-tags", "respect-pdb-during-node-pool-deletion", "scope", "single-process-oom-kill", "size-gb", "standard-rollout-policy", "storage-pools", "strategy", "subnetwork", "sysctls", "tags", "topology-manager", "total-egress-bandwidth-tier", "transparent-hugepage-defrag", "transparent-hugepage-enabled", "upgrade-settings", "variant", "variant-config", "wait-for-drain-duration", "windows-node-config", "workload-metadata-config", "writable-cgroups", "zone"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -9035,13 +10170,14 @@ where
                     "maintenance-policy.window.daily-maintenance-window.start-time" => Some(("maintenancePolicy.window.dailyMaintenanceWindow.startTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "maintenance-policy.window.recurring-window.recurrence" => Some(("maintenancePolicy.window.recurringWindow.recurrence", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "maintenance-policy.window.recurring-window.window.end-time" => Some(("maintenancePolicy.window.recurringWindow.window.endTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "maintenance-policy.window.recurring-window.window.maintenance-exclusion-options.end-time-behavior" => Some(("maintenancePolicy.window.recurringWindow.window.maintenanceExclusionOptions.endTimeBehavior", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "maintenance-policy.window.recurring-window.window.maintenance-exclusion-options.scope" => Some(("maintenancePolicy.window.recurringWindow.window.maintenanceExclusionOptions.scope", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "maintenance-policy.window.recurring-window.window.start-time" => Some(("maintenancePolicy.window.recurringWindow.window.startTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "project-id" => Some(("projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "zone" => Some(("zone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["cluster-id", "daily-maintenance-window", "duration", "end-time", "maintenance-exclusion-options", "maintenance-policy", "name", "project-id", "recurrence", "recurring-window", "resource-version", "scope", "start-time", "window", "zone"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["cluster-id", "daily-maintenance-window", "duration", "end-time", "end-time-behavior", "maintenance-exclusion-options", "maintenance-policy", "name", "project-id", "recurrence", "recurring-window", "resource-version", "scope", "start-time", "window", "zone"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -9758,14 +10894,24 @@ where
                     "update.desired-addons-config.gcp-filestore-csi-driver-config.enabled" => Some(("update.desiredAddonsConfig.gcpFilestoreCsiDriverConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "update.desired-addons-config.gcs-fuse-csi-driver-config.enabled" => Some(("update.desiredAddonsConfig.gcsFuseCsiDriverConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "update.desired-addons-config.gke-backup-agent-config.enabled" => Some(("update.desiredAddonsConfig.gkeBackupAgentConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "update.desired-addons-config.high-scale-checkpointing-config.enabled" => Some(("update.desiredAddonsConfig.highScaleCheckpointingConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "update.desired-addons-config.horizontal-pod-autoscaling.disabled" => Some(("update.desiredAddonsConfig.horizontalPodAutoscaling.disabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "update.desired-addons-config.http-load-balancing.disabled" => Some(("update.desiredAddonsConfig.httpLoadBalancing.disabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "update.desired-addons-config.kubernetes-dashboard.disabled" => Some(("update.desiredAddonsConfig.kubernetesDashboard.disabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "update.desired-addons-config.lustre-csi-driver-config.enable-legacy-lustre-port" => Some(("update.desiredAddonsConfig.lustreCsiDriverConfig.enableLegacyLustrePort", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "update.desired-addons-config.lustre-csi-driver-config.enabled" => Some(("update.desiredAddonsConfig.lustreCsiDriverConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "update.desired-addons-config.network-policy-config.disabled" => Some(("update.desiredAddonsConfig.networkPolicyConfig.disabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "update.desired-addons-config.parallelstore-csi-driver-config.enabled" => Some(("update.desiredAddonsConfig.parallelstoreCsiDriverConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "update.desired-addons-config.ray-operator-config.enabled" => Some(("update.desiredAddonsConfig.rayOperatorConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "update.desired-addons-config.ray-operator-config.ray-cluster-logging-config.enabled" => Some(("update.desiredAddonsConfig.rayOperatorConfig.rayClusterLoggingConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "update.desired-addons-config.ray-operator-config.ray-cluster-monitoring-config.enabled" => Some(("update.desiredAddonsConfig.rayOperatorConfig.rayClusterMonitoringConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "update.desired-addons-config.stateful-ha-config.enabled" => Some(("update.desiredAddonsConfig.statefulHaConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "update.desired-anonymous-authentication-config.mode" => Some(("update.desiredAnonymousAuthenticationConfig.mode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update.desired-authenticator-groups-config.enabled" => Some(("update.desiredAuthenticatorGroupsConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "update.desired-authenticator-groups-config.security-group" => Some(("update.desiredAuthenticatorGroupsConfig.securityGroup", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-auto-ipam-config.enabled" => Some(("update.desiredAutoIpamConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "update.desired-autopilot-workload-policy-config.allow-net-admin" => Some(("update.desiredAutopilotWorkloadPolicyConfig.allowNetAdmin", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "update.desired-autopilot-workload-policy-config.autopilot-compatibility-auditing-enabled" => Some(("update.desiredAutopilotWorkloadPolicyConfig.autopilotCompatibilityAuditingEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "update.desired-binary-authorization.enabled" => Some(("update.desiredBinaryAuthorization.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "update.desired-binary-authorization.evaluation-mode" => Some(("update.desiredBinaryAuthorization.evaluationMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update.desired-cluster-autoscaling.autoprovisioning-locations" => Some(("update.desiredClusterAutoscaling.autoprovisioningLocations", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
@@ -9783,6 +10929,7 @@ where
                     "update.desired-cluster-autoscaling.autoprovisioning-node-pool-defaults.service-account" => Some(("update.desiredClusterAutoscaling.autoprovisioningNodePoolDefaults.serviceAccount", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update.desired-cluster-autoscaling.autoprovisioning-node-pool-defaults.shielded-instance-config.enable-integrity-monitoring" => Some(("update.desiredClusterAutoscaling.autoprovisioningNodePoolDefaults.shieldedInstanceConfig.enableIntegrityMonitoring", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "update.desired-cluster-autoscaling.autoprovisioning-node-pool-defaults.shielded-instance-config.enable-secure-boot" => Some(("update.desiredClusterAutoscaling.autoprovisioningNodePoolDefaults.shieldedInstanceConfig.enableSecureBoot", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "update.desired-cluster-autoscaling.autoprovisioning-node-pool-defaults.upgrade-settings.blue-green-settings.autoscaled-rollout-policy.wait-for-drain-duration" => Some(("update.desiredClusterAutoscaling.autoprovisioningNodePoolDefaults.upgradeSettings.blueGreenSettings.autoscaledRolloutPolicy.waitForDrainDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update.desired-cluster-autoscaling.autoprovisioning-node-pool-defaults.upgrade-settings.blue-green-settings.node-pool-soak-duration" => Some(("update.desiredClusterAutoscaling.autoprovisioningNodePoolDefaults.upgradeSettings.blueGreenSettings.nodePoolSoakDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update.desired-cluster-autoscaling.autoprovisioning-node-pool-defaults.upgrade-settings.blue-green-settings.standard-rollout-policy.batch-node-count" => Some(("update.desiredClusterAutoscaling.autoprovisioningNodePoolDefaults.upgradeSettings.blueGreenSettings.standardRolloutPolicy.batchNodeCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "update.desired-cluster-autoscaling.autoprovisioning-node-pool-defaults.upgrade-settings.blue-green-settings.standard-rollout-policy.batch-percentage" => Some(("update.desiredClusterAutoscaling.autoprovisioningNodePoolDefaults.upgradeSettings.blueGreenSettings.standardRolloutPolicy.batchPercentage", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
@@ -9791,15 +10938,33 @@ where
                     "update.desired-cluster-autoscaling.autoprovisioning-node-pool-defaults.upgrade-settings.max-unavailable" => Some(("update.desiredClusterAutoscaling.autoprovisioningNodePoolDefaults.upgradeSettings.maxUnavailable", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "update.desired-cluster-autoscaling.autoprovisioning-node-pool-defaults.upgrade-settings.strategy" => Some(("update.desiredClusterAutoscaling.autoprovisioningNodePoolDefaults.upgradeSettings.strategy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update.desired-cluster-autoscaling.autoscaling-profile" => Some(("update.desiredClusterAutoscaling.autoscalingProfile", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-cluster-autoscaling.default-compute-class-config.enabled" => Some(("update.desiredClusterAutoscaling.defaultComputeClassConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "update.desired-cluster-autoscaling.enable-node-autoprovisioning" => Some(("update.desiredClusterAutoscaling.enableNodeAutoprovisioning", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "update.desired-compliance-posture-config.mode" => Some(("update.desiredCompliancePostureConfig.mode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update.desired-containerd-config.private-registry-access-config.enabled" => Some(("update.desiredContainerdConfig.privateRegistryAccessConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "update.desired-containerd-config.writable-cgroups.enabled" => Some(("update.desiredContainerdConfig.writableCgroups.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "update.desired-control-plane-endpoints-config.dns-endpoint-config.allow-external-traffic" => Some(("update.desiredControlPlaneEndpointsConfig.dnsEndpointConfig.allowExternalTraffic", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "update.desired-control-plane-endpoints-config.dns-endpoint-config.enable-k8s-certs-via-dns" => Some(("update.desiredControlPlaneEndpointsConfig.dnsEndpointConfig.enableK8sCertsViaDns", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "update.desired-control-plane-endpoints-config.dns-endpoint-config.enable-k8s-tokens-via-dns" => Some(("update.desiredControlPlaneEndpointsConfig.dnsEndpointConfig.enableK8sTokensViaDns", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "update.desired-control-plane-endpoints-config.dns-endpoint-config.endpoint" => Some(("update.desiredControlPlaneEndpointsConfig.dnsEndpointConfig.endpoint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-control-plane-endpoints-config.ip-endpoints-config.authorized-networks-config.enabled" => Some(("update.desiredControlPlaneEndpointsConfig.ipEndpointsConfig.authorizedNetworksConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "update.desired-control-plane-endpoints-config.ip-endpoints-config.authorized-networks-config.gcp-public-cidrs-access-enabled" => Some(("update.desiredControlPlaneEndpointsConfig.ipEndpointsConfig.authorizedNetworksConfig.gcpPublicCidrsAccessEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "update.desired-control-plane-endpoints-config.ip-endpoints-config.authorized-networks-config.private-endpoint-enforcement-enabled" => Some(("update.desiredControlPlaneEndpointsConfig.ipEndpointsConfig.authorizedNetworksConfig.privateEndpointEnforcementEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "update.desired-control-plane-endpoints-config.ip-endpoints-config.enable-public-endpoint" => Some(("update.desiredControlPlaneEndpointsConfig.ipEndpointsConfig.enablePublicEndpoint", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "update.desired-control-plane-endpoints-config.ip-endpoints-config.enabled" => Some(("update.desiredControlPlaneEndpointsConfig.ipEndpointsConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "update.desired-control-plane-endpoints-config.ip-endpoints-config.global-access" => Some(("update.desiredControlPlaneEndpointsConfig.ipEndpointsConfig.globalAccess", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "update.desired-control-plane-endpoints-config.ip-endpoints-config.private-endpoint" => Some(("update.desiredControlPlaneEndpointsConfig.ipEndpointsConfig.privateEndpoint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-control-plane-endpoints-config.ip-endpoints-config.private-endpoint-subnetwork" => Some(("update.desiredControlPlaneEndpointsConfig.ipEndpointsConfig.privateEndpointSubnetwork", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-control-plane-endpoints-config.ip-endpoints-config.public-endpoint" => Some(("update.desiredControlPlaneEndpointsConfig.ipEndpointsConfig.publicEndpoint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update.desired-cost-management-config.enabled" => Some(("update.desiredCostManagementConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "update.desired-database-encryption.current-state" => Some(("update.desiredDatabaseEncryption.currentState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update.desired-database-encryption.decryption-keys" => Some(("update.desiredDatabaseEncryption.decryptionKeys", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "update.desired-database-encryption.key-name" => Some(("update.desiredDatabaseEncryption.keyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update.desired-database-encryption.state" => Some(("update.desiredDatabaseEncryption.state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update.desired-datapath-provider" => Some(("update.desiredDatapathProvider", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-default-enable-private-nodes" => Some(("update.desiredDefaultEnablePrivateNodes", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "update.desired-default-snat-status.disabled" => Some(("update.desiredDefaultSnatStatus.disabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "update.desired-disable-l4-lb-firewall-reconciliation" => Some(("update.desiredDisableL4LbFirewallReconciliation", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "update.desired-dns-config.additive-vpc-scope-dns-domain" => Some(("update.desiredDnsConfig.additiveVpcScopeDnsDomain", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update.desired-dns-config.cluster-dns" => Some(("update.desiredDnsConfig.clusterDns", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update.desired-dns-config.cluster-dns-domain" => Some(("update.desiredDnsConfig.clusterDnsDomain", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -9808,7 +10973,9 @@ where
                     "update.desired-enable-fqdn-network-policy" => Some(("update.desiredEnableFqdnNetworkPolicy", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "update.desired-enable-multi-networking" => Some(("update.desiredEnableMultiNetworking", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "update.desired-enable-private-endpoint" => Some(("update.desiredEnablePrivateEndpoint", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "update.desired-enterprise-config.desired-tier" => Some(("update.desiredEnterpriseConfig.desiredTier", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update.desired-fleet.membership" => Some(("update.desiredFleet.membership", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-fleet.membership-type" => Some(("update.desiredFleet.membershipType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update.desired-fleet.pre-registered" => Some(("update.desiredFleet.preRegistered", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "update.desired-fleet.project" => Some(("update.desiredFleet.project", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update.desired-gateway-api-config.channel" => Some(("update.desiredGatewayApiConfig.channel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -9822,27 +10989,100 @@ where
                     "update.desired-locations" => Some(("update.desiredLocations", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "update.desired-logging-config.component-config.enable-components" => Some(("update.desiredLoggingConfig.componentConfig.enableComponents", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "update.desired-logging-service" => Some(("update.desiredLoggingService", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-managed-opentelemetry-config.scope" => Some(("update.desiredManagedOpentelemetryConfig.scope", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update.desired-master-authorized-networks-config.enabled" => Some(("update.desiredMasterAuthorizedNetworksConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "update.desired-master-authorized-networks-config.gcp-public-cidrs-access-enabled" => Some(("update.desiredMasterAuthorizedNetworksConfig.gcpPublicCidrsAccessEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "update.desired-master-authorized-networks-config.private-endpoint-enforcement-enabled" => Some(("update.desiredMasterAuthorizedNetworksConfig.privateEndpointEnforcementEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "update.desired-master-version" => Some(("update.desiredMasterVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update.desired-mesh-certificates.enable-certificates" => Some(("update.desiredMeshCertificates.enableCertificates", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "update.desired-monitoring-config.advanced-datapath-observability-config.enable-metrics" => Some(("update.desiredMonitoringConfig.advancedDatapathObservabilityConfig.enableMetrics", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "update.desired-monitoring-config.advanced-datapath-observability-config.enable-relay" => Some(("update.desiredMonitoringConfig.advancedDatapathObservabilityConfig.enableRelay", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "update.desired-monitoring-config.advanced-datapath-observability-config.relay-mode" => Some(("update.desiredMonitoringConfig.advancedDatapathObservabilityConfig.relayMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update.desired-monitoring-config.component-config.enable-components" => Some(("update.desiredMonitoringConfig.componentConfig.enableComponents", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "update.desired-monitoring-config.managed-prometheus-config.auto-monitoring-config.scope" => Some(("update.desiredMonitoringConfig.managedPrometheusConfig.autoMonitoringConfig.scope", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update.desired-monitoring-config.managed-prometheus-config.enabled" => Some(("update.desiredMonitoringConfig.managedPrometheusConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "update.desired-monitoring-service" => Some(("update.desiredMonitoringService", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update.desired-network-performance-config.total-egress-bandwidth-tier" => Some(("update.desiredNetworkPerformanceConfig.totalEgressBandwidthTier", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-network-tier-config.network-tier" => Some(("update.desiredNetworkTierConfig.networkTier", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-node-kubelet-config.allowed-unsafe-sysctls" => Some(("update.desiredNodeKubeletConfig.allowedUnsafeSysctls", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "update.desired-node-kubelet-config.container-log-max-files" => Some(("update.desiredNodeKubeletConfig.containerLogMaxFiles", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "update.desired-node-kubelet-config.container-log-max-size" => Some(("update.desiredNodeKubeletConfig.containerLogMaxSize", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update.desired-node-kubelet-config.cpu-cfs-quota" => Some(("update.desiredNodeKubeletConfig.cpuCfsQuota", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "update.desired-node-kubelet-config.cpu-cfs-quota-period" => Some(("update.desiredNodeKubeletConfig.cpuCfsQuotaPeriod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update.desired-node-kubelet-config.cpu-manager-policy" => Some(("update.desiredNodeKubeletConfig.cpuManagerPolicy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-node-kubelet-config.eviction-max-pod-grace-period-seconds" => Some(("update.desiredNodeKubeletConfig.evictionMaxPodGracePeriodSeconds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "update.desired-node-kubelet-config.eviction-minimum-reclaim.imagefs-available" => Some(("update.desiredNodeKubeletConfig.evictionMinimumReclaim.imagefsAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-node-kubelet-config.eviction-minimum-reclaim.imagefs-inodes-free" => Some(("update.desiredNodeKubeletConfig.evictionMinimumReclaim.imagefsInodesFree", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-node-kubelet-config.eviction-minimum-reclaim.memory-available" => Some(("update.desiredNodeKubeletConfig.evictionMinimumReclaim.memoryAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-node-kubelet-config.eviction-minimum-reclaim.nodefs-available" => Some(("update.desiredNodeKubeletConfig.evictionMinimumReclaim.nodefsAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-node-kubelet-config.eviction-minimum-reclaim.nodefs-inodes-free" => Some(("update.desiredNodeKubeletConfig.evictionMinimumReclaim.nodefsInodesFree", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-node-kubelet-config.eviction-minimum-reclaim.pid-available" => Some(("update.desiredNodeKubeletConfig.evictionMinimumReclaim.pidAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-node-kubelet-config.eviction-soft.imagefs-available" => Some(("update.desiredNodeKubeletConfig.evictionSoft.imagefsAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-node-kubelet-config.eviction-soft.imagefs-inodes-free" => Some(("update.desiredNodeKubeletConfig.evictionSoft.imagefsInodesFree", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-node-kubelet-config.eviction-soft.memory-available" => Some(("update.desiredNodeKubeletConfig.evictionSoft.memoryAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-node-kubelet-config.eviction-soft.nodefs-available" => Some(("update.desiredNodeKubeletConfig.evictionSoft.nodefsAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-node-kubelet-config.eviction-soft.nodefs-inodes-free" => Some(("update.desiredNodeKubeletConfig.evictionSoft.nodefsInodesFree", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-node-kubelet-config.eviction-soft.pid-available" => Some(("update.desiredNodeKubeletConfig.evictionSoft.pidAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-node-kubelet-config.eviction-soft-grace-period.imagefs-available" => Some(("update.desiredNodeKubeletConfig.evictionSoftGracePeriod.imagefsAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-node-kubelet-config.eviction-soft-grace-period.imagefs-inodes-free" => Some(("update.desiredNodeKubeletConfig.evictionSoftGracePeriod.imagefsInodesFree", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-node-kubelet-config.eviction-soft-grace-period.memory-available" => Some(("update.desiredNodeKubeletConfig.evictionSoftGracePeriod.memoryAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-node-kubelet-config.eviction-soft-grace-period.nodefs-available" => Some(("update.desiredNodeKubeletConfig.evictionSoftGracePeriod.nodefsAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-node-kubelet-config.eviction-soft-grace-period.nodefs-inodes-free" => Some(("update.desiredNodeKubeletConfig.evictionSoftGracePeriod.nodefsInodesFree", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-node-kubelet-config.eviction-soft-grace-period.pid-available" => Some(("update.desiredNodeKubeletConfig.evictionSoftGracePeriod.pidAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-node-kubelet-config.image-gc-high-threshold-percent" => Some(("update.desiredNodeKubeletConfig.imageGcHighThresholdPercent", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "update.desired-node-kubelet-config.image-gc-low-threshold-percent" => Some(("update.desiredNodeKubeletConfig.imageGcLowThresholdPercent", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "update.desired-node-kubelet-config.image-maximum-gc-age" => Some(("update.desiredNodeKubeletConfig.imageMaximumGcAge", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-node-kubelet-config.image-minimum-gc-age" => Some(("update.desiredNodeKubeletConfig.imageMinimumGcAge", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update.desired-node-kubelet-config.insecure-kubelet-readonly-port-enabled" => Some(("update.desiredNodeKubeletConfig.insecureKubeletReadonlyPortEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "update.desired-node-kubelet-config.max-parallel-image-pulls" => Some(("update.desiredNodeKubeletConfig.maxParallelImagePulls", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "update.desired-node-kubelet-config.memory-manager.policy" => Some(("update.desiredNodeKubeletConfig.memoryManager.policy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update.desired-node-kubelet-config.pod-pids-limit" => Some(("update.desiredNodeKubeletConfig.podPidsLimit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-node-kubelet-config.single-process-oom-kill" => Some(("update.desiredNodeKubeletConfig.singleProcessOomKill", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "update.desired-node-kubelet-config.topology-manager.policy" => Some(("update.desiredNodeKubeletConfig.topologyManager.policy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-node-kubelet-config.topology-manager.scope" => Some(("update.desiredNodeKubeletConfig.topologyManager.scope", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-node-pool-auto-config-kubelet-config.allowed-unsafe-sysctls" => Some(("update.desiredNodePoolAutoConfigKubeletConfig.allowedUnsafeSysctls", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "update.desired-node-pool-auto-config-kubelet-config.container-log-max-files" => Some(("update.desiredNodePoolAutoConfigKubeletConfig.containerLogMaxFiles", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "update.desired-node-pool-auto-config-kubelet-config.container-log-max-size" => Some(("update.desiredNodePoolAutoConfigKubeletConfig.containerLogMaxSize", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update.desired-node-pool-auto-config-kubelet-config.cpu-cfs-quota" => Some(("update.desiredNodePoolAutoConfigKubeletConfig.cpuCfsQuota", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "update.desired-node-pool-auto-config-kubelet-config.cpu-cfs-quota-period" => Some(("update.desiredNodePoolAutoConfigKubeletConfig.cpuCfsQuotaPeriod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update.desired-node-pool-auto-config-kubelet-config.cpu-manager-policy" => Some(("update.desiredNodePoolAutoConfigKubeletConfig.cpuManagerPolicy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-node-pool-auto-config-kubelet-config.eviction-max-pod-grace-period-seconds" => Some(("update.desiredNodePoolAutoConfigKubeletConfig.evictionMaxPodGracePeriodSeconds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "update.desired-node-pool-auto-config-kubelet-config.eviction-minimum-reclaim.imagefs-available" => Some(("update.desiredNodePoolAutoConfigKubeletConfig.evictionMinimumReclaim.imagefsAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-node-pool-auto-config-kubelet-config.eviction-minimum-reclaim.imagefs-inodes-free" => Some(("update.desiredNodePoolAutoConfigKubeletConfig.evictionMinimumReclaim.imagefsInodesFree", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-node-pool-auto-config-kubelet-config.eviction-minimum-reclaim.memory-available" => Some(("update.desiredNodePoolAutoConfigKubeletConfig.evictionMinimumReclaim.memoryAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-node-pool-auto-config-kubelet-config.eviction-minimum-reclaim.nodefs-available" => Some(("update.desiredNodePoolAutoConfigKubeletConfig.evictionMinimumReclaim.nodefsAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-node-pool-auto-config-kubelet-config.eviction-minimum-reclaim.nodefs-inodes-free" => Some(("update.desiredNodePoolAutoConfigKubeletConfig.evictionMinimumReclaim.nodefsInodesFree", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-node-pool-auto-config-kubelet-config.eviction-minimum-reclaim.pid-available" => Some(("update.desiredNodePoolAutoConfigKubeletConfig.evictionMinimumReclaim.pidAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-node-pool-auto-config-kubelet-config.eviction-soft.imagefs-available" => Some(("update.desiredNodePoolAutoConfigKubeletConfig.evictionSoft.imagefsAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-node-pool-auto-config-kubelet-config.eviction-soft.imagefs-inodes-free" => Some(("update.desiredNodePoolAutoConfigKubeletConfig.evictionSoft.imagefsInodesFree", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-node-pool-auto-config-kubelet-config.eviction-soft.memory-available" => Some(("update.desiredNodePoolAutoConfigKubeletConfig.evictionSoft.memoryAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-node-pool-auto-config-kubelet-config.eviction-soft.nodefs-available" => Some(("update.desiredNodePoolAutoConfigKubeletConfig.evictionSoft.nodefsAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-node-pool-auto-config-kubelet-config.eviction-soft.nodefs-inodes-free" => Some(("update.desiredNodePoolAutoConfigKubeletConfig.evictionSoft.nodefsInodesFree", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-node-pool-auto-config-kubelet-config.eviction-soft.pid-available" => Some(("update.desiredNodePoolAutoConfigKubeletConfig.evictionSoft.pidAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-node-pool-auto-config-kubelet-config.eviction-soft-grace-period.imagefs-available" => Some(("update.desiredNodePoolAutoConfigKubeletConfig.evictionSoftGracePeriod.imagefsAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-node-pool-auto-config-kubelet-config.eviction-soft-grace-period.imagefs-inodes-free" => Some(("update.desiredNodePoolAutoConfigKubeletConfig.evictionSoftGracePeriod.imagefsInodesFree", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-node-pool-auto-config-kubelet-config.eviction-soft-grace-period.memory-available" => Some(("update.desiredNodePoolAutoConfigKubeletConfig.evictionSoftGracePeriod.memoryAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-node-pool-auto-config-kubelet-config.eviction-soft-grace-period.nodefs-available" => Some(("update.desiredNodePoolAutoConfigKubeletConfig.evictionSoftGracePeriod.nodefsAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-node-pool-auto-config-kubelet-config.eviction-soft-grace-period.nodefs-inodes-free" => Some(("update.desiredNodePoolAutoConfigKubeletConfig.evictionSoftGracePeriod.nodefsInodesFree", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-node-pool-auto-config-kubelet-config.eviction-soft-grace-period.pid-available" => Some(("update.desiredNodePoolAutoConfigKubeletConfig.evictionSoftGracePeriod.pidAvailable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-node-pool-auto-config-kubelet-config.image-gc-high-threshold-percent" => Some(("update.desiredNodePoolAutoConfigKubeletConfig.imageGcHighThresholdPercent", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "update.desired-node-pool-auto-config-kubelet-config.image-gc-low-threshold-percent" => Some(("update.desiredNodePoolAutoConfigKubeletConfig.imageGcLowThresholdPercent", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "update.desired-node-pool-auto-config-kubelet-config.image-maximum-gc-age" => Some(("update.desiredNodePoolAutoConfigKubeletConfig.imageMaximumGcAge", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-node-pool-auto-config-kubelet-config.image-minimum-gc-age" => Some(("update.desiredNodePoolAutoConfigKubeletConfig.imageMinimumGcAge", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update.desired-node-pool-auto-config-kubelet-config.insecure-kubelet-readonly-port-enabled" => Some(("update.desiredNodePoolAutoConfigKubeletConfig.insecureKubeletReadonlyPortEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "update.desired-node-pool-auto-config-kubelet-config.max-parallel-image-pulls" => Some(("update.desiredNodePoolAutoConfigKubeletConfig.maxParallelImagePulls", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "update.desired-node-pool-auto-config-kubelet-config.memory-manager.policy" => Some(("update.desiredNodePoolAutoConfigKubeletConfig.memoryManager.policy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update.desired-node-pool-auto-config-kubelet-config.pod-pids-limit" => Some(("update.desiredNodePoolAutoConfigKubeletConfig.podPidsLimit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-node-pool-auto-config-kubelet-config.single-process-oom-kill" => Some(("update.desiredNodePoolAutoConfigKubeletConfig.singleProcessOomKill", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "update.desired-node-pool-auto-config-kubelet-config.topology-manager.policy" => Some(("update.desiredNodePoolAutoConfigKubeletConfig.topologyManager.policy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-node-pool-auto-config-kubelet-config.topology-manager.scope" => Some(("update.desiredNodePoolAutoConfigKubeletConfig.topologyManager.scope", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-node-pool-auto-config-linux-node-config.cgroup-mode" => Some(("update.desiredNodePoolAutoConfigLinuxNodeConfig.cgroupMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-node-pool-auto-config-linux-node-config.hugepages.hugepage-size1g" => Some(("update.desiredNodePoolAutoConfigLinuxNodeConfig.hugepages.hugepageSize1g", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "update.desired-node-pool-auto-config-linux-node-config.hugepages.hugepage-size2m" => Some(("update.desiredNodePoolAutoConfigLinuxNodeConfig.hugepages.hugepageSize2m", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "update.desired-node-pool-auto-config-linux-node-config.node-kernel-module-loading.policy" => Some(("update.desiredNodePoolAutoConfigLinuxNodeConfig.nodeKernelModuleLoading.policy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-node-pool-auto-config-linux-node-config.sysctls" => Some(("update.desiredNodePoolAutoConfigLinuxNodeConfig.sysctls", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "update.desired-node-pool-auto-config-linux-node-config.transparent-hugepage-defrag" => Some(("update.desiredNodePoolAutoConfigLinuxNodeConfig.transparentHugepageDefrag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-node-pool-auto-config-linux-node-config.transparent-hugepage-enabled" => Some(("update.desiredNodePoolAutoConfigLinuxNodeConfig.transparentHugepageEnabled", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update.desired-node-pool-auto-config-network-tags.tags" => Some(("update.desiredNodePoolAutoConfigNetworkTags.tags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "update.desired-node-pool-auto-config-resource-manager-tags.tags" => Some(("update.desiredNodePoolAutoConfigResourceManagerTags.tags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "update.desired-node-pool-autoscaling.autoprovisioned" => Some(("update.desiredNodePoolAutoscaling.autoprovisioned", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -9860,6 +11100,7 @@ where
                     "update.desired-notification-config.pubsub.topic" => Some(("update.desiredNotificationConfig.pubsub.topic", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update.desired-parent-product-config.labels" => Some(("update.desiredParentProductConfig.labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "update.desired-parent-product-config.product-name" => Some(("update.desiredParentProductConfig.productName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-pod-autoscaling.hpa-profile" => Some(("update.desiredPodAutoscaling.hpaProfile", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update.desired-private-cluster-config.enable-private-endpoint" => Some(("update.desiredPrivateClusterConfig.enablePrivateEndpoint", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "update.desired-private-cluster-config.enable-private-nodes" => Some(("update.desiredPrivateClusterConfig.enablePrivateNodes", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "update.desired-private-cluster-config.master-global-access-config.enabled" => Some(("update.desiredPrivateClusterConfig.masterGlobalAccessConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -9869,23 +11110,48 @@ where
                     "update.desired-private-cluster-config.private-endpoint-subnetwork" => Some(("update.desiredPrivateClusterConfig.privateEndpointSubnetwork", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update.desired-private-cluster-config.public-endpoint" => Some(("update.desiredPrivateClusterConfig.publicEndpoint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update.desired-private-ipv6-google-access" => Some(("update.desiredPrivateIpv6GoogleAccess", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-privileged-admission-config.allowlist-paths" => Some(("update.desiredPrivilegedAdmissionConfig.allowlistPaths", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "update.desired-rbac-binding-config.enable-insecure-binding-system-authenticated" => Some(("update.desiredRbacBindingConfig.enableInsecureBindingSystemAuthenticated", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "update.desired-rbac-binding-config.enable-insecure-binding-system-unauthenticated" => Some(("update.desiredRbacBindingConfig.enableInsecureBindingSystemUnauthenticated", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "update.desired-release-channel.channel" => Some(("update.desiredReleaseChannel.channel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update.desired-resource-usage-export-config.bigquery-destination.dataset-id" => Some(("update.desiredResourceUsageExportConfig.bigqueryDestination.datasetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update.desired-resource-usage-export-config.consumption-metering-config.enabled" => Some(("update.desiredResourceUsageExportConfig.consumptionMeteringConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "update.desired-resource-usage-export-config.enable-network-egress-metering" => Some(("update.desiredResourceUsageExportConfig.enableNetworkEgressMetering", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "update.desired-secret-manager-config.enabled" => Some(("update.desiredSecretManagerConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "update.desired-secret-manager-config.rotation-config.enabled" => Some(("update.desiredSecretManagerConfig.rotationConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "update.desired-secret-manager-config.rotation-config.rotation-interval" => Some(("update.desiredSecretManagerConfig.rotationConfig.rotationInterval", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update.desired-security-posture-config.mode" => Some(("update.desiredSecurityPostureConfig.mode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update.desired-security-posture-config.vulnerability-mode" => Some(("update.desiredSecurityPostureConfig.vulnerabilityMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update.desired-service-external-ips-config.enabled" => Some(("update.desiredServiceExternalIpsConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "update.desired-shielded-nodes.enabled" => Some(("update.desiredShieldedNodes.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "update.desired-stack-type" => Some(("update.desiredStackType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-user-managed-keys-config.aggregation-ca" => Some(("update.desiredUserManagedKeysConfig.aggregationCa", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-user-managed-keys-config.cluster-ca" => Some(("update.desiredUserManagedKeysConfig.clusterCa", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-user-managed-keys-config.control-plane-disk-encryption-key" => Some(("update.desiredUserManagedKeysConfig.controlPlaneDiskEncryptionKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-user-managed-keys-config.control-plane-disk-encryption-key-versions" => Some(("update.desiredUserManagedKeysConfig.controlPlaneDiskEncryptionKeyVersions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "update.desired-user-managed-keys-config.etcd-api-ca" => Some(("update.desiredUserManagedKeysConfig.etcdApiCa", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-user-managed-keys-config.etcd-peer-ca" => Some(("update.desiredUserManagedKeysConfig.etcdPeerCa", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-user-managed-keys-config.gkeops-etcd-backup-encryption-key" => Some(("update.desiredUserManagedKeysConfig.gkeopsEtcdBackupEncryptionKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-user-managed-keys-config.service-account-signing-keys" => Some(("update.desiredUserManagedKeysConfig.serviceAccountSigningKeys", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "update.desired-user-managed-keys-config.service-account-verification-keys" => Some(("update.desiredUserManagedKeysConfig.serviceAccountVerificationKeys", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "update.desired-vertical-pod-autoscaling.enabled" => Some(("update.desiredVerticalPodAutoscaling.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "update.desired-workload-identity-config.workload-pool" => Some(("update.desiredWorkloadIdentityConfig.workloadPool", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update.enable-k8s-beta-apis.enabled-apis" => Some(("update.enableK8sBetaApis.enabledApis", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "update.etag" => Some(("update.etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.gke-auto-upgrade-config.patch-mode" => Some(("update.gkeAutoUpgradeConfig.patchMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update.removed-additional-pod-ranges-config.pod-range-names" => Some(("update.removedAdditionalPodRangesConfig.podRangeNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "update.user-managed-keys-config.aggregation-ca" => Some(("update.userManagedKeysConfig.aggregationCa", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.user-managed-keys-config.cluster-ca" => Some(("update.userManagedKeysConfig.clusterCa", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.user-managed-keys-config.control-plane-disk-encryption-key" => Some(("update.userManagedKeysConfig.controlPlaneDiskEncryptionKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.user-managed-keys-config.control-plane-disk-encryption-key-versions" => Some(("update.userManagedKeysConfig.controlPlaneDiskEncryptionKeyVersions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "update.user-managed-keys-config.etcd-api-ca" => Some(("update.userManagedKeysConfig.etcdApiCa", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.user-managed-keys-config.etcd-peer-ca" => Some(("update.userManagedKeysConfig.etcdPeerCa", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.user-managed-keys-config.gkeops-etcd-backup-encryption-key" => Some(("update.userManagedKeysConfig.gkeopsEtcdBackupEncryptionKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.user-managed-keys-config.service-account-signing-keys" => Some(("update.userManagedKeysConfig.serviceAccountSigningKeys", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "update.user-managed-keys-config.service-account-verification-keys" => Some(("update.userManagedKeysConfig.serviceAccountVerificationKeys", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "zone" => Some(("zone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["additional-pod-ranges-config", "additive-vpc-scope-dns-domain", "advanced-datapath-observability-config", "allow-net-admin", "auto-repair", "auto-upgrade", "auto-upgrade-start-time", "autoprovisioned", "autoprovisioning-locations", "autoprovisioning-node-pool-defaults", "autoscaling-profile", "batch-node-count", "batch-percentage", "batch-soak-duration", "bigquery-destination", "blue-green-settings", "boot-disk-kms-key", "channel", "cloud-run-config", "cluster-dns", "cluster-dns-domain", "cluster-dns-scope", "cluster-id", "component-config", "config-connector-config", "consumption-metering-config", "cpu-cfs-quota", "cpu-cfs-quota-period", "cpu-manager-policy", "current-state", "dataset-id", "decryption-keys", "description", "desired-addons-config", "desired-authenticator-groups-config", "desired-autopilot-workload-policy-config", "desired-binary-authorization", "desired-cluster-autoscaling", "desired-containerd-config", "desired-cost-management-config", "desired-database-encryption", "desired-datapath-provider", "desired-default-snat-status", "desired-dns-config", "desired-enable-cilium-clusterwide-network-policy", "desired-enable-fqdn-network-policy", "desired-enable-multi-networking", "desired-enable-private-endpoint", "desired-fleet", "desired-gateway-api-config", "desired-gcfs-config", "desired-identity-service-config", "desired-image-type", "desired-in-transit-encryption-config", "desired-intra-node-visibility-config", "desired-k8s-beta-apis", "desired-l4ilb-subsetting-config", "desired-locations", "desired-logging-config", "desired-logging-service", "desired-master-authorized-networks-config", "desired-master-version", "desired-mesh-certificates", "desired-monitoring-config", "desired-monitoring-service", "desired-network-performance-config", "desired-node-kubelet-config", "desired-node-pool-auto-config-kubelet-config", "desired-node-pool-auto-config-network-tags", "desired-node-pool-auto-config-resource-manager-tags", "desired-node-pool-autoscaling", "desired-node-pool-id", "desired-node-pool-logging-config", "desired-node-version", "desired-notification-config", "desired-parent-product-config", "desired-private-cluster-config", "desired-private-ipv6-google-access", "desired-release-channel", "desired-resource-usage-export-config", "desired-security-posture-config", "desired-service-external-ips-config", "desired-shielded-nodes", "desired-stack-type", "desired-vertical-pod-autoscaling", "desired-workload-identity-config", "disabled", "disk-size-gb", "disk-type", "dns-cache-config", "enable-certificates", "enable-components", "enable-integrity-monitoring", "enable-k8s-beta-apis", "enable-metrics", "enable-network-egress-metering", "enable-node-autoprovisioning", "enable-private-endpoint", "enable-private-nodes", "enable-relay", "enable-secure-boot", "enabled", "enabled-apis", "etag", "evaluation-mode", "event-type", "filter", "gce-persistent-disk-csi-driver-config", "gcp-filestore-csi-driver-config", "gcp-public-cidrs-access-enabled", "gcs-fuse-csi-driver-config", "gke-backup-agent-config", "horizontal-pod-autoscaling", "http-load-balancing", "image-type", "insecure-kubelet-readonly-port-enabled", "key-name", "kubernetes-dashboard", "labels", "load-balancer-type", "location-policy", "managed-prometheus-config", "management", "master-global-access-config", "master-ipv4-cidr-block", "max-node-count", "max-surge", "max-unavailable", "membership", "min-cpu-platform", "min-node-count", "mode", "name", "network-policy-config", "node-pool-soak-duration", "oauth-scopes", "peering-name", "pod-pids-limit", "pod-range-names", "pre-registered", "private-endpoint", "private-endpoint-subnetwork", "private-registry-access-config", "product-name", "project", "project-id", "public-endpoint", "pubsub", "relay-mode", "removed-additional-pod-ranges-config", "security-group", "service-account", "shielded-instance-config", "standard-rollout-policy", "state", "stateful-ha-config", "strategy", "tags", "topic", "total-egress-bandwidth-tier", "total-max-node-count", "total-min-node-count", "update", "upgrade-options", "upgrade-settings", "variant", "variant-config", "vulnerability-mode", "workload-pool", "zone"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["additional-pod-ranges-config", "additive-vpc-scope-dns-domain", "advanced-datapath-observability-config", "aggregation-ca", "allow-external-traffic", "allow-net-admin", "allowed-unsafe-sysctls", "allowlist-paths", "authorized-networks-config", "auto-monitoring-config", "auto-repair", "auto-upgrade", "auto-upgrade-start-time", "autopilot-compatibility-auditing-enabled", "autoprovisioned", "autoprovisioning-locations", "autoprovisioning-node-pool-defaults", "autoscaled-rollout-policy", "autoscaling-profile", "batch-node-count", "batch-percentage", "batch-soak-duration", "bigquery-destination", "blue-green-settings", "boot-disk-kms-key", "cgroup-mode", "channel", "cloud-run-config", "cluster-ca", "cluster-dns", "cluster-dns-domain", "cluster-dns-scope", "cluster-id", "component-config", "config-connector-config", "consumption-metering-config", "container-log-max-files", "container-log-max-size", "control-plane-disk-encryption-key", "control-plane-disk-encryption-key-versions", "cpu-cfs-quota", "cpu-cfs-quota-period", "cpu-manager-policy", "current-state", "dataset-id", "decryption-keys", "default-compute-class-config", "description", "desired-addons-config", "desired-anonymous-authentication-config", "desired-authenticator-groups-config", "desired-auto-ipam-config", "desired-autopilot-workload-policy-config", "desired-binary-authorization", "desired-cluster-autoscaling", "desired-compliance-posture-config", "desired-containerd-config", "desired-control-plane-endpoints-config", "desired-cost-management-config", "desired-database-encryption", "desired-datapath-provider", "desired-default-enable-private-nodes", "desired-default-snat-status", "desired-disable-l4-lb-firewall-reconciliation", "desired-dns-config", "desired-enable-cilium-clusterwide-network-policy", "desired-enable-fqdn-network-policy", "desired-enable-multi-networking", "desired-enable-private-endpoint", "desired-enterprise-config", "desired-fleet", "desired-gateway-api-config", "desired-gcfs-config", "desired-identity-service-config", "desired-image-type", "desired-in-transit-encryption-config", "desired-intra-node-visibility-config", "desired-k8s-beta-apis", "desired-l4ilb-subsetting-config", "desired-locations", "desired-logging-config", "desired-logging-service", "desired-managed-opentelemetry-config", "desired-master-authorized-networks-config", "desired-master-version", "desired-mesh-certificates", "desired-monitoring-config", "desired-monitoring-service", "desired-network-performance-config", "desired-network-tier-config", "desired-node-kubelet-config", "desired-node-pool-auto-config-kubelet-config", "desired-node-pool-auto-config-linux-node-config", "desired-node-pool-auto-config-network-tags", "desired-node-pool-auto-config-resource-manager-tags", "desired-node-pool-autoscaling", "desired-node-pool-id", "desired-node-pool-logging-config", "desired-node-version", "desired-notification-config", "desired-parent-product-config", "desired-pod-autoscaling", "desired-private-cluster-config", "desired-private-ipv6-google-access", "desired-privileged-admission-config", "desired-rbac-binding-config", "desired-release-channel", "desired-resource-usage-export-config", "desired-secret-manager-config", "desired-security-posture-config", "desired-service-external-ips-config", "desired-shielded-nodes", "desired-stack-type", "desired-tier", "desired-user-managed-keys-config", "desired-vertical-pod-autoscaling", "desired-workload-identity-config", "disabled", "disk-size-gb", "disk-type", "dns-cache-config", "dns-endpoint-config", "enable-certificates", "enable-components", "enable-insecure-binding-system-authenticated", "enable-insecure-binding-system-unauthenticated", "enable-integrity-monitoring", "enable-k8s-beta-apis", "enable-k8s-certs-via-dns", "enable-k8s-tokens-via-dns", "enable-legacy-lustre-port", "enable-metrics", "enable-network-egress-metering", "enable-node-autoprovisioning", "enable-private-endpoint", "enable-private-nodes", "enable-public-endpoint", "enable-relay", "enable-secure-boot", "enabled", "enabled-apis", "endpoint", "etag", "etcd-api-ca", "etcd-peer-ca", "evaluation-mode", "event-type", "eviction-max-pod-grace-period-seconds", "eviction-minimum-reclaim", "eviction-soft", "eviction-soft-grace-period", "filter", "gce-persistent-disk-csi-driver-config", "gcp-filestore-csi-driver-config", "gcp-public-cidrs-access-enabled", "gcs-fuse-csi-driver-config", "gke-auto-upgrade-config", "gke-backup-agent-config", "gkeops-etcd-backup-encryption-key", "global-access", "high-scale-checkpointing-config", "horizontal-pod-autoscaling", "hpa-profile", "http-load-balancing", "hugepage-size1g", "hugepage-size2m", "hugepages", "image-gc-high-threshold-percent", "image-gc-low-threshold-percent", "image-maximum-gc-age", "image-minimum-gc-age", "image-type", "imagefs-available", "imagefs-inodes-free", "insecure-kubelet-readonly-port-enabled", "ip-endpoints-config", "key-name", "kubernetes-dashboard", "labels", "load-balancer-type", "location-policy", "lustre-csi-driver-config", "managed-prometheus-config", "management", "master-global-access-config", "master-ipv4-cidr-block", "max-node-count", "max-parallel-image-pulls", "max-surge", "max-unavailable", "membership", "membership-type", "memory-available", "memory-manager", "min-cpu-platform", "min-node-count", "mode", "name", "network-policy-config", "network-tier", "node-kernel-module-loading", "node-pool-soak-duration", "nodefs-available", "nodefs-inodes-free", "oauth-scopes", "parallelstore-csi-driver-config", "patch-mode", "peering-name", "pid-available", "pod-pids-limit", "pod-range-names", "policy", "pre-registered", "private-endpoint", "private-endpoint-enforcement-enabled", "private-endpoint-subnetwork", "private-registry-access-config", "product-name", "project", "project-id", "public-endpoint", "pubsub", "ray-cluster-logging-config", "ray-cluster-monitoring-config", "ray-operator-config", "relay-mode", "removed-additional-pod-ranges-config", "rotation-config", "rotation-interval", "scope", "security-group", "service-account", "service-account-signing-keys", "service-account-verification-keys", "shielded-instance-config", "single-process-oom-kill", "standard-rollout-policy", "state", "stateful-ha-config", "strategy", "sysctls", "tags", "topic", "topology-manager", "total-egress-bandwidth-tier", "total-max-node-count", "total-min-node-count", "transparent-hugepage-defrag", "transparent-hugepage-enabled", "update", "upgrade-options", "upgrade-settings", "user-managed-keys-config", "variant", "variant-config", "vulnerability-mode", "wait-for-drain-duration", "workload-pool", "writable-cgroups", "zone"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -10431,6 +11697,13 @@ where
                         ._projects_locations_clusters_delete(opt, dry_run, &mut err)
                         .await;
                 }
+                ("locations-clusters-fetch-cluster-upgrade-info", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_clusters_fetch_cluster_upgrade_info(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
                 ("locations-clusters-get", Some(opt)) => {
                     call_result = self
                         ._projects_locations_clusters_get(opt, dry_run, &mut err)
@@ -10461,6 +11734,13 @@ where
                 ("locations-clusters-node-pools-delete", Some(opt)) => {
                     call_result = self
                         ._projects_locations_clusters_node_pools_delete(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("locations-clusters-node-pools-fetch-node-pool-upgrade-info", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_clusters_node_pools_fetch_node_pool_upgrade_info(
+                            opt, dry_run, &mut err,
+                        )
                         .await;
                 }
                 ("locations-clusters-node-pools-get", Some(opt)) => {
@@ -10609,6 +11889,11 @@ where
                         ._projects_zones_clusters_delete(opt, dry_run, &mut err)
                         .await;
                 }
+                ("zones-clusters-fetch-cluster-upgrade-info", Some(opt)) => {
+                    call_result = self
+                        ._projects_zones_clusters_fetch_cluster_upgrade_info(opt, dry_run, &mut err)
+                        .await;
+                }
                 ("zones-clusters-get", Some(opt)) => {
                     call_result = self
                         ._projects_zones_clusters_get(opt, dry_run, &mut err)
@@ -10657,6 +11942,13 @@ where
                 ("zones-clusters-node-pools-delete", Some(opt)) => {
                     call_result = self
                         ._projects_zones_clusters_node_pools_delete(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("zones-clusters-node-pools-fetch-node-pool-upgrade-info", Some(opt)) => {
+                    call_result = self
+                        ._projects_zones_clusters_node_pools_fetch_node_pool_upgrade_info(
+                            opt, dry_run, &mut err,
+                        )
                         .await;
                 }
                 ("zones-clusters-node-pools-get", Some(opt)) => {
@@ -10785,7 +12077,9 @@ where
         let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
             secret,
             yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-            hyper_util::client::legacy::Client::builder(executor).build(connector),
+            yup_oauth2::client::CustomHyperClientBuilder::from(
+                hyper_util::client::legacy::Client::builder(executor).build(connector),
+            ),
         )
         .persist_tokens_to_disk(format!("{}/container1", config_dir))
         .build()
@@ -10838,7 +12132,7 @@ where
 async fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("projects", "methods: 'aggregated-usable-subnetworks-list', 'locations-clusters-check-autopilot-compatibility', 'locations-clusters-complete-ip-rotation', 'locations-clusters-create', 'locations-clusters-delete', 'locations-clusters-get', 'locations-clusters-get-jwks', 'locations-clusters-list', 'locations-clusters-node-pools-complete-upgrade', 'locations-clusters-node-pools-create', 'locations-clusters-node-pools-delete', 'locations-clusters-node-pools-get', 'locations-clusters-node-pools-list', 'locations-clusters-node-pools-rollback', 'locations-clusters-node-pools-set-autoscaling', 'locations-clusters-node-pools-set-management', 'locations-clusters-node-pools-set-size', 'locations-clusters-node-pools-update', 'locations-clusters-set-addons', 'locations-clusters-set-legacy-abac', 'locations-clusters-set-locations', 'locations-clusters-set-logging', 'locations-clusters-set-maintenance-policy', 'locations-clusters-set-master-auth', 'locations-clusters-set-monitoring', 'locations-clusters-set-network-policy', 'locations-clusters-set-resource-labels', 'locations-clusters-start-ip-rotation', 'locations-clusters-update', 'locations-clusters-update-master', 'locations-clusters-well-known-get-openid-configuration', 'locations-get-server-config', 'locations-operations-cancel', 'locations-operations-get', 'locations-operations-list', 'zones-clusters-addons', 'zones-clusters-complete-ip-rotation', 'zones-clusters-create', 'zones-clusters-delete', 'zones-clusters-get', 'zones-clusters-legacy-abac', 'zones-clusters-list', 'zones-clusters-locations', 'zones-clusters-logging', 'zones-clusters-master', 'zones-clusters-monitoring', 'zones-clusters-node-pools-autoscaling', 'zones-clusters-node-pools-create', 'zones-clusters-node-pools-delete', 'zones-clusters-node-pools-get', 'zones-clusters-node-pools-list', 'zones-clusters-node-pools-rollback', 'zones-clusters-node-pools-set-management', 'zones-clusters-node-pools-set-size', 'zones-clusters-node-pools-update', 'zones-clusters-resource-labels', 'zones-clusters-set-maintenance-policy', 'zones-clusters-set-master-auth', 'zones-clusters-set-network-policy', 'zones-clusters-start-ip-rotation', 'zones-clusters-update', 'zones-get-serverconfig', 'zones-operations-cancel', 'zones-operations-get' and 'zones-operations-list'", vec![
+        ("projects", "methods: 'aggregated-usable-subnetworks-list', 'locations-clusters-check-autopilot-compatibility', 'locations-clusters-complete-ip-rotation', 'locations-clusters-create', 'locations-clusters-delete', 'locations-clusters-fetch-cluster-upgrade-info', 'locations-clusters-get', 'locations-clusters-get-jwks', 'locations-clusters-list', 'locations-clusters-node-pools-complete-upgrade', 'locations-clusters-node-pools-create', 'locations-clusters-node-pools-delete', 'locations-clusters-node-pools-fetch-node-pool-upgrade-info', 'locations-clusters-node-pools-get', 'locations-clusters-node-pools-list', 'locations-clusters-node-pools-rollback', 'locations-clusters-node-pools-set-autoscaling', 'locations-clusters-node-pools-set-management', 'locations-clusters-node-pools-set-size', 'locations-clusters-node-pools-update', 'locations-clusters-set-addons', 'locations-clusters-set-legacy-abac', 'locations-clusters-set-locations', 'locations-clusters-set-logging', 'locations-clusters-set-maintenance-policy', 'locations-clusters-set-master-auth', 'locations-clusters-set-monitoring', 'locations-clusters-set-network-policy', 'locations-clusters-set-resource-labels', 'locations-clusters-start-ip-rotation', 'locations-clusters-update', 'locations-clusters-update-master', 'locations-clusters-well-known-get-openid-configuration', 'locations-get-server-config', 'locations-operations-cancel', 'locations-operations-get', 'locations-operations-list', 'zones-clusters-addons', 'zones-clusters-complete-ip-rotation', 'zones-clusters-create', 'zones-clusters-delete', 'zones-clusters-fetch-cluster-upgrade-info', 'zones-clusters-get', 'zones-clusters-legacy-abac', 'zones-clusters-list', 'zones-clusters-locations', 'zones-clusters-logging', 'zones-clusters-master', 'zones-clusters-monitoring', 'zones-clusters-node-pools-autoscaling', 'zones-clusters-node-pools-create', 'zones-clusters-node-pools-delete', 'zones-clusters-node-pools-fetch-node-pool-upgrade-info', 'zones-clusters-node-pools-get', 'zones-clusters-node-pools-list', 'zones-clusters-node-pools-rollback', 'zones-clusters-node-pools-set-management', 'zones-clusters-node-pools-set-size', 'zones-clusters-node-pools-update', 'zones-clusters-resource-labels', 'zones-clusters-set-maintenance-policy', 'zones-clusters-set-master-auth', 'zones-clusters-set-network-policy', 'zones-clusters-start-ip-rotation', 'zones-clusters-update', 'zones-get-serverconfig', 'zones-operations-cancel', 'zones-operations-get' and 'zones-operations-list'", vec![
             ("aggregated-usable-subnetworks-list",
                     Some(r##"Lists subnetworks that are usable for creating clusters in a project."##),
                     "Details at http://byron.github.io/google-apis-rs/google_container1_cli/projects_aggregated-usable-subnetworks-list",
@@ -10905,7 +12199,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-clusters-create",
-                    Some(r##"Creates a cluster, consisting of the specified number and type of Google Compute Engine instances. By default, the cluster is created in the project's [default network](https://cloud.google.com/compute/docs/networks-and-firewalls#networks). One firewall is added for the cluster. After cluster creation, the Kubelet creates routes for each node to allow the containers on that node to communicate with all other instances in the cluster. Finally, an entry is added to the project's global metadata indicating which CIDR range the cluster is using."##),
+                    Some(r##"Creates a cluster, consisting of the specified number and type of Google Compute Engine instances. By default, the cluster is created in the project's [default network](https://cloud.google.com/compute/docs/networks-and-firewalls#networks). One firewall is added for the cluster. After cluster creation, the kubelet creates routes for each node to allow the containers on that node to communicate with all other instances in the cluster. Finally, an entry is added to the project's global metadata indicating which CIDR range the cluster is using."##),
                     "Details at http://byron.github.io/google-apis-rs/google_container1_cli/projects_locations-clusters-create",
                   vec![
                     (Some(r##"parent"##),
@@ -10936,6 +12230,26 @@ async fn main() {
                     (Some(r##"name"##),
                      None,
                      Some(r##"The name (project, location, cluster) of the cluster to delete. Specified in the format `projects/*/locations/*/clusters/*`."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-clusters-fetch-cluster-upgrade-info",
+                    Some(r##"Fetch upgrade information of a specific cluster."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_container1_cli/projects_locations-clusters-fetch-cluster-upgrade-info",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The name (project, location, cluster) of the cluster to get. Specified in the format `projects/*/locations/*/clusters/*` or `projects/*/zones/*/clusters/*`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -11066,6 +12380,26 @@ async fn main() {
                     (Some(r##"name"##),
                      None,
                      Some(r##"The name (project, location, cluster, node pool id) of the node pool to delete. Specified in the format `projects/*/locations/*/clusters/*/nodePools/*`."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-clusters-node-pools-fetch-node-pool-upgrade-info",
+                    Some(r##"Fetch upgrade information of a specific nodepool."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_container1_cli/projects_locations-clusters-node-pools-fetch-node-pool-upgrade-info",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The name (project, location, cluster, nodepool) of the nodepool to get. Specified in the format `projects/*/locations/*/clusters/*/nodePools/*` or `projects/*/zones/*/clusters/*/nodePools/*`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -11720,7 +13054,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("zones-clusters-create",
-                    Some(r##"Creates a cluster, consisting of the specified number and type of Google Compute Engine instances. By default, the cluster is created in the project's [default network](https://cloud.google.com/compute/docs/networks-and-firewalls#networks). One firewall is added for the cluster. After cluster creation, the Kubelet creates routes for each node to allow the containers on that node to communicate with all other instances in the cluster. Finally, an entry is added to the project's global metadata indicating which CIDR range the cluster is using."##),
+                    Some(r##"Creates a cluster, consisting of the specified number and type of Google Compute Engine instances. By default, the cluster is created in the project's [default network](https://cloud.google.com/compute/docs/networks-and-firewalls#networks). One firewall is added for the cluster. After cluster creation, the kubelet creates routes for each node to allow the containers on that node to communicate with all other instances in the cluster. Finally, an entry is added to the project's global metadata indicating which CIDR range the cluster is using."##),
                     "Details at http://byron.github.io/google-apis-rs/google_container1_cli/projects_zones-clusters-create",
                   vec![
                     (Some(r##"project-id"##),
@@ -11766,6 +13100,26 @@ async fn main() {
                     (Some(r##"cluster-id"##),
                      None,
                      Some(r##"Deprecated. The name of the cluster to delete. This field has been deprecated and replaced by the name field."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("zones-clusters-fetch-cluster-upgrade-info",
+                    Some(r##"Fetch upgrade information of a specific cluster."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_container1_cli/projects_zones-clusters-fetch-cluster-upgrade-info",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The name (project, location, cluster) of the cluster to get. Specified in the format `projects/*/locations/*/clusters/*` or `projects/*/zones/*/clusters/*`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -12106,6 +13460,26 @@ async fn main() {
                     (Some(r##"node-pool-id"##),
                      None,
                      Some(r##"Deprecated. The name of the node pool to delete. This field has been deprecated and replaced by the name field."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("zones-clusters-node-pools-fetch-node-pool-upgrade-info",
+                    Some(r##"Fetch upgrade information of a specific nodepool."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_container1_cli/projects_zones-clusters-node-pools-fetch-node-pool-upgrade-info",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The name (project, location, cluster, nodepool) of the nodepool to get. Specified in the format `projects/*/locations/*/clusters/*/nodePools/*` or `projects/*/zones/*/clusters/*/nodePools/*`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -12674,7 +14048,7 @@ async fn main() {
 
     let mut app = App::new("container1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("6.0.0+20240608")
+           .version("7.0.0+20251216")
            .about("Builds and manages container-based applications, powered by the open source Kubernetes technology.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_container1_cli")
            .arg(Arg::with_name("url")
@@ -12739,7 +14113,7 @@ async fn main() {
         .with_native_roots()
         .unwrap()
         .https_or_http()
-        .enable_http1()
+        .enable_http2()
         .build();
 
     match Engine::new(matches, connector).await {

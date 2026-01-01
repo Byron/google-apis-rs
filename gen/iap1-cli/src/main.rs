@@ -582,6 +582,7 @@ where
                     "access-settings.policy-delegation-settings.policy-name.region" => Some(("accessSettings.policyDelegationSettings.policyName.region", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "access-settings.policy-delegation-settings.policy-name.type" => Some(("accessSettings.policyDelegationSettings.policyName.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "access-settings.policy-delegation-settings.resource.labels" => Some(("accessSettings.policyDelegationSettings.resource.labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "access-settings.policy-delegation-settings.resource.locations" => Some(("accessSettings.policyDelegationSettings.resource.locations", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "access-settings.policy-delegation-settings.resource.name" => Some(("accessSettings.policyDelegationSettings.resource.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "access-settings.policy-delegation-settings.resource.next-state-of-tags.tags-full-state.tags" => Some(("accessSettings.policyDelegationSettings.resource.nextStateOfTags.tagsFullState.tags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "access-settings.policy-delegation-settings.resource.next-state-of-tags.tags-full-state-for-child-resource.tags" => Some(("accessSettings.policyDelegationSettings.resource.nextStateOfTags.tagsFullStateForChildResource.tags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
@@ -606,7 +607,7 @@ where
                     "application-settings.csm-settings.rctoken-aud" => Some(("applicationSettings.csmSettings.rctokenAud", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["access-denied-page-settings", "access-denied-page-uri", "access-settings", "allow-http-options", "allowed-domains-settings", "application-settings", "attribute-propagation-settings", "client-id", "client-secret", "client-secret-sha256", "cookie-domain", "cors-settings", "csm-settings", "domains", "enable", "expression", "gcip-settings", "generate-troubleshooting-uri", "iam-permission", "iam-service-name", "id", "identity-sources", "labels", "login-hint", "login-page-uri", "max-age", "method", "name", "next-state-of-tags", "oauth2", "oauth-settings", "output-credentials", "policy-delegation-settings", "policy-name", "policy-type", "programmatic-clients", "rctoken-aud", "reauth-settings", "region", "remediation-token-generation-enabled", "resource", "service", "tag-keys-to-remove", "tags", "tags-full-state", "tags-full-state-for-child-resource", "tags-partial-state", "tags-to-upsert", "tenant-ids", "type", "workforce-identity-settings", "workforce-pools"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["access-denied-page-settings", "access-denied-page-uri", "access-settings", "allow-http-options", "allowed-domains-settings", "application-settings", "attribute-propagation-settings", "client-id", "client-secret", "client-secret-sha256", "cookie-domain", "cors-settings", "csm-settings", "domains", "enable", "expression", "gcip-settings", "generate-troubleshooting-uri", "iam-permission", "iam-service-name", "id", "identity-sources", "labels", "locations", "login-hint", "login-page-uri", "max-age", "method", "name", "next-state-of-tags", "oauth2", "oauth-settings", "output-credentials", "policy-delegation-settings", "policy-name", "policy-type", "programmatic-clients", "rctoken-aud", "reauth-settings", "region", "remediation-token-generation-enabled", "resource", "service", "tag-keys-to-remove", "tags", "tags-full-state", "tags-full-state-for-child-resource", "tags-partial-state", "tags-to-upsert", "tenant-ids", "type", "workforce-identity-settings", "workforce-pools"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2368,7 +2369,9 @@ where
         let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
             secret,
             yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-            hyper_util::client::legacy::Client::builder(executor).build(connector),
+            yup_oauth2::client::CustomHyperClientBuilder::from(
+                hyper_util::client::legacy::Client::builder(executor).build(connector),
+            ),
         )
         .persist_tokens_to_disk(format!("{}/iap1", config_dir))
         .build()
@@ -2854,7 +2857,7 @@ async fn main() {
 
     let mut app = App::new("iap1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("6.0.0+20240623")
+           .version("7.0.0+20251208")
            .about("Controls access to cloud applications running on Google Cloud Platform.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_iap1_cli")
            .arg(Arg::with_name("url")
@@ -2919,7 +2922,7 @@ async fn main() {
         .with_native_roots()
         .unwrap()
         .https_or_http()
-        .enable_http1()
+        .enable_http2()
         .build();
 
     match Engine::new(matches, connector).await {

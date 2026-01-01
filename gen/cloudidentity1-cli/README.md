@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Cloud Identity* API at revision *20240625*. The CLI is at version *6.0.0*.
+This documentation was generated from the *Cloud Identity* API at revision *20251216*. The CLI is at version *7.0.0*.
 
 ```bash
 cloudidentity1 [options]
@@ -74,6 +74,12 @@ cloudidentity1 [options]
                 patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 search [-p <v>]... [-o <out>]
                 update-security-settings <name> (-r <kv>)... [-p <v>]... [-o <out>]
+        inbound-oidc-sso-profiles
+                create (-r <kv>)... [-p <v>]... [-o <out>]
+                delete <name> [-p <v>]... [-o <out>]
+                get <name> [-p <v>]... [-o <out>]
+                list [-p <v>]... [-o <out>]
+                patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
         inbound-saml-sso-profiles
                 create (-r <kv>)... [-p <v>]... [-o <out>]
                 delete <name> [-p <v>]... [-o <out>]
@@ -90,6 +96,9 @@ cloudidentity1 [options]
                 get <name> [-p <v>]... [-o <out>]
                 list [-p <v>]... [-o <out>]
                 patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+        policies
+                get <name> [-p <v>]... [-o <out>]
+                list [-p <v>]... [-o <out>]
   cloudidentity1 --help
 
 Configuration:

@@ -350,6 +350,13 @@ where
         {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "return-partial-success" => {
+                    call = call.return_partial_success(
+                        value
+                            .map(|v| arg_from_str(v, err, "return-partial-success", "boolean"))
+                            .unwrap_or(false),
+                    );
+                }
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
                 }
@@ -380,7 +387,16 @@ where
                             .push(CLIError::UnknownParameter(key.to_string(), {
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
-                                v.extend(["filter", "page-size", "page-token"].iter().map(|v| *v));
+                                v.extend(
+                                    [
+                                        "filter",
+                                        "page-size",
+                                        "page-token",
+                                        "return-partial-success",
+                                    ]
+                                    .iter()
+                                    .map(|v| *v),
+                                );
                                 v
                             }));
                     }
@@ -667,6 +683,102 @@ where
                             .push(CLIError::UnknownParameter(key.to_string(), {
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _users_environments_generate_access_token(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .users()
+            .environments_generate_access_token(opt.value_of("environment").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "ttl" => {
+                    call = call.ttl(
+                        value
+                            .map(|v| arg_from_str(v, err, "ttl", "google-duration"))
+                            .unwrap_or(chrono::Duration::seconds(0)),
+                    );
+                }
+                "expire-time" => {
+                    call = call.expire_time(
+                        value
+                            .map(|v| arg_from_str(v, err, "expire-time", "google-datetime"))
+                            .unwrap_or(chrono::Utc::now()),
+                    );
+                }
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["expire-time", "ttl"].iter().map(|v| *v));
                                 v
                             }));
                     }
@@ -1110,6 +1222,11 @@ where
                         ._users_environments_authorize(opt, dry_run, &mut err)
                         .await;
                 }
+                ("environments-generate-access-token", Some(opt)) => {
+                    call_result = self
+                        ._users_environments_generate_access_token(opt, dry_run, &mut err)
+                        .await;
+                }
                 ("environments-get", Some(opt)) => {
                     call_result = self._users_environments_get(opt, dry_run, &mut err).await;
                 }
@@ -1167,7 +1284,9 @@ where
         let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
             secret,
             yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-            hyper_util::client::legacy::Client::builder(executor).build(connector),
+            yup_oauth2::client::CustomHyperClientBuilder::from(
+                hyper_util::client::legacy::Client::builder(executor).build(connector),
+            ),
         )
         .persist_tokens_to_disk(format!("{}/cloudshell1", config_dir))
         .build()
@@ -1222,7 +1341,7 @@ async fn main() {
     let arg_data = [
         ("operations", "methods: 'cancel', 'delete', 'get' and 'list'", vec![
             ("cancel",
-                    Some(r##"Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of 1, corresponding to `Code.CANCELLED`."##),
+                    Some(r##"Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of `1`, corresponding to `Code.CANCELLED`."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudshell1_cli/operations_cancel",
                   vec![
                     (Some(r##"name"##),
@@ -1307,7 +1426,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ]),
-            ("users", "methods: 'environments-add-public-key', 'environments-authorize', 'environments-get', 'environments-remove-public-key' and 'environments-start'", vec![
+            ("users", "methods: 'environments-add-public-key', 'environments-authorize', 'environments-generate-access-token', 'environments-get', 'environments-remove-public-key' and 'environments-start'", vec![
             ("environments-add-public-key",
                     Some(r##"Adds a public SSH key to an environment, allowing clients with the corresponding private key to connect to that environment via SSH. If a key with the same content already exists, this will error with ALREADY_EXISTS."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudshell1_cli/users_environments-add-public-key",
@@ -1347,6 +1466,26 @@ async fn main() {
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("environments-generate-access-token",
+                    Some(r##"Generates an access token for the user's environment."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_cloudshell1_cli/users_environments-generate-access-token",
+                  vec![
+                    (Some(r##"environment"##),
+                     None,
+                     Some(r##"Required. The environment to generate the access token for."##),
+                     Some(true),
+                     Some(false)),
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
@@ -1433,7 +1572,7 @@ async fn main() {
 
     let mut app = App::new("cloudshell1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("6.0.0+20240624")
+           .version("7.0.0+20251215")
            .about("Allows users to start, configure, and connect to interactive shell sessions running in the cloud. ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_cloudshell1_cli")
            .arg(Arg::with_name("url")
@@ -1498,7 +1637,7 @@ async fn main() {
         .with_native_roots()
         .unwrap()
         .https_or_http()
-        .enable_http1()
+        .enable_http2()
         .build();
 
     match Engine::new(matches, connector).await {

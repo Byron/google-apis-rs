@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Display Video* crate version *6.0.0+20240620*, where *20240620* is the exact revision of the *displayvideo:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v6.0.0*.
+//! This documentation was generated from *Display Video* crate version *7.0.0+20251204*, where *20251204* is the exact revision of the *displayvideo:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v7.0.0*.
 //!
 //! Everything else about the *Display Video* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/display-video/).
@@ -12,15 +12,13 @@
 //! Handle the following *Resources* with ease from the central [hub](DisplayVideo) ...
 //!
 //! * [advertisers](api::Advertiser)
-//!  * [*assets upload*](api::AdvertiserAssetUploadCall), [*audit*](api::AdvertiserAuditCall), [*bulk edit advertiser assigned targeting options*](api::AdvertiserBulkEditAdvertiserAssignedTargetingOptionCall), [*bulk list advertiser assigned targeting options*](api::AdvertiserBulkListAdvertiserAssignedTargetingOptionCall), [*campaigns bulk list campaign assigned targeting options*](api::AdvertiserCampaignBulkListCampaignAssignedTargetingOptionCall), [*campaigns create*](api::AdvertiserCampaignCreateCall), [*campaigns delete*](api::AdvertiserCampaignDeleteCall), [*campaigns get*](api::AdvertiserCampaignGetCall), [*campaigns list*](api::AdvertiserCampaignListCall), [*campaigns patch*](api::AdvertiserCampaignPatchCall), [*campaigns targeting types assigned targeting options get*](api::AdvertiserCampaignTargetingTypeAssignedTargetingOptionGetCall), [*campaigns targeting types assigned targeting options list*](api::AdvertiserCampaignTargetingTypeAssignedTargetingOptionListCall), [*channels create*](api::AdvertiserChannelCreateCall), [*channels get*](api::AdvertiserChannelGetCall), [*channels list*](api::AdvertiserChannelListCall), [*channels patch*](api::AdvertiserChannelPatchCall), [*channels sites bulk edit*](api::AdvertiserChannelSiteBulkEditCall), [*channels sites create*](api::AdvertiserChannelSiteCreateCall), [*channels sites delete*](api::AdvertiserChannelSiteDeleteCall), [*channels sites list*](api::AdvertiserChannelSiteListCall), [*channels sites replace*](api::AdvertiserChannelSiteReplaceCall), [*create*](api::AdvertiserCreateCall), [*creatives create*](api::AdvertiserCreativeCreateCall), [*creatives delete*](api::AdvertiserCreativeDeleteCall), [*creatives get*](api::AdvertiserCreativeGetCall), [*creatives list*](api::AdvertiserCreativeListCall), [*creatives patch*](api::AdvertiserCreativePatchCall), [*delete*](api::AdvertiserDeleteCall), [*get*](api::AdvertiserGetCall), [*insertion orders bulk list insertion order assigned targeting options*](api::AdvertiserInsertionOrderBulkListInsertionOrderAssignedTargetingOptionCall), [*insertion orders create*](api::AdvertiserInsertionOrderCreateCall), [*insertion orders delete*](api::AdvertiserInsertionOrderDeleteCall), [*insertion orders get*](api::AdvertiserInsertionOrderGetCall), [*insertion orders list*](api::AdvertiserInsertionOrderListCall), [*insertion orders patch*](api::AdvertiserInsertionOrderPatchCall), [*insertion orders targeting types assigned targeting options get*](api::AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionGetCall), [*insertion orders targeting types assigned targeting options list*](api::AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionListCall), [*invoices list*](api::AdvertiserInvoiceListCall), [*invoices lookup invoice currency*](api::AdvertiserInvoiceLookupInvoiceCurrencyCall), [*line items bulk edit line item assigned targeting options*](api::AdvertiserLineItemBulkEditLineItemAssignedTargetingOptionCall), [*line items bulk list line item assigned targeting options*](api::AdvertiserLineItemBulkListLineItemAssignedTargetingOptionCall), [*line items create*](api::AdvertiserLineItemCreateCall), [*line items delete*](api::AdvertiserLineItemDeleteCall), [*line items generate default*](api::AdvertiserLineItemGenerateDefaultCall), [*line items get*](api::AdvertiserLineItemGetCall), [*line items list*](api::AdvertiserLineItemListCall), [*line items patch*](api::AdvertiserLineItemPatchCall), [*line items targeting types assigned targeting options create*](api::AdvertiserLineItemTargetingTypeAssignedTargetingOptionCreateCall), [*line items targeting types assigned targeting options delete*](api::AdvertiserLineItemTargetingTypeAssignedTargetingOptionDeleteCall), [*line items targeting types assigned targeting options get*](api::AdvertiserLineItemTargetingTypeAssignedTargetingOptionGetCall), [*line items targeting types assigned targeting options list*](api::AdvertiserLineItemTargetingTypeAssignedTargetingOptionListCall), [*list*](api::AdvertiserListCall), [*location lists assigned locations bulk edit*](api::AdvertiserLocationListAssignedLocationBulkEditCall), [*location lists assigned locations create*](api::AdvertiserLocationListAssignedLocationCreateCall), [*location lists assigned locations delete*](api::AdvertiserLocationListAssignedLocationDeleteCall), [*location lists assigned locations list*](api::AdvertiserLocationListAssignedLocationListCall), [*location lists create*](api::AdvertiserLocationListCreateCall), [*location lists get*](api::AdvertiserLocationListGetCall), [*location lists list*](api::AdvertiserLocationListListCall), [*location lists patch*](api::AdvertiserLocationListPatchCall), [*manual triggers activate*](api::AdvertiserManualTriggerActivateCall), [*manual triggers create*](api::AdvertiserManualTriggerCreateCall), [*manual triggers deactivate*](api::AdvertiserManualTriggerDeactivateCall), [*manual triggers get*](api::AdvertiserManualTriggerGetCall), [*manual triggers list*](api::AdvertiserManualTriggerListCall), [*manual triggers patch*](api::AdvertiserManualTriggerPatchCall), [*negative keyword lists create*](api::AdvertiserNegativeKeywordListCreateCall), [*negative keyword lists delete*](api::AdvertiserNegativeKeywordListDeleteCall), [*negative keyword lists get*](api::AdvertiserNegativeKeywordListGetCall), [*negative keyword lists list*](api::AdvertiserNegativeKeywordListListCall), [*negative keyword lists negative keywords bulk edit*](api::AdvertiserNegativeKeywordListNegativeKeywordBulkEditCall), [*negative keyword lists negative keywords create*](api::AdvertiserNegativeKeywordListNegativeKeywordCreateCall), [*negative keyword lists negative keywords delete*](api::AdvertiserNegativeKeywordListNegativeKeywordDeleteCall), [*negative keyword lists negative keywords list*](api::AdvertiserNegativeKeywordListNegativeKeywordListCall), [*negative keyword lists negative keywords replace*](api::AdvertiserNegativeKeywordListNegativeKeywordReplaceCall), [*negative keyword lists patch*](api::AdvertiserNegativeKeywordListPatchCall), [*patch*](api::AdvertiserPatchCall), [*targeting types assigned targeting options create*](api::AdvertiserTargetingTypeAssignedTargetingOptionCreateCall), [*targeting types assigned targeting options delete*](api::AdvertiserTargetingTypeAssignedTargetingOptionDeleteCall), [*targeting types assigned targeting options get*](api::AdvertiserTargetingTypeAssignedTargetingOptionGetCall) and [*targeting types assigned targeting options list*](api::AdvertiserTargetingTypeAssignedTargetingOptionListCall)
+//!  * [*assets upload*](api::AdvertiserAssetUploadCall), [*audit*](api::AdvertiserAuditCall), [*bulk edit advertiser assigned targeting options*](api::AdvertiserBulkEditAdvertiserAssignedTargetingOptionCall), [*bulk list advertiser assigned targeting options*](api::AdvertiserBulkListAdvertiserAssignedTargetingOptionCall), [*campaigns create*](api::AdvertiserCampaignCreateCall), [*campaigns delete*](api::AdvertiserCampaignDeleteCall), [*campaigns get*](api::AdvertiserCampaignGetCall), [*campaigns list*](api::AdvertiserCampaignListCall), [*campaigns patch*](api::AdvertiserCampaignPatchCall), [*channels create*](api::AdvertiserChannelCreateCall), [*channels get*](api::AdvertiserChannelGetCall), [*channels list*](api::AdvertiserChannelListCall), [*channels patch*](api::AdvertiserChannelPatchCall), [*channels sites bulk edit*](api::AdvertiserChannelSiteBulkEditCall), [*channels sites create*](api::AdvertiserChannelSiteCreateCall), [*channels sites delete*](api::AdvertiserChannelSiteDeleteCall), [*channels sites list*](api::AdvertiserChannelSiteListCall), [*channels sites replace*](api::AdvertiserChannelSiteReplaceCall), [*create*](api::AdvertiserCreateCall), [*creatives create*](api::AdvertiserCreativeCreateCall), [*creatives delete*](api::AdvertiserCreativeDeleteCall), [*creatives get*](api::AdvertiserCreativeGetCall), [*creatives list*](api::AdvertiserCreativeListCall), [*creatives patch*](api::AdvertiserCreativePatchCall), [*delete*](api::AdvertiserDeleteCall), [*get*](api::AdvertiserGetCall), [*insertion orders create*](api::AdvertiserInsertionOrderCreateCall), [*insertion orders delete*](api::AdvertiserInsertionOrderDeleteCall), [*insertion orders get*](api::AdvertiserInsertionOrderGetCall), [*insertion orders list*](api::AdvertiserInsertionOrderListCall), [*insertion orders patch*](api::AdvertiserInsertionOrderPatchCall), [*invoices list*](api::AdvertiserInvoiceListCall), [*invoices lookup invoice currency*](api::AdvertiserInvoiceLookupInvoiceCurrencyCall), [*line items bulk edit line item assigned targeting options*](api::AdvertiserLineItemBulkEditLineItemAssignedTargetingOptionCall), [*line items bulk list line item assigned targeting options*](api::AdvertiserLineItemBulkListLineItemAssignedTargetingOptionCall), [*line items create*](api::AdvertiserLineItemCreateCall), [*line items delete*](api::AdvertiserLineItemDeleteCall), [*line items get*](api::AdvertiserLineItemGetCall), [*line items list*](api::AdvertiserLineItemListCall), [*line items patch*](api::AdvertiserLineItemPatchCall), [*line items targeting types assigned targeting options create*](api::AdvertiserLineItemTargetingTypeAssignedTargetingOptionCreateCall), [*line items targeting types assigned targeting options delete*](api::AdvertiserLineItemTargetingTypeAssignedTargetingOptionDeleteCall), [*line items targeting types assigned targeting options get*](api::AdvertiserLineItemTargetingTypeAssignedTargetingOptionGetCall), [*line items targeting types assigned targeting options list*](api::AdvertiserLineItemTargetingTypeAssignedTargetingOptionListCall), [*list*](api::AdvertiserListCall), [*location lists assigned locations bulk edit*](api::AdvertiserLocationListAssignedLocationBulkEditCall), [*location lists assigned locations create*](api::AdvertiserLocationListAssignedLocationCreateCall), [*location lists assigned locations delete*](api::AdvertiserLocationListAssignedLocationDeleteCall), [*location lists assigned locations list*](api::AdvertiserLocationListAssignedLocationListCall), [*location lists create*](api::AdvertiserLocationListCreateCall), [*location lists get*](api::AdvertiserLocationListGetCall), [*location lists list*](api::AdvertiserLocationListListCall), [*location lists patch*](api::AdvertiserLocationListPatchCall), [*manual triggers activate*](api::AdvertiserManualTriggerActivateCall), [*manual triggers create*](api::AdvertiserManualTriggerCreateCall), [*manual triggers deactivate*](api::AdvertiserManualTriggerDeactivateCall), [*manual triggers get*](api::AdvertiserManualTriggerGetCall), [*manual triggers list*](api::AdvertiserManualTriggerListCall), [*manual triggers patch*](api::AdvertiserManualTriggerPatchCall), [*negative keyword lists create*](api::AdvertiserNegativeKeywordListCreateCall), [*negative keyword lists delete*](api::AdvertiserNegativeKeywordListDeleteCall), [*negative keyword lists get*](api::AdvertiserNegativeKeywordListGetCall), [*negative keyword lists list*](api::AdvertiserNegativeKeywordListListCall), [*negative keyword lists negative keywords bulk edit*](api::AdvertiserNegativeKeywordListNegativeKeywordBulkEditCall), [*negative keyword lists negative keywords create*](api::AdvertiserNegativeKeywordListNegativeKeywordCreateCall), [*negative keyword lists negative keywords delete*](api::AdvertiserNegativeKeywordListNegativeKeywordDeleteCall), [*negative keyword lists negative keywords list*](api::AdvertiserNegativeKeywordListNegativeKeywordListCall), [*negative keyword lists negative keywords replace*](api::AdvertiserNegativeKeywordListNegativeKeywordReplaceCall), [*negative keyword lists patch*](api::AdvertiserNegativeKeywordListPatchCall), [*patch*](api::AdvertiserPatchCall), [*targeting types assigned targeting options create*](api::AdvertiserTargetingTypeAssignedTargetingOptionCreateCall), [*targeting types assigned targeting options delete*](api::AdvertiserTargetingTypeAssignedTargetingOptionDeleteCall), [*targeting types assigned targeting options get*](api::AdvertiserTargetingTypeAssignedTargetingOptionGetCall) and [*targeting types assigned targeting options list*](api::AdvertiserTargetingTypeAssignedTargetingOptionListCall)
 //! * [combined audiences](api::CombinedAudience)
 //!  * [*get*](api::CombinedAudienceGetCall) and [*list*](api::CombinedAudienceListCall)
 //! * [custom bidding algorithms](api::CustomBiddingAlgorithm)
 //!  * [*create*](api::CustomBiddingAlgorithmCreateCall), [*get*](api::CustomBiddingAlgorithmGetCall), [*list*](api::CustomBiddingAlgorithmListCall), [*patch*](api::CustomBiddingAlgorithmPatchCall), [*scripts create*](api::CustomBiddingAlgorithmScriptCreateCall), [*scripts get*](api::CustomBiddingAlgorithmScriptGetCall), [*scripts list*](api::CustomBiddingAlgorithmScriptListCall) and [*upload script*](api::CustomBiddingAlgorithmUploadScriptCall)
 //! * [custom lists](api::CustomList)
 //!  * [*get*](api::CustomListGetCall) and [*list*](api::CustomListListCall)
-//! * [first and third party audiences](api::FirstAndThirdPartyAudience)
-//!  * [*create*](api::FirstAndThirdPartyAudienceCreateCall), [*edit customer match members*](api::FirstAndThirdPartyAudienceEditCustomerMatchMemberCall), [*get*](api::FirstAndThirdPartyAudienceGetCall), [*list*](api::FirstAndThirdPartyAudienceListCall) and [*patch*](api::FirstAndThirdPartyAudiencePatchCall)
 //! * [floodlight groups](api::FloodlightGroup)
 //!  * [*get*](api::FloodlightGroupGetCall) and [*patch*](api::FloodlightGroupPatchCall)
 //! * [google audiences](api::GoogleAudience)
@@ -85,9 +83,6 @@
 //!
 //! ```ignore
 //! let r = hub.advertisers().assets_upload(...).doit().await
-//! let r = hub.advertisers().campaigns_targeting_types_assigned_targeting_options_get(...).doit().await
-//! let r = hub.advertisers().campaigns_targeting_types_assigned_targeting_options_list(...).doit().await
-//! let r = hub.advertisers().campaigns_bulk_list_campaign_assigned_targeting_options(...).doit().await
 //! let r = hub.advertisers().campaigns_create(...).doit().await
 //! let r = hub.advertisers().campaigns_delete(...).doit().await
 //! let r = hub.advertisers().campaigns_get(...).doit().await
@@ -107,9 +102,6 @@
 //! let r = hub.advertisers().creatives_get(...).doit().await
 //! let r = hub.advertisers().creatives_list(...).doit().await
 //! let r = hub.advertisers().creatives_patch(...).doit().await
-//! let r = hub.advertisers().insertion_orders_targeting_types_assigned_targeting_options_get(...).doit().await
-//! let r = hub.advertisers().insertion_orders_targeting_types_assigned_targeting_options_list(...).doit().await
-//! let r = hub.advertisers().insertion_orders_bulk_list_insertion_order_assigned_targeting_options(...).doit().await
 //! let r = hub.advertisers().insertion_orders_create(...).doit().await
 //! let r = hub.advertisers().insertion_orders_delete(...).doit().await
 //! let r = hub.advertisers().insertion_orders_get(...).doit().await
@@ -125,7 +117,6 @@
 //! let r = hub.advertisers().line_items_bulk_list_line_item_assigned_targeting_options(...).doit().await
 //! let r = hub.advertisers().line_items_create(...).doit().await
 //! let r = hub.advertisers().line_items_delete(...).doit().await
-//! let r = hub.advertisers().line_items_generate_default(...).doit().await
 //! let r = hub.advertisers().line_items_get(...).doit().await
 //! let r = hub.advertisers().line_items_list(...).doit().await
 //! let r = hub.advertisers().line_items_patch(...).doit().await
@@ -203,9 +194,20 @@
 //! // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about
 //! // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 //! // retrieve them from storage.
-//! let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+//! let connector = hyper_rustls::HttpsConnectorBuilder::new()
+//!     .with_native_roots()
+//!     .unwrap()
+//!     .https_only()
+//!     .enable_http2()
+//!     .build();
+//!
+//! let executor = hyper_util::rt::TokioExecutor::new();
+//! let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 //!     secret,
 //!     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+//!     yup_oauth2::client::CustomHyperClientBuilder::from(
+//!         hyper_util::client::legacy::Client::builder(executor).build(connector),
+//!     ),
 //! ).build().await.unwrap();
 //!
 //! let client = hyper_util::client::legacy::Client::builder(
@@ -216,14 +218,15 @@
 //!         .with_native_roots()
 //!         .unwrap()
 //!         .https_or_http()
-//!         .enable_http1()
+//!         .enable_http2()
 //!         .build()
 //! );
 //! let mut hub = DisplayVideo::new(client, auth);
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
-//! let result = hub.advertisers().campaigns_targeting_types_assigned_targeting_options_list(-80, -2, "targetingType")
+//! let result = hub.advertisers().channels_sites_list(-80, -2)
+//!              .partner_id(-59)
 //!              .page_token("amet.")
 //!              .page_size(-20)
 //!              .order_by("ipsum")

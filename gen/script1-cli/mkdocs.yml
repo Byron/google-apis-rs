@@ -1,0 +1,34 @@
+site_name: Script v7.0.0+20251130
+site_url: http://byron.github.io/google-apis-rs/google-script1-cli
+site_description: A complete library to interact with Script (protocol v1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/script1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+nav:
+- Home: 'index.md'
+- 'Processes':
+    - 'List': 'processes_list.md'
+    - 'List Script Processes': 'processes_list-script-processes.md'
+- 'Projects':
+    - 'Create': 'projects_create.md'
+    - 'Deployments Create': 'projects_deployments-create.md'
+    - 'Deployments Delete': 'projects_deployments-delete.md'
+    - 'Deployments Get': 'projects_deployments-get.md'
+    - 'Deployments List': 'projects_deployments-list.md'
+    - 'Deployments Update': 'projects_deployments-update.md'
+    - 'Get': 'projects_get.md'
+    - 'Get Content': 'projects_get-content.md'
+    - 'Get Metrics': 'projects_get-metrics.md'
+    - 'Update Content': 'projects_update-content.md'
+    - 'Versions Create': 'projects_versions-create.md'
+    - 'Versions Get': 'projects_versions-get.md'
+    - 'Versions List': 'projects_versions-list.md'
+- 'Scripts':
+    - 'Run': 'scripts_run.md'
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015–2024, `Sebastian Thiel`

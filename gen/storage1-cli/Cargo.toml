@@ -4,7 +4,7 @@
 [package]
 
 name = "google-storage1-cli"
-version = "7.0.0+20240621"
+version = "7.0.0+20251218"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with storage (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/storage1-cli"
@@ -41,5 +41,5 @@ google-clis-common = { path = "../../google-clis-common", version = "8" }
 
 [dependencies.google-storage1]
 path = "../storage1"
-version = "7.0.0+20240621"
+version = "7.0.0+20251218"
 

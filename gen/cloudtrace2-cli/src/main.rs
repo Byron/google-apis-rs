@@ -517,7 +517,9 @@ where
         let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
             secret,
             yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-            hyper_util::client::legacy::Client::builder(executor).build(connector),
+            yup_oauth2::client::CustomHyperClientBuilder::from(
+                hyper_util::client::legacy::Client::builder(executor).build(connector),
+            ),
         )
         .persist_tokens_to_disk(format!("{}/cloudtrace2", config_dir))
         .build()
@@ -572,7 +574,7 @@ async fn main() {
     let arg_data = [
         ("projects", "methods: 'traces-batch-write' and 'traces-spans-create-span'", vec![
             ("traces-batch-write",
-                    Some(r##"Batch writes new spans to new or existing traces. You cannot update existing spans."##),
+                    Some(r##"Batch writes new spans to new or existing traces. You cannot update existing spans. If a span ID already exists, an additional copy of the span will be stored."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudtrace2_cli/projects_traces-batch-write",
                   vec![
                     (Some(r##"name"##),
@@ -597,7 +599,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("traces-spans-create-span",
-                    Some(r##"Creates a new span."##),
+                    Some(r##"Creates a new span. If a span ID already exists, an additional copy of the span will be stored."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudtrace2_cli/projects_traces-spans-create-span",
                   vec![
                     (Some(r##"name"##),
@@ -626,7 +628,7 @@ async fn main() {
 
     let mut app = App::new("cloudtrace2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("6.0.0+20240621")
+           .version("7.0.0+20251212")
            .about("Sends application trace data to Cloud Trace for viewing. Trace data is collected for all App Engine applications by default. Trace data from other applications can be provided using this API. This library is used to interact with the Cloud Trace API directly. If you are looking to instrument your application for Cloud Trace, we recommend using OpenTelemetry. ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_cloudtrace2_cli")
            .arg(Arg::with_name("url")
@@ -691,7 +693,7 @@ async fn main() {
         .with_native_roots()
         .unwrap()
         .https_or_http()
-        .enable_http1()
+        .enable_http2()
         .build();
 
     match Engine::new(matches, connector).await {

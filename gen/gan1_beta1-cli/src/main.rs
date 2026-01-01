@@ -471,10 +471,16 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
+        let link_id: i64 = arg_from_str(
+            &opt.value_of("link-id").unwrap_or(""),
+            err,
+            "<link-id>",
+            "int64",
+        );
         let mut call = self.hub.links().get(
             opt.value_of("role").unwrap_or(""),
             opt.value_of("role-id").unwrap_or(""),
-            opt.value_of("link-id").unwrap_or(""),
+            link_id,
         );
         for parg in opt
             .values_of("v")
@@ -1521,7 +1527,9 @@ where
         let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
             secret,
             yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-            hyper_util::client::legacy::Client::builder(executor).build(connector),
+            yup_oauth2::client::CustomHyperClientBuilder::from(
+                hyper_util::client::legacy::Client::builder(executor).build(connector),
+            ),
         )
         .persist_tokens_to_disk(format!("{}/gan1-beta1", config_dir))
         .build()
@@ -1843,7 +1851,7 @@ async fn main() {
 
     let mut app = App::new("gan1-beta1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("6.0.0+20130205")
+           .version("7.0.0+20130205")
            .about("Lets you have programmatic access to your Google Affiliate Network data.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_gan1_beta1_cli")
            .arg(Arg::with_name("folder")
@@ -1903,7 +1911,7 @@ async fn main() {
         .with_native_roots()
         .unwrap()
         .https_or_http()
-        .enable_http1()
+        .enable_http2()
         .build();
 
     match Engine::new(matches, connector).await {

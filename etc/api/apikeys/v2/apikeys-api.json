@@ -396,7 +396,7 @@
             }
         }
     },
-    "revision": "20240623",
+    "revision": "20251202",
     "rootUrl": "https://apikeys.googleapis.com/",
     "schemas": {
         "Operation": {
@@ -502,7 +502,7 @@
                     "type": "array"
                 },
                 "service": {
-                    "description": "The service for this restriction. It should be the canonical service name, for example: `translate.googleapis.com`. You can use [`gcloud services list`](/sdk/gcloud/reference/services/list) to get a list of services that are enabled in the project.",
+                    "description": "The service for this restriction. It should be the canonical service name, for example: `translate.googleapis.com`. You can use [`gcloud services list`](https://cloud.google.com/sdk/gcloud/reference/services/list) to get a list of services that are enabled in the project.",
                     "type": "string"
                 }
             },
@@ -592,6 +592,10 @@
                 "restrictions": {
                     "$ref": "V2Restrictions",
                     "description": "Key restrictions."
+                },
+                "serviceAccountEmail": {
+                    "description": "Optional. The email address of [the service account](https://cloud.google.com/iam/docs/service-accounts) the key is bound to.",
+                    "type": "string"
                 },
                 "uid": {
                     "description": "Output only. Unique id in UUID4 format.",

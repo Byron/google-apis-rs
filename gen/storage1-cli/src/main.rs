@@ -1959,6 +1959,13 @@ where
                 "user-project" => {
                     call = call.user_project(value.unwrap_or(""));
                 }
+                "soft-deleted" => {
+                    call = call.soft_deleted(
+                        value
+                            .map(|v| arg_from_str(v, err, "soft-deleted", "boolean"))
+                            .unwrap_or(false),
+                    );
+                }
                 "projection" => {
                     call = call.projection(value.unwrap_or(""));
                 }
@@ -1973,6 +1980,13 @@ where
                     call = call.if_metageneration_match(
                         value
                             .map(|v| arg_from_str(v, err, "if-metageneration-match", "int64"))
+                            .unwrap_or(-0),
+                    );
+                }
+                "generation" => {
+                    call = call.generation(
+                        value
+                            .map(|v| arg_from_str(v, err, "generation", "int64"))
                             .unwrap_or(-0),
                     );
                 }
@@ -1995,9 +2009,11 @@ where
                                 v.extend(self.gp.iter().map(|v| *v));
                                 v.extend(
                                     [
+                                        "generation",
                                         "if-metageneration-match",
                                         "if-metageneration-not-match",
                                         "projection",
+                                        "soft-deleted",
                                         "user-project",
                                     ]
                                     .iter()
@@ -2312,6 +2328,42 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "encryption.customer-managed-encryption-enforcement-config.effective-time" => {
+                    Some((
+                        "encryption.customerManagedEncryptionEnforcementConfig.effectiveTime",
+                        JsonTypeInfo {
+                            jtype: JsonType::String,
+                            ctype: ComplexType::Pod,
+                        },
+                    ))
+                }
+                "encryption.customer-managed-encryption-enforcement-config.restriction-mode" => {
+                    Some((
+                        "encryption.customerManagedEncryptionEnforcementConfig.restrictionMode",
+                        JsonTypeInfo {
+                            jtype: JsonType::String,
+                            ctype: ComplexType::Pod,
+                        },
+                    ))
+                }
+                "encryption.customer-supplied-encryption-enforcement-config.effective-time" => {
+                    Some((
+                        "encryption.customerSuppliedEncryptionEnforcementConfig.effectiveTime",
+                        JsonTypeInfo {
+                            jtype: JsonType::String,
+                            ctype: ComplexType::Pod,
+                        },
+                    ))
+                }
+                "encryption.customer-supplied-encryption-enforcement-config.restriction-mode" => {
+                    Some((
+                        "encryption.customerSuppliedEncryptionEnforcementConfig.restrictionMode",
+                        JsonTypeInfo {
+                            jtype: JsonType::String,
+                            ctype: ComplexType::Pod,
+                        },
+                    ))
+                }
                 "encryption.default-kms-key-name" => Some((
                     "encryption.defaultKmsKeyName",
                     JsonTypeInfo {
@@ -2319,8 +2371,38 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "encryption.google-managed-encryption-enforcement-config.effective-time" => Some((
+                    "encryption.googleManagedEncryptionEnforcementConfig.effectiveTime",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "encryption.google-managed-encryption-enforcement-config.restriction-mode" => {
+                    Some((
+                        "encryption.googleManagedEncryptionEnforcementConfig.restrictionMode",
+                        JsonTypeInfo {
+                            jtype: JsonType::String,
+                            ctype: ComplexType::Pod,
+                        },
+                    ))
+                }
                 "etag" => Some((
                     "etag",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "generation" => Some((
+                    "generation",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "hard-delete-time" => Some((
+                    "hardDeleteTime",
                     JsonTypeInfo {
                         jtype: JsonType::String,
                         ctype: ComplexType::Pod,
@@ -2373,6 +2455,34 @@ where
                     JsonTypeInfo {
                         jtype: JsonType::String,
                         ctype: ComplexType::Pod,
+                    },
+                )),
+                "ip-filter.allow-all-service-agent-access" => Some((
+                    "ipFilter.allowAllServiceAgentAccess",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "ip-filter.allow-cross-org-vpcs" => Some((
+                    "ipFilter.allowCrossOrgVpcs",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "ip-filter.mode" => Some((
+                    "ipFilter.mode",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "ip-filter.public-network-source.allowed-ip-cidr-ranges" => Some((
+                    "ipFilter.publicNetworkSource.allowedIpCidrRanges",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
                     },
                 )),
                 "kind" => Some((
@@ -2487,6 +2597,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "satisfies-pzi" => Some((
+                    "satisfiesPZI",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "satisfies-pzs" => Some((
                     "satisfiesPZS",
                     JsonTypeInfo {
@@ -2510,6 +2627,13 @@ where
                 )),
                 "soft-delete-policy.retention-duration-seconds" => Some((
                     "softDeletePolicy.retentionDurationSeconds",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "soft-delete-time" => Some((
+                    "softDeleteTime",
                     JsonTypeInfo {
                         jtype: JsonType::String,
                         ctype: ComplexType::Pod,
@@ -2561,10 +2685,15 @@ where
                     let suggestion = FieldCursor::did_you_mean(
                         key,
                         &vec![
+                            "allow-all-service-agent-access",
+                            "allow-cross-org-vpcs",
+                            "allowed-ip-cidr-ranges",
                             "autoclass",
                             "billing",
                             "bucket-policy-only",
                             "custom-placement-config",
+                            "customer-managed-encryption-enforcement-config",
+                            "customer-supplied-encryption-enforcement-config",
                             "data-locations",
                             "default-event-based-hold",
                             "default-kms-key-name",
@@ -2574,9 +2703,13 @@ where
                             "entity",
                             "entity-id",
                             "etag",
+                            "generation",
+                            "google-managed-encryption-enforcement-config",
+                            "hard-delete-time",
                             "hierarchical-namespace",
                             "iam-configuration",
                             "id",
+                            "ip-filter",
                             "is-locked",
                             "kind",
                             "labels",
@@ -2595,14 +2728,18 @@ where
                             "owner",
                             "project-number",
                             "public-access-prevention",
+                            "public-network-source",
                             "requester-pays",
+                            "restriction-mode",
                             "retention-duration-seconds",
                             "retention-period",
                             "retention-policy",
                             "rpo",
+                            "satisfies-pzi",
                             "satisfies-pzs",
                             "self-link",
                             "soft-delete-policy",
+                            "soft-delete-time",
                             "storage-class",
                             "terminal-storage-class",
                             "terminal-storage-class-update-time",
@@ -2759,6 +2896,20 @@ where
                 "user-project" => {
                     call = call.user_project(value.unwrap_or(""));
                 }
+                "soft-deleted" => {
+                    call = call.soft_deleted(
+                        value
+                            .map(|v| arg_from_str(v, err, "soft-deleted", "boolean"))
+                            .unwrap_or(false),
+                    );
+                }
+                "return-partial-success" => {
+                    call = call.return_partial_success(
+                        value
+                            .map(|v| arg_from_str(v, err, "return-partial-success", "boolean"))
+                            .unwrap_or(false),
+                    );
+                }
                 "projection" => {
                     call = call.projection(value.unwrap_or(""));
                 }
@@ -2798,6 +2949,8 @@ where
                                         "page-token",
                                         "prefix",
                                         "projection",
+                                        "return-partial-success",
+                                        "soft-deleted",
                                         "user-project",
                                     ]
                                     .iter()
@@ -2936,6 +3089,133 @@ where
                     ostream.flush().unwrap();
                     Ok(())
                 }
+            }
+        }
+    }
+
+    async fn _buckets_operations_advance_relocate_bucket(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut field_cursor = FieldCursor::default();
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "expire-time" => Some((
+                    "expireTime",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "ttl" => Some((
+                    "ttl",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(key, &vec!["expire-time", "ttl"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
+            }
+        }
+        let mut request: api::AdvanceRelocateBucketOperationRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self.hub.buckets().operations_advance_relocate_bucket(
+            request,
+            opt.value_of("bucket").unwrap_or(""),
+            opt.value_of("operation-id").unwrap_or(""),
+        );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok(mut response) => Ok(()),
             }
         }
     }
@@ -3261,6 +3541,42 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "encryption.customer-managed-encryption-enforcement-config.effective-time" => {
+                    Some((
+                        "encryption.customerManagedEncryptionEnforcementConfig.effectiveTime",
+                        JsonTypeInfo {
+                            jtype: JsonType::String,
+                            ctype: ComplexType::Pod,
+                        },
+                    ))
+                }
+                "encryption.customer-managed-encryption-enforcement-config.restriction-mode" => {
+                    Some((
+                        "encryption.customerManagedEncryptionEnforcementConfig.restrictionMode",
+                        JsonTypeInfo {
+                            jtype: JsonType::String,
+                            ctype: ComplexType::Pod,
+                        },
+                    ))
+                }
+                "encryption.customer-supplied-encryption-enforcement-config.effective-time" => {
+                    Some((
+                        "encryption.customerSuppliedEncryptionEnforcementConfig.effectiveTime",
+                        JsonTypeInfo {
+                            jtype: JsonType::String,
+                            ctype: ComplexType::Pod,
+                        },
+                    ))
+                }
+                "encryption.customer-supplied-encryption-enforcement-config.restriction-mode" => {
+                    Some((
+                        "encryption.customerSuppliedEncryptionEnforcementConfig.restrictionMode",
+                        JsonTypeInfo {
+                            jtype: JsonType::String,
+                            ctype: ComplexType::Pod,
+                        },
+                    ))
+                }
                 "encryption.default-kms-key-name" => Some((
                     "encryption.defaultKmsKeyName",
                     JsonTypeInfo {
@@ -3268,8 +3584,38 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "encryption.google-managed-encryption-enforcement-config.effective-time" => Some((
+                    "encryption.googleManagedEncryptionEnforcementConfig.effectiveTime",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "encryption.google-managed-encryption-enforcement-config.restriction-mode" => {
+                    Some((
+                        "encryption.googleManagedEncryptionEnforcementConfig.restrictionMode",
+                        JsonTypeInfo {
+                            jtype: JsonType::String,
+                            ctype: ComplexType::Pod,
+                        },
+                    ))
+                }
                 "etag" => Some((
                     "etag",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "generation" => Some((
+                    "generation",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "hard-delete-time" => Some((
+                    "hardDeleteTime",
                     JsonTypeInfo {
                         jtype: JsonType::String,
                         ctype: ComplexType::Pod,
@@ -3322,6 +3668,34 @@ where
                     JsonTypeInfo {
                         jtype: JsonType::String,
                         ctype: ComplexType::Pod,
+                    },
+                )),
+                "ip-filter.allow-all-service-agent-access" => Some((
+                    "ipFilter.allowAllServiceAgentAccess",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "ip-filter.allow-cross-org-vpcs" => Some((
+                    "ipFilter.allowCrossOrgVpcs",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "ip-filter.mode" => Some((
+                    "ipFilter.mode",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "ip-filter.public-network-source.allowed-ip-cidr-ranges" => Some((
+                    "ipFilter.publicNetworkSource.allowedIpCidrRanges",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
                     },
                 )),
                 "kind" => Some((
@@ -3436,6 +3810,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "satisfies-pzi" => Some((
+                    "satisfiesPZI",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "satisfies-pzs" => Some((
                     "satisfiesPZS",
                     JsonTypeInfo {
@@ -3459,6 +3840,13 @@ where
                 )),
                 "soft-delete-policy.retention-duration-seconds" => Some((
                     "softDeletePolicy.retentionDurationSeconds",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "soft-delete-time" => Some((
+                    "softDeleteTime",
                     JsonTypeInfo {
                         jtype: JsonType::String,
                         ctype: ComplexType::Pod,
@@ -3510,10 +3898,15 @@ where
                     let suggestion = FieldCursor::did_you_mean(
                         key,
                         &vec![
+                            "allow-all-service-agent-access",
+                            "allow-cross-org-vpcs",
+                            "allowed-ip-cidr-ranges",
                             "autoclass",
                             "billing",
                             "bucket-policy-only",
                             "custom-placement-config",
+                            "customer-managed-encryption-enforcement-config",
+                            "customer-supplied-encryption-enforcement-config",
                             "data-locations",
                             "default-event-based-hold",
                             "default-kms-key-name",
@@ -3523,9 +3916,13 @@ where
                             "entity",
                             "entity-id",
                             "etag",
+                            "generation",
+                            "google-managed-encryption-enforcement-config",
+                            "hard-delete-time",
                             "hierarchical-namespace",
                             "iam-configuration",
                             "id",
+                            "ip-filter",
                             "is-locked",
                             "kind",
                             "labels",
@@ -3544,14 +3941,18 @@ where
                             "owner",
                             "project-number",
                             "public-access-prevention",
+                            "public-network-source",
                             "requester-pays",
+                            "restriction-mode",
                             "retention-duration-seconds",
                             "retention-period",
                             "retention-policy",
                             "rpo",
+                            "satisfies-pzi",
                             "satisfies-pzs",
                             "self-link",
                             "soft-delete-policy",
+                            "soft-delete-time",
                             "storage-class",
                             "terminal-storage-class",
                             "terminal-storage-class-update-time",
@@ -3649,6 +4050,257 @@ where
                                     .iter()
                                     .map(|v| *v),
                                 );
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _buckets_relocate(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut field_cursor = FieldCursor::default();
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "destination-custom-placement-config.data-locations" => Some((
+                    "destinationCustomPlacementConfig.dataLocations",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "destination-location" => Some((
+                    "destinationLocation",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "validate-only" => Some((
+                    "validateOnly",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec![
+                            "data-locations",
+                            "destination-custom-placement-config",
+                            "destination-location",
+                            "validate-only",
+                        ],
+                    );
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
+            }
+        }
+        let mut request: api::RelocateBucketRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .buckets()
+            .relocate(request, opt.value_of("bucket").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _buckets_restore(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let generation: i64 = arg_from_str(
+            &opt.value_of("generation").unwrap_or(""),
+            err,
+            "<generation>",
+            "int64",
+        );
+        let mut call = self
+            .hub
+            .buckets()
+            .restore(opt.value_of("bucket").unwrap_or(""), generation);
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "user-project" => {
+                    call = call.user_project(value.unwrap_or(""));
+                }
+                "projection" => {
+                    call = call.projection(value.unwrap_or(""));
+                }
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["projection", "user-project"].iter().map(|v| *v));
                                 v
                             }));
                     }
@@ -4027,6 +4679,42 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "encryption.customer-managed-encryption-enforcement-config.effective-time" => {
+                    Some((
+                        "encryption.customerManagedEncryptionEnforcementConfig.effectiveTime",
+                        JsonTypeInfo {
+                            jtype: JsonType::String,
+                            ctype: ComplexType::Pod,
+                        },
+                    ))
+                }
+                "encryption.customer-managed-encryption-enforcement-config.restriction-mode" => {
+                    Some((
+                        "encryption.customerManagedEncryptionEnforcementConfig.restrictionMode",
+                        JsonTypeInfo {
+                            jtype: JsonType::String,
+                            ctype: ComplexType::Pod,
+                        },
+                    ))
+                }
+                "encryption.customer-supplied-encryption-enforcement-config.effective-time" => {
+                    Some((
+                        "encryption.customerSuppliedEncryptionEnforcementConfig.effectiveTime",
+                        JsonTypeInfo {
+                            jtype: JsonType::String,
+                            ctype: ComplexType::Pod,
+                        },
+                    ))
+                }
+                "encryption.customer-supplied-encryption-enforcement-config.restriction-mode" => {
+                    Some((
+                        "encryption.customerSuppliedEncryptionEnforcementConfig.restrictionMode",
+                        JsonTypeInfo {
+                            jtype: JsonType::String,
+                            ctype: ComplexType::Pod,
+                        },
+                    ))
+                }
                 "encryption.default-kms-key-name" => Some((
                     "encryption.defaultKmsKeyName",
                     JsonTypeInfo {
@@ -4034,8 +4722,38 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "encryption.google-managed-encryption-enforcement-config.effective-time" => Some((
+                    "encryption.googleManagedEncryptionEnforcementConfig.effectiveTime",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "encryption.google-managed-encryption-enforcement-config.restriction-mode" => {
+                    Some((
+                        "encryption.googleManagedEncryptionEnforcementConfig.restrictionMode",
+                        JsonTypeInfo {
+                            jtype: JsonType::String,
+                            ctype: ComplexType::Pod,
+                        },
+                    ))
+                }
                 "etag" => Some((
                     "etag",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "generation" => Some((
+                    "generation",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "hard-delete-time" => Some((
+                    "hardDeleteTime",
                     JsonTypeInfo {
                         jtype: JsonType::String,
                         ctype: ComplexType::Pod,
@@ -4088,6 +4806,34 @@ where
                     JsonTypeInfo {
                         jtype: JsonType::String,
                         ctype: ComplexType::Pod,
+                    },
+                )),
+                "ip-filter.allow-all-service-agent-access" => Some((
+                    "ipFilter.allowAllServiceAgentAccess",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "ip-filter.allow-cross-org-vpcs" => Some((
+                    "ipFilter.allowCrossOrgVpcs",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "ip-filter.mode" => Some((
+                    "ipFilter.mode",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "ip-filter.public-network-source.allowed-ip-cidr-ranges" => Some((
+                    "ipFilter.publicNetworkSource.allowedIpCidrRanges",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
                     },
                 )),
                 "kind" => Some((
@@ -4202,6 +4948,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "satisfies-pzi" => Some((
+                    "satisfiesPZI",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "satisfies-pzs" => Some((
                     "satisfiesPZS",
                     JsonTypeInfo {
@@ -4225,6 +4978,13 @@ where
                 )),
                 "soft-delete-policy.retention-duration-seconds" => Some((
                     "softDeletePolicy.retentionDurationSeconds",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "soft-delete-time" => Some((
+                    "softDeleteTime",
                     JsonTypeInfo {
                         jtype: JsonType::String,
                         ctype: ComplexType::Pod,
@@ -4276,10 +5036,15 @@ where
                     let suggestion = FieldCursor::did_you_mean(
                         key,
                         &vec![
+                            "allow-all-service-agent-access",
+                            "allow-cross-org-vpcs",
+                            "allowed-ip-cidr-ranges",
                             "autoclass",
                             "billing",
                             "bucket-policy-only",
                             "custom-placement-config",
+                            "customer-managed-encryption-enforcement-config",
+                            "customer-supplied-encryption-enforcement-config",
                             "data-locations",
                             "default-event-based-hold",
                             "default-kms-key-name",
@@ -4289,9 +5054,13 @@ where
                             "entity",
                             "entity-id",
                             "etag",
+                            "generation",
+                            "google-managed-encryption-enforcement-config",
+                            "hard-delete-time",
                             "hierarchical-namespace",
                             "iam-configuration",
                             "id",
+                            "ip-filter",
                             "is-locked",
                             "kind",
                             "labels",
@@ -4310,14 +5079,18 @@ where
                             "owner",
                             "project-number",
                             "public-access-prevention",
+                            "public-network-source",
                             "requester-pays",
+                            "restriction-mode",
                             "retention-duration-seconds",
                             "retention-period",
                             "retention-policy",
                             "rpo",
+                            "satisfies-pzi",
                             "satisfies-pzs",
                             "self-link",
                             "soft-delete-policy",
+                            "soft-delete-time",
                             "storage-class",
                             "terminal-storage-class",
                             "terminal-storage-class-update-time",
@@ -8639,6 +9412,20 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "created-after-time" => Some((
+                    "createdAfterTime",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "created-before-time" => Some((
+                    "createdBeforeTime",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "match-globs" => Some((
                     "matchGlobs",
                     JsonTypeInfo {
@@ -8666,6 +9453,8 @@ where
                         &vec![
                             "allow-overwrite",
                             "copy-source-acl",
+                            "created-after-time",
+                            "created-before-time",
                             "match-globs",
                             "soft-deleted-after-time",
                             "soft-deleted-before-time",
@@ -8797,6 +9586,13 @@ where
 
             let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
             {
+                "delete-source-objects" => Some((
+                    "deleteSourceObjects",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "destination.bucket" => Some((
                     "destination.bucket",
                     JsonTypeInfo {
@@ -8972,6 +9768,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "destination.restore-token" => Some((
+                    "destination.restoreToken",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "destination.retention.mode" => Some((
                     "destination.retention.mode",
                     JsonTypeInfo {
@@ -9042,6 +9845,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "destination.time-finalized" => Some((
+                    "destination.timeFinalized",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "destination.time-storage-class-updated" => Some((
                     "destination.timeStorageClassUpdated",
                     JsonTypeInfo {
@@ -9077,6 +9887,7 @@ where
                             "crc32c",
                             "custom-time",
                             "customer-encryption",
+                            "delete-source-objects",
                             "destination",
                             "encryption-algorithm",
                             "entity",
@@ -9096,6 +9907,7 @@ where
                             "mode",
                             "name",
                             "owner",
+                            "restore-token",
                             "retain-until-time",
                             "retention",
                             "retention-expiration-time",
@@ -9106,6 +9918,7 @@ where
                             "temporary-hold",
                             "time-created",
                             "time-deleted",
+                            "time-finalized",
                             "time-storage-class-updated",
                             "updated",
                         ],
@@ -9445,6 +10258,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "restore-token" => Some((
+                    "restoreToken",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "retention.mode" => Some((
                     "retention.mode",
                     JsonTypeInfo {
@@ -9515,6 +10335,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "time-finalized" => Some((
+                    "timeFinalized",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "time-storage-class-updated" => Some((
                     "timeStorageClassUpdated",
                     JsonTypeInfo {
@@ -9561,6 +10388,7 @@ where
                             "mode",
                             "name",
                             "owner",
+                            "restore-token",
                             "retain-until-time",
                             "retention",
                             "retention-expiration-time",
@@ -9571,6 +10399,7 @@ where
                             "temporary-hold",
                             "time-created",
                             "time-deleted",
+                            "time-finalized",
                             "time-storage-class-updated",
                             "updated",
                         ],
@@ -9916,6 +10745,9 @@ where
                             .unwrap_or(false),
                     );
                 }
+                "restore-token" => {
+                    call = call.restore_token(value.unwrap_or(""));
+                }
                 "projection" => {
                     call = call.projection(value.unwrap_or(""));
                 }
@@ -9982,6 +10814,7 @@ where
                                         "if-metageneration-match",
                                         "if-metageneration-not-match",
                                         "projection",
+                                        "restore-token",
                                         "soft-deleted",
                                         "user-project",
                                     ]
@@ -10345,6 +11178,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "restore-token" => Some((
+                    "restoreToken",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "retention.mode" => Some((
                     "retention.mode",
                     JsonTypeInfo {
@@ -10415,6 +11255,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "time-finalized" => Some((
+                    "timeFinalized",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "time-storage-class-updated" => Some((
                     "timeStorageClassUpdated",
                     JsonTypeInfo {
@@ -10461,6 +11308,7 @@ where
                             "mode",
                             "name",
                             "owner",
+                            "restore-token",
                             "retain-until-time",
                             "retention",
                             "retention-expiration-time",
@@ -10471,6 +11319,7 @@ where
                             "temporary-hold",
                             "time-created",
                             "time-deleted",
+                            "time-finalized",
                             "time-storage-class-updated",
                             "updated",
                         ],
@@ -10714,6 +11563,9 @@ where
                             .unwrap_or(false),
                     );
                 }
+                "filter" => {
+                    call = call.filter(value.unwrap_or(""));
+                }
                 "end-offset" => {
                     call = call.end_offset(value.unwrap_or(""));
                 }
@@ -10741,6 +11593,7 @@ where
                                     [
                                         "delimiter",
                                         "end-offset",
+                                        "filter",
                                         "include-folders-as-prefixes",
                                         "include-trailing-delimiter",
                                         "match-glob",
@@ -10752,6 +11605,172 @@ where
                                         "start-offset",
                                         "user-project",
                                         "versions",
+                                    ]
+                                    .iter()
+                                    .map(|v| *v),
+                                );
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _objects_move(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self.hub.objects().move_(
+            opt.value_of("bucket").unwrap_or(""),
+            opt.value_of("source-object").unwrap_or(""),
+            opt.value_of("destination-object").unwrap_or(""),
+        );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "user-project" => {
+                    call = call.user_project(value.unwrap_or(""));
+                }
+                "projection" => {
+                    call = call.projection(value.unwrap_or(""));
+                }
+                "if-source-metageneration-not-match" => {
+                    call = call.if_source_metageneration_not_match(
+                        value
+                            .map(|v| {
+                                arg_from_str(v, err, "if-source-metageneration-not-match", "int64")
+                            })
+                            .unwrap_or(-0),
+                    );
+                }
+                "if-source-metageneration-match" => {
+                    call = call.if_source_metageneration_match(
+                        value
+                            .map(|v| {
+                                arg_from_str(v, err, "if-source-metageneration-match", "int64")
+                            })
+                            .unwrap_or(-0),
+                    );
+                }
+                "if-source-generation-not-match" => {
+                    call = call.if_source_generation_not_match(
+                        value
+                            .map(|v| {
+                                arg_from_str(v, err, "if-source-generation-not-match", "int64")
+                            })
+                            .unwrap_or(-0),
+                    );
+                }
+                "if-source-generation-match" => {
+                    call = call.if_source_generation_match(
+                        value
+                            .map(|v| arg_from_str(v, err, "if-source-generation-match", "int64"))
+                            .unwrap_or(-0),
+                    );
+                }
+                "if-metageneration-not-match" => {
+                    call = call.if_metageneration_not_match(
+                        value
+                            .map(|v| arg_from_str(v, err, "if-metageneration-not-match", "int64"))
+                            .unwrap_or(-0),
+                    );
+                }
+                "if-metageneration-match" => {
+                    call = call.if_metageneration_match(
+                        value
+                            .map(|v| arg_from_str(v, err, "if-metageneration-match", "int64"))
+                            .unwrap_or(-0),
+                    );
+                }
+                "if-generation-not-match" => {
+                    call = call.if_generation_not_match(
+                        value
+                            .map(|v| arg_from_str(v, err, "if-generation-not-match", "int64"))
+                            .unwrap_or(-0),
+                    );
+                }
+                "if-generation-match" => {
+                    call = call.if_generation_match(
+                        value
+                            .map(|v| arg_from_str(v, err, "if-generation-match", "int64"))
+                            .unwrap_or(-0),
+                    );
+                }
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(
+                                    [
+                                        "if-generation-match",
+                                        "if-generation-not-match",
+                                        "if-metageneration-match",
+                                        "if-metageneration-not-match",
+                                        "if-source-generation-match",
+                                        "if-source-generation-not-match",
+                                        "if-source-metageneration-match",
+                                        "if-source-metageneration-not-match",
+                                        "projection",
+                                        "user-project",
                                     ]
                                     .iter()
                                     .map(|v| *v),
@@ -11008,6 +12027,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "restore-token" => Some((
+                    "restoreToken",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "retention.mode" => Some((
                     "retention.mode",
                     JsonTypeInfo {
@@ -11078,6 +12104,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "time-finalized" => Some((
+                    "timeFinalized",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "time-storage-class-updated" => Some((
                     "timeStorageClassUpdated",
                     JsonTypeInfo {
@@ -11124,6 +12157,7 @@ where
                             "mode",
                             "name",
                             "owner",
+                            "restore-token",
                             "retain-until-time",
                             "retention",
                             "retention-expiration-time",
@@ -11134,6 +12168,7 @@ where
                             "temporary-hold",
                             "time-created",
                             "time-deleted",
+                            "time-finalized",
                             "time-storage-class-updated",
                             "updated",
                         ],
@@ -11327,6 +12362,9 @@ where
                 "user-project" => {
                     call = call.user_project(value.unwrap_or(""));
                 }
+                "restore-token" => {
+                    call = call.restore_token(value.unwrap_or(""));
+                }
                 "projection" => {
                     call = call.projection(value.unwrap_or(""));
                 }
@@ -11390,6 +12428,7 @@ where
                                         "if-metageneration-match",
                                         "if-metageneration-not-match",
                                         "projection",
+                                        "restore-token",
                                         "user-project",
                                     ]
                                     .iter()
@@ -11647,6 +12686,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "restore-token" => Some((
+                    "restoreToken",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "retention.mode" => Some((
                     "retention.mode",
                     JsonTypeInfo {
@@ -11717,6 +12763,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "time-finalized" => Some((
+                    "timeFinalized",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "time-storage-class-updated" => Some((
                     "timeStorageClassUpdated",
                     JsonTypeInfo {
@@ -11763,6 +12816,7 @@ where
                             "mode",
                             "name",
                             "owner",
+                            "restore-token",
                             "retain-until-time",
                             "retention",
                             "retention-expiration-time",
@@ -11773,6 +12827,7 @@ where
                             "temporary-hold",
                             "time-created",
                             "time-deleted",
+                            "time-finalized",
                             "time-storage-class-updated",
                             "updated",
                         ],
@@ -12460,6 +13515,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "restore-token" => Some((
+                    "restoreToken",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "retention.mode" => Some((
                     "retention.mode",
                     JsonTypeInfo {
@@ -12530,6 +13592,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "time-finalized" => Some((
+                    "timeFinalized",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "time-storage-class-updated" => Some((
                     "timeStorageClassUpdated",
                     JsonTypeInfo {
@@ -12576,6 +13645,7 @@ where
                             "mode",
                             "name",
                             "owner",
+                            "restore-token",
                             "retain-until-time",
                             "retention",
                             "retention-expiration-time",
@@ -12586,6 +13656,7 @@ where
                             "temporary-hold",
                             "time-created",
                             "time-deleted",
+                            "time-finalized",
                             "time-storage-class-updated",
                             "updated",
                         ],
@@ -13775,6 +14846,11 @@ where
                         ._buckets_lock_retention_policy(opt, dry_run, &mut err)
                         .await;
                 }
+                ("operations-advance-relocate-bucket", Some(opt)) => {
+                    call_result = self
+                        ._buckets_operations_advance_relocate_bucket(opt, dry_run, &mut err)
+                        .await;
+                }
                 ("operations-cancel", Some(opt)) => {
                     call_result = self
                         ._buckets_operations_cancel(opt, dry_run, &mut err)
@@ -13788,6 +14864,12 @@ where
                 }
                 ("patch", Some(opt)) => {
                     call_result = self._buckets_patch(opt, dry_run, &mut err).await;
+                }
+                ("relocate", Some(opt)) => {
+                    call_result = self._buckets_relocate(opt, dry_run, &mut err).await;
+                }
+                ("restore", Some(opt)) => {
+                    call_result = self._buckets_restore(opt, dry_run, &mut err).await;
                 }
                 ("set-iam-policy", Some(opt)) => {
                     call_result = self._buckets_set_iam_policy(opt, dry_run, &mut err).await;
@@ -13991,6 +15073,9 @@ where
                 }
                 ("list", Some(opt)) => {
                     call_result = self._objects_list(opt, dry_run, &mut err).await;
+                }
+                ("move", Some(opt)) => {
+                    call_result = self._objects_move(opt, dry_run, &mut err).await;
                 }
                 ("patch", Some(opt)) => {
                     call_result = self._objects_patch(opt, dry_run, &mut err).await;
@@ -14474,9 +15559,9 @@ async fn main() {
                      Some(false)),
                   ]),
             ]),
-            ("buckets", "methods: 'delete', 'get', 'get-iam-policy', 'get-storage-layout', 'insert', 'list', 'lock-retention-policy', 'operations-cancel', 'operations-get', 'operations-list', 'patch', 'set-iam-policy', 'test-iam-permissions' and 'update'", vec![
+            ("buckets", "methods: 'delete', 'get', 'get-iam-policy', 'get-storage-layout', 'insert', 'list', 'lock-retention-policy', 'operations-advance-relocate-bucket', 'operations-cancel', 'operations-get', 'operations-list', 'patch', 'relocate', 'restore', 'set-iam-policy', 'test-iam-permissions' and 'update'", vec![
             ("delete",
-                    Some(r##"Permanently deletes an empty bucket."##),
+                    Some(r##"Deletes an empty bucket. Deletions are permanent unless soft delete is enabled on the bucket."##),
                     "Details at http://byron.github.io/google-apis-rs/google_storage1_cli/buckets_delete",
                   vec![
                     (Some(r##"bucket"##),
@@ -14620,6 +15705,31 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("operations-advance-relocate-bucket",
+                    Some(r##"Starts asynchronous advancement of the relocate bucket operation in the case of required write downtime, to allow it to lock the bucket at the source location, and proceed with the bucket location swap. The server makes a best effort to advance the relocate bucket operation, but success is not guaranteed."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_storage1_cli/buckets_operations-advance-relocate-bucket",
+                  vec![
+                    (Some(r##"bucket"##),
+                     None,
+                     Some(r##"Name of the bucket to advance the relocate for."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"operation-id"##),
+                     None,
+                     Some(r##"ID of the operation resource."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                  ]),
             ("operations-cancel",
                     Some(r##"Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed."##),
                     "Details at http://byron.github.io/google-apis-rs/google_storage1_cli/buckets_operations-cancel",
@@ -14699,6 +15809,56 @@ async fn main() {
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("relocate",
+                    Some(r##"Initiates a long-running Relocate Bucket operation on the specified bucket."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_storage1_cli/buckets_relocate",
+                  vec![
+                    (Some(r##"bucket"##),
+                     None,
+                     Some(r##"Name of the bucket to be moved."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("restore",
+                    Some(r##"Restores a soft-deleted bucket."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_storage1_cli/buckets_restore",
+                  vec![
+                    (Some(r##"bucket"##),
+                     None,
+                     Some(r##"Name of a bucket."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"generation"##),
+                     None,
+                     Some(r##"Generation of a bucket."##),
+                     Some(true),
+                     Some(false)),
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
@@ -15528,7 +16688,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ]),
-            ("objects", "methods: 'bulk-restore', 'compose', 'copy', 'delete', 'get', 'get-iam-policy', 'insert', 'list', 'patch', 'restore', 'rewrite', 'set-iam-policy', 'test-iam-permissions', 'update' and 'watch-all'", vec![
+            ("objects", "methods: 'bulk-restore', 'compose', 'copy', 'delete', 'get', 'get-iam-policy', 'insert', 'list', 'move', 'patch', 'restore', 'rewrite', 'set-iam-policy', 'test-iam-permissions', 'update' and 'watch-all'", vec![
             ("bulk-restore",
                     Some(r##"Initiates a long-running bulk restore operation on the specified bucket."##),
                     "Details at http://byron.github.io/google-apis-rs/google_storage1_cli/objects_bulk-restore",
@@ -15744,6 +16904,36 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("move",
+                    Some(r##"Moves the source object to the destination object in the same bucket."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_storage1_cli/objects_move",
+                  vec![
+                    (Some(r##"bucket"##),
+                     None,
+                     Some(r##"Name of the bucket in which the object resides."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"source-object"##),
+                     None,
+                     Some(r##"Name of the source object. For information about how to URL encode object names to be path safe, see [Encoding URI Path Parts](https://cloud.google.com/storage/docs/request-endpoints#encoding)."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"destination-object"##),
+                     None,
+                     Some(r##"Name of the destination object. For information about how to URL encode object names to be path safe, see [Encoding URI Path Parts](https://cloud.google.com/storage/docs/request-endpoints#encoding)."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("patch",
                     Some(r##"Patches an object's metadata."##),
                     "Details at http://byron.github.io/google-apis-rs/google_storage1_cli/objects_patch",
@@ -15785,7 +16975,7 @@ async fn main() {
                      Some(false)),
                     (Some(r##"object"##),
                      None,
-                     Some(r##"Name of the object. For information about how to URL encode object names to be path safe, see Encoding URI Path Parts."##),
+                     Some(r##"Name of the object. For information about how to URL encode object names to be path safe, see [Encoding URI Path Parts](https://cloud.google.com/storage/docs/request-endpoints#encoding)."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"generation"##),
@@ -16052,7 +17242,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("hmac-keys-update",
-                    Some(r##"Updates the state of an HMAC key. See the HMAC Key resource descriptor for valid states."##),
+                    Some(r##"Updates the state of an HMAC key. See the [HMAC Key resource descriptor](https://cloud.google.com/storage/docs/json_api/v1/projects/hmacKeys/update#request-body) for valid states."##),
                     "Details at http://byron.github.io/google-apis-rs/google_storage1_cli/projects_hmac-keys-update",
                   vec![
                     (Some(r##"project-id"##),
@@ -16106,7 +17296,7 @@ async fn main() {
 
     let mut app = App::new("storage1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("7.0.0+20240621")
+           .version("7.0.0+20251218")
            .about("Stores and retrieves potentially large, immutable data objects.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_storage1_cli")
            .arg(Arg::with_name("url")

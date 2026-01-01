@@ -1026,6 +1026,9 @@ where
                 "filter" => {
                     call = call.filter(value.unwrap_or(""));
                 }
+                "extra-location-types" => {
+                    call = call.add_extra_location_types(value.unwrap_or(""));
+                }
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -1043,7 +1046,11 @@ where
                             .push(CLIError::UnknownParameter(key.to_string(), {
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
-                                v.extend(["filter", "page-size", "page-token"].iter().map(|v| *v));
+                                v.extend(
+                                    ["extra-location-types", "filter", "page-size", "page-token"]
+                                        .iter()
+                                        .map(|v| *v),
+                                );
                                 v
                             }));
                     }
@@ -1177,6 +1184,27 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "error.code" => Some((
+                    "error.code",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "error.message" => Some((
+                    "error.message",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "managed-table-type" => Some((
+                    "managedTableType",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "name" => Some((
                     "name",
                     JsonTypeInfo {
@@ -1233,6 +1261,34 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "schedule-options-v2.event-driven-schedule.pubsub-subscription" => Some((
+                    "scheduleOptionsV2.eventDrivenSchedule.pubsubSubscription",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "schedule-options-v2.time-based-schedule.end-time" => Some((
+                    "scheduleOptionsV2.timeBasedSchedule.endTime",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "schedule-options-v2.time-based-schedule.schedule" => Some((
+                    "scheduleOptionsV2.timeBasedSchedule.schedule",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "schedule-options-v2.time-based-schedule.start-time" => Some((
+                    "scheduleOptionsV2.timeBasedSchedule.startTime",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "state" => Some((
                     "state",
                     JsonTypeInfo {
@@ -1258,6 +1314,7 @@ where
                     let suggestion = FieldCursor::did_you_mean(
                         key,
                         &vec![
+                            "code",
                             "data-refresh-window-days",
                             "data-source-id",
                             "dataset-region",
@@ -1270,15 +1327,22 @@ where
                             "enable-failure-email",
                             "encryption-configuration",
                             "end-time",
+                            "error",
+                            "event-driven-schedule",
                             "kms-key-name",
+                            "managed-table-type",
+                            "message",
                             "name",
                             "next-run-time",
                             "notification-pubsub-topic",
                             "owner-info",
+                            "pubsub-subscription",
                             "schedule",
                             "schedule-options",
+                            "schedule-options-v2",
                             "start-time",
                             "state",
+                            "time-based-schedule",
                             "update-time",
                             "user-id",
                         ],
@@ -1739,6 +1803,27 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "error.code" => Some((
+                    "error.code",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "error.message" => Some((
+                    "error.message",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "managed-table-type" => Some((
+                    "managedTableType",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "name" => Some((
                     "name",
                     JsonTypeInfo {
@@ -1795,6 +1880,34 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "schedule-options-v2.event-driven-schedule.pubsub-subscription" => Some((
+                    "scheduleOptionsV2.eventDrivenSchedule.pubsubSubscription",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "schedule-options-v2.time-based-schedule.end-time" => Some((
+                    "scheduleOptionsV2.timeBasedSchedule.endTime",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "schedule-options-v2.time-based-schedule.schedule" => Some((
+                    "scheduleOptionsV2.timeBasedSchedule.schedule",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "schedule-options-v2.time-based-schedule.start-time" => Some((
+                    "scheduleOptionsV2.timeBasedSchedule.startTime",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "state" => Some((
                     "state",
                     JsonTypeInfo {
@@ -1820,6 +1933,7 @@ where
                     let suggestion = FieldCursor::did_you_mean(
                         key,
                         &vec![
+                            "code",
                             "data-refresh-window-days",
                             "data-source-id",
                             "dataset-region",
@@ -1832,15 +1946,22 @@ where
                             "enable-failure-email",
                             "encryption-configuration",
                             "end-time",
+                            "error",
+                            "event-driven-schedule",
                             "kms-key-name",
+                            "managed-table-type",
+                            "message",
                             "name",
                             "next-run-time",
                             "notification-pubsub-topic",
                             "owner-info",
+                            "pubsub-subscription",
                             "schedule",
                             "schedule-options",
+                            "schedule-options-v2",
                             "start-time",
                             "state",
+                            "time-based-schedule",
                             "update-time",
                             "user-id",
                         ],
@@ -2858,6 +2979,27 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "error.code" => Some((
+                    "error.code",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "error.message" => Some((
+                    "error.message",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "managed-table-type" => Some((
+                    "managedTableType",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "name" => Some((
                     "name",
                     JsonTypeInfo {
@@ -2914,6 +3056,34 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "schedule-options-v2.event-driven-schedule.pubsub-subscription" => Some((
+                    "scheduleOptionsV2.eventDrivenSchedule.pubsubSubscription",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "schedule-options-v2.time-based-schedule.end-time" => Some((
+                    "scheduleOptionsV2.timeBasedSchedule.endTime",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "schedule-options-v2.time-based-schedule.schedule" => Some((
+                    "scheduleOptionsV2.timeBasedSchedule.schedule",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "schedule-options-v2.time-based-schedule.start-time" => Some((
+                    "scheduleOptionsV2.timeBasedSchedule.startTime",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "state" => Some((
                     "state",
                     JsonTypeInfo {
@@ -2939,6 +3109,7 @@ where
                     let suggestion = FieldCursor::did_you_mean(
                         key,
                         &vec![
+                            "code",
                             "data-refresh-window-days",
                             "data-source-id",
                             "dataset-region",
@@ -2951,15 +3122,22 @@ where
                             "enable-failure-email",
                             "encryption-configuration",
                             "end-time",
+                            "error",
+                            "event-driven-schedule",
                             "kms-key-name",
+                            "managed-table-type",
+                            "message",
                             "name",
                             "next-run-time",
                             "notification-pubsub-topic",
                             "owner-info",
+                            "pubsub-subscription",
                             "schedule",
                             "schedule-options",
+                            "schedule-options-v2",
                             "start-time",
                             "state",
+                            "time-based-schedule",
                             "update-time",
                             "user-id",
                         ],
@@ -3420,6 +3598,27 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "error.code" => Some((
+                    "error.code",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "error.message" => Some((
+                    "error.message",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "managed-table-type" => Some((
+                    "managedTableType",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "name" => Some((
                     "name",
                     JsonTypeInfo {
@@ -3476,6 +3675,34 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "schedule-options-v2.event-driven-schedule.pubsub-subscription" => Some((
+                    "scheduleOptionsV2.eventDrivenSchedule.pubsubSubscription",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "schedule-options-v2.time-based-schedule.end-time" => Some((
+                    "scheduleOptionsV2.timeBasedSchedule.endTime",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "schedule-options-v2.time-based-schedule.schedule" => Some((
+                    "scheduleOptionsV2.timeBasedSchedule.schedule",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "schedule-options-v2.time-based-schedule.start-time" => Some((
+                    "scheduleOptionsV2.timeBasedSchedule.startTime",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "state" => Some((
                     "state",
                     JsonTypeInfo {
@@ -3501,6 +3728,7 @@ where
                     let suggestion = FieldCursor::did_you_mean(
                         key,
                         &vec![
+                            "code",
                             "data-refresh-window-days",
                             "data-source-id",
                             "dataset-region",
@@ -3513,15 +3741,22 @@ where
                             "enable-failure-email",
                             "encryption-configuration",
                             "end-time",
+                            "error",
+                            "event-driven-schedule",
                             "kms-key-name",
+                            "managed-table-type",
+                            "message",
                             "name",
                             "next-run-time",
                             "notification-pubsub-topic",
                             "owner-info",
+                            "pubsub-subscription",
                             "schedule",
                             "schedule-options",
+                            "schedule-options-v2",
                             "start-time",
                             "state",
+                            "time-based-schedule",
                             "update-time",
                             "user-id",
                         ],
@@ -4529,7 +4764,9 @@ where
         let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
             secret,
             yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-            hyper_util::client::legacy::Client::builder(executor).build(connector),
+            yup_oauth2::client::CustomHyperClientBuilder::from(
+                hyper_util::client::legacy::Client::builder(executor).build(connector),
+            ),
         )
         .persist_tokens_to_disk(format!("{}/bigquerydatatransfer1", config_dir))
         .build()
@@ -4589,7 +4826,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The data source in the form: `projects/{project_id}/dataSources/{data_source_id}` or `projects/{project_id}/locations/{location_id}/dataSources/{data_source_id}`."##),
+                     Some(r##"Required. The name of the data source. If you are using the regionless method, the location must be `US` and the name should be in the following form: * `projects/{project_id}/dataSources/{data_source_id}` If you are using the regionalized method, the name should be in the following form: * `projects/{project_id}/locations/{location_id}/dataSources/{data_source_id}`"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -4614,7 +4851,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The field will contain name of the resource requested, for example: `projects/{project_id}/dataSources/{data_source_id}` or `projects/{project_id}/locations/{location_id}/dataSources/{data_source_id}`"##),
+                     Some(r##"Required. The name of the resource requested. If you are using the regionless method, the location must be `US` and the name should be in the following form: * `projects/{project_id}/dataSources/{data_source_id}` If you are using the regionalized method, the name should be in the following form: * `projects/{project_id}/locations/{location_id}/dataSources/{data_source_id}`"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -4679,7 +4916,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The data source in the form: `projects/{project_id}/dataSources/{data_source_id}` or `projects/{project_id}/locations/{location_id}/dataSources/{data_source_id}`."##),
+                     Some(r##"Required. The name of the data source. If you are using the regionless method, the location must be `US` and the name should be in the following form: * `projects/{project_id}/dataSources/{data_source_id}` If you are using the regionalized method, the name should be in the following form: * `projects/{project_id}/locations/{location_id}/dataSources/{data_source_id}`"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -4704,7 +4941,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The field will contain name of the resource requested, for example: `projects/{project_id}/dataSources/{data_source_id}` or `projects/{project_id}/locations/{location_id}/dataSources/{data_source_id}`"##),
+                     Some(r##"Required. The name of the resource requested. If you are using the regionless method, the location must be `US` and the name should be in the following form: * `projects/{project_id}/dataSources/{data_source_id}` If you are using the regionalized method, the name should be in the following form: * `projects/{project_id}/locations/{location_id}/dataSources/{data_source_id}`"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -4834,7 +5071,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The field will contain name of the resource requested, for example: `projects/{project_id}/transferConfigs/{config_id}` or `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}`"##),
+                     Some(r##"Required. The name of the resource to delete. If you are using the regionless method, the location must be `US` and the name should be in the following form: * `projects/{project_id}/transferConfigs/{config_id}` If you are using the regionalized method, the name should be in the following form: * `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}`"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -4854,7 +5091,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The field will contain name of the resource requested, for example: `projects/{project_id}/transferConfigs/{config_id}` or `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}`"##),
+                     Some(r##"Required. The name of the resource requested. If you are using the regionless method, the location must be `US` and the name should be in the following form: * `projects/{project_id}/transferConfigs/{config_id}` If you are using the regionalized method, the name should be in the following form: * `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}`"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -4874,7 +5111,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The BigQuery project id for which transfer configs should be returned: `projects/{project_id}` or `projects/{project_id}/locations/{location_id}`"##),
+                     Some(r##"Required. The BigQuery project id for which transfer configs should be returned. If you are using the regionless method, the location must be `US` and `parent` should be in the following form: * `projects/{project_id} If you are using the regionalized method, `parent` should be in the following form: * `projects/{project_id}/locations/{location_id}`"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -4919,7 +5156,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The field will contain name of the resource requested, for example: `projects/{project_id}/transferConfigs/{config_id}/runs/{run_id}` or `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}/runs/{run_id}`"##),
+                     Some(r##"Required. The name of the resource requested. If you are using the regionless method, the location must be `US` and the name should be in the following form: * `projects/{project_id}/transferConfigs/{config_id}/runs/{run_id}` If you are using the regionalized method, the name should be in the following form: * `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}/runs/{run_id}`"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -4939,7 +5176,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The field will contain name of the resource requested, for example: `projects/{project_id}/transferConfigs/{config_id}/runs/{run_id}` or `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}/runs/{run_id}`"##),
+                     Some(r##"Required. The name of the resource requested. If you are using the regionless method, the location must be `US` and the name should be in the following form: * `projects/{project_id}/transferConfigs/{config_id}/runs/{run_id}` If you are using the regionalized method, the name should be in the following form: * `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}/runs/{run_id}`"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -4959,7 +5196,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Name of transfer configuration for which transfer runs should be retrieved. Format of transfer configuration resource name is: `projects/{project_id}/transferConfigs/{config_id}` or `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}`."##),
+                     Some(r##"Required. Name of transfer configuration for which transfer runs should be retrieved. If you are using the regionless method, the location must be `US` and the name should be in the following form: * `projects/{project_id}/transferConfigs/{config_id}` If you are using the regionalized method, the name should be in the following form: * `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}`"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -4979,7 +5216,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Transfer run name in the form: `projects/{project_id}/transferConfigs/{config_id}/runs/{run_id}` or `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}/runs/{run_id}`"##),
+                     Some(r##"Required. Transfer run name. If you are using the regionless method, the location must be `US` and the name should be in the following form: * `projects/{project_id}/transferConfigs/{config_id}/runs/{run_id}` If you are using the regionalized method, the name should be in the following form: * `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}/runs/{run_id}`"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -4999,7 +5236,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Transfer configuration name in the form: `projects/{project_id}/transferConfigs/{config_id}` or `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}`."##),
+                     Some(r##"Required. Transfer configuration name. If you are using the regionless method, the location must be `US` and the name should be in the following form: * `projects/{project_id}/transferConfigs/{config_id}` If you are using the regionalized method, the name should be in the following form: * `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}`"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -5019,12 +5256,12 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-transfer-configs-start-manual-runs",
-                    Some(r##"Start manual transfer runs to be executed now with schedule_time equal to current time. The transfer runs can be created for a time range where the run_time is between start_time (inclusive) and end_time (exclusive), or for a specific run_time."##),
+                    Some(r##"Manually initiates transfer runs. You can schedule these runs in two ways: 1. For a specific point in time using the 'requested_run_time' parameter. 2. For a period between 'start_time' (inclusive) and 'end_time' (exclusive). If scheduling a single run, it is set to execute immediately (schedule_time equals the current time). When scheduling multiple runs within a time range, the first run starts now, and subsequent runs are delayed by 15 seconds each."##),
                     "Details at http://byron.github.io/google-apis-rs/google_bigquerydatatransfer1_cli/projects_locations-transfer-configs-start-manual-runs",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Transfer configuration name in the form: `projects/{project_id}/transferConfigs/{config_id}` or `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}`."##),
+                     Some(r##"Required. Transfer configuration name. If you are using the regionless method, the location must be `US` and the name should be in the following form: * `projects/{project_id}/transferConfigs/{config_id}` If you are using the regionalized method, the name should be in the following form: * `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}`"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -5099,7 +5336,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The field will contain name of the resource requested, for example: `projects/{project_id}/transferConfigs/{config_id}` or `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}`"##),
+                     Some(r##"Required. The name of the resource to delete. If you are using the regionless method, the location must be `US` and the name should be in the following form: * `projects/{project_id}/transferConfigs/{config_id}` If you are using the regionalized method, the name should be in the following form: * `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}`"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -5119,7 +5356,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The field will contain name of the resource requested, for example: `projects/{project_id}/transferConfigs/{config_id}` or `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}`"##),
+                     Some(r##"Required. The name of the resource requested. If you are using the regionless method, the location must be `US` and the name should be in the following form: * `projects/{project_id}/transferConfigs/{config_id}` If you are using the regionalized method, the name should be in the following form: * `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}`"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -5139,7 +5376,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The BigQuery project id for which transfer configs should be returned: `projects/{project_id}` or `projects/{project_id}/locations/{location_id}`"##),
+                     Some(r##"Required. The BigQuery project id for which transfer configs should be returned. If you are using the regionless method, the location must be `US` and `parent` should be in the following form: * `projects/{project_id} If you are using the regionalized method, `parent` should be in the following form: * `projects/{project_id}/locations/{location_id}`"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -5184,7 +5421,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The field will contain name of the resource requested, for example: `projects/{project_id}/transferConfigs/{config_id}/runs/{run_id}` or `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}/runs/{run_id}`"##),
+                     Some(r##"Required. The name of the resource requested. If you are using the regionless method, the location must be `US` and the name should be in the following form: * `projects/{project_id}/transferConfigs/{config_id}/runs/{run_id}` If you are using the regionalized method, the name should be in the following form: * `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}/runs/{run_id}`"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -5204,7 +5441,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The field will contain name of the resource requested, for example: `projects/{project_id}/transferConfigs/{config_id}/runs/{run_id}` or `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}/runs/{run_id}`"##),
+                     Some(r##"Required. The name of the resource requested. If you are using the regionless method, the location must be `US` and the name should be in the following form: * `projects/{project_id}/transferConfigs/{config_id}/runs/{run_id}` If you are using the regionalized method, the name should be in the following form: * `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}/runs/{run_id}`"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -5224,7 +5461,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Name of transfer configuration for which transfer runs should be retrieved. Format of transfer configuration resource name is: `projects/{project_id}/transferConfigs/{config_id}` or `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}`."##),
+                     Some(r##"Required. Name of transfer configuration for which transfer runs should be retrieved. If you are using the regionless method, the location must be `US` and the name should be in the following form: * `projects/{project_id}/transferConfigs/{config_id}` If you are using the regionalized method, the name should be in the following form: * `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}`"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -5244,7 +5481,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Transfer run name in the form: `projects/{project_id}/transferConfigs/{config_id}/runs/{run_id}` or `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}/runs/{run_id}`"##),
+                     Some(r##"Required. Transfer run name. If you are using the regionless method, the location must be `US` and the name should be in the following form: * `projects/{project_id}/transferConfigs/{config_id}/runs/{run_id}` If you are using the regionalized method, the name should be in the following form: * `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}/runs/{run_id}`"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -5264,7 +5501,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Transfer configuration name in the form: `projects/{project_id}/transferConfigs/{config_id}` or `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}`."##),
+                     Some(r##"Required. Transfer configuration name. If you are using the regionless method, the location must be `US` and the name should be in the following form: * `projects/{project_id}/transferConfigs/{config_id}` If you are using the regionalized method, the name should be in the following form: * `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}`"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -5284,12 +5521,12 @@ async fn main() {
                      Some(false)),
                   ]),
             ("transfer-configs-start-manual-runs",
-                    Some(r##"Start manual transfer runs to be executed now with schedule_time equal to current time. The transfer runs can be created for a time range where the run_time is between start_time (inclusive) and end_time (exclusive), or for a specific run_time."##),
+                    Some(r##"Manually initiates transfer runs. You can schedule these runs in two ways: 1. For a specific point in time using the 'requested_run_time' parameter. 2. For a period between 'start_time' (inclusive) and 'end_time' (exclusive). If scheduling a single run, it is set to execute immediately (schedule_time equals the current time). When scheduling multiple runs within a time range, the first run starts now, and subsequent runs are delayed by 15 seconds each."##),
                     "Details at http://byron.github.io/google-apis-rs/google_bigquerydatatransfer1_cli/projects_transfer-configs-start-manual-runs",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Transfer configuration name in the form: `projects/{project_id}/transferConfigs/{config_id}` or `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}`."##),
+                     Some(r##"Required. Transfer configuration name. If you are using the regionless method, the location must be `US` and the name should be in the following form: * `projects/{project_id}/transferConfigs/{config_id}` If you are using the regionalized method, the name should be in the following form: * `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}`"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -5313,7 +5550,7 @@ async fn main() {
 
     let mut app = App::new("bigquerydatatransfer1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("6.0.0+20240616")
+           .version("7.0.0+20251213")
            .about("Schedule queries or transfer external data from SaaS applications to Google BigQuery on a regular basis.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_bigquerydatatransfer1_cli")
            .arg(Arg::with_name("url")
@@ -5378,7 +5615,7 @@ async fn main() {
         .with_native_roots()
         .unwrap()
         .https_or_http()
-        .enable_http1()
+        .enable_http2()
         .build();
 
     match Engine::new(matches, connector).await {

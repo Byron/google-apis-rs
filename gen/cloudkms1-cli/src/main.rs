@@ -123,6 +123,87 @@ where
         }
     }
 
+    async fn _folders_get_kaj_policy_config(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .folders()
+            .get_kaj_policy_config(opt.value_of("name").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _folders_update_autokey_config(
         &self,
         opt: &ArgMatches<'n>,
@@ -154,6 +235,13 @@ where
 
             let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
             {
+                "etag" => Some((
+                    "etag",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "key-project" => Some((
                     "keyProject",
                     JsonTypeInfo {
@@ -168,8 +256,18 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "state" => Some((
+                    "state",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["key-project", "name"]);
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec!["etag", "key-project", "name", "state"],
+                    );
                     err.issues.push(CLIError::Field(FieldError::Unknown(
                         temp_cursor.to_string(),
                         suggestion,
@@ -226,6 +324,482 @@ where
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
                                 v.extend(["update-mask"].iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _folders_update_kaj_policy_config(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut field_cursor = FieldCursor::default();
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "default-key-access-justification-policy.allowed-access-reasons" => Some((
+                    "defaultKeyAccessJustificationPolicy.allowedAccessReasons",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "name" => Some((
+                    "name",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec![
+                            "allowed-access-reasons",
+                            "default-key-access-justification-policy",
+                            "name",
+                        ],
+                    );
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
+            }
+        }
+        let mut request: api::KeyAccessJustificationsPolicyConfig =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .folders()
+            .update_kaj_policy_config(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "update-mask" => {
+                    call = call.update_mask(
+                        value
+                            .map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask"))
+                            .unwrap_or(apis_common::FieldMask::default()),
+                    );
+                }
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["update-mask"].iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _organizations_get_kaj_policy_config(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .organizations()
+            .get_kaj_policy_config(opt.value_of("name").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _organizations_update_kaj_policy_config(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut field_cursor = FieldCursor::default();
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "default-key-access-justification-policy.allowed-access-reasons" => Some((
+                    "defaultKeyAccessJustificationPolicy.allowedAccessReasons",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "name" => Some((
+                    "name",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec![
+                            "allowed-access-reasons",
+                            "default-key-access-justification-policy",
+                            "name",
+                        ],
+                    );
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
+            }
+        }
+        let mut request: api::KeyAccessJustificationsPolicyConfig =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .organizations()
+            .update_kaj_policy_config(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "update-mask" => {
+                    call = call.update_mask(
+                        value
+                            .map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask"))
+                            .unwrap_or(apis_common::FieldMask::default()),
+                    );
+                }
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["update-mask"].iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_get_kaj_policy_config(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .get_kaj_policy_config(opt.value_of("name").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
                                 v
                             }));
                     }
@@ -2212,6 +2786,16 @@ where
         {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                }
+                "page-size" => {
+                    call = call.page_size(
+                        value
+                            .map(|v| arg_from_str(v, err, "page-size", "int32"))
+                            .unwrap_or(-0),
+                    );
+                }
                 "filter" => {
                     call = call.filter(value.unwrap_or(""));
                 }
@@ -2232,7 +2816,7 @@ where
                             .push(CLIError::UnknownParameter(key.to_string(), {
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
-                                v.extend(["filter"].iter().map(|v| *v));
+                                v.extend(["filter", "page-size", "page-token"].iter().map(|v| *v));
                                 v
                             }));
                     }
@@ -3473,6 +4057,151 @@ where
         }
     }
 
+    async fn _projects_locations_key_rings_crypto_keys_crypto_key_versions_decapsulate(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut field_cursor = FieldCursor::default();
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "ciphertext" => Some((
+                    "ciphertext",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "ciphertext-crc32c" => Some((
+                    "ciphertextCrc32c",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion =
+                        FieldCursor::did_you_mean(key, &vec!["ciphertext", "ciphertext-crc32c"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
+            }
+        }
+        let mut request: api::DecapsulateRequest = serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .locations_key_rings_crypto_keys_crypto_key_versions_decapsulate(
+                request,
+                opt.value_of("name").unwrap_or(""),
+            );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _projects_locations_key_rings_crypto_keys_crypto_key_versions_destroy(
         &self,
         opt: &ArgMatches<'n>,
@@ -3707,6 +4436,9 @@ where
         {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "public-key-format" => {
+                    call = call.public_key_format(value.unwrap_or(""));
+                }
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -3724,6 +4456,7 @@ where
                             .push(CLIError::UnknownParameter(key.to_string(), {
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["public-key-format"].iter().map(|v| *v));
                                 v
                             }));
                     }
@@ -6862,6 +7595,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "crypto-key-backend" => Some((
+                    "cryptoKeyBackend",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "expire-event-time" => Some((
                     "expireEventTime",
                     JsonTypeInfo {
@@ -6927,6 +7667,7 @@ where
                             "cert-chains",
                             "content",
                             "create-time",
+                            "crypto-key-backend",
                             "expire-event-time",
                             "expire-time",
                             "format",
@@ -8027,6 +8768,9 @@ where
                 "filter" => {
                     call = call.filter(value.unwrap_or(""));
                 }
+                "extra-location-types" => {
+                    call = call.add_extra_location_types(value.unwrap_or(""));
+                }
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -8044,7 +8788,11 @@ where
                             .push(CLIError::UnknownParameter(key.to_string(), {
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
-                                v.extend(["filter", "page-size", "page-token"].iter().map(|v| *v));
+                                v.extend(
+                                    ["extra-location-types", "filter", "page-size", "page-token"]
+                                        .iter()
+                                        .map(|v| *v),
+                                );
                                 v
                             }));
                     }
@@ -8403,6 +9151,329 @@ where
         }
     }
 
+    async fn _projects_show_effective_key_access_justifications_enrollment_config(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .show_effective_key_access_justifications_enrollment_config(
+                opt.value_of("project").unwrap_or(""),
+            );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_show_effective_key_access_justifications_policy_config(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .show_effective_key_access_justifications_policy_config(
+                opt.value_of("project").unwrap_or(""),
+            );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_update_kaj_policy_config(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut field_cursor = FieldCursor::default();
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "default-key-access-justification-policy.allowed-access-reasons" => Some((
+                    "defaultKeyAccessJustificationPolicy.allowedAccessReasons",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "name" => Some((
+                    "name",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec![
+                            "allowed-access-reasons",
+                            "default-key-access-justification-policy",
+                            "name",
+                        ],
+                    );
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
+            }
+        }
+        let mut request: api::KeyAccessJustificationsPolicyConfig =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .update_kaj_policy_config(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "update-mask" => {
+                    call = call.update_mask(
+                        value
+                            .map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask"))
+                            .unwrap_or(apis_common::FieldMask::default()),
+                    );
+                }
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["update-mask"].iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _doit(
         &self,
         dry_run: bool,
@@ -8417,9 +9488,19 @@ where
                         ._folders_get_autokey_config(opt, dry_run, &mut err)
                         .await;
                 }
+                ("get-kaj-policy-config", Some(opt)) => {
+                    call_result = self
+                        ._folders_get_kaj_policy_config(opt, dry_run, &mut err)
+                        .await;
+                }
                 ("update-autokey-config", Some(opt)) => {
                     call_result = self
                         ._folders_update_autokey_config(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("update-kaj-policy-config", Some(opt)) => {
+                    call_result = self
+                        ._folders_update_kaj_policy_config(opt, dry_run, &mut err)
                         .await;
                 }
                 _ => {
@@ -8428,7 +9509,29 @@ where
                     writeln!(std::io::stderr(), "{}\n", opt.usage()).ok();
                 }
             },
+            ("organizations", Some(opt)) => match opt.subcommand() {
+                ("get-kaj-policy-config", Some(opt)) => {
+                    call_result = self
+                        ._organizations_get_kaj_policy_config(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("update-kaj-policy-config", Some(opt)) => {
+                    call_result = self
+                        ._organizations_update_kaj_policy_config(opt, dry_run, &mut err)
+                        .await;
+                }
+                _ => {
+                    err.issues
+                        .push(CLIError::MissingMethodError("organizations".to_string()));
+                    writeln!(std::io::stderr(), "{}\n", opt.usage()).ok();
+                }
+            },
             ("projects", Some(opt)) => match opt.subcommand() {
+                ("get-kaj-policy-config", Some(opt)) => {
+                    call_result = self
+                        ._projects_get_kaj_policy_config(opt, dry_run, &mut err)
+                        .await;
+                }
                 ("locations-ekm-config-get-iam-policy", Some(opt)) => {
                     call_result = self
                         ._projects_locations_ekm_config_get_iam_policy(opt, dry_run, &mut err)
@@ -8541,6 +9644,13 @@ where
                 ("locations-key-rings-crypto-keys-crypto-key-versions-create", Some(opt)) => {
                     call_result = self
                         ._projects_locations_key_rings_crypto_keys_crypto_key_versions_create(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
+                ("locations-key-rings-crypto-keys-crypto-key-versions-decapsulate", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_key_rings_crypto_keys_crypto_key_versions_decapsulate(
                             opt, dry_run, &mut err,
                         )
                         .await;
@@ -8753,6 +9863,25 @@ where
                         ._projects_show_effective_autokey_config(opt, dry_run, &mut err)
                         .await;
                 }
+                ("show-effective-key-access-justifications-enrollment-config", Some(opt)) => {
+                    call_result = self
+                        ._projects_show_effective_key_access_justifications_enrollment_config(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
+                ("show-effective-key-access-justifications-policy-config", Some(opt)) => {
+                    call_result = self
+                        ._projects_show_effective_key_access_justifications_policy_config(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
+                ("update-kaj-policy-config", Some(opt)) => {
+                    call_result = self
+                        ._projects_update_kaj_policy_config(opt, dry_run, &mut err)
+                        .await;
+                }
                 _ => {
                     err.issues
                         .push(CLIError::MissingMethodError("projects".to_string()));
@@ -8799,7 +9928,9 @@ where
         let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
             secret,
             yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-            hyper_util::client::legacy::Client::builder(executor).build(connector),
+            yup_oauth2::client::CustomHyperClientBuilder::from(
+                hyper_util::client::legacy::Client::builder(executor).build(connector),
+            ),
         )
         .persist_tokens_to_disk(format!("{}/cloudkms1", config_dir))
         .build()
@@ -8852,7 +9983,7 @@ where
 async fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("folders", "methods: 'get-autokey-config' and 'update-autokey-config'", vec![
+        ("folders", "methods: 'get-autokey-config', 'get-kaj-policy-config', 'update-autokey-config' and 'update-kaj-policy-config'", vec![
             ("get-autokey-config",
                     Some(r##"Returns the AutokeyConfig for a folder."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudkms1_cli/folders_get-autokey-config",
@@ -8873,13 +10004,58 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("get-kaj-policy-config",
+                    Some(r##"Gets the KeyAccessJustificationsPolicyConfig for a given organization, folder, or project."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_cloudkms1_cli/folders_get-kaj-policy-config",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The name of the KeyAccessJustificationsPolicyConfig to get."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("update-autokey-config",
                     Some(r##"Updates the AutokeyConfig for a folder. The caller must have both `cloudkms.autokeyConfigs.update` permission on the parent folder and `cloudkms.cryptoKeys.setIamPolicy` permission on the provided key project. A KeyHandle creation in the folder's descendant projects will use this configuration to determine where to create the resulting CryptoKey."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudkms1_cli/folders_update-autokey-config",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Identifier. Name of the AutokeyConfig resource, e.g. `folders/{FOLDER_NUMBER}/autokeyConfig`."##),
+                     Some(r##"Identifier. Name of the AutokeyConfig resource, e.g. `folders/{FOLDER_NUMBER}/autokeyConfig`"##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("update-kaj-policy-config",
+                    Some(r##"Updates the KeyAccessJustificationsPolicyConfig for a given organization, folder, or project."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_cloudkms1_cli/folders_update-kaj-policy-config",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Identifier. The resource name for this KeyAccessJustificationsPolicyConfig in the format of "{organizations|folders|projects}/*/kajPolicyConfig"."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -8899,7 +10075,74 @@ async fn main() {
                      Some(false)),
                   ]),
             ]),
-            ("projects", "methods: 'locations-ekm-config-get-iam-policy', 'locations-ekm-config-set-iam-policy', 'locations-ekm-config-test-iam-permissions', 'locations-ekm-connections-create', 'locations-ekm-connections-get', 'locations-ekm-connections-get-iam-policy', 'locations-ekm-connections-list', 'locations-ekm-connections-patch', 'locations-ekm-connections-set-iam-policy', 'locations-ekm-connections-test-iam-permissions', 'locations-ekm-connections-verify-connectivity', 'locations-generate-random-bytes', 'locations-get', 'locations-get-ekm-config', 'locations-key-handles-create', 'locations-key-handles-get', 'locations-key-handles-list', 'locations-key-rings-create', 'locations-key-rings-crypto-keys-create', 'locations-key-rings-crypto-keys-crypto-key-versions-asymmetric-decrypt', 'locations-key-rings-crypto-keys-crypto-key-versions-asymmetric-sign', 'locations-key-rings-crypto-keys-crypto-key-versions-create', 'locations-key-rings-crypto-keys-crypto-key-versions-destroy', 'locations-key-rings-crypto-keys-crypto-key-versions-get', 'locations-key-rings-crypto-keys-crypto-key-versions-get-public-key', 'locations-key-rings-crypto-keys-crypto-key-versions-import', 'locations-key-rings-crypto-keys-crypto-key-versions-list', 'locations-key-rings-crypto-keys-crypto-key-versions-mac-sign', 'locations-key-rings-crypto-keys-crypto-key-versions-mac-verify', 'locations-key-rings-crypto-keys-crypto-key-versions-patch', 'locations-key-rings-crypto-keys-crypto-key-versions-raw-decrypt', 'locations-key-rings-crypto-keys-crypto-key-versions-raw-encrypt', 'locations-key-rings-crypto-keys-crypto-key-versions-restore', 'locations-key-rings-crypto-keys-decrypt', 'locations-key-rings-crypto-keys-encrypt', 'locations-key-rings-crypto-keys-get', 'locations-key-rings-crypto-keys-get-iam-policy', 'locations-key-rings-crypto-keys-list', 'locations-key-rings-crypto-keys-patch', 'locations-key-rings-crypto-keys-set-iam-policy', 'locations-key-rings-crypto-keys-test-iam-permissions', 'locations-key-rings-crypto-keys-update-primary-version', 'locations-key-rings-get', 'locations-key-rings-get-iam-policy', 'locations-key-rings-import-jobs-create', 'locations-key-rings-import-jobs-get', 'locations-key-rings-import-jobs-get-iam-policy', 'locations-key-rings-import-jobs-list', 'locations-key-rings-import-jobs-set-iam-policy', 'locations-key-rings-import-jobs-test-iam-permissions', 'locations-key-rings-list', 'locations-key-rings-set-iam-policy', 'locations-key-rings-test-iam-permissions', 'locations-list', 'locations-operations-get', 'locations-update-ekm-config' and 'show-effective-autokey-config'", vec![
+            ("organizations", "methods: 'get-kaj-policy-config' and 'update-kaj-policy-config'", vec![
+            ("get-kaj-policy-config",
+                    Some(r##"Gets the KeyAccessJustificationsPolicyConfig for a given organization, folder, or project."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_cloudkms1_cli/organizations_get-kaj-policy-config",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The name of the KeyAccessJustificationsPolicyConfig to get."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("update-kaj-policy-config",
+                    Some(r##"Updates the KeyAccessJustificationsPolicyConfig for a given organization, folder, or project."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_cloudkms1_cli/organizations_update-kaj-policy-config",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Identifier. The resource name for this KeyAccessJustificationsPolicyConfig in the format of "{organizations|folders|projects}/*/kajPolicyConfig"."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ]),
+            ("projects", "methods: 'get-kaj-policy-config', 'locations-ekm-config-get-iam-policy', 'locations-ekm-config-set-iam-policy', 'locations-ekm-config-test-iam-permissions', 'locations-ekm-connections-create', 'locations-ekm-connections-get', 'locations-ekm-connections-get-iam-policy', 'locations-ekm-connections-list', 'locations-ekm-connections-patch', 'locations-ekm-connections-set-iam-policy', 'locations-ekm-connections-test-iam-permissions', 'locations-ekm-connections-verify-connectivity', 'locations-generate-random-bytes', 'locations-get', 'locations-get-ekm-config', 'locations-key-handles-create', 'locations-key-handles-get', 'locations-key-handles-list', 'locations-key-rings-create', 'locations-key-rings-crypto-keys-create', 'locations-key-rings-crypto-keys-crypto-key-versions-asymmetric-decrypt', 'locations-key-rings-crypto-keys-crypto-key-versions-asymmetric-sign', 'locations-key-rings-crypto-keys-crypto-key-versions-create', 'locations-key-rings-crypto-keys-crypto-key-versions-decapsulate', 'locations-key-rings-crypto-keys-crypto-key-versions-destroy', 'locations-key-rings-crypto-keys-crypto-key-versions-get', 'locations-key-rings-crypto-keys-crypto-key-versions-get-public-key', 'locations-key-rings-crypto-keys-crypto-key-versions-import', 'locations-key-rings-crypto-keys-crypto-key-versions-list', 'locations-key-rings-crypto-keys-crypto-key-versions-mac-sign', 'locations-key-rings-crypto-keys-crypto-key-versions-mac-verify', 'locations-key-rings-crypto-keys-crypto-key-versions-patch', 'locations-key-rings-crypto-keys-crypto-key-versions-raw-decrypt', 'locations-key-rings-crypto-keys-crypto-key-versions-raw-encrypt', 'locations-key-rings-crypto-keys-crypto-key-versions-restore', 'locations-key-rings-crypto-keys-decrypt', 'locations-key-rings-crypto-keys-encrypt', 'locations-key-rings-crypto-keys-get', 'locations-key-rings-crypto-keys-get-iam-policy', 'locations-key-rings-crypto-keys-list', 'locations-key-rings-crypto-keys-patch', 'locations-key-rings-crypto-keys-set-iam-policy', 'locations-key-rings-crypto-keys-test-iam-permissions', 'locations-key-rings-crypto-keys-update-primary-version', 'locations-key-rings-get', 'locations-key-rings-get-iam-policy', 'locations-key-rings-import-jobs-create', 'locations-key-rings-import-jobs-get', 'locations-key-rings-import-jobs-get-iam-policy', 'locations-key-rings-import-jobs-list', 'locations-key-rings-import-jobs-set-iam-policy', 'locations-key-rings-import-jobs-test-iam-permissions', 'locations-key-rings-list', 'locations-key-rings-set-iam-policy', 'locations-key-rings-test-iam-permissions', 'locations-list', 'locations-operations-get', 'locations-update-ekm-config', 'show-effective-autokey-config', 'show-effective-key-access-justifications-enrollment-config', 'show-effective-key-access-justifications-policy-config' and 'update-kaj-policy-config'", vec![
+            ("get-kaj-policy-config",
+                    Some(r##"Gets the KeyAccessJustificationsPolicyConfig for a given organization, folder, or project."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_cloudkms1_cli/projects_get-kaj-policy-config",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The name of the KeyAccessJustificationsPolicyConfig to get."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("locations-ekm-config-get-iam-policy",
                     Some(r##"Gets the access control policy for a resource. Returns an empty policy if the resource exists and does not have a policy set."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudkms1_cli/projects_locations-ekm-config-get-iam-policy",
@@ -9387,6 +10630,31 @@ async fn main() {
                     (Some(r##"parent"##),
                      None,
                      Some(r##"Required. The name of the CryptoKey associated with the CryptoKeyVersions."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-key-rings-crypto-keys-crypto-key-versions-decapsulate",
+                    Some(r##"Decapsulates data that was encapsulated with a public key retrieved from GetPublicKey corresponding to a CryptoKeyVersion with CryptoKey.purpose KEY_ENCAPSULATION."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_cloudkms1_cli/projects_locations-key-rings-crypto-keys-crypto-key-versions-decapsulate",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The resource name of the CryptoKeyVersion to use for decapsulation."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -10205,12 +11473,77 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("show-effective-key-access-justifications-enrollment-config",
+                    Some(r##"Returns the KeyAccessJustificationsEnrollmentConfig of the resource closest to the given project in hierarchy."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_cloudkms1_cli/projects_show-effective-key-access-justifications-enrollment-config",
+                  vec![
+                    (Some(r##"project"##),
+                     None,
+                     Some(r##"Required. The number or id of the project to get the effective KeyAccessJustificationsEnrollmentConfig for."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("show-effective-key-access-justifications-policy-config",
+                    Some(r##"Returns the KeyAccessJustificationsPolicyConfig of the resource closest to the given project in hierarchy."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_cloudkms1_cli/projects_show-effective-key-access-justifications-policy-config",
+                  vec![
+                    (Some(r##"project"##),
+                     None,
+                     Some(r##"Required. The number or id of the project to get the effective KeyAccessJustificationsPolicyConfig. In the format of "projects/{|}""##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("update-kaj-policy-config",
+                    Some(r##"Updates the KeyAccessJustificationsPolicyConfig for a given organization, folder, or project."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_cloudkms1_cli/projects_update-kaj-policy-config",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Identifier. The resource name for this KeyAccessJustificationsPolicyConfig in the format of "{organizations|folders|projects}/*/kajPolicyConfig"."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ]),
         ];
 
     let mut app = App::new("cloudkms1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("6.0.0+20240621")
+           .version("7.0.0+20251203")
            .about("Manages keys and performs cryptographic operations in a central cloud service, for direct use by other cloud resources and applications. ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_cloudkms1_cli")
            .arg(Arg::with_name("url")
@@ -10275,7 +11608,7 @@ async fn main() {
         .with_native_roots()
         .unwrap()
         .https_or_http()
-        .enable_http1()
+        .enable_http2()
         .build();
 
     match Engine::new(matches, connector).await {

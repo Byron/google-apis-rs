@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *VM Migration Service* API at revision *20240613*. The CLI is at version *6.0.0*.
+This documentation was generated from the *VM Migration Service* API at revision *20251204*. The CLI is at version *7.0.0*.
 
 ```bash
 vmmigration1 [options]
@@ -57,7 +57,15 @@ vmmigration1 [options]
                 locations-sources-datacenter-connectors-list <parent> [-p <v>]... [-o <out>]
                 locations-sources-datacenter-connectors-upgrade-appliance <datacenter-connector> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-sources-delete <name> [-p <v>]... [-o <out>]
+                locations-sources-disk-migration-jobs-cancel <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-sources-disk-migration-jobs-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-sources-disk-migration-jobs-delete <name> [-p <v>]... [-o <out>]
+                locations-sources-disk-migration-jobs-get <name> [-p <v>]... [-o <out>]
+                locations-sources-disk-migration-jobs-list <parent> [-p <v>]... [-o <out>]
+                locations-sources-disk-migration-jobs-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-sources-disk-migration-jobs-run <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-sources-fetch-inventory <source> [-p <v>]... [-o <out>]
+                locations-sources-fetch-storage-inventory <source> [-p <v>]... [-o <out>]
                 locations-sources-get <name> [-p <v>]... [-o <out>]
                 locations-sources-list <parent> [-p <v>]... [-o <out>]
                 locations-sources-migrating-vms-clone-jobs-cancel <name> (-r <kv>)... [-p <v>]... [-o <out>]
@@ -70,6 +78,7 @@ vmmigration1 [options]
                 locations-sources-migrating-vms-cutover-jobs-get <name> [-p <v>]... [-o <out>]
                 locations-sources-migrating-vms-cutover-jobs-list <parent> [-p <v>]... [-o <out>]
                 locations-sources-migrating-vms-delete <name> [-p <v>]... [-o <out>]
+                locations-sources-migrating-vms-extend-migration <migrating-vm> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-sources-migrating-vms-finalize-migration <migrating-vm> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-sources-migrating-vms-get <name> [-p <v>]... [-o <out>]
                 locations-sources-migrating-vms-list <parent> [-p <v>]... [-o <out>]

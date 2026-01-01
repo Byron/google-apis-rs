@@ -681,7 +681,7 @@
                     ],
                     "parameters": {
                         "destinationParent": {
-                            "description": "Required. Name of the Google Cloud folder or organization to reparent the target resource. The analysis will be performed against hypothetically moving the resource to this specified desitination parent. This can only be a folder number (such as \"folders/123\") or an organization number (such as \"organizations/123\").",
+                            "description": "Required. Name of the Google Cloud folder or organization to reparent the target resource. The analysis will be performed against hypothetically moving the resource to this specified destination parent. This can only be a folder number (such as \"folders/123\") or an organization number (such as \"organizations/123\").",
                             "location": "query",
                             "type": "string"
                         },
@@ -1095,7 +1095,7 @@
             }
         }
     },
-    "revision": "20240621",
+    "revision": "20251212",
     "rootUrl": "https://cloudasset.googleapis.com/",
     "schemas": {
         "AccessSelector": {
@@ -1170,7 +1170,7 @@
                     "description": "The main analysis that matches the original request."
                 },
                 "serviceAccountImpersonationAnalysis": {
-                    "description": "The service account impersonation analysis if AnalyzeIamPolicyRequest.analyze_service_account_impersonation is enabled.",
+                    "description": "The service account impersonation analysis if IamPolicyAnalysisQuery.Options.analyze_service_account_impersonation is enabled.",
                     "items": {
                         "$ref": "IamPolicyAnalysis"
                     },
@@ -1323,6 +1323,13 @@
                     },
                     "type": "array"
                 },
+                "assetExceptions": {
+                    "description": "The exceptions of a resource.",
+                    "items": {
+                        "$ref": "AssetException"
+                    },
+                    "type": "array"
+                },
                 "assetType": {
                     "description": "The type of the asset. Example: `compute.googleapis.com/Disk` See [Supported asset types](https://cloud.google.com/asset-inventory/docs/supported-asset-types) for more information.",
                     "type": "string"
@@ -1366,6 +1373,40 @@
                 "updateTime": {
                     "description": "The last update timestamp of an asset. update_time is updated when create/update/delete operation is performed.",
                     "format": "google-datetime",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "AssetEnrichment": {
+            "description": "The enhanced metadata information for a resource.",
+            "id": "AssetEnrichment",
+            "properties": {
+                "resourceOwners": {
+                    "$ref": "ResourceOwners",
+                    "description": "The resource owners for a resource. Note that this field only contains the members that have \"roles/owner\" role in the resource's IAM Policy."
+                }
+            },
+            "type": "object"
+        },
+        "AssetException": {
+            "description": "An exception of an asset.",
+            "id": "AssetException",
+            "properties": {
+                "details": {
+                    "description": "The details of the exception.",
+                    "type": "string"
+                },
+                "exceptionType": {
+                    "description": "The type of exception.",
+                    "enum": [
+                        "EXCEPTION_TYPE_UNSPECIFIED",
+                        "TRUNCATION"
+                    ],
+                    "enumDescriptions": [
+                        "exception_type is not applicable for the current asset.",
+                        "The asset content is truncated."
+                    ],
                     "type": "string"
                 }
             },
@@ -1474,7 +1515,7 @@
                     "type": "string"
                 },
                 "force": {
-                    "description": "If the destination table already exists and this flag is `TRUE`, the table will be overwritten by the contents of assets snapshot. If the flag is `FALSE` or unset and the destination table already exists, the export call returns an INVALID_ARGUMEMT error.",
+                    "description": "If the destination table already exists and this flag is `TRUE`, the table will be overwritten by the contents of assets snapshot. If the flag is `FALSE` or unset and the destination table already exists, the export call returns an INVALID_ARGUMENT error.",
                     "type": "boolean"
                 },
                 "partitionSpec": {
@@ -1609,7 +1650,7 @@
             "id": "EffectiveTagDetails",
             "properties": {
                 "attachedResource": {
-                    "description": "The [full resource name](https://cloud.google.com/asset-inventory/docs/resource-name-format) of the ancestor from which an effective_tag is inherited, according to [tag inheritance](https://cloud.google.com/resource-manager/docs/tags/tags-overview#inheritance).",
+                    "description": "The [full resource name](https://cloud.google.com/asset-inventory/docs/resource-name-format) of the ancestor from which effective_tags are inherited, according to [tag inheritance](https://cloud.google.com/resource-manager/docs/tags/tags-overview#inheritance).",
                     "type": "string"
                 },
                 "effectiveTags": {
@@ -1873,7 +1914,7 @@
                     "description": "A Google Cloud resource governed by the organization policies of the AnalyzeOrgPolicyGovernedAssetsRequest.constraint."
                 },
                 "policyBundle": {
-                    "description": "The ordered list of all organization policies from the AnalyzeOrgPoliciesResponse.OrgPolicyResult.consolidated_policy.attached_resource to the scope specified in the request. If the constraint is defined with default policy, it will also appear in the list.",
+                    "description": "The ordered list of all organization policies from the consolidated_policy.attached_resource to the scope specified in the request. If the constraint is defined with default policy, it will also appear in the list.",
                     "items": {
                         "$ref": "AnalyzerOrgPolicy"
                     },
@@ -1973,7 +2014,7 @@
                     ],
                     "enumDescriptions": [
                         "Unspecified partition key. Tables won't be partitioned using this option.",
-                        "The time when the request is received. If specified as partition key, the result table(s) is partitoned by the RequestTime column, an additional timestamp column representing when the request was received."
+                        "The time when the request is received. If specified as partition key, the result table(s) is partitioned by the RequestTime column, an additional timestamp column representing when the request was received."
                     ],
                     "type": "string"
                 },
@@ -2054,7 +2095,7 @@
                     "type": "string"
                 },
                 "condition": {
-                    "description": "Organization Policy condition/expression. For example: `resource.instanceName.matches(\"[production|test]_.*_(\\d)+\")'` or, `resource.management.auto_upgrade == true`",
+                    "description": "Organization Policy condition/expression. For example: `resource.instanceName.matches(\"(production|test)_(.+_)?[\\d]+\")'` or, `resource.management.auto_upgrade == true`",
                     "type": "string"
                 },
                 "description": {
@@ -2072,13 +2113,17 @@
                             "METHOD_TYPE_UNSPECIFIED",
                             "CREATE",
                             "UPDATE",
-                            "DELETE"
+                            "DELETE",
+                            "REMOVE_GRANT",
+                            "GOVERN_TAGS"
                         ],
                         "enumDescriptions": [
                             "Unspecified. Will results in user error.",
                             "Constraint applied when creating the resource.",
                             "Constraint applied when updating the resource.",
-                            "Constraint applied when deleting the resource."
+                            "Constraint applied when deleting the resource.",
+                            "Constraint applied when removing an IAM grant.",
+                            "Constraint applied when enforcing forced tagging."
                         ],
                         "type": "string"
                     },
@@ -2159,7 +2204,7 @@
                     "type": "string"
                 },
                 "policyBundle": {
-                    "description": "The ordered list of all organization policies from the AnalyzeOrgPoliciesResponse.OrgPolicyResult.consolidated_policy.attached_resource. to the scope specified in the request. If the constraint is defined with default policy, it will also appear in the list.",
+                    "description": "The ordered list of all organization policies from the consolidated_policy.attached_resource. to the scope specified in the request. If the constraint is defined with default policy, it will also appear in the list.",
                     "items": {
                         "$ref": "AnalyzerOrgPolicy"
                     },
@@ -2600,6 +2645,7 @@
             "properties": {
                 "etag": {
                     "description": "Output only. An opaque identifier for the current version of the `AccessPolicy`. This will always be a strongly validated etag, meaning that two Access Policies will be identical if and only if their etags are identical. Clients should not expect this to be in any specific format.",
+                    "readOnly": true,
                     "type": "string"
                 },
                 "name": {
@@ -2798,7 +2844,7 @@
             "id": "GoogleIdentityAccesscontextmanagerV1EgressFrom",
             "properties": {
                 "identities": {
-                    "description": "A list of identities that are allowed access through [EgressPolicy]. Identities can be an individual user, service account, Google group, or third-party identity. The `v1` identities that have the prefix `user`, `group`, `serviceAccount`, `principal`, and `principalSet` in https://cloud.google.com/iam/docs/principal-identifiers#v1 are supported.",
+                    "description": "A list of identities that are allowed access through [EgressPolicy]. Identities can be an individual user, service account, Google group, or third-party identity. For third-party identity, only single identities are supported and other identity types are not supported. The `v1` identities that have the prefix `user`, `group`, `serviceAccount`, and `principal` in https://cloud.google.com/iam/docs/principal-identifiers#v1 are supported.",
                     "items": {
                         "type": "string"
                     },
@@ -2855,6 +2901,10 @@
                 "egressTo": {
                     "$ref": "GoogleIdentityAccesscontextmanagerV1EgressTo",
                     "description": "Defines the conditions on the ApiOperation and destination resources that cause this EgressPolicy to apply."
+                },
+                "title": {
+                    "description": "Optional. Human-readable title for the egress rule. The title must be unique within the perimeter and can not exceed 100 characters. Within the access policy, the combined length of all rule titles must not exceed 240,000 characters.",
+                    "type": "string"
                 }
             },
             "type": "object"
@@ -2865,6 +2915,10 @@
             "properties": {
                 "accessLevel": {
                     "description": "An AccessLevel resource name that allows protected resources inside the ServicePerimeters to access outside the ServicePerimeter boundaries. AccessLevels listed must be in the same policy as this ServicePerimeter. Referencing a nonexistent AccessLevel will cause an error. If an AccessLevel name is not specified, only resources within the perimeter can be accessed through Google Cloud calls with request origins within the perimeter. Example: `accessPolicies/MY_POLICY/accessLevels/MY_LEVEL`. If a single `*` is specified for `access_level`, then all EgressSources will be allowed.",
+                    "type": "string"
+                },
+                "resource": {
+                    "description": "A Google Cloud resource from the service perimeter that you want to allow to access data outside the perimeter. This field supports only projects. The project format is `projects/{project_number}`. You can't use `*` in this field to allow all Google Cloud resources.",
                     "type": "string"
                 }
             },
@@ -2894,6 +2948,13 @@
                         "type": "string"
                     },
                     "type": "array"
+                },
+                "roles": {
+                    "description": "IAM roles that represent the set of operations that the sources specified in the corresponding EgressFrom. are allowed to perform in this ServicePerimeter.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
                 }
             },
             "type": "object"
@@ -2903,7 +2964,7 @@
             "id": "GoogleIdentityAccesscontextmanagerV1IngressFrom",
             "properties": {
                 "identities": {
-                    "description": "A list of identities that are allowed access through [IngressPolicy]. Identities can be an individual user, service account, Google group, or third-party identity. The `v1` identities that have the prefix `user`, `group`, `serviceAccount`, `principal`, and `principalSet` in https://cloud.google.com/iam/docs/principal-identifiers#v1 are supported.",
+                    "description": "A list of identities that are allowed access through [IngressPolicy]. Identities can be an individual user, service account, Google group, or third-party identity. For third-party identity, only single identities are supported and other identity types are not supported. The `v1` identities that have the prefix `user`, `group`, `serviceAccount`, and `principal` in https://cloud.google.com/iam/docs/principal-identifiers#v1 are supported.",
                     "items": {
                         "type": "string"
                     },
@@ -2946,6 +3007,10 @@
                 "ingressTo": {
                     "$ref": "GoogleIdentityAccesscontextmanagerV1IngressTo",
                     "description": "Defines the conditions on the ApiOperation and request destination that cause this IngressPolicy to apply."
+                },
+                "title": {
+                    "description": "Optional. Human-readable title for the ingress rule. The title must be unique within the perimeter and can not exceed 100 characters. Within the access policy, the combined length of all rule titles must not exceed 240,000 characters.",
+                    "type": "string"
                 }
             },
             "type": "object"
@@ -2978,6 +3043,13 @@
                 },
                 "resources": {
                     "description": "A list of resources, currently only projects in the form `projects/`, protected by this ServicePerimeter that are allowed to be accessed by sources defined in the corresponding IngressFrom. If a single `*` is specified, then access to all resources inside the perimeter are allowed.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "roles": {
+                    "description": "IAM roles that represent the set of operations that the sources specified in the corresponding IngressFrom are allowed to perform in this ServicePerimeter.",
                     "items": {
                         "type": "string"
                     },
@@ -3044,6 +3116,10 @@
             "properties": {
                 "description": {
                     "description": "Description of the `ServicePerimeter` and its use. Does not affect behavior.",
+                    "type": "string"
+                },
+                "etag": {
+                    "description": "Optional. An opaque identifier for the current version of the `ServicePerimeter`. This identifier does not follow any specific format. If an etag is not provided, the operation will be performed as if a valid etag is provided.",
                     "type": "string"
                 },
                 "name": {
@@ -3360,7 +3436,7 @@
                     "description": "The IAM policy directly set on the given resource. Note that the original IAM policy can contain multiple bindings. This only contains the bindings that match the given query. For queries that don't contain a constrain on policies (e.g., an empty query), this contains all the bindings. To search against the `policy` bindings: * use a field query: - query by the policy contained members. Example: `policy:amy@gmail.com` - query by the policy contained roles. Example: `policy:roles/compute.admin` - query by the policy contained roles' included permissions. Example: `policy.role.permissions:compute.instances.create`"
                 },
                 "project": {
-                    "description": "The project that the associated Google Cloud resource belongs to, in the form of projects/{PROJECT_NUMBER}. If an IAM policy is set on a resource (like VM instance, Cloud Storage bucket), the project field will indicate the project that contains the resource. If an IAM policy is set on a folder or orgnization, this field will be empty. To search against the `project`: * specify the `scope` field as this project in your search request.",
+                    "description": "The project that the associated Google Cloud resource belongs to, in the form of projects/{PROJECT_NUMBER}. If an IAM policy is set on a resource (like VM instance, Cloud Storage bucket), the project field will indicate the project that contains the resource. If an IAM policy is set on a folder or organization, this field will be empty. To search against the `project`: * specify the `scope` field as this project in your search request.",
                     "type": "string"
                 },
                 "resource": {
@@ -3451,7 +3527,7 @@
                         "AVAILABLE_PACKAGE"
                     ],
                     "enumDescriptions": [
-                        "Invalid. An type must be specified.",
+                        "Invalid. A type must be specified.",
                         "This represents a package that is installed on the VM.",
                         "This represents an update that is available for a package."
                     ],
@@ -3642,7 +3718,7 @@
             "properties": {
                 "consolidatedPolicy": {
                     "$ref": "AnalyzerOrgPolicy",
-                    "description": "The consolidated organization policy for the analyzed resource. The consolidated organization policy is computed by merging and evaluating AnalyzeOrgPoliciesResponse.policy_bundle. The evaluation will respect the organization policy [hierarchy rules](https://cloud.google.com/resource-manager/docs/organization-policy/understanding-hierarchy)."
+                    "description": "The consolidated organization policy for the analyzed resource. The consolidated organization policy is computed by merging and evaluating policy_bundle. The evaluation will respect the organization policy [hierarchy rules](https://cloud.google.com/resource-manager/docs/organization-policy/understanding-hierarchy)."
                 },
                 "folders": {
                     "description": "The folder(s) that this consolidated policy belongs to, in the format of folders/{FOLDER_NUMBER}. This field is available when the consolidated policy belongs (directly or cascadingly) to one or more folders.",
@@ -3656,7 +3732,7 @@
                     "type": "string"
                 },
                 "policyBundle": {
-                    "description": "The ordered list of all organization policies from the AnalyzeOrgPoliciesResponse.OrgPolicyResult.consolidated_policy.attached_resource. to the scope specified in the request. If the constraint is defined with default policy, it will also appear in the list.",
+                    "description": "The ordered list of all organization policies from the consolidated_policy.attached_resource. to the scope specified in the request. If the constraint is defined with default policy, it will also appear in the list.",
                     "items": {
                         "$ref": "AnalyzerOrgPolicy"
                     },
@@ -3736,8 +3812,8 @@
                     ],
                     "enumDescriptions": [
                         "Unspecified partition key. If used, it means using non-partitioned table.",
-                        "The time when the snapshot is taken. If specified as partition key, the result table(s) is partitoned by the additional timestamp column, readTime. If [read_time] in ExportAssetsRequest is specified, the readTime column's value will be the same as it. Otherwise, its value will be the current time that is used to take the snapshot.",
-                        "The time when the request is received and started to be processed. If specified as partition key, the result table(s) is partitoned by the requestTime column, an additional timestamp column representing when the request was received."
+                        "The time when the snapshot is taken. If specified as partition key, the result table(s) is partitioned by the additional timestamp column, readTime. If [read_time] in ExportAssetsRequest is specified, the readTime column's value will be the same as it. Otherwise, its value will be the current time that is used to take the snapshot.",
+                        "The time when the request is received and started to be processed. If specified as partition key, the result table(s) is partitioned by the requestTime column, an additional timestamp column representing when the request was received."
                     ],
                     "type": "string"
                 }
@@ -3873,7 +3949,7 @@
             "id": "QueryAssetsResponse",
             "properties": {
                 "done": {
-                    "description": "The query response, which can be either an `error` or a valid `response`. If `done` == `false` and the query result is being saved in a output, the output_config field will be set. If `done` == `true`, exactly one of `error`, `query_result` or `output_config` will be set.",
+                    "description": "The query response, which can be either an `error` or a valid `response`. If `done` == `false` and the query result is being saved in an output, the output_config field will be set. If `done` == `true`, exactly one of `error`, `query_result` or `output_config` will be set. [done] is unset unless the [QueryAssetsResponse] contains a [QueryAssetsResponse.job_reference].",
                     "type": "boolean"
                 },
                 "error": {
@@ -3886,7 +3962,7 @@
                 },
                 "outputConfig": {
                     "$ref": "QueryAssetsOutputConfig",
-                    "description": "Output configuration which indicates instead of being returned in API response on the fly, the query result will be saved in a specific output."
+                    "description": "Output configuration, which indicates that instead of being returned in an API response on the fly, the query result will be saved in a specific output."
                 },
                 "queryResult": {
                     "$ref": "QueryResult",
@@ -4074,6 +4150,20 @@
             },
             "type": "object"
         },
+        "ResourceOwners": {
+            "description": "The resource owners information.",
+            "id": "ResourceOwners",
+            "properties": {
+                "resourceOwners": {
+                    "description": "List of resource owners.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                }
+            },
+            "type": "object"
+        },
         "ResourceSearchResult": {
             "description": "A result of Resource Search, containing information of a cloud resource.",
             "id": "ResourceSearchResult",
@@ -4114,6 +4204,13 @@
                     "description": "The effective tags on this resource. All of the tags that are both attached to and inherited by a resource are collectively called the effective tags. For more information, see [tag inheritance](https://cloud.google.com/resource-manager/docs/tags/tags-overview#inheritance). To search against the `effective_tags`: * Use a field query. Example: - `effectiveTagKeys:\"123456789/env*\"` - `effectiveTagKeys=\"123456789/env\"` - `effectiveTagKeys:\"env\"` - `effectiveTagKeyIds=\"tagKeys/123\"` - `effectiveTagValues:\"env\"` - `effectiveTagValues:\"env/prod\"` - `effectiveTagValues:\"123456789/env/prod*\"` - `effectiveTagValues=\"123456789/env/prod\"` - `effectiveTagValueIds=\"tagValues/456\"`",
                     "items": {
                         "$ref": "EffectiveTagDetails"
+                    },
+                    "type": "array"
+                },
+                "enrichments": {
+                    "description": "Enrichments of the asset. Currently supported enrichment types with SearchAllResources API: * RESOURCE_OWNERS The corresponding read masks in order to get the enrichment: * enrichments.resource_owners The corresponding required permissions: * cloudasset.assets.searchEnrichmentResourceOwners Example query to get resource owner enrichment: ``` scope: \"projects/my-project\" query: \"name: my-project\" assetTypes: \"cloudresourcemanager.googleapis.com/Project\" readMask: { paths: \"asset_type\" paths: \"name\" paths: \"enrichments.resource_owners\" } ```",
+                    "items": {
+                        "$ref": "AssetEnrichment"
                     },
                     "type": "array"
                 },
@@ -4563,6 +4660,13 @@
             "description": "Resource representation as defined by the corresponding service providing the resource for a given API version.",
             "id": "VersionedResource",
             "properties": {
+                "assetExceptions": {
+                    "description": "The exceptions of a resource.",
+                    "items": {
+                        "$ref": "AssetException"
+                    },
+                    "type": "array"
+                },
                 "resource": {
                     "additionalProperties": {
                         "description": "Properties of the object.",

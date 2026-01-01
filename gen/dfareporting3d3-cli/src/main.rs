@@ -48,10 +48,22 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self.hub.account_active_ad_summaries().get(
-            opt.value_of("profile-id").unwrap_or(""),
-            opt.value_of("summary-account-id").unwrap_or(""),
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
         );
+        let summary_account_id: i64 = arg_from_str(
+            &opt.value_of("summary-account-id").unwrap_or(""),
+            err,
+            "<summary-account-id>",
+            "int64",
+        );
+        let mut call = self
+            .hub
+            .account_active_ad_summaries()
+            .get(profile_id, summary_account_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -129,10 +141,14 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self.hub.account_permission_groups().get(
-            opt.value_of("profile-id").unwrap_or(""),
-            opt.value_of("id").unwrap_or(""),
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
         );
+        let id: i64 = arg_from_str(&opt.value_of("id").unwrap_or(""), err, "<id>", "int64");
+        let mut call = self.hub.account_permission_groups().get(profile_id, id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -210,10 +226,13 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self
-            .hub
-            .account_permission_groups()
-            .list(opt.value_of("profile-id").unwrap_or(""));
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
+        );
+        let mut call = self.hub.account_permission_groups().list(profile_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -291,10 +310,14 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self.hub.account_permissions().get(
-            opt.value_of("profile-id").unwrap_or(""),
-            opt.value_of("id").unwrap_or(""),
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
         );
+        let id: i64 = arg_from_str(&opt.value_of("id").unwrap_or(""), err, "<id>", "int64");
+        let mut call = self.hub.account_permissions().get(profile_id, id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -372,10 +395,13 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self
-            .hub
-            .account_permissions()
-            .list(opt.value_of("profile-id").unwrap_or(""));
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
+        );
+        let mut call = self.hub.account_permissions().list(profile_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -453,10 +479,14 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self.hub.account_user_profiles().get(
-            opt.value_of("profile-id").unwrap_or(""),
-            opt.value_of("id").unwrap_or(""),
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
         );
+        let id: i64 = arg_from_str(&opt.value_of("id").unwrap_or(""), err, "<id>", "int64");
+        let mut call = self.hub.account_user_profiles().get(profile_id, id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -770,10 +800,13 @@ where
             }
         }
         let mut request: api::AccountUserProfile = serde_json::value::from_value(object).unwrap();
-        let mut call = self
-            .hub
-            .account_user_profiles()
-            .insert(request, opt.value_of("profile-id").unwrap_or(""));
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
+        );
+        let mut call = self.hub.account_user_profiles().insert(request, profile_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -851,10 +884,13 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self
-            .hub
-            .account_user_profiles()
-            .list(opt.value_of("profile-id").unwrap_or(""));
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
+        );
+        let mut call = self.hub.account_user_profiles().list(profile_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -1230,11 +1266,17 @@ where
             }
         }
         let mut request: api::AccountUserProfile = serde_json::value::from_value(object).unwrap();
-        let mut call = self.hub.account_user_profiles().patch(
-            request,
-            opt.value_of("profile-id").unwrap_or(""),
-            opt.value_of("id").unwrap_or(""),
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
         );
+        let id: i64 = arg_from_str(&opt.value_of("id").unwrap_or(""), err, "<id>", "int64");
+        let mut call = self
+            .hub
+            .account_user_profiles()
+            .patch(request, profile_id, id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -1548,10 +1590,13 @@ where
             }
         }
         let mut request: api::AccountUserProfile = serde_json::value::from_value(object).unwrap();
-        let mut call = self
-            .hub
-            .account_user_profiles()
-            .update(request, opt.value_of("profile-id").unwrap_or(""));
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
+        );
+        let mut call = self.hub.account_user_profiles().update(request, profile_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -1629,10 +1674,14 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self.hub.accounts().get(
-            opt.value_of("profile-id").unwrap_or(""),
-            opt.value_of("id").unwrap_or(""),
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
         );
+        let id: i64 = arg_from_str(&opt.value_of("id").unwrap_or(""), err, "<id>", "int64");
+        let mut call = self.hub.accounts().get(profile_id, id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -1710,10 +1759,13 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self
-            .hub
-            .accounts()
-            .list(opt.value_of("profile-id").unwrap_or(""));
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
+        );
+        let mut call = self.hub.accounts().list(profile_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -1901,11 +1953,14 @@ where
             }
         }
         let mut request: api::Account = serde_json::value::from_value(object).unwrap();
-        let mut call = self.hub.accounts().patch(
-            request,
-            opt.value_of("profile-id").unwrap_or(""),
-            opt.value_of("id").unwrap_or(""),
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
         );
+        let id: i64 = arg_from_str(&opt.value_of("id").unwrap_or(""), err, "<id>", "int64");
+        let mut call = self.hub.accounts().patch(request, profile_id, id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -2047,10 +2102,13 @@ where
             }
         }
         let mut request: api::Account = serde_json::value::from_value(object).unwrap();
-        let mut call = self
-            .hub
-            .accounts()
-            .update(request, opt.value_of("profile-id").unwrap_or(""));
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
+        );
+        let mut call = self.hub.accounts().update(request, profile_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -2128,10 +2186,14 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self.hub.ads().get(
-            opt.value_of("profile-id").unwrap_or(""),
-            opt.value_of("id").unwrap_or(""),
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
         );
+        let id: i64 = arg_from_str(&opt.value_of("id").unwrap_or(""), err, "<id>", "int64");
+        let mut call = self.hub.ads().get(profile_id, id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -2788,10 +2850,13 @@ where
             }
         }
         let mut request: api::Ad = serde_json::value::from_value(object).unwrap();
-        let mut call = self
-            .hub
-            .ads()
-            .insert(request, opt.value_of("profile-id").unwrap_or(""));
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
+        );
+        let mut call = self.hub.ads().insert(request, profile_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -2869,10 +2934,13 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self
-            .hub
-            .ads()
-            .list(opt.value_of("profile-id").unwrap_or(""));
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
+        );
+        let mut call = self.hub.ads().list(profile_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -3702,11 +3770,14 @@ where
             }
         }
         let mut request: api::Ad = serde_json::value::from_value(object).unwrap();
-        let mut call = self.hub.ads().patch(
-            request,
-            opt.value_of("profile-id").unwrap_or(""),
-            opt.value_of("id").unwrap_or(""),
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
         );
+        let id: i64 = arg_from_str(&opt.value_of("id").unwrap_or(""), err, "<id>", "int64");
+        let mut call = self.hub.ads().patch(request, profile_id, id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -4363,10 +4434,13 @@ where
             }
         }
         let mut request: api::Ad = serde_json::value::from_value(object).unwrap();
-        let mut call = self
-            .hub
-            .ads()
-            .update(request, opt.value_of("profile-id").unwrap_or(""));
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
+        );
+        let mut call = self.hub.ads().update(request, profile_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -4444,10 +4518,14 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self.hub.advertiser_groups().delete(
-            opt.value_of("profile-id").unwrap_or(""),
-            opt.value_of("id").unwrap_or(""),
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
         );
+        let id: i64 = arg_from_str(&opt.value_of("id").unwrap_or(""), err, "<id>", "int64");
+        let mut call = self.hub.advertiser_groups().delete(profile_id, id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -4509,10 +4587,14 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self.hub.advertiser_groups().get(
-            opt.value_of("profile-id").unwrap_or(""),
-            opt.value_of("id").unwrap_or(""),
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
         );
+        let id: i64 = arg_from_str(&opt.value_of("id").unwrap_or(""), err, "<id>", "int64");
+        let mut call = self.hub.advertiser_groups().get(profile_id, id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -4665,10 +4747,13 @@ where
             }
         }
         let mut request: api::AdvertiserGroup = serde_json::value::from_value(object).unwrap();
-        let mut call = self
-            .hub
-            .advertiser_groups()
-            .insert(request, opt.value_of("profile-id").unwrap_or(""));
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
+        );
+        let mut call = self.hub.advertiser_groups().insert(request, profile_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -4746,10 +4831,13 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self
-            .hub
-            .advertiser_groups()
-            .list(opt.value_of("profile-id").unwrap_or(""));
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
+        );
+        let mut call = self.hub.advertiser_groups().list(profile_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -4940,11 +5028,14 @@ where
             }
         }
         let mut request: api::AdvertiserGroup = serde_json::value::from_value(object).unwrap();
-        let mut call = self.hub.advertiser_groups().patch(
-            request,
-            opt.value_of("profile-id").unwrap_or(""),
-            opt.value_of("id").unwrap_or(""),
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
         );
+        let id: i64 = arg_from_str(&opt.value_of("id").unwrap_or(""), err, "<id>", "int64");
+        let mut call = self.hub.advertiser_groups().patch(request, profile_id, id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -5097,10 +5188,13 @@ where
             }
         }
         let mut request: api::AdvertiserGroup = serde_json::value::from_value(object).unwrap();
-        let mut call = self
-            .hub
-            .advertiser_groups()
-            .update(request, opt.value_of("profile-id").unwrap_or(""));
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
+        );
+        let mut call = self.hub.advertiser_groups().update(request, profile_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -5178,10 +5272,14 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self.hub.advertiser_landing_pages().get(
-            opt.value_of("profile-id").unwrap_or(""),
-            opt.value_of("id").unwrap_or(""),
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
         );
+        let id: i64 = arg_from_str(&opt.value_of("id").unwrap_or(""), err, "<id>", "int64");
+        let mut call = self.hub.advertiser_landing_pages().get(profile_id, id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -5350,10 +5448,16 @@ where
             }
         }
         let mut request: api::LandingPage = serde_json::value::from_value(object).unwrap();
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
+        );
         let mut call = self
             .hub
             .advertiser_landing_pages()
-            .insert(request, opt.value_of("profile-id").unwrap_or(""));
+            .insert(request, profile_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -5431,10 +5535,13 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self
-            .hub
-            .advertiser_landing_pages()
-            .list(opt.value_of("profile-id").unwrap_or(""));
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
+        );
+        let mut call = self.hub.advertiser_landing_pages().list(profile_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -5673,11 +5780,17 @@ where
             }
         }
         let mut request: api::LandingPage = serde_json::value::from_value(object).unwrap();
-        let mut call = self.hub.advertiser_landing_pages().patch(
-            request,
-            opt.value_of("profile-id").unwrap_or(""),
-            opt.value_of("id").unwrap_or(""),
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
         );
+        let id: i64 = arg_from_str(&opt.value_of("id").unwrap_or(""), err, "<id>", "int64");
+        let mut call = self
+            .hub
+            .advertiser_landing_pages()
+            .patch(request, profile_id, id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -5846,10 +5959,16 @@ where
             }
         }
         let mut request: api::LandingPage = serde_json::value::from_value(object).unwrap();
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
+        );
         let mut call = self
             .hub
             .advertiser_landing_pages()
-            .update(request, opt.value_of("profile-id").unwrap_or(""));
+            .update(request, profile_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -5927,10 +6046,14 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self.hub.advertisers().get(
-            opt.value_of("profile-id").unwrap_or(""),
-            opt.value_of("id").unwrap_or(""),
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
         );
+        let id: i64 = arg_from_str(&opt.value_of("id").unwrap_or(""), err, "<id>", "int64");
+        let mut call = self.hub.advertisers().get(profile_id, id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -6252,10 +6375,13 @@ where
             }
         }
         let mut request: api::Advertiser = serde_json::value::from_value(object).unwrap();
-        let mut call = self
-            .hub
-            .advertisers()
-            .insert(request, opt.value_of("profile-id").unwrap_or(""));
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
+        );
+        let mut call = self.hub.advertisers().insert(request, profile_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -6333,10 +6459,13 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self
-            .hub
-            .advertisers()
-            .list(opt.value_of("profile-id").unwrap_or(""));
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
+        );
+        let mut call = self.hub.advertisers().list(profile_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -6747,11 +6876,14 @@ where
             }
         }
         let mut request: api::Advertiser = serde_json::value::from_value(object).unwrap();
-        let mut call = self.hub.advertisers().patch(
-            request,
-            opt.value_of("profile-id").unwrap_or(""),
-            opt.value_of("id").unwrap_or(""),
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
         );
+        let id: i64 = arg_from_str(&opt.value_of("id").unwrap_or(""), err, "<id>", "int64");
+        let mut call = self.hub.advertisers().patch(request, profile_id, id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -7073,10 +7205,13 @@ where
             }
         }
         let mut request: api::Advertiser = serde_json::value::from_value(object).unwrap();
-        let mut call = self
-            .hub
-            .advertisers()
-            .update(request, opt.value_of("profile-id").unwrap_or(""));
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
+        );
+        let mut call = self.hub.advertisers().update(request, profile_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -7154,10 +7289,13 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self
-            .hub
-            .browsers()
-            .list(opt.value_of("profile-id").unwrap_or(""));
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
+        );
+        let mut call = self.hub.browsers().list(profile_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -7296,11 +7434,22 @@ where
         }
         let mut request: api::CampaignCreativeAssociation =
             serde_json::value::from_value(object).unwrap();
-        let mut call = self.hub.campaign_creative_associations().insert(
-            request,
-            opt.value_of("profile-id").unwrap_or(""),
-            opt.value_of("campaign-id").unwrap_or(""),
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
         );
+        let campaign_id: i64 = arg_from_str(
+            &opt.value_of("campaign-id").unwrap_or(""),
+            err,
+            "<campaign-id>",
+            "int64",
+        );
+        let mut call =
+            self.hub
+                .campaign_creative_associations()
+                .insert(request, profile_id, campaign_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -7378,10 +7527,22 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self.hub.campaign_creative_associations().list(
-            opt.value_of("profile-id").unwrap_or(""),
-            opt.value_of("campaign-id").unwrap_or(""),
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
         );
+        let campaign_id: i64 = arg_from_str(
+            &opt.value_of("campaign-id").unwrap_or(""),
+            err,
+            "<campaign-id>",
+            "int64",
+        );
+        let mut call = self
+            .hub
+            .campaign_creative_associations()
+            .list(profile_id, campaign_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -7477,10 +7638,14 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self.hub.campaigns().get(
-            opt.value_of("profile-id").unwrap_or(""),
-            opt.value_of("id").unwrap_or(""),
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
         );
+        let id: i64 = arg_from_str(&opt.value_of("id").unwrap_or(""), err, "<id>", "int64");
+        let mut call = self.hub.campaigns().get(profile_id, id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -7945,10 +8110,13 @@ where
             }
         }
         let mut request: api::Campaign = serde_json::value::from_value(object).unwrap();
-        let mut call = self
-            .hub
-            .campaigns()
-            .insert(request, opt.value_of("profile-id").unwrap_or(""));
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
+        );
+        let mut call = self.hub.campaigns().insert(request, profile_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -8026,10 +8194,13 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self
-            .hub
-            .campaigns()
-            .list(opt.value_of("profile-id").unwrap_or(""));
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
+        );
+        let mut call = self.hub.campaigns().list(profile_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -8595,11 +8766,14 @@ where
             }
         }
         let mut request: api::Campaign = serde_json::value::from_value(object).unwrap();
-        let mut call = self.hub.campaigns().patch(
-            request,
-            opt.value_of("profile-id").unwrap_or(""),
-            opt.value_of("id").unwrap_or(""),
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
         );
+        let id: i64 = arg_from_str(&opt.value_of("id").unwrap_or(""), err, "<id>", "int64");
+        let mut call = self.hub.campaigns().patch(request, profile_id, id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -9064,10 +9238,13 @@ where
             }
         }
         let mut request: api::Campaign = serde_json::value::from_value(object).unwrap();
-        let mut call = self
-            .hub
-            .campaigns()
-            .update(request, opt.value_of("profile-id").unwrap_or(""));
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
+        );
+        let mut call = self.hub.campaigns().update(request, profile_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -9145,10 +9322,14 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self.hub.change_logs().get(
-            opt.value_of("profile-id").unwrap_or(""),
-            opt.value_of("id").unwrap_or(""),
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
         );
+        let id: i64 = arg_from_str(&opt.value_of("id").unwrap_or(""), err, "<id>", "int64");
+        let mut call = self.hub.change_logs().get(profile_id, id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -9226,10 +9407,13 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self
-            .hub
-            .change_logs()
-            .list(opt.value_of("profile-id").unwrap_or(""));
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
+        );
+        let mut call = self.hub.change_logs().list(profile_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -9369,10 +9553,13 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self
-            .hub
-            .cities()
-            .list(opt.value_of("profile-id").unwrap_or(""));
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
+        );
+        let mut call = self.hub.cities().list(profile_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -9484,10 +9671,14 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self.hub.connection_types().get(
-            opt.value_of("profile-id").unwrap_or(""),
-            opt.value_of("id").unwrap_or(""),
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
         );
+        let id: i64 = arg_from_str(&opt.value_of("id").unwrap_or(""), err, "<id>", "int64");
+        let mut call = self.hub.connection_types().get(profile_id, id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -9565,10 +9756,13 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self
-            .hub
-            .connection_types()
-            .list(opt.value_of("profile-id").unwrap_or(""));
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
+        );
+        let mut call = self.hub.connection_types().list(profile_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -9646,10 +9840,14 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self.hub.content_categories().delete(
-            opt.value_of("profile-id").unwrap_or(""),
-            opt.value_of("id").unwrap_or(""),
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
         );
+        let id: i64 = arg_from_str(&opt.value_of("id").unwrap_or(""), err, "<id>", "int64");
+        let mut call = self.hub.content_categories().delete(profile_id, id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -9711,10 +9909,14 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self.hub.content_categories().get(
-            opt.value_of("profile-id").unwrap_or(""),
-            opt.value_of("id").unwrap_or(""),
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
         );
+        let id: i64 = arg_from_str(&opt.value_of("id").unwrap_or(""), err, "<id>", "int64");
+        let mut call = self.hub.content_categories().get(profile_id, id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -9867,10 +10069,13 @@ where
             }
         }
         let mut request: api::ContentCategory = serde_json::value::from_value(object).unwrap();
-        let mut call = self
-            .hub
-            .content_categories()
-            .insert(request, opt.value_of("profile-id").unwrap_or(""));
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
+        );
+        let mut call = self.hub.content_categories().insert(request, profile_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -9948,10 +10153,13 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self
-            .hub
-            .content_categories()
-            .list(opt.value_of("profile-id").unwrap_or(""));
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
+        );
+        let mut call = self.hub.content_categories().list(profile_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -10142,11 +10350,14 @@ where
             }
         }
         let mut request: api::ContentCategory = serde_json::value::from_value(object).unwrap();
-        let mut call = self.hub.content_categories().patch(
-            request,
-            opt.value_of("profile-id").unwrap_or(""),
-            opt.value_of("id").unwrap_or(""),
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
         );
+        let id: i64 = arg_from_str(&opt.value_of("id").unwrap_or(""), err, "<id>", "int64");
+        let mut call = self.hub.content_categories().patch(request, profile_id, id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -10299,10 +10510,13 @@ where
             }
         }
         let mut request: api::ContentCategory = serde_json::value::from_value(object).unwrap();
-        let mut call = self
-            .hub
-            .content_categories()
-            .update(request, opt.value_of("profile-id").unwrap_or(""));
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
+        );
+        let mut call = self.hub.content_categories().update(request, profile_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -10471,10 +10685,13 @@ where
         }
         let mut request: api::ConversionsBatchInsertRequest =
             serde_json::value::from_value(object).unwrap();
-        let mut call = self
-            .hub
-            .conversions()
-            .batchinsert(request, opt.value_of("profile-id").unwrap_or(""));
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
+        );
+        let mut call = self.hub.conversions().batchinsert(request, profile_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -10643,10 +10860,13 @@ where
         }
         let mut request: api::ConversionsBatchUpdateRequest =
             serde_json::value::from_value(object).unwrap();
-        let mut call = self
-            .hub
-            .conversions()
-            .batchupdate(request, opt.value_of("profile-id").unwrap_or(""));
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
+        );
+        let mut call = self.hub.conversions().batchupdate(request, profile_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -10724,10 +10944,19 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self.hub.countries().get(
-            opt.value_of("profile-id").unwrap_or(""),
-            opt.value_of("dart-id").unwrap_or(""),
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
         );
+        let dart_id: i64 = arg_from_str(
+            &opt.value_of("dart-id").unwrap_or(""),
+            err,
+            "<dart-id>",
+            "int64",
+        );
+        let mut call = self.hub.countries().get(profile_id, dart_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -10805,10 +11034,13 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self
-            .hub
-            .countries()
-            .list(opt.value_of("profile-id").unwrap_or(""));
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
+        );
+        let mut call = self.hub.countries().list(profile_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -11033,11 +11265,22 @@ where
         }
         let mut request: api::CreativeAssetMetadata =
             serde_json::value::from_value(object).unwrap();
-        let mut call = self.hub.creative_assets().insert(
-            request,
-            opt.value_of("profile-id").unwrap_or(""),
-            opt.value_of("advertiser-id").unwrap_or(""),
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
         );
+        let advertiser_id: i64 = arg_from_str(
+            &opt.value_of("advertiser-id").unwrap_or(""),
+            err,
+            "<advertiser-id>",
+            "int64",
+        );
+        let mut call = self
+            .hub
+            .creative_assets()
+            .insert(request, profile_id, advertiser_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -11127,11 +11370,23 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self.hub.creative_field_values().delete(
-            opt.value_of("profile-id").unwrap_or(""),
-            opt.value_of("creative-field-id").unwrap_or(""),
-            opt.value_of("id").unwrap_or(""),
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
         );
+        let creative_field_id: i64 = arg_from_str(
+            &opt.value_of("creative-field-id").unwrap_or(""),
+            err,
+            "<creative-field-id>",
+            "int64",
+        );
+        let id: i64 = arg_from_str(&opt.value_of("id").unwrap_or(""), err, "<id>", "int64");
+        let mut call = self
+            .hub
+            .creative_field_values()
+            .delete(profile_id, creative_field_id, id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -11193,11 +11448,23 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self.hub.creative_field_values().get(
-            opt.value_of("profile-id").unwrap_or(""),
-            opt.value_of("creative-field-id").unwrap_or(""),
-            opt.value_of("id").unwrap_or(""),
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
         );
+        let creative_field_id: i64 = arg_from_str(
+            &opt.value_of("creative-field-id").unwrap_or(""),
+            err,
+            "<creative-field-id>",
+            "int64",
+        );
+        let id: i64 = arg_from_str(&opt.value_of("id").unwrap_or(""), err, "<id>", "int64");
+        let mut call = self
+            .hub
+            .creative_field_values()
+            .get(profile_id, creative_field_id, id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -11342,11 +11609,22 @@ where
             }
         }
         let mut request: api::CreativeFieldValue = serde_json::value::from_value(object).unwrap();
-        let mut call = self.hub.creative_field_values().insert(
-            request,
-            opt.value_of("profile-id").unwrap_or(""),
-            opt.value_of("creative-field-id").unwrap_or(""),
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
         );
+        let creative_field_id: i64 = arg_from_str(
+            &opt.value_of("creative-field-id").unwrap_or(""),
+            err,
+            "<creative-field-id>",
+            "int64",
+        );
+        let mut call =
+            self.hub
+                .creative_field_values()
+                .insert(request, profile_id, creative_field_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -11424,10 +11702,22 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self.hub.creative_field_values().list(
-            opt.value_of("profile-id").unwrap_or(""),
-            opt.value_of("creative-field-id").unwrap_or(""),
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
         );
+        let creative_field_id: i64 = arg_from_str(
+            &opt.value_of("creative-field-id").unwrap_or(""),
+            err,
+            "<creative-field-id>",
+            "int64",
+        );
+        let mut call = self
+            .hub
+            .creative_field_values()
+            .list(profile_id, creative_field_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -11610,12 +11900,23 @@ where
             }
         }
         let mut request: api::CreativeFieldValue = serde_json::value::from_value(object).unwrap();
-        let mut call = self.hub.creative_field_values().patch(
-            request,
-            opt.value_of("profile-id").unwrap_or(""),
-            opt.value_of("creative-field-id").unwrap_or(""),
-            opt.value_of("id").unwrap_or(""),
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
         );
+        let creative_field_id: i64 = arg_from_str(
+            &opt.value_of("creative-field-id").unwrap_or(""),
+            err,
+            "<creative-field-id>",
+            "int64",
+        );
+        let id: i64 = arg_from_str(&opt.value_of("id").unwrap_or(""), err, "<id>", "int64");
+        let mut call =
+            self.hub
+                .creative_field_values()
+                .patch(request, profile_id, creative_field_id, id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -11760,11 +12061,22 @@ where
             }
         }
         let mut request: api::CreativeFieldValue = serde_json::value::from_value(object).unwrap();
-        let mut call = self.hub.creative_field_values().update(
-            request,
-            opt.value_of("profile-id").unwrap_or(""),
-            opt.value_of("creative-field-id").unwrap_or(""),
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
         );
+        let creative_field_id: i64 = arg_from_str(
+            &opt.value_of("creative-field-id").unwrap_or(""),
+            err,
+            "<creative-field-id>",
+            "int64",
+        );
+        let mut call =
+            self.hub
+                .creative_field_values()
+                .update(request, profile_id, creative_field_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -11842,10 +12154,14 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self.hub.creative_fields().delete(
-            opt.value_of("profile-id").unwrap_or(""),
-            opt.value_of("id").unwrap_or(""),
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
         );
+        let id: i64 = arg_from_str(&opt.value_of("id").unwrap_or(""), err, "<id>", "int64");
+        let mut call = self.hub.creative_fields().delete(profile_id, id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -11907,10 +12223,14 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self.hub.creative_fields().get(
-            opt.value_of("profile-id").unwrap_or(""),
-            opt.value_of("id").unwrap_or(""),
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
         );
+        let id: i64 = arg_from_str(&opt.value_of("id").unwrap_or(""), err, "<id>", "int64");
+        let mut call = self.hub.creative_fields().get(profile_id, id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -12133,10 +12453,13 @@ where
             }
         }
         let mut request: api::CreativeField = serde_json::value::from_value(object).unwrap();
-        let mut call = self
-            .hub
-            .creative_fields()
-            .insert(request, opt.value_of("profile-id").unwrap_or(""));
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
+        );
+        let mut call = self.hub.creative_fields().insert(request, profile_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -12214,10 +12537,13 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self
-            .hub
-            .creative_fields()
-            .list(opt.value_of("profile-id").unwrap_or(""));
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
+        );
+        let mut call = self.hub.creative_fields().list(profile_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -12486,11 +12812,14 @@ where
             }
         }
         let mut request: api::CreativeField = serde_json::value::from_value(object).unwrap();
-        let mut call = self.hub.creative_fields().patch(
-            request,
-            opt.value_of("profile-id").unwrap_or(""),
-            opt.value_of("id").unwrap_or(""),
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
         );
+        let id: i64 = arg_from_str(&opt.value_of("id").unwrap_or(""), err, "<id>", "int64");
+        let mut call = self.hub.creative_fields().patch(request, profile_id, id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -12713,10 +13042,13 @@ where
             }
         }
         let mut request: api::CreativeField = serde_json::value::from_value(object).unwrap();
-        let mut call = self
-            .hub
-            .creative_fields()
-            .update(request, opt.value_of("profile-id").unwrap_or(""));
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
+        );
+        let mut call = self.hub.creative_fields().update(request, profile_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -12794,10 +13126,14 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self.hub.creative_groups().get(
-            opt.value_of("profile-id").unwrap_or(""),
-            opt.value_of("id").unwrap_or(""),
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
         );
+        let id: i64 = arg_from_str(&opt.value_of("id").unwrap_or(""), err, "<id>", "int64");
+        let mut call = self.hub.creative_groups().get(profile_id, id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -13028,10 +13364,13 @@ where
             }
         }
         let mut request: api::CreativeGroup = serde_json::value::from_value(object).unwrap();
-        let mut call = self
-            .hub
-            .creative_groups()
-            .insert(request, opt.value_of("profile-id").unwrap_or(""));
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
+        );
+        let mut call = self.hub.creative_groups().insert(request, profile_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -13109,10 +13448,13 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self
-            .hub
-            .creative_groups()
-            .list(opt.value_of("profile-id").unwrap_or(""));
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
+        );
+        let mut call = self.hub.creative_groups().list(profile_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -13397,11 +13739,14 @@ where
             }
         }
         let mut request: api::CreativeGroup = serde_json::value::from_value(object).unwrap();
-        let mut call = self.hub.creative_groups().patch(
-            request,
-            opt.value_of("profile-id").unwrap_or(""),
-            opt.value_of("id").unwrap_or(""),
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
         );
+        let id: i64 = arg_from_str(&opt.value_of("id").unwrap_or(""), err, "<id>", "int64");
+        let mut call = self.hub.creative_groups().patch(request, profile_id, id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -13632,10 +13977,13 @@ where
             }
         }
         let mut request: api::CreativeGroup = serde_json::value::from_value(object).unwrap();
-        let mut call = self
-            .hub
-            .creative_groups()
-            .update(request, opt.value_of("profile-id").unwrap_or(""));
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
+        );
+        let mut call = self.hub.creative_groups().update(request, profile_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -13713,10 +14061,14 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self.hub.creatives().get(
-            opt.value_of("profile-id").unwrap_or(""),
-            opt.value_of("id").unwrap_or(""),
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
         );
+        let id: i64 = arg_from_str(&opt.value_of("id").unwrap_or(""), err, "<id>", "int64");
+        let mut call = self.hub.creatives().get(profile_id, id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -14482,10 +14834,13 @@ where
             }
         }
         let mut request: api::Creative = serde_json::value::from_value(object).unwrap();
-        let mut call = self
-            .hub
-            .creatives()
-            .insert(request, opt.value_of("profile-id").unwrap_or(""));
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
+        );
+        let mut call = self.hub.creatives().insert(request, profile_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -14563,10 +14918,13 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self
-            .hub
-            .creatives()
-            .list(opt.value_of("profile-id").unwrap_or(""));
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
+        );
+        let mut call = self.hub.creatives().list(profile_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -15446,11 +15804,14 @@ where
             }
         }
         let mut request: api::Creative = serde_json::value::from_value(object).unwrap();
-        let mut call = self.hub.creatives().patch(
-            request,
-            opt.value_of("profile-id").unwrap_or(""),
-            opt.value_of("id").unwrap_or(""),
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
         );
+        let id: i64 = arg_from_str(&opt.value_of("id").unwrap_or(""), err, "<id>", "int64");
+        let mut call = self.hub.creatives().patch(request, profile_id, id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -16216,10 +16577,13 @@ where
             }
         }
         let mut request: api::Creative = serde_json::value::from_value(object).unwrap();
-        let mut call = self
-            .hub
-            .creatives()
-            .update(request, opt.value_of("profile-id").unwrap_or(""));
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
+        );
+        let mut call = self.hub.creatives().update(request, profile_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -16375,10 +16739,13 @@ where
         }
         let mut request: api::DimensionValueRequest =
             serde_json::value::from_value(object).unwrap();
-        let mut call = self
-            .hub
-            .dimension_values()
-            .query(request, opt.value_of("profile-id").unwrap_or(""));
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
+        );
+        let mut call = self.hub.dimension_values().query(request, profile_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -16467,10 +16834,14 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self.hub.directory_sites().get(
-            opt.value_of("profile-id").unwrap_or(""),
-            opt.value_of("id").unwrap_or(""),
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
         );
+        let id: i64 = arg_from_str(&opt.value_of("id").unwrap_or(""), err, "<id>", "int64");
+        let mut call = self.hub.directory_sites().get(profile_id, id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -16767,10 +17138,13 @@ where
             }
         }
         let mut request: api::DirectorySite = serde_json::value::from_value(object).unwrap();
-        let mut call = self
-            .hub
-            .directory_sites()
-            .insert(request, opt.value_of("profile-id").unwrap_or(""));
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
+        );
+        let mut call = self.hub.directory_sites().insert(request, profile_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -16848,10 +17222,13 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self
-            .hub
-            .directory_sites()
-            .list(opt.value_of("profile-id").unwrap_or(""));
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
+        );
+        let mut call = self.hub.directory_sites().list(profile_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -17014,9 +17391,21 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
+        );
+        let object_id: i64 = arg_from_str(
+            &opt.value_of("object-id").unwrap_or(""),
+            err,
+            "<object-id>",
+            "int64",
+        );
         let mut call = self.hub.dynamic_targeting_keys().delete(
-            opt.value_of("profile-id").unwrap_or(""),
-            opt.value_of("object-id").unwrap_or(""),
+            profile_id,
+            object_id,
             opt.value_of("name").unwrap_or(""),
             opt.value_of("object-type").unwrap_or(""),
         );
@@ -17158,10 +17547,16 @@ where
             }
         }
         let mut request: api::DynamicTargetingKey = serde_json::value::from_value(object).unwrap();
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
+        );
         let mut call = self
             .hub
             .dynamic_targeting_keys()
-            .insert(request, opt.value_of("profile-id").unwrap_or(""));
+            .insert(request, profile_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -17239,10 +17634,13 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self
-            .hub
-            .dynamic_targeting_keys()
-            .list(opt.value_of("profile-id").unwrap_or(""));
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
+        );
+        let mut call = self.hub.dynamic_targeting_keys().list(profile_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -17345,10 +17743,14 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self.hub.event_tags().delete(
-            opt.value_of("profile-id").unwrap_or(""),
-            opt.value_of("id").unwrap_or(""),
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
         );
+        let id: i64 = arg_from_str(&opt.value_of("id").unwrap_or(""), err, "<id>", "int64");
+        let mut call = self.hub.event_tags().delete(profile_id, id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -17410,10 +17812,14 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self.hub.event_tags().get(
-            opt.value_of("profile-id").unwrap_or(""),
-            opt.value_of("id").unwrap_or(""),
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
         );
+        let id: i64 = arg_from_str(&opt.value_of("id").unwrap_or(""), err, "<id>", "int64");
+        let mut call = self.hub.event_tags().get(profile_id, id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -17759,10 +18165,13 @@ where
             }
         }
         let mut request: api::EventTag = serde_json::value::from_value(object).unwrap();
-        let mut call = self
-            .hub
-            .event_tags()
-            .insert(request, opt.value_of("profile-id").unwrap_or(""));
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
+        );
+        let mut call = self.hub.event_tags().insert(request, profile_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -17840,10 +18249,13 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self
-            .hub
-            .event_tags()
-            .list(opt.value_of("profile-id").unwrap_or(""));
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
+        );
+        let mut call = self.hub.event_tags().list(profile_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -18259,11 +18671,14 @@ where
             }
         }
         let mut request: api::EventTag = serde_json::value::from_value(object).unwrap();
-        let mut call = self.hub.event_tags().patch(
-            request,
-            opt.value_of("profile-id").unwrap_or(""),
-            opt.value_of("id").unwrap_or(""),
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
         );
+        let id: i64 = arg_from_str(&opt.value_of("id").unwrap_or(""), err, "<id>", "int64");
+        let mut call = self.hub.event_tags().patch(request, profile_id, id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -18609,10 +19024,13 @@ where
             }
         }
         let mut request: api::EventTag = serde_json::value::from_value(object).unwrap();
-        let mut call = self
-            .hub
-            .event_tags()
-            .update(request, opt.value_of("profile-id").unwrap_or(""));
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
+        );
+        let mut call = self.hub.event_tags().update(request, profile_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -18690,11 +19108,20 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut download_mode = false;
-        let mut call = self.hub.files().get(
-            opt.value_of("report-id").unwrap_or(""),
-            opt.value_of("file-id").unwrap_or(""),
+        let report_id: i64 = arg_from_str(
+            &opt.value_of("report-id").unwrap_or(""),
+            err,
+            "<report-id>",
+            "int64",
         );
+        let file_id: i64 = arg_from_str(
+            &opt.value_of("file-id").unwrap_or(""),
+            err,
+            "<file-id>",
+            "int64",
+        );
+        let mut download_mode = false;
+        let mut call = self.hub.files().get(report_id, file_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -18788,10 +19215,13 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self
-            .hub
-            .files()
-            .list(opt.value_of("profile-id").unwrap_or(""));
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
+        );
+        let mut call = self.hub.files().list(profile_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -18899,10 +19329,14 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self.hub.floodlight_activities().delete(
-            opt.value_of("profile-id").unwrap_or(""),
-            opt.value_of("id").unwrap_or(""),
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
         );
+        let id: i64 = arg_from_str(&opt.value_of("id").unwrap_or(""), err, "<id>", "int64");
+        let mut call = self.hub.floodlight_activities().delete(profile_id, id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -18964,10 +19398,13 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self
-            .hub
-            .floodlight_activities()
-            .generatetag(opt.value_of("profile-id").unwrap_or(""));
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
+        );
+        let mut call = self.hub.floodlight_activities().generatetag(profile_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -19053,10 +19490,14 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self.hub.floodlight_activities().get(
-            opt.value_of("profile-id").unwrap_or(""),
-            opt.value_of("id").unwrap_or(""),
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
         );
+        let id: i64 = arg_from_str(&opt.value_of("id").unwrap_or(""), err, "<id>", "int64");
+        let mut call = self.hub.floodlight_activities().get(profile_id, id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -19501,10 +19942,13 @@ where
             }
         }
         let mut request: api::FloodlightActivity = serde_json::value::from_value(object).unwrap();
-        let mut call = self
-            .hub
-            .floodlight_activities()
-            .insert(request, opt.value_of("profile-id").unwrap_or(""));
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
+        );
+        let mut call = self.hub.floodlight_activities().insert(request, profile_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -19582,10 +20026,13 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self
-            .hub
-            .floodlight_activities()
-            .list(opt.value_of("profile-id").unwrap_or(""));
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
+        );
+        let mut call = self.hub.floodlight_activities().list(profile_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -20108,11 +20555,17 @@ where
             }
         }
         let mut request: api::FloodlightActivity = serde_json::value::from_value(object).unwrap();
-        let mut call = self.hub.floodlight_activities().patch(
-            request,
-            opt.value_of("profile-id").unwrap_or(""),
-            opt.value_of("id").unwrap_or(""),
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
         );
+        let id: i64 = arg_from_str(&opt.value_of("id").unwrap_or(""), err, "<id>", "int64");
+        let mut call = self
+            .hub
+            .floodlight_activities()
+            .patch(request, profile_id, id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -20557,10 +21010,13 @@ where
             }
         }
         let mut request: api::FloodlightActivity = serde_json::value::from_value(object).unwrap();
-        let mut call = self
-            .hub
-            .floodlight_activities()
-            .update(request, opt.value_of("profile-id").unwrap_or(""));
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
+        );
+        let mut call = self.hub.floodlight_activities().update(request, profile_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -20638,10 +21094,14 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self.hub.floodlight_activity_groups().get(
-            opt.value_of("profile-id").unwrap_or(""),
-            opt.value_of("id").unwrap_or(""),
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
         );
+        let id: i64 = arg_from_str(&opt.value_of("id").unwrap_or(""), err, "<id>", "int64");
+        let mut call = self.hub.floodlight_activity_groups().get(profile_id, id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -20975,10 +21435,16 @@ where
         }
         let mut request: api::FloodlightActivityGroup =
             serde_json::value::from_value(object).unwrap();
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
+        );
         let mut call = self
             .hub
             .floodlight_activity_groups()
-            .insert(request, opt.value_of("profile-id").unwrap_or(""));
+            .insert(request, profile_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -21056,10 +21522,13 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self
-            .hub
-            .floodlight_activity_groups()
-            .list(opt.value_of("profile-id").unwrap_or(""));
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
+        );
+        let mut call = self.hub.floodlight_activity_groups().list(profile_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -21451,11 +21920,17 @@ where
         }
         let mut request: api::FloodlightActivityGroup =
             serde_json::value::from_value(object).unwrap();
-        let mut call = self.hub.floodlight_activity_groups().patch(
-            request,
-            opt.value_of("profile-id").unwrap_or(""),
-            opt.value_of("id").unwrap_or(""),
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
         );
+        let id: i64 = arg_from_str(&opt.value_of("id").unwrap_or(""), err, "<id>", "int64");
+        let mut call = self
+            .hub
+            .floodlight_activity_groups()
+            .patch(request, profile_id, id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -21789,10 +22264,16 @@ where
         }
         let mut request: api::FloodlightActivityGroup =
             serde_json::value::from_value(object).unwrap();
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
+        );
         let mut call = self
             .hub
             .floodlight_activity_groups()
-            .update(request, opt.value_of("profile-id").unwrap_or(""));
+            .update(request, profile_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -21870,10 +22351,14 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self.hub.floodlight_configurations().get(
-            opt.value_of("profile-id").unwrap_or(""),
-            opt.value_of("id").unwrap_or(""),
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
         );
+        let id: i64 = arg_from_str(&opt.value_of("id").unwrap_or(""), err, "<id>", "int64");
+        let mut call = self.hub.floodlight_configurations().get(profile_id, id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -21951,10 +22436,13 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self
-            .hub
-            .floodlight_configurations()
-            .list(opt.value_of("profile-id").unwrap_or(""));
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
+        );
+        let mut call = self.hub.floodlight_configurations().list(profile_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -22361,11 +22849,17 @@ where
         }
         let mut request: api::FloodlightConfiguration =
             serde_json::value::from_value(object).unwrap();
-        let mut call = self.hub.floodlight_configurations().patch(
-            request,
-            opt.value_of("profile-id").unwrap_or(""),
-            opt.value_of("id").unwrap_or(""),
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
         );
+        let id: i64 = arg_from_str(&opt.value_of("id").unwrap_or(""), err, "<id>", "int64");
+        let mut call = self
+            .hub
+            .floodlight_configurations()
+            .patch(request, profile_id, id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -22764,10 +23258,16 @@ where
         }
         let mut request: api::FloodlightConfiguration =
             serde_json::value::from_value(object).unwrap();
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
+        );
         let mut call = self
             .hub
             .floodlight_configurations()
-            .update(request, opt.value_of("profile-id").unwrap_or(""));
+            .update(request, profile_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -22845,11 +23345,20 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self.hub.inventory_items().get(
-            opt.value_of("profile-id").unwrap_or(""),
-            opt.value_of("project-id").unwrap_or(""),
-            opt.value_of("id").unwrap_or(""),
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
         );
+        let project_id: i64 = arg_from_str(
+            &opt.value_of("project-id").unwrap_or(""),
+            err,
+            "<project-id>",
+            "int64",
+        );
+        let id: i64 = arg_from_str(&opt.value_of("id").unwrap_or(""), err, "<id>", "int64");
+        let mut call = self.hub.inventory_items().get(profile_id, project_id, id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -22927,10 +23436,19 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self.hub.inventory_items().list(
-            opt.value_of("profile-id").unwrap_or(""),
-            opt.value_of("project-id").unwrap_or(""),
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
         );
+        let project_id: i64 = arg_from_str(
+            &opt.value_of("project-id").unwrap_or(""),
+            err,
+            "<project-id>",
+            "int64",
+        );
+        let mut call = self.hub.inventory_items().list(profile_id, project_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -23070,10 +23588,13 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self
-            .hub
-            .languages()
-            .list(opt.value_of("profile-id").unwrap_or(""));
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
+        );
+        let mut call = self.hub.languages().list(profile_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -23151,10 +23672,13 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self
-            .hub
-            .metros()
-            .list(opt.value_of("profile-id").unwrap_or(""));
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
+        );
+        let mut call = self.hub.metros().list(profile_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -23232,10 +23756,16 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self.hub.mobile_apps().get(
-            opt.value_of("profile-id").unwrap_or(""),
-            opt.value_of("id").unwrap_or(""),
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
         );
+        let mut call = self
+            .hub
+            .mobile_apps()
+            .get(profile_id, opt.value_of("id").unwrap_or(""));
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -23313,10 +23843,13 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self
-            .hub
-            .mobile_apps()
-            .list(opt.value_of("profile-id").unwrap_or(""));
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
+        );
+        let mut call = self.hub.mobile_apps().list(profile_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -23424,10 +23957,14 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self.hub.mobile_carriers().get(
-            opt.value_of("profile-id").unwrap_or(""),
-            opt.value_of("id").unwrap_or(""),
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
         );
+        let id: i64 = arg_from_str(&opt.value_of("id").unwrap_or(""), err, "<id>", "int64");
+        let mut call = self.hub.mobile_carriers().get(profile_id, id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -23505,10 +24042,13 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self
-            .hub
-            .mobile_carriers()
-            .list(opt.value_of("profile-id").unwrap_or(""));
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
+        );
+        let mut call = self.hub.mobile_carriers().list(profile_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -23586,10 +24126,14 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self.hub.operating_system_versions().get(
-            opt.value_of("profile-id").unwrap_or(""),
-            opt.value_of("id").unwrap_or(""),
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
         );
+        let id: i64 = arg_from_str(&opt.value_of("id").unwrap_or(""), err, "<id>", "int64");
+        let mut call = self.hub.operating_system_versions().get(profile_id, id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -23667,10 +24211,13 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self
-            .hub
-            .operating_system_versions()
-            .list(opt.value_of("profile-id").unwrap_or(""));
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
+        );
+        let mut call = self.hub.operating_system_versions().list(profile_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -23748,10 +24295,19 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self.hub.operating_systems().get(
-            opt.value_of("profile-id").unwrap_or(""),
-            opt.value_of("dart-id").unwrap_or(""),
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
         );
+        let dart_id: i64 = arg_from_str(
+            &opt.value_of("dart-id").unwrap_or(""),
+            err,
+            "<dart-id>",
+            "int64",
+        );
+        let mut call = self.hub.operating_systems().get(profile_id, dart_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -23829,10 +24385,13 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self
-            .hub
-            .operating_systems()
-            .list(opt.value_of("profile-id").unwrap_or(""));
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
+        );
+        let mut call = self.hub.operating_systems().list(profile_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -23910,11 +24469,20 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self.hub.order_documents().get(
-            opt.value_of("profile-id").unwrap_or(""),
-            opt.value_of("project-id").unwrap_or(""),
-            opt.value_of("id").unwrap_or(""),
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
         );
+        let project_id: i64 = arg_from_str(
+            &opt.value_of("project-id").unwrap_or(""),
+            err,
+            "<project-id>",
+            "int64",
+        );
+        let id: i64 = arg_from_str(&opt.value_of("id").unwrap_or(""), err, "<id>", "int64");
+        let mut call = self.hub.order_documents().get(profile_id, project_id, id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -23992,10 +24560,19 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self.hub.order_documents().list(
-            opt.value_of("profile-id").unwrap_or(""),
-            opt.value_of("project-id").unwrap_or(""),
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
         );
+        let project_id: i64 = arg_from_str(
+            &opt.value_of("project-id").unwrap_or(""),
+            err,
+            "<project-id>",
+            "int64",
+        );
+        let mut call = self.hub.order_documents().list(profile_id, project_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -24135,11 +24712,20 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self.hub.orders().get(
-            opt.value_of("profile-id").unwrap_or(""),
-            opt.value_of("project-id").unwrap_or(""),
-            opt.value_of("id").unwrap_or(""),
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
         );
+        let project_id: i64 = arg_from_str(
+            &opt.value_of("project-id").unwrap_or(""),
+            err,
+            "<project-id>",
+            "int64",
+        );
+        let id: i64 = arg_from_str(&opt.value_of("id").unwrap_or(""), err, "<id>", "int64");
+        let mut call = self.hub.orders().get(profile_id, project_id, id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -24217,10 +24803,19 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self.hub.orders().list(
-            opt.value_of("profile-id").unwrap_or(""),
-            opt.value_of("project-id").unwrap_or(""),
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
         );
+        let project_id: i64 = arg_from_str(
+            &opt.value_of("project-id").unwrap_or(""),
+            err,
+            "<project-id>",
+            "int64",
+        );
+        let mut call = self.hub.orders().list(profile_id, project_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -24344,10 +24939,14 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self.hub.placement_groups().get(
-            opt.value_of("profile-id").unwrap_or(""),
-            opt.value_of("id").unwrap_or(""),
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
         );
+        let id: i64 = arg_from_str(&opt.value_of("id").unwrap_or(""), err, "<id>", "int64");
+        let mut call = self.hub.placement_groups().get(profile_id, id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -24955,10 +25554,13 @@ where
             }
         }
         let mut request: api::PlacementGroup = serde_json::value::from_value(object).unwrap();
-        let mut call = self
-            .hub
-            .placement_groups()
-            .insert(request, opt.value_of("profile-id").unwrap_or(""));
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
+        );
+        let mut call = self.hub.placement_groups().insert(request, profile_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -25036,10 +25638,13 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self
-            .hub
-            .placement_groups()
-            .list(opt.value_of("profile-id").unwrap_or(""));
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
+        );
+        let mut call = self.hub.placement_groups().list(profile_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -25765,11 +26370,14 @@ where
             }
         }
         let mut request: api::PlacementGroup = serde_json::value::from_value(object).unwrap();
-        let mut call = self.hub.placement_groups().patch(
-            request,
-            opt.value_of("profile-id").unwrap_or(""),
-            opt.value_of("id").unwrap_or(""),
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
         );
+        let id: i64 = arg_from_str(&opt.value_of("id").unwrap_or(""), err, "<id>", "int64");
+        let mut call = self.hub.placement_groups().patch(request, profile_id, id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -26377,10 +26985,13 @@ where
             }
         }
         let mut request: api::PlacementGroup = serde_json::value::from_value(object).unwrap();
-        let mut call = self
-            .hub
-            .placement_groups()
-            .update(request, opt.value_of("profile-id").unwrap_or(""));
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
+        );
+        let mut call = self.hub.placement_groups().update(request, profile_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -26458,10 +27069,14 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self.hub.placement_strategies().delete(
-            opt.value_of("profile-id").unwrap_or(""),
-            opt.value_of("id").unwrap_or(""),
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
         );
+        let id: i64 = arg_from_str(&opt.value_of("id").unwrap_or(""), err, "<id>", "int64");
+        let mut call = self.hub.placement_strategies().delete(profile_id, id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -26523,10 +27138,14 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self.hub.placement_strategies().get(
-            opt.value_of("profile-id").unwrap_or(""),
-            opt.value_of("id").unwrap_or(""),
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
         );
+        let id: i64 = arg_from_str(&opt.value_of("id").unwrap_or(""), err, "<id>", "int64");
+        let mut call = self.hub.placement_strategies().get(profile_id, id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -26679,10 +27298,13 @@ where
             }
         }
         let mut request: api::PlacementStrategy = serde_json::value::from_value(object).unwrap();
-        let mut call = self
-            .hub
-            .placement_strategies()
-            .insert(request, opt.value_of("profile-id").unwrap_or(""));
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
+        );
+        let mut call = self.hub.placement_strategies().insert(request, profile_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -26760,10 +27382,13 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self
-            .hub
-            .placement_strategies()
-            .list(opt.value_of("profile-id").unwrap_or(""));
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
+        );
+        let mut call = self.hub.placement_strategies().list(profile_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -26954,11 +27579,17 @@ where
             }
         }
         let mut request: api::PlacementStrategy = serde_json::value::from_value(object).unwrap();
-        let mut call = self.hub.placement_strategies().patch(
-            request,
-            opt.value_of("profile-id").unwrap_or(""),
-            opt.value_of("id").unwrap_or(""),
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
         );
+        let id: i64 = arg_from_str(&opt.value_of("id").unwrap_or(""), err, "<id>", "int64");
+        let mut call = self
+            .hub
+            .placement_strategies()
+            .patch(request, profile_id, id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -27111,10 +27742,13 @@ where
             }
         }
         let mut request: api::PlacementStrategy = serde_json::value::from_value(object).unwrap();
-        let mut call = self
-            .hub
-            .placement_strategies()
-            .update(request, opt.value_of("profile-id").unwrap_or(""));
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
+        );
+        let mut call = self.hub.placement_strategies().update(request, profile_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -27192,10 +27826,13 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self
-            .hub
-            .placements()
-            .generatetags(opt.value_of("profile-id").unwrap_or(""));
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
+        );
+        let mut call = self.hub.placements().generatetags(profile_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -27295,10 +27932,14 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self.hub.placements().get(
-            opt.value_of("profile-id").unwrap_or(""),
-            opt.value_of("id").unwrap_or(""),
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
         );
+        let id: i64 = arg_from_str(&opt.value_of("id").unwrap_or(""), err, "<id>", "int64");
+        let mut call = self.hub.placements().get(profile_id, id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -28179,10 +28820,13 @@ where
             }
         }
         let mut request: api::Placement = serde_json::value::from_value(object).unwrap();
-        let mut call = self
-            .hub
-            .placements()
-            .insert(request, opt.value_of("profile-id").unwrap_or(""));
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
+        );
+        let mut call = self.hub.placements().insert(request, profile_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -28260,10 +28904,13 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self
-            .hub
-            .placements()
-            .list(opt.value_of("profile-id").unwrap_or(""));
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
+        );
+        let mut call = self.hub.placements().list(profile_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -29282,11 +29929,14 @@ where
             }
         }
         let mut request: api::Placement = serde_json::value::from_value(object).unwrap();
-        let mut call = self.hub.placements().patch(
-            request,
-            opt.value_of("profile-id").unwrap_or(""),
-            opt.value_of("id").unwrap_or(""),
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
         );
+        let id: i64 = arg_from_str(&opt.value_of("id").unwrap_or(""), err, "<id>", "int64");
+        let mut call = self.hub.placements().patch(request, profile_id, id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -30167,10 +30817,13 @@ where
             }
         }
         let mut request: api::Placement = serde_json::value::from_value(object).unwrap();
-        let mut call = self
-            .hub
-            .placements()
-            .update(request, opt.value_of("profile-id").unwrap_or(""));
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
+        );
+        let mut call = self.hub.placements().update(request, profile_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -30248,10 +30901,14 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self.hub.platform_types().get(
-            opt.value_of("profile-id").unwrap_or(""),
-            opt.value_of("id").unwrap_or(""),
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
         );
+        let id: i64 = arg_from_str(&opt.value_of("id").unwrap_or(""), err, "<id>", "int64");
+        let mut call = self.hub.platform_types().get(profile_id, id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -30329,10 +30986,13 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self
-            .hub
-            .platform_types()
-            .list(opt.value_of("profile-id").unwrap_or(""));
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
+        );
+        let mut call = self.hub.platform_types().list(profile_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -30410,10 +31070,16 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self.hub.postal_codes().get(
-            opt.value_of("profile-id").unwrap_or(""),
-            opt.value_of("code").unwrap_or(""),
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
         );
+        let mut call = self
+            .hub
+            .postal_codes()
+            .get(profile_id, opt.value_of("code").unwrap_or(""));
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -30491,10 +31157,13 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self
-            .hub
-            .postal_codes()
-            .list(opt.value_of("profile-id").unwrap_or(""));
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
+        );
+        let mut call = self.hub.postal_codes().list(profile_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -30572,10 +31241,14 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self.hub.projects().get(
-            opt.value_of("profile-id").unwrap_or(""),
-            opt.value_of("id").unwrap_or(""),
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
         );
+        let id: i64 = arg_from_str(&opt.value_of("id").unwrap_or(""), err, "<id>", "int64");
+        let mut call = self.hub.projects().get(profile_id, id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -30653,10 +31326,13 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self
-            .hub
-            .projects()
-            .list(opt.value_of("profile-id").unwrap_or(""));
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
+        );
+        let mut call = self.hub.projects().list(profile_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -30780,10 +31456,13 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self
-            .hub
-            .regions()
-            .list(opt.value_of("profile-id").unwrap_or(""));
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
+        );
+        let mut call = self.hub.regions().list(profile_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -30861,10 +31540,22 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self.hub.remarketing_list_shares().get(
-            opt.value_of("profile-id").unwrap_or(""),
-            opt.value_of("remarketing-list-id").unwrap_or(""),
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
         );
+        let remarketing_list_id: i64 = arg_from_str(
+            &opt.value_of("remarketing-list-id").unwrap_or(""),
+            err,
+            "<remarketing-list-id>",
+            "int64",
+        );
+        let mut call = self
+            .hub
+            .remarketing_list_shares()
+            .get(profile_id, remarketing_list_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -31024,11 +31715,17 @@ where
             }
         }
         let mut request: api::RemarketingListShare = serde_json::value::from_value(object).unwrap();
-        let mut call = self.hub.remarketing_list_shares().patch(
-            request,
-            opt.value_of("profile-id").unwrap_or(""),
-            opt.value_of("id").unwrap_or(""),
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
         );
+        let id: i64 = arg_from_str(&opt.value_of("id").unwrap_or(""), err, "<id>", "int64");
+        let mut call = self
+            .hub
+            .remarketing_list_shares()
+            .patch(request, profile_id, id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -31188,10 +31885,16 @@ where
             }
         }
         let mut request: api::RemarketingListShare = serde_json::value::from_value(object).unwrap();
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
+        );
         let mut call = self
             .hub
             .remarketing_list_shares()
-            .update(request, opt.value_of("profile-id").unwrap_or(""));
+            .update(request, profile_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -31269,10 +31972,14 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self.hub.remarketing_lists().get(
-            opt.value_of("profile-id").unwrap_or(""),
-            opt.value_of("id").unwrap_or(""),
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
         );
+        let id: i64 = arg_from_str(&opt.value_of("id").unwrap_or(""), err, "<id>", "int64");
+        let mut call = self.hub.remarketing_lists().get(profile_id, id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -31552,10 +32259,13 @@ where
             }
         }
         let mut request: api::RemarketingList = serde_json::value::from_value(object).unwrap();
-        let mut call = self
-            .hub
-            .remarketing_lists()
-            .insert(request, opt.value_of("profile-id").unwrap_or(""));
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
+        );
+        let mut call = self.hub.remarketing_lists().insert(request, profile_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -31633,10 +32343,19 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self.hub.remarketing_lists().list(
-            opt.value_of("profile-id").unwrap_or(""),
-            opt.value_of("advertiser-id").unwrap_or(""),
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
         );
+        let advertiser_id: i64 = arg_from_str(
+            &opt.value_of("advertiser-id").unwrap_or(""),
+            err,
+            "<advertiser-id>",
+            "int64",
+        );
+        let mut call = self.hub.remarketing_lists().list(profile_id, advertiser_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -31962,11 +32681,14 @@ where
             }
         }
         let mut request: api::RemarketingList = serde_json::value::from_value(object).unwrap();
-        let mut call = self.hub.remarketing_lists().patch(
-            request,
-            opt.value_of("profile-id").unwrap_or(""),
-            opt.value_of("id").unwrap_or(""),
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
         );
+        let id: i64 = arg_from_str(&opt.value_of("id").unwrap_or(""), err, "<id>", "int64");
+        let mut call = self.hub.remarketing_lists().patch(request, profile_id, id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -32246,10 +32968,13 @@ where
             }
         }
         let mut request: api::RemarketingList = serde_json::value::from_value(object).unwrap();
-        let mut call = self
-            .hub
-            .remarketing_lists()
-            .update(request, opt.value_of("profile-id").unwrap_or(""));
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
+        );
+        let mut call = self.hub.remarketing_lists().update(request, profile_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -32450,10 +33175,16 @@ where
             }
         }
         let mut request: api::Report = serde_json::value::from_value(object).unwrap();
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
+        );
         let mut call = self
             .hub
             .reports()
-            .compatible_fields_query(request, opt.value_of("profile-id").unwrap_or(""));
+            .compatible_fields_query(request, profile_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -32531,10 +33262,19 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self.hub.reports().delete(
-            opt.value_of("profile-id").unwrap_or(""),
-            opt.value_of("report-id").unwrap_or(""),
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
         );
+        let report_id: i64 = arg_from_str(
+            &opt.value_of("report-id").unwrap_or(""),
+            err,
+            "<report-id>",
+            "int64",
+        );
+        let mut call = self.hub.reports().delete(profile_id, report_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -32596,12 +33336,26 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut download_mode = false;
-        let mut call = self.hub.reports().files_get(
-            opt.value_of("profile-id").unwrap_or(""),
-            opt.value_of("report-id").unwrap_or(""),
-            opt.value_of("file-id").unwrap_or(""),
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
         );
+        let report_id: i64 = arg_from_str(
+            &opt.value_of("report-id").unwrap_or(""),
+            err,
+            "<report-id>",
+            "int64",
+        );
+        let file_id: i64 = arg_from_str(
+            &opt.value_of("file-id").unwrap_or(""),
+            err,
+            "<file-id>",
+            "int64",
+        );
+        let mut download_mode = false;
+        let mut call = self.hub.reports().files_get(profile_id, report_id, file_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -32695,10 +33449,19 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self.hub.reports().files_list(
-            opt.value_of("profile-id").unwrap_or(""),
-            opt.value_of("report-id").unwrap_or(""),
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
         );
+        let report_id: i64 = arg_from_str(
+            &opt.value_of("report-id").unwrap_or(""),
+            err,
+            "<report-id>",
+            "int64",
+        );
+        let mut call = self.hub.reports().files_list(profile_id, report_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -32797,10 +33560,19 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self.hub.reports().get(
-            opt.value_of("profile-id").unwrap_or(""),
-            opt.value_of("report-id").unwrap_or(""),
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
         );
+        let report_id: i64 = arg_from_str(
+            &opt.value_of("report-id").unwrap_or(""),
+            err,
+            "<report-id>",
+            "int64",
+        );
+        let mut call = self.hub.reports().get(profile_id, report_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -33001,10 +33773,13 @@ where
             }
         }
         let mut request: api::Report = serde_json::value::from_value(object).unwrap();
-        let mut call = self
-            .hub
-            .reports()
-            .insert(request, opt.value_of("profile-id").unwrap_or(""));
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
+        );
+        let mut call = self.hub.reports().insert(request, profile_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -33082,10 +33857,13 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self
-            .hub
-            .reports()
-            .list(opt.value_of("profile-id").unwrap_or(""));
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
+        );
+        let mut call = self.hub.reports().list(profile_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -33316,11 +34094,19 @@ where
             }
         }
         let mut request: api::Report = serde_json::value::from_value(object).unwrap();
-        let mut call = self.hub.reports().patch(
-            request,
-            opt.value_of("profile-id").unwrap_or(""),
-            opt.value_of("report-id").unwrap_or(""),
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
         );
+        let report_id: i64 = arg_from_str(
+            &opt.value_of("report-id").unwrap_or(""),
+            err,
+            "<report-id>",
+            "int64",
+        );
+        let mut call = self.hub.reports().patch(request, profile_id, report_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -33398,10 +34184,19 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self.hub.reports().run(
-            opt.value_of("profile-id").unwrap_or(""),
-            opt.value_of("report-id").unwrap_or(""),
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
         );
+        let report_id: i64 = arg_from_str(
+            &opt.value_of("report-id").unwrap_or(""),
+            err,
+            "<report-id>",
+            "int64",
+        );
+        let mut call = self.hub.reports().run(profile_id, report_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -33610,11 +34405,19 @@ where
             }
         }
         let mut request: api::Report = serde_json::value::from_value(object).unwrap();
-        let mut call = self.hub.reports().update(
-            request,
-            opt.value_of("profile-id").unwrap_or(""),
-            opt.value_of("report-id").unwrap_or(""),
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
         );
+        let report_id: i64 = arg_from_str(
+            &opt.value_of("report-id").unwrap_or(""),
+            err,
+            "<report-id>",
+            "int64",
+        );
+        let mut call = self.hub.reports().update(request, profile_id, report_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -33692,10 +34495,14 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self.hub.sites().get(
-            opt.value_of("profile-id").unwrap_or(""),
-            opt.value_of("id").unwrap_or(""),
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
         );
+        let id: i64 = arg_from_str(&opt.value_of("id").unwrap_or(""), err, "<id>", "int64");
+        let mut call = self.hub.sites().get(profile_id, id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -34155,10 +34962,13 @@ where
             }
         }
         let mut request: api::Site = serde_json::value::from_value(object).unwrap();
-        let mut call = self
-            .hub
-            .sites()
-            .insert(request, opt.value_of("profile-id").unwrap_or(""));
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
+        );
+        let mut call = self.hub.sites().insert(request, profile_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -34236,10 +35046,13 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self
-            .hub
-            .sites()
-            .list(opt.value_of("profile-id").unwrap_or(""));
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
+        );
+        let mut call = self.hub.sites().list(profile_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -34820,11 +35633,14 @@ where
             }
         }
         let mut request: api::Site = serde_json::value::from_value(object).unwrap();
-        let mut call = self.hub.sites().patch(
-            request,
-            opt.value_of("profile-id").unwrap_or(""),
-            opt.value_of("id").unwrap_or(""),
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
         );
+        let id: i64 = arg_from_str(&opt.value_of("id").unwrap_or(""), err, "<id>", "int64");
+        let mut call = self.hub.sites().patch(request, profile_id, id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -35284,10 +36100,13 @@ where
             }
         }
         let mut request: api::Site = serde_json::value::from_value(object).unwrap();
-        let mut call = self
-            .hub
-            .sites()
-            .update(request, opt.value_of("profile-id").unwrap_or(""));
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
+        );
+        let mut call = self.hub.sites().update(request, profile_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -35365,10 +36184,14 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self.hub.sizes().get(
-            opt.value_of("profile-id").unwrap_or(""),
-            opt.value_of("id").unwrap_or(""),
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
         );
+        let id: i64 = arg_from_str(&opt.value_of("id").unwrap_or(""), err, "<id>", "int64");
+        let mut call = self.hub.sizes().get(profile_id, id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -35530,10 +36353,13 @@ where
             }
         }
         let mut request: api::Size = serde_json::value::from_value(object).unwrap();
-        let mut call = self
-            .hub
-            .sizes()
-            .insert(request, opt.value_of("profile-id").unwrap_or(""));
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
+        );
+        let mut call = self.hub.sizes().insert(request, profile_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -35611,10 +36437,13 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self
-            .hub
-            .sizes()
-            .list(opt.value_of("profile-id").unwrap_or(""));
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
+        );
+        let mut call = self.hub.sizes().list(profile_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -35725,10 +36554,14 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self.hub.subaccounts().get(
-            opt.value_of("profile-id").unwrap_or(""),
-            opt.value_of("id").unwrap_or(""),
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
         );
+        let id: i64 = arg_from_str(&opt.value_of("id").unwrap_or(""), err, "<id>", "int64");
+        let mut call = self.hub.subaccounts().get(profile_id, id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -35896,10 +36729,13 @@ where
             }
         }
         let mut request: api::Subaccount = serde_json::value::from_value(object).unwrap();
-        let mut call = self
-            .hub
-            .subaccounts()
-            .insert(request, opt.value_of("profile-id").unwrap_or(""));
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
+        );
+        let mut call = self.hub.subaccounts().insert(request, profile_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -35977,10 +36813,13 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self
-            .hub
-            .subaccounts()
-            .list(opt.value_of("profile-id").unwrap_or(""));
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
+        );
+        let mut call = self.hub.subaccounts().list(profile_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -36186,11 +37025,14 @@ where
             }
         }
         let mut request: api::Subaccount = serde_json::value::from_value(object).unwrap();
-        let mut call = self.hub.subaccounts().patch(
-            request,
-            opt.value_of("profile-id").unwrap_or(""),
-            opt.value_of("id").unwrap_or(""),
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
         );
+        let id: i64 = arg_from_str(&opt.value_of("id").unwrap_or(""), err, "<id>", "int64");
+        let mut call = self.hub.subaccounts().patch(request, profile_id, id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -36358,10 +37200,13 @@ where
             }
         }
         let mut request: api::Subaccount = serde_json::value::from_value(object).unwrap();
-        let mut call = self
-            .hub
-            .subaccounts()
-            .update(request, opt.value_of("profile-id").unwrap_or(""));
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
+        );
+        let mut call = self.hub.subaccounts().update(request, profile_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -36439,10 +37284,14 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self.hub.targetable_remarketing_lists().get(
-            opt.value_of("profile-id").unwrap_or(""),
-            opt.value_of("id").unwrap_or(""),
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
         );
+        let id: i64 = arg_from_str(&opt.value_of("id").unwrap_or(""), err, "<id>", "int64");
+        let mut call = self.hub.targetable_remarketing_lists().get(profile_id, id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -36520,10 +37369,22 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self.hub.targetable_remarketing_lists().list(
-            opt.value_of("profile-id").unwrap_or(""),
-            opt.value_of("advertiser-id").unwrap_or(""),
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
         );
+        let advertiser_id: i64 = arg_from_str(
+            &opt.value_of("advertiser-id").unwrap_or(""),
+            err,
+            "<advertiser-id>",
+            "int64",
+        );
+        let mut call = self
+            .hub
+            .targetable_remarketing_lists()
+            .list(profile_id, advertiser_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -36639,10 +37500,14 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self.hub.targeting_templates().get(
-            opt.value_of("profile-id").unwrap_or(""),
-            opt.value_of("id").unwrap_or(""),
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
         );
+        let id: i64 = arg_from_str(&opt.value_of("id").unwrap_or(""), err, "<id>", "int64");
+        let mut call = self.hub.targeting_templates().get(profile_id, id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -36916,10 +37781,13 @@ where
             }
         }
         let mut request: api::TargetingTemplate = serde_json::value::from_value(object).unwrap();
-        let mut call = self
-            .hub
-            .targeting_templates()
-            .insert(request, opt.value_of("profile-id").unwrap_or(""));
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
+        );
+        let mut call = self.hub.targeting_templates().insert(request, profile_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -36997,10 +37865,13 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self
-            .hub
-            .targeting_templates()
-            .list(opt.value_of("profile-id").unwrap_or(""));
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
+        );
+        let mut call = self.hub.targeting_templates().list(profile_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -37320,11 +38191,17 @@ where
             }
         }
         let mut request: api::TargetingTemplate = serde_json::value::from_value(object).unwrap();
-        let mut call = self.hub.targeting_templates().patch(
-            request,
-            opt.value_of("profile-id").unwrap_or(""),
-            opt.value_of("id").unwrap_or(""),
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
         );
+        let id: i64 = arg_from_str(&opt.value_of("id").unwrap_or(""), err, "<id>", "int64");
+        let mut call = self
+            .hub
+            .targeting_templates()
+            .patch(request, profile_id, id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -37598,10 +38475,13 @@ where
             }
         }
         let mut request: api::TargetingTemplate = serde_json::value::from_value(object).unwrap();
-        let mut call = self
-            .hub
-            .targeting_templates()
-            .update(request, opt.value_of("profile-id").unwrap_or(""));
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
+        );
+        let mut call = self.hub.targeting_templates().update(request, profile_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -37679,10 +38559,13 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self
-            .hub
-            .user_profiles()
-            .get(opt.value_of("profile-id").unwrap_or(""));
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
+        );
+        let mut call = self.hub.user_profiles().get(profile_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -37838,10 +38721,14 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self.hub.user_role_permission_groups().get(
-            opt.value_of("profile-id").unwrap_or(""),
-            opt.value_of("id").unwrap_or(""),
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
         );
+        let id: i64 = arg_from_str(&opt.value_of("id").unwrap_or(""), err, "<id>", "int64");
+        let mut call = self.hub.user_role_permission_groups().get(profile_id, id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -37919,10 +38806,13 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self
-            .hub
-            .user_role_permission_groups()
-            .list(opt.value_of("profile-id").unwrap_or(""));
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
+        );
+        let mut call = self.hub.user_role_permission_groups().list(profile_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -38000,10 +38890,14 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self.hub.user_role_permissions().get(
-            opt.value_of("profile-id").unwrap_or(""),
-            opt.value_of("id").unwrap_or(""),
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
         );
+        let id: i64 = arg_from_str(&opt.value_of("id").unwrap_or(""), err, "<id>", "int64");
+        let mut call = self.hub.user_role_permissions().get(profile_id, id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -38081,10 +38975,13 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self
-            .hub
-            .user_role_permissions()
-            .list(opt.value_of("profile-id").unwrap_or(""));
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
+        );
+        let mut call = self.hub.user_role_permissions().list(profile_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -38170,10 +39067,14 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self.hub.user_roles().delete(
-            opt.value_of("profile-id").unwrap_or(""),
-            opt.value_of("id").unwrap_or(""),
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
         );
+        let id: i64 = arg_from_str(&opt.value_of("id").unwrap_or(""), err, "<id>", "int64");
+        let mut call = self.hub.user_roles().delete(profile_id, id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -38235,10 +39136,14 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self.hub.user_roles().get(
-            opt.value_of("profile-id").unwrap_or(""),
-            opt.value_of("id").unwrap_or(""),
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
         );
+        let id: i64 = arg_from_str(&opt.value_of("id").unwrap_or(""), err, "<id>", "int64");
+        let mut call = self.hub.user_roles().get(profile_id, id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -38422,10 +39327,13 @@ where
             }
         }
         let mut request: api::UserRole = serde_json::value::from_value(object).unwrap();
-        let mut call = self
-            .hub
-            .user_roles()
-            .insert(request, opt.value_of("profile-id").unwrap_or(""));
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
+        );
+        let mut call = self.hub.user_roles().insert(request, profile_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -38503,10 +39411,13 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self
-            .hub
-            .user_roles()
-            .list(opt.value_of("profile-id").unwrap_or(""));
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
+        );
+        let mut call = self.hub.user_roles().list(profile_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -38744,11 +39655,14 @@ where
             }
         }
         let mut request: api::UserRole = serde_json::value::from_value(object).unwrap();
-        let mut call = self.hub.user_roles().patch(
-            request,
-            opt.value_of("profile-id").unwrap_or(""),
-            opt.value_of("id").unwrap_or(""),
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
         );
+        let id: i64 = arg_from_str(&opt.value_of("id").unwrap_or(""), err, "<id>", "int64");
+        let mut call = self.hub.user_roles().patch(request, profile_id, id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -38932,10 +39846,13 @@ where
             }
         }
         let mut request: api::UserRole = serde_json::value::from_value(object).unwrap();
-        let mut call = self
-            .hub
-            .user_roles()
-            .update(request, opt.value_of("profile-id").unwrap_or(""));
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
+        );
+        let mut call = self.hub.user_roles().update(request, profile_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -39013,11 +39930,14 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let id: i32 = arg_from_str(&opt.value_of("id").unwrap_or(""), err, "<id>", "integer");
-        let mut call = self
-            .hub
-            .video_formats()
-            .get(opt.value_of("profile-id").unwrap_or(""), id);
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
+        );
+        let id: i32 = arg_from_str(&opt.value_of("id").unwrap_or(""), err, "<id>", "int32");
+        let mut call = self.hub.video_formats().get(profile_id, id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -39095,10 +40015,13 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self
-            .hub
-            .video_formats()
-            .list(opt.value_of("profile-id").unwrap_or(""));
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
+        );
+        let mut call = self.hub.video_formats().list(profile_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -40398,7 +41321,9 @@ where
         let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
             secret,
             yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-            hyper_util::client::legacy::Client::builder(executor).build(connector),
+            yup_oauth2::client::CustomHyperClientBuilder::from(
+                hyper_util::client::legacy::Client::builder(executor).build(connector),
+            ),
         )
         .persist_tokens_to_disk(format!("{}/dfareporting3d3", config_dir))
         .build()
@@ -45571,7 +46496,7 @@ async fn main() {
 
     let mut app = App::new("dfareporting3d3")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("6.0.0+20220104")
+           .version("7.0.0+20220104")
            .about("Build applications to efficiently manage large or complex trafficking, reporting, and attribution workflows for Campaign Manager 360.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_dfareporting3d3_cli")
            .arg(Arg::with_name("url")
@@ -45649,7 +46574,7 @@ async fn main() {
         .with_native_roots()
         .unwrap()
         .https_or_http()
-        .enable_http1()
+        .enable_http2()
         .build();
 
     match Engine::new(matches, connector).await {

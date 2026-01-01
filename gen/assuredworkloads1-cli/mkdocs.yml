@@ -1,4 +1,4 @@
-site_name: Assuredworkloads v6.0.0+20240617
+site_name: Assuredworkloads v7.0.0+20251211
 site_url: http://byron.github.io/google-apis-rs/google-assuredworkloads1-cli
 site_description: A complete library to interact with Assuredworkloads (protocol v1)
 
@@ -15,12 +15,15 @@ nav:
     - 'Locations Workloads Analyze Workload Move': 'organizations_locations-workloads-analyze-workload-move.md'
     - 'Locations Workloads Create': 'organizations_locations-workloads-create.md'
     - 'Locations Workloads Delete': 'organizations_locations-workloads-delete.md'
+    - 'Locations Workloads Enable Compliance Updates': 'organizations_locations-workloads-enable-compliance-updates.md'
     - 'Locations Workloads Enable Resource Monitoring': 'organizations_locations-workloads-enable-resource-monitoring.md'
     - 'Locations Workloads Get': 'organizations_locations-workloads-get.md'
     - 'Locations Workloads List': 'organizations_locations-workloads-list.md'
     - 'Locations Workloads Mutate Partner Permissions': 'organizations_locations-workloads-mutate-partner-permissions.md'
     - 'Locations Workloads Patch': 'organizations_locations-workloads-patch.md'
     - 'Locations Workloads Restrict Allowed Resources': 'organizations_locations-workloads-restrict-allowed-resources.md'
+    - 'Locations Workloads Updates Apply': 'organizations_locations-workloads-updates-apply.md'
+    - 'Locations Workloads Updates List': 'organizations_locations-workloads-updates-list.md'
     - 'Locations Workloads Violations Acknowledge': 'organizations_locations-workloads-violations-acknowledge.md'
     - 'Locations Workloads Violations Get': 'organizations_locations-workloads-violations-get.md'
     - 'Locations Workloads Violations List': 'organizations_locations-workloads-violations-list.md'

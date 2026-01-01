@@ -26,7 +26,7 @@
     "canonicalName": "Docs",
     "description": "Reads and writes Google Docs documents.",
     "discoveryVersion": "v1",
-    "documentationLink": "https://developers.google.com/docs/",
+    "documentationLink": "https://developers.google.com/workspace/docs/",
     "fullyEncodeReservedExpansion": true,
     "icons": {
         "x16": "http://www.google.com/images/icons/product/search-16.gif",
@@ -183,6 +183,11 @@
                             "required": true,
                             "type": "string"
                         },
+                        "includeTabsContent": {
+                            "description": "Whether to populate the Document.tabs field instead of the text content fields like `body` and `documentStyle` on Document. - When `True`: Document content populates in the Document.tabs field instead of the text content fields in Document. - When `False`: The content of the document's first tab populates the content fields in Document excluding Document.tabs. If a document has only one tab, then that tab is used to populate the document content. Document.tabs will be empty.",
+                            "location": "query",
+                            "type": "boolean"
+                        },
                         "suggestionsViewMode": {
                             "description": "The suggestions view mode to apply to the document. This allows viewing the document with all suggestions inline, accepted or rejected. If one is not specified, DEFAULT_FOR_CURRENT_ACCESS is used.",
                             "enum": [
@@ -216,9 +221,31 @@
             }
         }
     },
-    "revision": "20240613",
+    "revision": "20251215",
     "rootUrl": "https://docs.googleapis.com/",
     "schemas": {
+        "AddDocumentTabRequest": {
+            "description": "Adds a document tab. When a tab is added at a given index, all subsequent tabs' indexes are incremented.",
+            "id": "AddDocumentTabRequest",
+            "properties": {
+                "tabProperties": {
+                    "$ref": "TabProperties",
+                    "description": "The properties of the tab to add. All properties are optional."
+                }
+            },
+            "type": "object"
+        },
+        "AddDocumentTabResponse": {
+            "description": "The result of adding a document tab.",
+            "id": "AddDocumentTabResponse",
+            "properties": {
+                "tabProperties": {
+                    "$ref": "TabProperties",
+                    "description": "The properties of the newly added tab."
+                }
+            },
+            "type": "object"
+        },
         "AutoText": {
             "description": "A ParagraphElement representing a spot in the text that's dynamically replaced with content that can change over time, like a page number.",
             "id": "AutoText",
@@ -337,6 +364,21 @@
                         "$ref": "StructuralElement"
                     },
                     "type": "array"
+                }
+            },
+            "type": "object"
+        },
+        "BookmarkLink": {
+            "description": "A reference to a bookmark in this document.",
+            "id": "BookmarkLink",
+            "properties": {
+                "id": {
+                    "description": "The ID of a bookmark in this document.",
+                    "type": "string"
+                },
+                "tabId": {
+                    "description": "The ID of the tab containing this bookmark.",
+                    "type": "string"
                 }
             },
             "type": "object"
@@ -595,7 +637,7 @@
             "type": "object"
         },
         "CropProperties": {
-            "description": "The crop properties of an image. The crop rectangle is represented using fractional offsets from the original content's 4 edges. - If the offset is in the interval (0, 1), the corresponding edge of crop rectangle is positioned inside of the image's original bounding rectangle. - If the offset is negative or greater than 1, the corresponding edge of crop rectangle is positioned outside of the image's original bounding rectangle. - If all offsets and rotation angle are 0, the image is not cropped.",
+            "description": "The crop properties of an image. The crop rectangle is represented using fractional offsets from the original content's 4 edges. - If the offset is in the interval (0, 1), the corresponding edge of crop rectangle is positioned inside of the image's original bounding rectangle. - If the offset is negative or greater than 1, the corresponding edge of crop rectangle is positioned outside of the image's original bounding rectangle. - If all offsets and rotation angles are 0, the image is not cropped.",
             "id": "CropProperties",
             "properties": {
                 "angle": {
@@ -653,6 +695,141 @@
             },
             "type": "object"
         },
+        "DateElement": {
+            "description": "A date instance mentioned in a document.",
+            "id": "DateElement",
+            "properties": {
+                "dateElementProperties": {
+                    "$ref": "DateElementProperties",
+                    "description": "The properties of this DateElement."
+                },
+                "dateId": {
+                    "description": "Output only. The unique ID of this date.",
+                    "readOnly": true,
+                    "type": "string"
+                },
+                "suggestedDateElementPropertiesChanges": {
+                    "additionalProperties": {
+                        "$ref": "SuggestedDateElementProperties"
+                    },
+                    "description": "The suggested changes to the date element properties, keyed by suggestion ID.",
+                    "type": "object"
+                },
+                "suggestedDeletionIds": {
+                    "description": "IDs for suggestions that remove this date from the document. A DateElement might have multiple deletion IDs if, for example, multiple users suggest deleting it. If empty, then this date isn't suggested for deletion.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "suggestedInsertionIds": {
+                    "description": "IDs for suggestions that insert this date into the document. A DateElement might have multiple insertion IDs if it's a nested suggested change (a suggestion within a suggestion made by a different user, for example). If empty, then this date isn't a suggested insertion.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "suggestedTextStyleChanges": {
+                    "additionalProperties": {
+                        "$ref": "SuggestedTextStyle"
+                    },
+                    "description": "The suggested text style changes to this DateElement, keyed by suggestion ID.",
+                    "type": "object"
+                },
+                "textStyle": {
+                    "$ref": "TextStyle",
+                    "description": "The text style of this DateElement."
+                }
+            },
+            "type": "object"
+        },
+        "DateElementProperties": {
+            "description": "Properties of a DateElement.",
+            "id": "DateElementProperties",
+            "properties": {
+                "dateFormat": {
+                    "description": "Determines how the date part of the DateElement will be displayed in the document. If unset, the default value is DATE_FORMAT_MONTH_DAY_YEAR_ABBREVIATED, indicating the DateElement will be formatted as `MMM d, y` in `en_US`, or locale specific equivalent.",
+                    "enum": [
+                        "DATE_FORMAT_UNSPECIFIED",
+                        "DATE_FORMAT_CUSTOM",
+                        "DATE_FORMAT_MONTH_DAY_ABBREVIATED",
+                        "DATE_FORMAT_MONTH_DAY_FULL",
+                        "DATE_FORMAT_MONTH_DAY_YEAR_ABBREVIATED",
+                        "DATE_FORMAT_ISO8601"
+                    ],
+                    "enumDescriptions": [
+                        "The date format is unspecified.",
+                        "Output only. The date format is imported from an external source.",
+                        "The date format is an abbreviated month followed by the day. For example, \"Jan 1\".",
+                        "The date format is a month followed by the day. For example, \"January 01\".",
+                        "The date format is an abbreviated month followed by the day and the year. For example, \"Jan 1, 1970\".",
+                        "The date format is in ISO 8601 format. For example, \"1970-01-01\"."
+                    ],
+                    "type": "string"
+                },
+                "displayText": {
+                    "description": "Output only. Indicates how the DateElement is displayed in the document.",
+                    "type": "string"
+                },
+                "locale": {
+                    "description": "The locale of the document, as defined by the Unicode Common Locale Data Repository (CLDR) project. For example, `en_US`. If unset, the default locale is `en_US`.",
+                    "type": "string"
+                },
+                "timeFormat": {
+                    "description": "Determines how the time part of the DateElement will be displayed in the document. If unset, the default value is TIME_FORMAT_DISABLED, indicating no time should be shown.",
+                    "enum": [
+                        "TIME_FORMAT_UNSPECIFIED",
+                        "TIME_FORMAT_DISABLED",
+                        "TIME_FORMAT_HOUR_MINUTE",
+                        "TIME_FORMAT_HOUR_MINUTE_TIMEZONE"
+                    ],
+                    "enumDescriptions": [
+                        "The time format is unspecified.",
+                        "Indicates that the date does not have a time.",
+                        "The time format shows the hour and minute. For example, \"Jan 1, 1970 12:00 PM\".",
+                        "The time format shows the hour, minute, and timezone. For example, \"Jan 1, 1970 12:00 PM UTC\"."
+                    ],
+                    "type": "string"
+                },
+                "timeZoneId": {
+                    "description": "The time zone of the DateElement, as defined by the Unicode Common Locale Data Repository (CLDR) project. For example, `America/New York`. If unset, the default time zone is `etc/UTC`.",
+                    "type": "string"
+                },
+                "timestamp": {
+                    "description": "The point in time to represent, in seconds and nanoseconds since Unix epoch: January 1, 1970 at midnight UTC. Timestamp is expected to be in UTC. If time_zone_id is set, the timestamp is adjusted according to the time zone. For example, a timestamp of `18000` with a date format of `DATE_FORMAT_ISO8601` and time format of `TIME_FORMAT_HOUR_MINUTE` would be displayed as `1970-01-01 5:00 AM`. A timestamp of `18000` with date format of `DATE_FORMAT_8SO8601`, time format of `TIME_FORMAT_HOUR_MINUTE`, and time zone set to `America/New_York` will instead be `1970-01-01 12:00 AM`.",
+                    "format": "google-datetime",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "DateElementPropertiesSuggestionState": {
+            "description": "A mask that indicates which of the fields on the base DateElementProperties have been changed in this suggestion. For any field set to true, there's a new suggested value.",
+            "id": "DateElementPropertiesSuggestionState",
+            "properties": {
+                "dateFormatSuggested": {
+                    "description": "Indicates if there was a suggested change to date_format.",
+                    "type": "boolean"
+                },
+                "localeSuggested": {
+                    "description": "Indicates if there was a suggested change to locale.",
+                    "type": "boolean"
+                },
+                "timeFormatSuggested": {
+                    "description": "Indicates if there was a suggested change to time_format.",
+                    "type": "boolean"
+                },
+                "timeZoneIdSuggested": {
+                    "description": "Indicates if there was a suggested change to time_zone_id.",
+                    "type": "boolean"
+                },
+                "timestampSuggested": {
+                    "description": "Indicates if there was a suggested change to timestamp.",
+                    "type": "boolean"
+                }
+            },
+            "type": "object"
+        },
         "DeleteContentRangeRequest": {
             "description": "Deletes content from the document.",
             "id": "DeleteContentRangeRequest",
@@ -671,6 +848,10 @@
                 "footerId": {
                     "description": "The id of the footer to delete. If this footer is defined on DocumentStyle, the reference to this footer is removed, resulting in no footer of that type for the first section of the document. If this footer is defined on a SectionStyle, the reference to this footer is removed and the footer of that type is now continued from the previous section.",
                     "type": "string"
+                },
+                "tabId": {
+                    "description": "The tab that contains the footer to delete. When omitted, the request is applied to the first tab. In a document containing a single tab: - If provided, must match the singular tab's ID. - If omitted, the request applies to the singular tab. In a document containing multiple tabs: - If provided, the request applies to the specified tab. - If omitted, the request applies to the first tab in the document.",
+                    "type": "string"
                 }
             },
             "type": "object"
@@ -681,6 +862,10 @@
             "properties": {
                 "headerId": {
                     "description": "The id of the header to delete. If this header is defined on DocumentStyle, the reference to this header is removed, resulting in no header of that type for the first section of the document. If this header is defined on a SectionStyle, the reference to this header is removed and the header of that type is now continued from the previous section.",
+                    "type": "string"
+                },
+                "tabId": {
+                    "description": "The tab containing the header to delete. When omitted, the request is applied to the first tab. In a document containing a single tab: - If provided, must match the singular tab's ID. - If omitted, the request applies to the singular tab. In a document containing multiple tabs: - If provided, the request applies to the specified tab. - If omitted, the request applies to the first tab in the document.",
                     "type": "string"
                 }
             },
@@ -697,6 +882,10 @@
                 "namedRangeId": {
                     "description": "The ID of the named range to delete.",
                     "type": "string"
+                },
+                "tabsCriteria": {
+                    "$ref": "TabsCriteria",
+                    "description": "Optional. The criteria used to specify which tab(s) the range deletion should occur in. When omitted, the range deletion is applied to all tabs. In a document containing a single tab: - If provided, must match the singular tab's ID. - If omitted, the range deletion applies to the singular tab. In a document containing multiple tabs: - If provided, the range deletion applies to the specified tabs. - If not provided, the range deletion applies to all tabs."
                 }
             },
             "type": "object"
@@ -718,6 +907,21 @@
             "properties": {
                 "objectId": {
                     "description": "The ID of the positioned object to delete.",
+                    "type": "string"
+                },
+                "tabId": {
+                    "description": "The tab that the positioned object to delete is in. When omitted, the request is applied to the first tab. In a document containing a single tab: - If provided, must match the singular tab's ID. - If omitted, the request applies to the singular tab. In a document containing multiple tabs: - If provided, the request applies to the specified tab. - If omitted, the request applies to the first tab in the document.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "DeleteTabRequest": {
+            "description": "Deletes a tab. If the tab has child tabs, they are deleted as well.",
+            "id": "DeleteTabRequest",
+            "properties": {
+                "tabId": {
+                    "description": "The ID of the tab to delete.",
                     "type": "string"
                 }
             },
@@ -775,7 +979,7 @@
             "properties": {
                 "body": {
                     "$ref": "Body",
-                    "description": "Output only. The main body of the document."
+                    "description": "Output only. The main body of the document. Legacy field: Instead, use Document.tabs.documentTab.body, which exposes the actual document content from all tabs when the includeTabsContent parameter is set to `true`. If `false` or unset, this field contains information about the first tab in the document."
                 },
                 "documentId": {
                     "description": "Output only. The ID of the document.",
@@ -783,59 +987,59 @@
                 },
                 "documentStyle": {
                     "$ref": "DocumentStyle",
-                    "description": "Output only. The style of the document."
+                    "description": "Output only. The style of the document. Legacy field: Instead, use Document.tabs.documentTab.documentStyle, which exposes the actual document content from all tabs when the includeTabsContent parameter is set to `true`. If `false` or unset, this field contains information about the first tab in the document."
                 },
                 "footers": {
                     "additionalProperties": {
                         "$ref": "Footer"
                     },
-                    "description": "Output only. The footers in the document, keyed by footer ID.",
+                    "description": "Output only. The footers in the document, keyed by footer ID. Legacy field: Instead, use Document.tabs.documentTab.footers, which exposes the actual document content from all tabs when the includeTabsContent parameter is set to `true`. If `false` or unset, this field contains information about the first tab in the document.",
                     "type": "object"
                 },
                 "footnotes": {
                     "additionalProperties": {
                         "$ref": "Footnote"
                     },
-                    "description": "Output only. The footnotes in the document, keyed by footnote ID.",
+                    "description": "Output only. The footnotes in the document, keyed by footnote ID. Legacy field: Instead, use Document.tabs.documentTab.footnotes, which exposes the actual document content from all tabs when the includeTabsContent parameter is set to `true`. If `false` or unset, this field contains information about the first tab in the document.",
                     "type": "object"
                 },
                 "headers": {
                     "additionalProperties": {
                         "$ref": "Header"
                     },
-                    "description": "Output only. The headers in the document, keyed by header ID.",
+                    "description": "Output only. The headers in the document, keyed by header ID. Legacy field: Instead, use Document.tabs.documentTab.headers, which exposes the actual document content from all tabs when the includeTabsContent parameter is set to `true`. If `false` or unset, this field contains information about the first tab in the document.",
                     "type": "object"
                 },
                 "inlineObjects": {
                     "additionalProperties": {
                         "$ref": "InlineObject"
                     },
-                    "description": "Output only. The inline objects in the document, keyed by object ID.",
+                    "description": "Output only. The inline objects in the document, keyed by object ID. Legacy field: Instead, use Document.tabs.documentTab.inlineObjects, which exposes the actual document content from all tabs when the includeTabsContent parameter is set to `true`. If `false` or unset, this field contains information about the first tab in the document.",
                     "type": "object"
                 },
                 "lists": {
                     "additionalProperties": {
                         "$ref": "List"
                     },
-                    "description": "Output only. The lists in the document, keyed by list ID.",
+                    "description": "Output only. The lists in the document, keyed by list ID. Legacy field: Instead, use Document.tabs.documentTab.lists, which exposes the actual document content from all tabs when the includeTabsContent parameter is set to `true`. If `false` or unset, this field contains information about the first tab in the document.",
                     "type": "object"
                 },
                 "namedRanges": {
                     "additionalProperties": {
                         "$ref": "NamedRanges"
                     },
-                    "description": "Output only. The named ranges in the document, keyed by name.",
+                    "description": "Output only. The named ranges in the document, keyed by name. Legacy field: Instead, use Document.tabs.documentTab.namedRanges, which exposes the actual document content from all tabs when the includeTabsContent parameter is set to `true`. If `false` or unset, this field contains information about the first tab in the document.",
                     "type": "object"
                 },
                 "namedStyles": {
                     "$ref": "NamedStyles",
-                    "description": "Output only. The named styles of the document."
+                    "description": "Output only. The named styles of the document. Legacy field: Instead, use Document.tabs.documentTab.namedStyles, which exposes the actual document content from all tabs when the includeTabsContent parameter is set to `true`. If `false` or unset, this field contains information about the first tab in the document."
                 },
                 "positionedObjects": {
                     "additionalProperties": {
                         "$ref": "PositionedObject"
                     },
-                    "description": "Output only. The positioned objects in the document, keyed by object ID.",
+                    "description": "Output only. The positioned objects in the document, keyed by object ID. Legacy field: Instead, use Document.tabs.documentTab.positionedObjects, which exposes the actual document content from all tabs when the includeTabsContent parameter is set to `true`. If `false` or unset, this field contains information about the first tab in the document.",
                     "type": "object"
                 },
                 "revisionId": {
@@ -846,14 +1050,14 @@
                     "additionalProperties": {
                         "$ref": "SuggestedDocumentStyle"
                     },
-                    "description": "Output only. The suggested changes to the style of the document, keyed by suggestion ID.",
+                    "description": "Output only. The suggested changes to the style of the document, keyed by suggestion ID. Legacy field: Instead, use Document.tabs.documentTab.suggestedDocumentStyleChanges, which exposes the actual document content from all tabs when the includeTabsContent parameter is set to `true`. If `false` or unset, this field contains information about the first tab in the document.",
                     "type": "object"
                 },
                 "suggestedNamedStylesChanges": {
                     "additionalProperties": {
                         "$ref": "SuggestedNamedStyles"
                     },
-                    "description": "Output only. The suggested changes to the named styles of the document, keyed by suggestion ID.",
+                    "description": "Output only. The suggested changes to the named styles of the document, keyed by suggestion ID. Legacy field: Instead, use Document.tabs.documentTab.suggestedNamedStylesChanges, which exposes the actual document content from all tabs when the includeTabsContent parameter is set to `true`. If `false` or unset, this field contains information about the first tab in the document.",
                     "type": "object"
                 },
                 "suggestionsViewMode": {
@@ -872,8 +1076,36 @@
                     ],
                     "type": "string"
                 },
+                "tabs": {
+                    "description": "Tabs that are part of a document. Tabs can contain child tabs, a tab nested within another tab. Child tabs are represented by the Tab.childTabs field.",
+                    "items": {
+                        "$ref": "Tab"
+                    },
+                    "type": "array"
+                },
                 "title": {
                     "description": "The title of the document.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "DocumentFormat": {
+            "description": "Represents document-level format settings.",
+            "id": "DocumentFormat",
+            "properties": {
+                "documentMode": {
+                    "description": "Whether the document has pages or is pageless.",
+                    "enum": [
+                        "DOCUMENT_MODE_UNSPECIFIED",
+                        "PAGES",
+                        "PAGELESS"
+                    ],
+                    "enumDescriptions": [
+                        "The document mode is unspecified.",
+                        "The document has pages.",
+                        "The document is pageless."
+                    ],
                     "type": "string"
                 }
             },
@@ -888,76 +1120,80 @@
                     "description": "The background of the document. Documents cannot have a transparent background color."
                 },
                 "defaultFooterId": {
-                    "description": "The ID of the default footer. If not set, there's no default footer. This property is read-only.",
+                    "description": "The ID of the default footer. If not set, there's no default footer. If DocumentMode is PAGELESS, this property will not be rendered. This property is read-only.",
                     "type": "string"
                 },
                 "defaultHeaderId": {
-                    "description": "The ID of the default header. If not set, there's no default header. This property is read-only.",
+                    "description": "The ID of the default header. If not set, there's no default header. If DocumentMode is PAGELESS, this property will not be rendered. This property is read-only.",
                     "type": "string"
                 },
+                "documentFormat": {
+                    "$ref": "DocumentFormat",
+                    "description": "Specifies document-level format settings, such as the document mode (pages vs pageless)."
+                },
                 "evenPageFooterId": {
-                    "description": "The ID of the footer used only for even pages. The value of use_even_page_header_footer determines whether to use the default_footer_id or this value for the footer on even pages. If not set, there's no even page footer. This property is read-only.",
+                    "description": "The ID of the footer used only for even pages. The value of use_even_page_header_footer determines whether to use the default_footer_id or this value for the footer on even pages. If not set, there's no even page footer. If DocumentMode is PAGELESS, this property will not be rendered. This property is read-only.",
                     "type": "string"
                 },
                 "evenPageHeaderId": {
-                    "description": "The ID of the header used only for even pages. The value of use_even_page_header_footer determines whether to use the default_header_id or this value for the header on even pages. If not set, there's no even page header. This property is read-only.",
+                    "description": "The ID of the header used only for even pages. The value of use_even_page_header_footer determines whether to use the default_header_id or this value for the header on even pages. If not set, there's no even page header. If DocumentMode is PAGELESS, this property will not be rendered. This property is read-only.",
                     "type": "string"
                 },
                 "firstPageFooterId": {
-                    "description": "The ID of the footer used only for the first page. If not set then a unique footer for the first page does not exist. The value of use_first_page_header_footer determines whether to use the default_footer_id or this value for the footer on the first page. If not set, there's no first page footer. This property is read-only.",
+                    "description": "The ID of the footer used only for the first page. If not set then a unique footer for the first page does not exist. The value of use_first_page_header_footer determines whether to use the default_footer_id or this value for the footer on the first page. If not set, there's no first page footer. If DocumentMode is PAGELESS, this property will not be rendered. This property is read-only.",
                     "type": "string"
                 },
                 "firstPageHeaderId": {
-                    "description": "The ID of the header used only for the first page. If not set then a unique header for the first page does not exist. The value of use_first_page_header_footer determines whether to use the default_header_id or this value for the header on the first page. If not set, there's no first page header. This property is read-only.",
+                    "description": "The ID of the header used only for the first page. If not set then a unique header for the first page does not exist. The value of use_first_page_header_footer determines whether to use the default_header_id or this value for the header on the first page. If not set, there's no first page header. If DocumentMode is PAGELESS, this property will not be rendered. This property is read-only.",
                     "type": "string"
                 },
                 "flipPageOrientation": {
-                    "description": "Optional. Indicates whether to flip the dimensions of the page_size, which allows changing the page orientation between portrait and landscape.",
+                    "description": "Optional. Indicates whether to flip the dimensions of the page_size, which allows changing the page orientation between portrait and landscape. If DocumentMode is PAGELESS, this property will not be rendered.",
                     "type": "boolean"
                 },
                 "marginBottom": {
                     "$ref": "Dimension",
-                    "description": "The bottom page margin. Updating the bottom page margin on the document style clears the bottom page margin on all section styles."
+                    "description": "The bottom page margin. Updating the bottom page margin on the document style clears the bottom page margin on all section styles. If DocumentMode is PAGELESS, this property will not be rendered."
                 },
                 "marginFooter": {
                     "$ref": "Dimension",
-                    "description": "The amount of space between the bottom of the page and the contents of the footer."
+                    "description": "The amount of space between the bottom of the page and the contents of the footer. If DocumentMode is PAGELESS, this property will not be rendered."
                 },
                 "marginHeader": {
                     "$ref": "Dimension",
-                    "description": "The amount of space between the top of the page and the contents of the header."
+                    "description": "The amount of space between the top of the page and the contents of the header. If DocumentMode is PAGELESS, this property will not be rendered."
                 },
                 "marginLeft": {
                     "$ref": "Dimension",
-                    "description": "The left page margin. Updating the left page margin on the document style clears the left page margin on all section styles. It may also cause columns to resize in all sections."
+                    "description": "The left page margin. Updating the left page margin on the document style clears the left page margin on all section styles. It may also cause columns to resize in all sections. If DocumentMode is PAGELESS, this property will not be rendered."
                 },
                 "marginRight": {
                     "$ref": "Dimension",
-                    "description": "The right page margin. Updating the right page margin on the document style clears the right page margin on all section styles. It may also cause columns to resize in all sections."
+                    "description": "The right page margin. Updating the right page margin on the document style clears the right page margin on all section styles. It may also cause columns to resize in all sections. If DocumentMode is PAGELESS, this property will not be rendered."
                 },
                 "marginTop": {
                     "$ref": "Dimension",
-                    "description": "The top page margin. Updating the top page margin on the document style clears the top page margin on all section styles."
+                    "description": "The top page margin. Updating the top page margin on the document style clears the top page margin on all section styles. If DocumentMode is PAGELESS, this property will not be rendered."
                 },
                 "pageNumberStart": {
-                    "description": "The page number from which to start counting the number of pages.",
+                    "description": "The page number from which to start counting the number of pages. If DocumentMode is PAGELESS, this property will not be rendered.",
                     "format": "int32",
                     "type": "integer"
                 },
                 "pageSize": {
                     "$ref": "Size",
-                    "description": "The size of a page in the document."
+                    "description": "The size of a page in the document. If DocumentMode is PAGELESS, this property will not be rendered."
                 },
                 "useCustomHeaderFooterMargins": {
-                    "description": "Indicates whether DocumentStyle margin_header, SectionStyle margin_header and DocumentStyle margin_footer, SectionStyle margin_footer are respected. When false, the default values in the Docs editor for header and footer margin are used. This property is read-only.",
+                    "description": "Indicates whether DocumentStyle margin_header, SectionStyle margin_header and DocumentStyle margin_footer, SectionStyle margin_footer are respected. When false, the default values in the Docs editor for header and footer margin is used. If DocumentMode is PAGELESS, this property will not be rendered. This property is read-only.",
                     "type": "boolean"
                 },
                 "useEvenPageHeaderFooter": {
-                    "description": "Indicates whether to use the even page header / footer IDs for the even pages.",
+                    "description": "Indicates whether to use the even page header / footer IDs for the even pages. If DocumentMode is PAGELESS, this property will not be rendered.",
                     "type": "boolean"
                 },
                 "useFirstPageHeaderFooter": {
-                    "description": "Indicates whether to use the first page header / footer IDs for the first page.",
+                    "description": "Indicates whether to use the first page header / footer IDs for the first page. If DocumentMode is PAGELESS, this property will not be rendered.",
                     "type": "boolean"
                 }
             },
@@ -1042,6 +1278,88 @@
                 "useFirstPageHeaderFooterSuggested": {
                     "description": "Indicates if there was a suggested change to use_first_page_header_footer.",
                     "type": "boolean"
+                }
+            },
+            "type": "object"
+        },
+        "DocumentTab": {
+            "description": "A tab with document contents.",
+            "id": "DocumentTab",
+            "properties": {
+                "body": {
+                    "$ref": "Body",
+                    "description": "The main body of the document tab."
+                },
+                "documentStyle": {
+                    "$ref": "DocumentStyle",
+                    "description": "The style of the document tab."
+                },
+                "footers": {
+                    "additionalProperties": {
+                        "$ref": "Footer"
+                    },
+                    "description": "The footers in the document tab, keyed by footer ID.",
+                    "type": "object"
+                },
+                "footnotes": {
+                    "additionalProperties": {
+                        "$ref": "Footnote"
+                    },
+                    "description": "The footnotes in the document tab, keyed by footnote ID.",
+                    "type": "object"
+                },
+                "headers": {
+                    "additionalProperties": {
+                        "$ref": "Header"
+                    },
+                    "description": "The headers in the document tab, keyed by header ID.",
+                    "type": "object"
+                },
+                "inlineObjects": {
+                    "additionalProperties": {
+                        "$ref": "InlineObject"
+                    },
+                    "description": "The inline objects in the document tab, keyed by object ID.",
+                    "type": "object"
+                },
+                "lists": {
+                    "additionalProperties": {
+                        "$ref": "List"
+                    },
+                    "description": "The lists in the document tab, keyed by list ID.",
+                    "type": "object"
+                },
+                "namedRanges": {
+                    "additionalProperties": {
+                        "$ref": "NamedRanges"
+                    },
+                    "description": "The named ranges in the document tab, keyed by name.",
+                    "type": "object"
+                },
+                "namedStyles": {
+                    "$ref": "NamedStyles",
+                    "description": "The named styles of the document tab."
+                },
+                "positionedObjects": {
+                    "additionalProperties": {
+                        "$ref": "PositionedObject"
+                    },
+                    "description": "The positioned objects in the document tab, keyed by object ID.",
+                    "type": "object"
+                },
+                "suggestedDocumentStyleChanges": {
+                    "additionalProperties": {
+                        "$ref": "SuggestedDocumentStyle"
+                    },
+                    "description": "The suggested changes to the style of the document tab, keyed by suggestion ID.",
+                    "type": "object"
+                },
+                "suggestedNamedStylesChanges": {
+                    "additionalProperties": {
+                        "$ref": "SuggestedNamedStyles"
+                    },
+                    "description": "The suggested changes to the named styles of the document tab, keyed by suggestion ID.",
+                    "type": "object"
                 }
             },
             "type": "object"
@@ -1233,6 +1551,10 @@
                 "segmentId": {
                     "description": "The ID of the header, footer or footnote the location is in. An empty segment ID signifies the document's body.",
                     "type": "string"
+                },
+                "tabId": {
+                    "description": "The tab that the location is in. When omitted, the request is applied to the first tab. In a document containing a single tab: - If provided, must match the singular tab's ID. - If omitted, the request applies to the singular tab. In a document containing multiple tabs: - If provided, the request applies to the specified tab. - If omitted, the request applies to the first tab in the document.",
+                    "type": "string"
                 }
             },
             "type": "object"
@@ -1347,6 +1669,21 @@
                 },
                 "headerId": {
                     "description": "The ID of the header.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "HeadingLink": {
+            "description": "A reference to a heading in this document.",
+            "id": "HeadingLink",
+            "properties": {
+                "id": {
+                    "description": "The ID of a heading in this document.",
+                    "type": "string"
+                },
+                "tabId": {
+                    "description": "The ID of the tab containing this heading.",
                     "type": "string"
                 }
             },
@@ -1549,6 +1886,25 @@
             },
             "type": "object"
         },
+        "InsertDateRequest": {
+            "description": "Inserts a date at the specified location.",
+            "id": "InsertDateRequest",
+            "properties": {
+                "dateElementProperties": {
+                    "$ref": "DateElementProperties",
+                    "description": "The properties of the date to insert."
+                },
+                "endOfSegmentLocation": {
+                    "$ref": "EndOfSegmentLocation",
+                    "description": "Inserts the date at the end of the given header, footer or document body."
+                },
+                "location": {
+                    "$ref": "Location",
+                    "description": "Inserts the date at a specific index in the document. The date must be inserted inside the bounds of an existing Paragraph. For instance, it cannot be inserted at a table's start index (i.e. between an existing table and its preceding paragraph)."
+                }
+            },
+            "type": "object"
+        },
         "InsertInlineImageRequest": {
             "description": "Inserts an InlineObject containing an image at the given location.",
             "id": "InsertInlineImageRequest",
@@ -1605,6 +1961,25 @@
                 "location": {
                     "$ref": "Location",
                     "description": "Inserts the page break at a specific index in the document. The page break must be inserted inside the bounds of an existing Paragraph. For instance, it cannot be inserted at a table's start index (i.e. between the table and its preceding paragraph). Page breaks cannot be inserted inside a table, equation, footnote, header or footer. Since page breaks can only be inserted inside the body, the segment ID field must be empty."
+                }
+            },
+            "type": "object"
+        },
+        "InsertPersonRequest": {
+            "description": "Inserts a person mention.",
+            "id": "InsertPersonRequest",
+            "properties": {
+                "endOfSegmentLocation": {
+                    "$ref": "EndOfSegmentLocation",
+                    "description": "Inserts the person mention at the end of a header, footer, footnote or the document body."
+                },
+                "location": {
+                    "$ref": "Location",
+                    "description": "Inserts the person mention at a specific index in the document. The person mention must be inserted inside the bounds of an existing Paragraph. For instance, it cannot be inserted at a table's start index (i.e. between the table and its preceding paragraph). People cannot be inserted inside an equation."
+                },
+                "personProperties": {
+                    "$ref": "PersonProperties",
+                    "description": "The properties of the person mention to insert."
                 }
             },
             "type": "object"
@@ -1716,12 +2091,24 @@
             "description": "A reference to another portion of a document or an external URL resource.",
             "id": "Link",
             "properties": {
+                "bookmark": {
+                    "$ref": "BookmarkLink",
+                    "description": "A bookmark in this document. In documents containing a single tab, links to bookmarks within the singular tab continue to return Link.bookmarkId when the includeTabsContent parameter is set to `false` or unset. Otherwise, this field is returned."
+                },
                 "bookmarkId": {
-                    "description": "The ID of a bookmark in this document.",
+                    "description": "The ID of a bookmark in this document. Legacy field: Instead, set includeTabsContent to `true` and use Link.bookmark for read and write operations. This field is only returned when includeTabsContent is set to `false` in documents containing a single tab and links to a bookmark within the singular tab. Otherwise, Link.bookmark is returned. If this field is used in a write request, the bookmark is considered to be from the tab ID specified in the request. If a tab ID is not specified in the request, it is considered to be from the first tab in the document.",
                     "type": "string"
                 },
+                "heading": {
+                    "$ref": "HeadingLink",
+                    "description": "A heading in this document. In documents containing a single tab, links to headings within the singular tab continue to return Link.headingId when the includeTabsContent parameter is set to `false` or unset. Otherwise, this field is returned."
+                },
                 "headingId": {
-                    "description": "The ID of a heading in this document.",
+                    "description": "The ID of a heading in this document. Legacy field: Instead, set includeTabsContent to `true` and use Link.heading for read and write operations. This field is only returned when includeTabsContent is set to `false` in documents containing a single tab and links to a heading within the singular tab. Otherwise, Link.heading is returned. If this field is used in a write request, the heading is considered to be from the tab ID specified in the request. If a tab ID is not specified in the request, it is considered to be from the first tab in the document.",
+                    "type": "string"
+                },
+                "tabId": {
+                    "description": "The ID of a tab in this document.",
                     "type": "string"
                 },
                 "url": {
@@ -1821,6 +2208,10 @@
                 },
                 "segmentId": {
                     "description": "The ID of the header, footer or footnote the location is in. An empty segment ID signifies the document's body.",
+                    "type": "string"
+                },
+                "tabId": {
+                    "description": "The tab that the location is in. When omitted, the request is applied to the first tab. In a document containing a single tab: - If provided, must match the singular tab's ID. - If omitted, the request applies to the singular tab. In a document containing multiple tabs: - If provided, the request applies to the specified tab. - If omitted, the request applies to the first tab in the document.",
                     "type": "string"
                 }
             },
@@ -2016,11 +2407,11 @@
                     "type": "string"
                 },
                 "glyphSymbol": {
-                    "description": "A custom glyph symbol used by bullets when paragraphs at this level of nesting are unordered. The glyph symbol replaces placeholders within the glyph_format. For example, if the glyph_symbol is the solid circle corresponding to Unicode U+25cf code point and the glyph_format is `%0`, the rendered glyph would be the solid circle.",
+                    "description": "A custom glyph symbol used by bullets when paragraphs at this level of nesting is unordered. The glyph symbol replaces placeholders within the glyph_format. For example, if the glyph_symbol is the solid circle corresponding to Unicode U+25cf code point and the glyph_format is `%0`, the rendered glyph would be the solid circle.",
                     "type": "string"
                 },
                 "glyphType": {
-                    "description": "The type of glyph used by bullets when paragraphs at this level of nesting are ordered. The glyph type determines the type of glyph used to replace placeholders within the glyph_format when paragraphs at this level of nesting are ordered. For example, if the nesting level is 0, the glyph_format is `%0.` and the glyph type is DECIMAL, then the rendered glyph would replace the placeholder `%0` in the glyph format with a number corresponding to list item's order within the list.",
+                    "description": "The type of glyph used by bullets when paragraphs at this level of nesting is ordered. The glyph type determines the type of glyph used to replace placeholders within the glyph_format when paragraphs at this level of nesting are ordered. For example, if the nesting level is 0, the glyph_format is `%0.` and the glyph type is DECIMAL, then the rendered glyph would replace the placeholder `%0` in the glyph format with a number corresponding to the list item's order within the list.",
                     "enum": [
                         "GLYPH_TYPE_UNSPECIFIED",
                         "NONE",
@@ -2255,6 +2646,10 @@
                 "columnBreak": {
                     "$ref": "ColumnBreak",
                     "description": "A column break paragraph element."
+                },
+                "dateElement": {
+                    "$ref": "DateElement",
+                    "description": "A paragraph element that represents a date."
                 },
                 "endIndex": {
                     "description": "The zero-base end index of this paragraph element, exclusive, in UTF-16 code units.",
@@ -2596,13 +2991,11 @@
             "id": "PersonProperties",
             "properties": {
                 "email": {
-                    "description": "Output only. The email address linked to this Person. This field is always present.",
-                    "readOnly": true,
+                    "description": "The email address linked to this Person. This field is always present.",
                     "type": "string"
                 },
                 "name": {
-                    "description": "Output only. The name of the person if it's displayed in the link text instead of the person's email address.",
-                    "readOnly": true,
+                    "description": "The name of the person if it's displayed in the link text instead of the person's email address.",
                     "type": "string"
                 }
             },
@@ -2760,6 +3153,10 @@
                     "description": "The zero-based start index of this range, in UTF-16 code units. In all current uses, a start index must be provided. This field is an Int32Value in order to accommodate future use cases with open-ended ranges.",
                     "format": "int32",
                     "type": "integer"
+                },
+                "tabId": {
+                    "description": "The tab that contains this range. When omitted, the request applies to the first tab. In a document containing a single tab: - If provided, must match the singular tab's ID. - If omitted, the request applies to the singular tab. In a document containing multiple tabs: - If provided, the request applies to the specified tab. - If omitted, the request applies to the first tab in the document.",
+                    "type": "string"
                 }
             },
             "type": "object"
@@ -2775,6 +3172,10 @@
                 "replaceText": {
                     "description": "The text that will replace the matched text.",
                     "type": "string"
+                },
+                "tabsCriteria": {
+                    "$ref": "TabsCriteria",
+                    "description": "Optional. The criteria used to specify in which tabs the replacement occurs. When omitted, the replacement applies to all tabs. In a document containing a single tab: - If provided, must match the singular tab's ID. - If omitted, the replacement applies to the singular tab. In a document containing multiple tabs: - If provided, the replacement applies to the specified tabs. - If omitted, the replacement applies to all tabs."
                 }
             },
             "type": "object"
@@ -2811,6 +3212,10 @@
                     ],
                     "type": "string"
                 },
+                "tabId": {
+                    "description": "The tab that the image to be replaced is in. When omitted, the request is applied to the first tab. In a document containing a single tab: - If provided, must match the singular tab's ID. - If omitted, the request applies to the singular tab. In a document containing multiple tabs: - If provided, the request applies to the specified tab. - If omitted, the request applies to the first tab in the document.",
+                    "type": "string"
+                },
                 "uri": {
                     "description": "The URI of the new image. The image is fetched once at insertion time and a copy is stored for display inside the document. Images must be less than 50MB, cannot exceed 25 megapixels, and must be in PNG, JPEG, or GIF format. The provided URI can't surpass 2 KB in length. The URI is saved with the image, and exposed through the ImageProperties.source_uri field.",
                     "type": "string"
@@ -2830,6 +3235,10 @@
                     "description": "The name of the NamedRanges whose content will be replaced. If there are multiple named ranges with the given name, then the content of each one will be replaced. If there are no named ranges with the given name, then the request will be a no-op.",
                     "type": "string"
                 },
+                "tabsCriteria": {
+                    "$ref": "TabsCriteria",
+                    "description": "Optional. The criteria used to specify in which tabs the replacement occurs. When omitted, the replacement applies to all tabs. In a document containing a single tab: - If provided, must match the singular tab's ID. - If omitted, the replacement applies to the singular tab. In a document containing multiple tabs: - If provided, the replacement applies to the specified tabs. - If omitted, the replacement applies to all tabs."
+                },
                 "text": {
                     "description": "Replaces the content of the specified named range(s) with the given text.",
                     "type": "string"
@@ -2841,6 +3250,10 @@
             "description": "A single update to apply to a document.",
             "id": "Request",
             "properties": {
+                "addDocumentTab": {
+                    "$ref": "AddDocumentTabRequest",
+                    "description": "Adds a document tab."
+                },
                 "createFooter": {
                     "$ref": "CreateFooterRequest",
                     "description": "Creates a footer."
@@ -2885,6 +3298,10 @@
                     "$ref": "DeletePositionedObjectRequest",
                     "description": "Deletes a positioned object from the document."
                 },
+                "deleteTab": {
+                    "$ref": "DeleteTabRequest",
+                    "description": "Deletes a document tab."
+                },
                 "deleteTableColumn": {
                     "$ref": "DeleteTableColumnRequest",
                     "description": "Deletes a column from a table."
@@ -2893,6 +3310,10 @@
                     "$ref": "DeleteTableRowRequest",
                     "description": "Deletes a row from a table."
                 },
+                "insertDate": {
+                    "$ref": "InsertDateRequest",
+                    "description": "Inserts a date."
+                },
                 "insertInlineImage": {
                     "$ref": "InsertInlineImageRequest",
                     "description": "Inserts an inline image at the specified location."
@@ -2900,6 +3321,10 @@
                 "insertPageBreak": {
                     "$ref": "InsertPageBreakRequest",
                     "description": "Inserts a page break at the specified location."
+                },
+                "insertPerson": {
+                    "$ref": "InsertPersonRequest",
+                    "description": "Inserts a person mention."
                 },
                 "insertSectionBreak": {
                     "$ref": "InsertSectionBreakRequest",
@@ -2949,6 +3374,10 @@
                     "$ref": "UpdateDocumentStyleRequest",
                     "description": "Updates the style of the document."
                 },
+                "updateDocumentTabProperties": {
+                    "$ref": "UpdateDocumentTabPropertiesRequest",
+                    "description": "Updates the properties of a document tab."
+                },
                 "updateParagraphStyle": {
                     "$ref": "UpdateParagraphStyleRequest",
                     "description": "Updates the paragraph style at the specified range."
@@ -2980,6 +3409,10 @@
             "description": "A single response from an update.",
             "id": "Response",
             "properties": {
+                "addDocumentTab": {
+                    "$ref": "AddDocumentTabResponse",
+                    "description": "The result of adding a document tab."
+                },
                 "createFooter": {
                     "$ref": "CreateFooterResponse",
                     "description": "The result of creating a footer."
@@ -3080,18 +3513,15 @@
             "id": "RichLinkProperties",
             "properties": {
                 "mimeType": {
-                    "description": "Output only. The [MIME type](https://developers.google.com/drive/api/v3/mime-types) of the RichLink, if there's one (for example, when it's a file in Drive).",
-                    "readOnly": true,
+                    "description": "The [MIME type](https://developers.google.com/drive/api/v3/mime-types) of the RichLink, if there's one (for example, when it's a file in Drive).",
                     "type": "string"
                 },
                 "title": {
-                    "description": "Output only. The title of the RichLink as displayed in the link. This title matches the title of the linked resource at the time of the insertion or last update of the link. This field is always present.",
-                    "readOnly": true,
+                    "description": "The title of the RichLink as displayed in the link. This title matches the title of the linked resource at the time of the insertion or last update of the link. This field is always present.",
                     "type": "string"
                 },
                 "uri": {
-                    "description": "Output only. The URI to the RichLink. This is always present.",
-                    "readOnly": true,
+                    "description": "The URI to the RichLink. This is always present.",
                     "type": "string"
                 }
             },
@@ -3177,59 +3607,59 @@
                     "type": "string"
                 },
                 "defaultFooterId": {
-                    "description": "The ID of the default footer. If unset, the value inherits from the previous SectionBreak's SectionStyle. If the value is unset in the first SectionBreak, it inherits from DocumentStyle's default_footer_id. This property is read-only.",
+                    "description": "The ID of the default footer. If unset, the value inherits from the previous SectionBreak's SectionStyle. If the value is unset in the first SectionBreak, it inherits from DocumentStyle's default_footer_id. If DocumentMode is PAGELESS, this property will not be rendered. This property is read-only.",
                     "type": "string"
                 },
                 "defaultHeaderId": {
-                    "description": "The ID of the default header. If unset, the value inherits from the previous SectionBreak's SectionStyle. If the value is unset in the first SectionBreak, it inherits from DocumentStyle's default_header_id. This property is read-only.",
+                    "description": "The ID of the default header. If unset, the value inherits from the previous SectionBreak's SectionStyle. If the value is unset in the first SectionBreak, it inherits from DocumentStyle's default_header_id. If DocumentMode is PAGELESS, this property will not be rendered. This property is read-only.",
                     "type": "string"
                 },
                 "evenPageFooterId": {
-                    "description": "The ID of the footer used only for even pages. If the value of DocumentStyle's use_even_page_header_footer is true, this value is used for the footers on even pages in the section. If it is false, the footers on even pages use the default_footer_id. If unset, the value inherits from the previous SectionBreak's SectionStyle. If the value is unset in the first SectionBreak, it inherits from DocumentStyle's even_page_footer_id. This property is read-only.",
+                    "description": "The ID of the footer used only for even pages. If the value of DocumentStyle's use_even_page_header_footer is true, this value is used for the footers on even pages in the section. If it is false, the footers on even pages use the default_footer_id. If unset, the value inherits from the previous SectionBreak's SectionStyle. If the value is unset in the first SectionBreak, it inherits from DocumentStyle's even_page_footer_id. If DocumentMode is PAGELESS, this property will not be rendered. This property is read-only.",
                     "type": "string"
                 },
                 "evenPageHeaderId": {
-                    "description": "The ID of the header used only for even pages. If the value of DocumentStyle's use_even_page_header_footer is true, this value is used for the headers on even pages in the section. If it is false, the headers on even pages use the default_header_id. If unset, the value inherits from the previous SectionBreak's SectionStyle. If the value is unset in the first SectionBreak, it inherits from DocumentStyle's even_page_header_id. This property is read-only.",
+                    "description": "The ID of the header used only for even pages. If the value of DocumentStyle's use_even_page_header_footer is true, this value is used for the headers on even pages in the section. If it is false, the headers on even pages use the default_header_id. If unset, the value inherits from the previous SectionBreak's SectionStyle. If the value is unset in the first SectionBreak, it inherits from DocumentStyle's even_page_header_id. If DocumentMode is PAGELESS, this property will not be rendered. This property is read-only.",
                     "type": "string"
                 },
                 "firstPageFooterId": {
-                    "description": "The ID of the footer used only for the first page of the section. If use_first_page_header_footer is true, this value is used for the footer on the first page of the section. If it's false, the footer on the first page of the section uses the default_footer_id. If unset, the value inherits from the previous SectionBreak's SectionStyle. If the value is unset in the first SectionBreak, it inherits from DocumentStyle's first_page_footer_id. This property is read-only.",
+                    "description": "The ID of the footer used only for the first page of the section. If use_first_page_header_footer is true, this value is used for the footer on the first page of the section. If it's false, the footer on the first page of the section uses the default_footer_id. If unset, the value inherits from the previous SectionBreak's SectionStyle. If the value is unset in the first SectionBreak, it inherits from DocumentStyle's first_page_footer_id. If DocumentMode is PAGELESS, this property will not be rendered. This property is read-only.",
                     "type": "string"
                 },
                 "firstPageHeaderId": {
-                    "description": "The ID of the header used only for the first page of the section. If use_first_page_header_footer is true, this value is used for the header on the first page of the section. If it's false, the header on the first page of the section uses the default_header_id. If unset, the value inherits from the previous SectionBreak's SectionStyle. If the value is unset in the first SectionBreak, it inherits from DocumentStyle's first_page_header_id. This property is read-only.",
+                    "description": "The ID of the header used only for the first page of the section. If use_first_page_header_footer is true, this value is used for the header on the first page of the section. If it's false, the header on the first page of the section uses the default_header_id. If unset, the value inherits from the previous SectionBreak's SectionStyle. If the value is unset in the first SectionBreak, it inherits from DocumentStyle's first_page_header_id. If DocumentMode is PAGELESS, this property will not be rendered. This property is read-only.",
                     "type": "string"
                 },
                 "flipPageOrientation": {
-                    "description": "Optional. Indicates whether to flip the dimensions of DocumentStyle's page_size for this section, which allows changing the page orientation between portrait and landscape. If unset, the value inherits from DocumentStyle's flip_page_orientation. When updating this property, setting a concrete value is required. Unsetting this property results in a 400 bad request error.",
+                    "description": "Optional. Indicates whether to flip the dimensions of DocumentStyle's page_size for this section, which allows changing the page orientation between portrait and landscape. If unset, the value inherits from DocumentStyle's flip_page_orientation. If DocumentMode is PAGELESS, this property will not be rendered. When updating this property, setting a concrete value is required. Unsetting this property results in a 400 bad request error.",
                     "type": "boolean"
                 },
                 "marginBottom": {
                     "$ref": "Dimension",
-                    "description": "The bottom page margin of the section. If unset, the value defaults to margin_bottom from DocumentStyle. When updating this property, setting a concrete value is required. Unsetting this property results in a 400 bad request error."
+                    "description": "The bottom page margin of the section. If unset, the value defaults to margin_bottom from DocumentStyle. If DocumentMode is PAGELESS, this property will not be rendered. When updating this property, setting a concrete value is required. Unsetting this property results in a 400 bad request error."
                 },
                 "marginFooter": {
                     "$ref": "Dimension",
-                    "description": "The footer margin of the section. If unset, the value defaults to margin_footer from DocumentStyle. If updated, use_custom_header_footer_margins is set to true on DocumentStyle. The value of use_custom_header_footer_margins on DocumentStyle indicates if a footer margin is being respected for this section When updating this property, setting a concrete value is required. Unsetting this property results in a 400 bad request error."
+                    "description": "The footer margin of the section. If unset, the value defaults to margin_footer from DocumentStyle. If updated, use_custom_header_footer_margins is set to true on DocumentStyle. The value of use_custom_header_footer_margins on DocumentStyle indicates if a footer margin is being respected for this section If DocumentMode is PAGELESS, this property will not be rendered. When updating this property, setting a concrete value is required. Unsetting this property results in a 400 bad request error."
                 },
                 "marginHeader": {
                     "$ref": "Dimension",
-                    "description": "The header margin of the section. If unset, the value defaults to margin_header from DocumentStyle. If updated, use_custom_header_footer_margins is set to true on DocumentStyle. The value of use_custom_header_footer_margins on DocumentStyle indicates if a header margin is being respected for this section. When updating this property, setting a concrete value is required. Unsetting this property results in a 400 bad request error."
+                    "description": "The header margin of the section. If unset, the value defaults to margin_header from DocumentStyle. If updated, use_custom_header_footer_margins is set to true on DocumentStyle. The value of use_custom_header_footer_margins on DocumentStyle indicates if a header margin is being respected for this section. If DocumentMode is PAGELESS, this property will not be rendered. When updating this property, setting a concrete value is required. Unsetting this property results in a 400 bad request error."
                 },
                 "marginLeft": {
                     "$ref": "Dimension",
-                    "description": "The left page margin of the section. If unset, the value defaults to margin_left from DocumentStyle. Updating the left margin causes columns in this section to resize. Since the margin affects column width, it's applied before column properties. When updating this property, setting a concrete value is required. Unsetting this property results in a 400 bad request error."
+                    "description": "The left page margin of the section. If unset, the value defaults to margin_left from DocumentStyle. Updating the left margin causes columns in this section to resize. Since the margin affects column width, it's applied before column properties. If DocumentMode is PAGELESS, this property will not be rendered. When updating this property, setting a concrete value is required. Unsetting this property results in a 400 bad request error."
                 },
                 "marginRight": {
                     "$ref": "Dimension",
-                    "description": "The right page margin of the section. If unset, the value defaults to margin_right from DocumentStyle. Updating the right margin causes columns in this section to resize. Since the margin affects column width, it's applied before column properties. When updating this property, setting a concrete value is required. Unsetting this property results in a 400 bad request error."
+                    "description": "The right page margin of the section. If unset, the value defaults to margin_right from DocumentStyle. Updating the right margin causes columns in this section to resize. Since the margin affects column width, it's applied before column properties. If DocumentMode is PAGELESS, this property will not be rendered. When updating this property, setting a concrete value is required. Unsetting this property results in a 400 bad request error."
                 },
                 "marginTop": {
                     "$ref": "Dimension",
-                    "description": "The top page margin of the section. If unset, the value defaults to margin_top from DocumentStyle. When updating this property, setting a concrete value is required. Unsetting this property results in a 400 bad request error."
+                    "description": "The top page margin of the section. If unset, the value defaults to margin_top from DocumentStyle. If DocumentMode is PAGELESS, this property will not be rendered. When updating this property, setting a concrete value is required. Unsetting this property results in a 400 bad request error."
                 },
                 "pageNumberStart": {
-                    "description": "The page number from which to start counting the number of pages for this section. If unset, page numbering continues from the previous section. If the value is unset in the first SectionBreak, refer to DocumentStyle's page_number_start. When updating this property, setting a concrete value is required. Unsetting this property results in a 400 bad request error.",
+                    "description": "The page number from which to start counting the number of pages for this section. If unset, page numbering continues from the previous section. If the value is unset in the first SectionBreak, refer to DocumentStyle's page_number_start. If DocumentMode is PAGELESS, this property will not be rendered. When updating this property, setting a concrete value is required. Unsetting this property results in a 400 bad request error.",
                     "format": "int32",
                     "type": "integer"
                 },
@@ -3248,7 +3678,7 @@
                     "type": "string"
                 },
                 "useFirstPageHeaderFooter": {
-                    "description": "Indicates whether to use the first page header / footer IDs for the first page of the section. If unset, it inherits from DocumentStyle's use_first_page_header_footer for the first section. If the value is unset for subsequent sectors, it should be interpreted as false. When updating this property, setting a concrete value is required. Unsetting this property results in a 400 bad request error.",
+                    "description": "Indicates whether to use the first page header / footer IDs for the first page of the section. If unset, it inherits from DocumentStyle's use_first_page_header_footer for the first section. If the value is unset for subsequent sectors, it should be interpreted as false. If DocumentMode is PAGELESS, this property will not be rendered. When updating this property, setting a concrete value is required. Unsetting this property results in a 400 bad request error.",
                     "type": "boolean"
                 }
             },
@@ -3378,6 +3808,10 @@
                     "description": "Indicates whether the search should respect case: - `True`: the search is case sensitive. - `False`: the search is case insensitive.",
                     "type": "boolean"
                 },
+                "searchByRegex": {
+                    "description": "Optional. True if the find value should be treated as a regular expression. Any backslashes in the pattern should be escaped. - `True`: the search text is treated as a regular expressions. - `False`: the search text is treated as a substring for matching.",
+                    "type": "boolean"
+                },
                 "text": {
                     "description": "The text to search for in the document.",
                     "type": "string"
@@ -3396,6 +3830,21 @@
                 "bulletSuggestionState": {
                     "$ref": "BulletSuggestionState",
                     "description": "A mask that indicates which of the fields on the base Bullet have been changed in this suggestion."
+                }
+            },
+            "type": "object"
+        },
+        "SuggestedDateElementProperties": {
+            "description": "A suggested change to a DateElementProperties.",
+            "id": "SuggestedDateElementProperties",
+            "properties": {
+                "dateElementProperties": {
+                    "$ref": "DateElementProperties",
+                    "description": "DateElementProperties that only includes the changes made in this suggestion. This can be used along with the date_element_properties_suggestion_state to see which fields have changed and their new values."
+                },
+                "dateElementPropertiesSuggestionState": {
+                    "$ref": "DateElementPropertiesSuggestionState",
+                    "description": "A mask that indicates which of the fields on the base DateElementProperties have been changed in this suggestion."
                 }
             },
             "type": "object"
@@ -3531,6 +3980,61 @@
                 "textStyleSuggestionState": {
                     "$ref": "TextStyleSuggestionState",
                     "description": "A mask that indicates which of the fields on the base TextStyle have been changed in this suggestion."
+                }
+            },
+            "type": "object"
+        },
+        "Tab": {
+            "description": "A tab in a document.",
+            "id": "Tab",
+            "properties": {
+                "childTabs": {
+                    "description": "The child tabs nested within this tab.",
+                    "items": {
+                        "$ref": "Tab"
+                    },
+                    "type": "array"
+                },
+                "documentTab": {
+                    "$ref": "DocumentTab",
+                    "description": "A tab with document contents, like text and images."
+                },
+                "tabProperties": {
+                    "$ref": "TabProperties",
+                    "description": "The properties of the tab, like ID and title."
+                }
+            },
+            "type": "object"
+        },
+        "TabProperties": {
+            "description": "Properties of a tab.",
+            "id": "TabProperties",
+            "properties": {
+                "iconEmoji": {
+                    "description": "Optional. The emoji icon displayed with the tab. A valid emoji icon is represented by a non-empty Unicode string. Any set of characters that don't represent a single emoji is invalid. If an emoji is invalid, a 400 bad request error is returned. If this value is unset or empty, the tab will display the default tab icon.",
+                    "type": "string"
+                },
+                "index": {
+                    "description": "The zero-based index of the tab within the parent.",
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "nestingLevel": {
+                    "description": "Output only. The depth of the tab within the document. Root-level tabs start at 0.",
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "parentTabId": {
+                    "description": "Optional. The ID of the parent tab. Empty when the current tab is a root-level tab, which means it doesn't have any parents.",
+                    "type": "string"
+                },
+                "tabId": {
+                    "description": "The immutable ID of the tab.",
+                    "type": "string"
+                },
+                "title": {
+                    "description": "The user-visible name of the tab.",
+                    "type": "string"
                 }
             },
             "type": "object"
@@ -3998,6 +4502,20 @@
             },
             "type": "object"
         },
+        "TabsCriteria": {
+            "description": "A criteria that specifies in which tabs a request executes.",
+            "id": "TabsCriteria",
+            "properties": {
+                "tabIds": {
+                    "description": "The list of tab IDs in which the request executes.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                }
+            },
+            "type": "object"
+        },
         "TextRun": {
             "description": "A ParagraphElement that represents a run of text that all has the same styling.",
             "id": "TextRun",
@@ -4171,6 +4689,26 @@
                     "description": "The fields that should be updated. At least one field must be specified. The root `document_style` is implied and should not be specified. A single `\"*\"` can be used as short-hand for listing every field. For example to update the background, set `fields` to `\"background\"`.",
                     "format": "google-fieldmask",
                     "type": "string"
+                },
+                "tabId": {
+                    "description": "The tab that contains the style to update. When omitted, the request applies to the first tab. In a document containing a single tab: - If provided, must match the singular tab's ID. - If omitted, the request applies to the singular tab. In a document containing multiple tabs: - If provided, the request applies to the specified tab. - If not provided, the request applies to the first tab in the document.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "UpdateDocumentTabPropertiesRequest": {
+            "description": "Update the properties of a document tab.",
+            "id": "UpdateDocumentTabPropertiesRequest",
+            "properties": {
+                "fields": {
+                    "description": "The fields that should be updated. At least one field must be specified. The root `tab_properties` is implied and should not be specified. A single `\"*\"` can be used as short-hand for listing every field.",
+                    "format": "google-fieldmask",
+                    "type": "string"
+                },
+                "tabProperties": {
+                    "$ref": "TabProperties",
+                    "description": "The tab properties to update."
                 }
             },
             "type": "object"

@@ -1,4 +1,4 @@
-site_name: Firebasestorage v6.0.0+20240621
+site_name: Firebasestorage v7.0.0+20251212
 site_url: http://byron.github.io/google-apis-rs/google-firebasestorage1_beta-cli
 site_description: A complete library to interact with Firebasestorage (protocol v1beta)
 
@@ -14,6 +14,9 @@ nav:
     - 'Buckets Get': 'projects_buckets-get.md'
     - 'Buckets List': 'projects_buckets-list.md'
     - 'Buckets Remove Firebase': 'projects_buckets-remove-firebase.md'
+    - 'Default Bucket Create': 'projects_default-bucket-create.md'
+    - 'Delete Default Bucket': 'projects_delete-default-bucket.md'
+    - 'Get Default Bucket': 'projects_get-default-bucket.md'
 
 theme: readthedocs
 

@@ -1,4 +1,4 @@
-site_name: Maps Places v6.0.0+20241013
+site_name: Maps Places v7.0.0+20251210
 site_url: http://byron.github.io/google-apis-rs/google-places1-cli
 site_description: A complete library to interact with Maps Places (protocol v1)
 

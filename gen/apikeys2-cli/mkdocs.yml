@@ -1,4 +1,4 @@
-site_name: Api Keys Service v6.0.0+20240623
+site_name: Api Keys Service v7.0.0+20251202
 site_url: http://byron.github.io/google-apis-rs/google-apikeys2-cli
 site_description: A complete library to interact with Api Keys Service (protocol v2)
 

@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *appengine* API at revision *20240624*. The CLI is at version *6.0.0*.
+This documentation was generated from the *appengine* API at revision *20251210*. The CLI is at version *7.0.0*.
 
 ```bash
 appengine1 [options]
@@ -62,6 +62,7 @@ appengine1 [options]
                 services-patch <apps-id> <services-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 services-versions-create <apps-id> <services-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 services-versions-delete <apps-id> <services-id> <versions-id> [-p <v>]... [-o <out>]
+                services-versions-export-app-image <apps-id> <services-id> <versions-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 services-versions-get <apps-id> <services-id> <versions-id> [-p <v>]... [-o <out>]
                 services-versions-instances-debug <apps-id> <services-id> <versions-id> <instances-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 services-versions-instances-delete <apps-id> <services-id> <versions-id> <instances-id> [-p <v>]... [-o <out>]
@@ -70,7 +71,23 @@ appengine1 [options]
                 services-versions-list <apps-id> <services-id> [-p <v>]... [-o <out>]
                 services-versions-patch <apps-id> <services-id> <versions-id> (-r <kv>)... [-p <v>]... [-o <out>]
         projects
+                locations-applications-authorized-certificates-create <projects-id> <locations-id> <applications-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-applications-authorized-certificates-delete <projects-id> <locations-id> <applications-id> <authorized-certificates-id> [-p <v>]... [-o <out>]
+                locations-applications-authorized-certificates-get <projects-id> <locations-id> <applications-id> <authorized-certificates-id> [-p <v>]... [-o <out>]
+                locations-applications-authorized-certificates-list <projects-id> <locations-id> <applications-id> [-p <v>]... [-o <out>]
+                locations-applications-authorized-certificates-patch <projects-id> <locations-id> <applications-id> <authorized-certificates-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-applications-authorized-domains-list <projects-id> <locations-id> <applications-id> [-p <v>]... [-o <out>]
+                locations-applications-domain-mappings-create <projects-id> <locations-id> <applications-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-applications-domain-mappings-delete <projects-id> <locations-id> <applications-id> <domain-mappings-id> [-p <v>]... [-o <out>]
+                locations-applications-domain-mappings-get <projects-id> <locations-id> <applications-id> <domain-mappings-id> [-p <v>]... [-o <out>]
+                locations-applications-domain-mappings-list <projects-id> <locations-id> <applications-id> [-p <v>]... [-o <out>]
+                locations-applications-domain-mappings-patch <projects-id> <locations-id> <applications-id> <domain-mappings-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-applications-patch <projects-id> <locations-id> <applications-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-applications-services-delete <projects-id> <locations-id> <applications-id> <services-id> [-p <v>]... [-o <out>]
+                locations-applications-services-patch <projects-id> <locations-id> <applications-id> <services-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-applications-services-versions-delete <projects-id> <locations-id> <applications-id> <services-id> <versions-id> [-p <v>]... [-o <out>]
+                locations-applications-services-versions-export-app-image <projects-id> <locations-id> <applications-id> <services-id> <versions-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-applications-services-versions-patch <projects-id> <locations-id> <applications-id> <services-id> <versions-id> (-r <kv>)... [-p <v>]... [-o <out>]
   appengine1 --help
 
 Configuration:

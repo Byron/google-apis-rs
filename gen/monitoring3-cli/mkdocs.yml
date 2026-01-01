@@ -1,4 +1,4 @@
-site_name: Monitoring v6.0.0+20240623
+site_name: Monitoring v7.0.0+20251215
 site_url: http://byron.github.io/google-apis-rs/google-monitoring3-cli
 site_description: A complete library to interact with Monitoring (protocol v3)
 
@@ -19,6 +19,8 @@ nav:
     - 'Alert Policies Get': 'projects_alert-policies-get.md'
     - 'Alert Policies List': 'projects_alert-policies-list.md'
     - 'Alert Policies Patch': 'projects_alert-policies-patch.md'
+    - 'Alerts Get': 'projects_alerts-get.md'
+    - 'Alerts List': 'projects_alerts-list.md'
     - 'Collectd Time Series Create': 'projects_collectd-time-series-create.md'
     - 'Groups Create': 'projects_groups-create.md'
     - 'Groups Delete': 'projects_groups-delete.md'

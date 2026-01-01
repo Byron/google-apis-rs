@@ -1,4 +1,4 @@
-site_name: Cloud Shell v6.0.0+20240624
+site_name: Cloud Shell v7.0.0+20251215
 site_url: http://byron.github.io/google-apis-rs/google-cloudshell1-cli
 site_description: A complete library to interact with Cloud Shell (protocol v1)
 
@@ -17,6 +17,7 @@ nav:
 - 'Users':
     - 'Environments Add Public Key': 'users_environments-add-public-key.md'
     - 'Environments Authorize': 'users_environments-authorize.md'
+    - 'Environments Generate Access Token': 'users_environments-generate-access-token.md'
     - 'Environments Get': 'users_environments-get.md'
     - 'Environments Remove Public Key': 'users_environments-remove-public-key.md'
     - 'Environments Start': 'users_environments-start.md'

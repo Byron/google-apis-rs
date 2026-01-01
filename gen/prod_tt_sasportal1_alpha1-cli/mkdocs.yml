@@ -1,4 +1,4 @@
-site_name: SAS Portal Testing v6.0.0+20240626
+site_name: SAS Portal Testing v7.0.0+20251222
 site_url: http://byron.github.io/google-apis-rs/google-prod_tt_sasportal1_alpha1-cli
 site_description: A complete library to interact with SAS Portal Testing (protocol v1alpha1)
 

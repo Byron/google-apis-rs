@@ -1,4 +1,4 @@
-site_name: IAM Credentials v6.0.0+20240605
+site_name: IAM Credentials v7.0.0+20251108
 site_url: http://byron.github.io/google-apis-rs/google-iamcredentials1-cli
 site_description: A complete library to interact with IAM Credentials (protocol v1)
 
@@ -9,9 +9,13 @@ site_dir: build_html
 
 nav:
 - Home: 'index.md'
+- 'Locations':
+    - 'Workforce Pools Get Allowed Locations': 'locations_workforce-pools-get-allowed-locations.md'
 - 'Projects':
+    - 'Locations Workload Identity Pools Get Allowed Locations': 'projects_locations-workload-identity-pools-get-allowed-locations.md'
     - 'Service Accounts Generate Access Token': 'projects_service-accounts-generate-access-token.md'
     - 'Service Accounts Generate Id Token': 'projects_service-accounts-generate-id-token.md'
+    - 'Service Accounts Get Allowed Locations': 'projects_service-accounts-get-allowed-locations.md'
     - 'Service Accounts Sign Blob': 'projects_service-accounts-sign-blob.md'
     - 'Service Accounts Sign Jwt': 'projects_service-accounts-sign-jwt.md'
 

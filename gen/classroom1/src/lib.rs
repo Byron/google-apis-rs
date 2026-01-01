@@ -2,17 +2,17 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *classroom* crate version *6.0.0+20240617*, where *20240617* is the exact revision of the *classroom:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v6.0.0*.
+//! This documentation was generated from *classroom* crate version *7.0.0+20251217*, where *20251217* is the exact revision of the *classroom:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v7.0.0*.
 //!
 //! Everything else about the *classroom* *v1* API can be found at the
-//! [official documentation site](https://developers.google.com/classroom/).
+//! [official documentation site](https://developers.google.com/workspace/classroom/).
 //! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/main/gen/classroom1).
 //! # Features
 //!
 //! Handle the following *Resources* with ease from the central [hub](Classroom) ...
 //!
 //! * [courses](api::Course)
-//!  * [*aliases create*](api::CourseAliasCreateCall), [*aliases delete*](api::CourseAliasDeleteCall), [*aliases list*](api::CourseAliasListCall), [*announcements add on attachments create*](api::CourseAnnouncementAddOnAttachmentCreateCall), [*announcements add on attachments delete*](api::CourseAnnouncementAddOnAttachmentDeleteCall), [*announcements add on attachments get*](api::CourseAnnouncementAddOnAttachmentGetCall), [*announcements add on attachments list*](api::CourseAnnouncementAddOnAttachmentListCall), [*announcements add on attachments patch*](api::CourseAnnouncementAddOnAttachmentPatchCall), [*announcements create*](api::CourseAnnouncementCreateCall), [*announcements delete*](api::CourseAnnouncementDeleteCall), [*announcements get*](api::CourseAnnouncementGetCall), [*announcements get add on context*](api::CourseAnnouncementGetAddOnContextCall), [*announcements list*](api::CourseAnnouncementListCall), [*announcements modify assignees*](api::CourseAnnouncementModifyAssigneeCall), [*announcements patch*](api::CourseAnnouncementPatchCall), [*course work add on attachments create*](api::CourseCourseWorkAddOnAttachmentCreateCall), [*course work add on attachments delete*](api::CourseCourseWorkAddOnAttachmentDeleteCall), [*course work add on attachments get*](api::CourseCourseWorkAddOnAttachmentGetCall), [*course work add on attachments list*](api::CourseCourseWorkAddOnAttachmentListCall), [*course work add on attachments patch*](api::CourseCourseWorkAddOnAttachmentPatchCall), [*course work add on attachments student submissions get*](api::CourseCourseWorkAddOnAttachmentStudentSubmissionGetCall), [*course work add on attachments student submissions patch*](api::CourseCourseWorkAddOnAttachmentStudentSubmissionPatchCall), [*course work create*](api::CourseCourseWorkCreateCall), [*course work delete*](api::CourseCourseWorkDeleteCall), [*course work get*](api::CourseCourseWorkGetCall), [*course work get add on context*](api::CourseCourseWorkGetAddOnContextCall), [*course work list*](api::CourseCourseWorkListCall), [*course work modify assignees*](api::CourseCourseWorkModifyAssigneeCall), [*course work patch*](api::CourseCourseWorkPatchCall), [*course work student submissions get*](api::CourseCourseWorkStudentSubmissionGetCall), [*course work student submissions list*](api::CourseCourseWorkStudentSubmissionListCall), [*course work student submissions modify attachments*](api::CourseCourseWorkStudentSubmissionModifyAttachmentCall), [*course work student submissions patch*](api::CourseCourseWorkStudentSubmissionPatchCall), [*course work student submissions reclaim*](api::CourseCourseWorkStudentSubmissionReclaimCall), [*course work student submissions return*](api::CourseCourseWorkStudentSubmissionReturnCall), [*course work student submissions turn in*](api::CourseCourseWorkStudentSubmissionTurnInCall), [*course work materials add on attachments create*](api::CourseCourseWorkMaterialAddOnAttachmentCreateCall), [*course work materials add on attachments delete*](api::CourseCourseWorkMaterialAddOnAttachmentDeleteCall), [*course work materials add on attachments get*](api::CourseCourseWorkMaterialAddOnAttachmentGetCall), [*course work materials add on attachments list*](api::CourseCourseWorkMaterialAddOnAttachmentListCall), [*course work materials add on attachments patch*](api::CourseCourseWorkMaterialAddOnAttachmentPatchCall), [*course work materials create*](api::CourseCourseWorkMaterialCreateCall), [*course work materials delete*](api::CourseCourseWorkMaterialDeleteCall), [*course work materials get*](api::CourseCourseWorkMaterialGetCall), [*course work materials get add on context*](api::CourseCourseWorkMaterialGetAddOnContextCall), [*course work materials list*](api::CourseCourseWorkMaterialListCall), [*course work materials patch*](api::CourseCourseWorkMaterialPatchCall), [*create*](api::CourseCreateCall), [*delete*](api::CourseDeleteCall), [*get*](api::CourseGetCall), [*list*](api::CourseListCall), [*patch*](api::CoursePatchCall), [*posts add on attachments create*](api::CoursePostAddOnAttachmentCreateCall), [*posts add on attachments delete*](api::CoursePostAddOnAttachmentDeleteCall), [*posts add on attachments get*](api::CoursePostAddOnAttachmentGetCall), [*posts add on attachments list*](api::CoursePostAddOnAttachmentListCall), [*posts add on attachments patch*](api::CoursePostAddOnAttachmentPatchCall), [*posts add on attachments student submissions get*](api::CoursePostAddOnAttachmentStudentSubmissionGetCall), [*posts add on attachments student submissions patch*](api::CoursePostAddOnAttachmentStudentSubmissionPatchCall), [*posts get add on context*](api::CoursePostGetAddOnContextCall), [*students create*](api::CourseStudentCreateCall), [*students delete*](api::CourseStudentDeleteCall), [*students get*](api::CourseStudentGetCall), [*students list*](api::CourseStudentListCall), [*teachers create*](api::CourseTeacherCreateCall), [*teachers delete*](api::CourseTeacherDeleteCall), [*teachers get*](api::CourseTeacherGetCall), [*teachers list*](api::CourseTeacherListCall), [*topics create*](api::CourseTopicCreateCall), [*topics delete*](api::CourseTopicDeleteCall), [*topics get*](api::CourseTopicGetCall), [*topics list*](api::CourseTopicListCall), [*topics patch*](api::CourseTopicPatchCall) and [*update*](api::CourseUpdateCall)
+//!  * [*aliases create*](api::CourseAliasCreateCall), [*aliases delete*](api::CourseAliasDeleteCall), [*aliases list*](api::CourseAliasListCall), [*announcements add on attachments create*](api::CourseAnnouncementAddOnAttachmentCreateCall), [*announcements add on attachments delete*](api::CourseAnnouncementAddOnAttachmentDeleteCall), [*announcements add on attachments get*](api::CourseAnnouncementAddOnAttachmentGetCall), [*announcements add on attachments list*](api::CourseAnnouncementAddOnAttachmentListCall), [*announcements add on attachments patch*](api::CourseAnnouncementAddOnAttachmentPatchCall), [*announcements create*](api::CourseAnnouncementCreateCall), [*announcements delete*](api::CourseAnnouncementDeleteCall), [*announcements get*](api::CourseAnnouncementGetCall), [*announcements get add on context*](api::CourseAnnouncementGetAddOnContextCall), [*announcements list*](api::CourseAnnouncementListCall), [*announcements modify assignees*](api::CourseAnnouncementModifyAssigneeCall), [*announcements patch*](api::CourseAnnouncementPatchCall), [*course work add on attachments create*](api::CourseCourseWorkAddOnAttachmentCreateCall), [*course work add on attachments delete*](api::CourseCourseWorkAddOnAttachmentDeleteCall), [*course work add on attachments get*](api::CourseCourseWorkAddOnAttachmentGetCall), [*course work add on attachments list*](api::CourseCourseWorkAddOnAttachmentListCall), [*course work add on attachments patch*](api::CourseCourseWorkAddOnAttachmentPatchCall), [*course work add on attachments student submissions get*](api::CourseCourseWorkAddOnAttachmentStudentSubmissionGetCall), [*course work add on attachments student submissions patch*](api::CourseCourseWorkAddOnAttachmentStudentSubmissionPatchCall), [*course work create*](api::CourseCourseWorkCreateCall), [*course work delete*](api::CourseCourseWorkDeleteCall), [*course work get*](api::CourseCourseWorkGetCall), [*course work get add on context*](api::CourseCourseWorkGetAddOnContextCall), [*course work list*](api::CourseCourseWorkListCall), [*course work modify assignees*](api::CourseCourseWorkModifyAssigneeCall), [*course work patch*](api::CourseCourseWorkPatchCall), [*course work rubrics create*](api::CourseCourseWorkRubricCreateCall), [*course work rubrics delete*](api::CourseCourseWorkRubricDeleteCall), [*course work rubrics get*](api::CourseCourseWorkRubricGetCall), [*course work rubrics list*](api::CourseCourseWorkRubricListCall), [*course work rubrics patch*](api::CourseCourseWorkRubricPatchCall), [*course work student submissions get*](api::CourseCourseWorkStudentSubmissionGetCall), [*course work student submissions list*](api::CourseCourseWorkStudentSubmissionListCall), [*course work student submissions modify attachments*](api::CourseCourseWorkStudentSubmissionModifyAttachmentCall), [*course work student submissions patch*](api::CourseCourseWorkStudentSubmissionPatchCall), [*course work student submissions reclaim*](api::CourseCourseWorkStudentSubmissionReclaimCall), [*course work student submissions return*](api::CourseCourseWorkStudentSubmissionReturnCall), [*course work student submissions turn in*](api::CourseCourseWorkStudentSubmissionTurnInCall), [*course work update rubric*](api::CourseCourseWorkUpdateRubricCall), [*course work materials add on attachments create*](api::CourseCourseWorkMaterialAddOnAttachmentCreateCall), [*course work materials add on attachments delete*](api::CourseCourseWorkMaterialAddOnAttachmentDeleteCall), [*course work materials add on attachments get*](api::CourseCourseWorkMaterialAddOnAttachmentGetCall), [*course work materials add on attachments list*](api::CourseCourseWorkMaterialAddOnAttachmentListCall), [*course work materials add on attachments patch*](api::CourseCourseWorkMaterialAddOnAttachmentPatchCall), [*course work materials create*](api::CourseCourseWorkMaterialCreateCall), [*course work materials delete*](api::CourseCourseWorkMaterialDeleteCall), [*course work materials get*](api::CourseCourseWorkMaterialGetCall), [*course work materials get add on context*](api::CourseCourseWorkMaterialGetAddOnContextCall), [*course work materials list*](api::CourseCourseWorkMaterialListCall), [*course work materials patch*](api::CourseCourseWorkMaterialPatchCall), [*create*](api::CourseCreateCall), [*delete*](api::CourseDeleteCall), [*get*](api::CourseGetCall), [*get grading period settings*](api::CourseGetGradingPeriodSettingCall), [*list*](api::CourseListCall), [*patch*](api::CoursePatchCall), [*posts add on attachments create*](api::CoursePostAddOnAttachmentCreateCall), [*posts add on attachments delete*](api::CoursePostAddOnAttachmentDeleteCall), [*posts add on attachments get*](api::CoursePostAddOnAttachmentGetCall), [*posts add on attachments list*](api::CoursePostAddOnAttachmentListCall), [*posts add on attachments patch*](api::CoursePostAddOnAttachmentPatchCall), [*posts add on attachments student submissions get*](api::CoursePostAddOnAttachmentStudentSubmissionGetCall), [*posts add on attachments student submissions patch*](api::CoursePostAddOnAttachmentStudentSubmissionPatchCall), [*posts get add on context*](api::CoursePostGetAddOnContextCall), [*students create*](api::CourseStudentCreateCall), [*students delete*](api::CourseStudentDeleteCall), [*students get*](api::CourseStudentGetCall), [*students list*](api::CourseStudentListCall), [*teachers create*](api::CourseTeacherCreateCall), [*teachers delete*](api::CourseTeacherDeleteCall), [*teachers get*](api::CourseTeacherGetCall), [*teachers list*](api::CourseTeacherListCall), [*topics create*](api::CourseTopicCreateCall), [*topics delete*](api::CourseTopicDeleteCall), [*topics get*](api::CourseTopicGetCall), [*topics list*](api::CourseTopicListCall), [*topics patch*](api::CourseTopicPatchCall), [*update*](api::CourseUpdateCall) and [*update grading period settings*](api::CourseUpdateGradingPeriodSettingCall)
 //! * [invitations](api::Invitation)
 //!  * [*accept*](api::InvitationAcceptCall), [*create*](api::InvitationCreateCall), [*delete*](api::InvitationDeleteCall), [*get*](api::InvitationGetCall) and [*list*](api::InvitationListCall)
 //! * [registrations](api::Registration)
@@ -75,6 +75,11 @@
 //! let r = hub.courses().course_work_add_on_attachments_get(...).doit().await
 //! let r = hub.courses().course_work_add_on_attachments_list(...).doit().await
 //! let r = hub.courses().course_work_add_on_attachments_patch(...).doit().await
+//! let r = hub.courses().course_work_rubrics_create(...).doit().await
+//! let r = hub.courses().course_work_rubrics_delete(...).doit().await
+//! let r = hub.courses().course_work_rubrics_get(...).doit().await
+//! let r = hub.courses().course_work_rubrics_list(...).doit().await
+//! let r = hub.courses().course_work_rubrics_patch(...).doit().await
 //! let r = hub.courses().course_work_student_submissions_get(...).doit().await
 //! let r = hub.courses().course_work_student_submissions_list(...).doit().await
 //! let r = hub.courses().course_work_student_submissions_modify_attachments(...).doit().await
@@ -89,6 +94,7 @@
 //! let r = hub.courses().course_work_list(...).doit().await
 //! let r = hub.courses().course_work_modify_assignees(...).doit().await
 //! let r = hub.courses().course_work_patch(...).doit().await
+//! let r = hub.courses().course_work_update_rubric(...).doit().await
 //! let r = hub.courses().course_work_materials_add_on_attachments_create(...).doit().await
 //! let r = hub.courses().course_work_materials_add_on_attachments_delete(...).doit().await
 //! let r = hub.courses().course_work_materials_add_on_attachments_get(...).doit().await
@@ -124,9 +130,11 @@
 //! let r = hub.courses().create(...).doit().await
 //! let r = hub.courses().delete(...).doit().await
 //! let r = hub.courses().get(...).doit().await
+//! let r = hub.courses().get_grading_period_settings(...).doit().await
 //! let r = hub.courses().list(...).doit().await
 //! let r = hub.courses().patch(...).doit().await
 //! let r = hub.courses().update(...).doit().await
+//! let r = hub.courses().update_grading_period_settings(...).doit().await
 //! ```
 //!
 //! The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities`
@@ -166,9 +174,20 @@
 //! // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about
 //! // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 //! // retrieve them from storage.
-//! let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+//! let connector = hyper_rustls::HttpsConnectorBuilder::new()
+//!     .with_native_roots()
+//!     .unwrap()
+//!     .https_only()
+//!     .enable_http2()
+//!     .build();
+//!
+//! let executor = hyper_util::rt::TokioExecutor::new();
+//! let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 //!     secret,
 //!     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+//!     yup_oauth2::client::CustomHyperClientBuilder::from(
+//!         hyper_util::client::legacy::Client::builder(executor).build(connector),
+//!     ),
 //! ).build().await.unwrap();
 //!
 //! let client = hyper_util::client::legacy::Client::builder(
@@ -179,7 +198,7 @@
 //!         .with_native_roots()
 //!         .unwrap()
 //!         .https_or_http()
-//!         .enable_http1()
+//!         .enable_http2()
 //!         .build()
 //! );
 //! let mut hub = Classroom::new(client, auth);

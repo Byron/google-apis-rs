@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Document* crate version *6.0.0+20240619*, where *20240619* is the exact revision of the *documentai:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v6.0.0*.
+//! This documentation was generated from *Document* crate version *7.0.0+20251213*, where *20251213* is the exact revision of the *documentai:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v7.0.0*.
 //!
 //! Everything else about the *Document* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/document-ai/docs/).
@@ -14,7 +14,7 @@
 //! * operations
 //!  * [*delete*](api::OperationDeleteCall)
 //! * projects
-//!  * [*locations fetch processor types*](api::ProjectLocationFetchProcessorTypeCall), [*locations get*](api::ProjectLocationGetCall), [*locations list*](api::ProjectLocationListCall), [*locations operations cancel*](api::ProjectLocationOperationCancelCall), [*locations operations get*](api::ProjectLocationOperationGetCall), [*locations operations list*](api::ProjectLocationOperationListCall), [*locations processor types get*](api::ProjectLocationProcessorTypeGetCall), [*locations processor types list*](api::ProjectLocationProcessorTypeListCall), [*locations processors batch process*](api::ProjectLocationProcessorBatchProcesCall), [*locations processors create*](api::ProjectLocationProcessorCreateCall), [*locations processors delete*](api::ProjectLocationProcessorDeleteCall), [*locations processors disable*](api::ProjectLocationProcessorDisableCall), [*locations processors enable*](api::ProjectLocationProcessorEnableCall), [*locations processors get*](api::ProjectLocationProcessorGetCall), [*locations processors human review config review document*](api::ProjectLocationProcessorHumanReviewConfigReviewDocumentCall), [*locations processors list*](api::ProjectLocationProcessorListCall), [*locations processors process*](api::ProjectLocationProcessorProcesCall), [*locations processors processor versions batch process*](api::ProjectLocationProcessorProcessorVersionBatchProcesCall), [*locations processors processor versions delete*](api::ProjectLocationProcessorProcessorVersionDeleteCall), [*locations processors processor versions deploy*](api::ProjectLocationProcessorProcessorVersionDeployCall), [*locations processors processor versions evaluate processor version*](api::ProjectLocationProcessorProcessorVersionEvaluateProcessorVersionCall), [*locations processors processor versions evaluations get*](api::ProjectLocationProcessorProcessorVersionEvaluationGetCall), [*locations processors processor versions evaluations list*](api::ProjectLocationProcessorProcessorVersionEvaluationListCall), [*locations processors processor versions get*](api::ProjectLocationProcessorProcessorVersionGetCall), [*locations processors processor versions list*](api::ProjectLocationProcessorProcessorVersionListCall), [*locations processors processor versions process*](api::ProjectLocationProcessorProcessorVersionProcesCall), [*locations processors processor versions train*](api::ProjectLocationProcessorProcessorVersionTrainCall), [*locations processors processor versions undeploy*](api::ProjectLocationProcessorProcessorVersionUndeployCall), [*locations processors set default processor version*](api::ProjectLocationProcessorSetDefaultProcessorVersionCall) and [*operations get*](api::ProjectOperationGetCall)
+//!  * [*locations fetch processor types*](api::ProjectLocationFetchProcessorTypeCall), [*locations get*](api::ProjectLocationGetCall), [*locations list*](api::ProjectLocationListCall), [*locations operations cancel*](api::ProjectLocationOperationCancelCall), [*locations operations get*](api::ProjectLocationOperationGetCall), [*locations operations list*](api::ProjectLocationOperationListCall), [*locations processor types get*](api::ProjectLocationProcessorTypeGetCall), [*locations processor types list*](api::ProjectLocationProcessorTypeListCall), [*locations processors batch process*](api::ProjectLocationProcessorBatchProcesCall), [*locations processors create*](api::ProjectLocationProcessorCreateCall), [*locations processors delete*](api::ProjectLocationProcessorDeleteCall), [*locations processors disable*](api::ProjectLocationProcessorDisableCall), [*locations processors enable*](api::ProjectLocationProcessorEnableCall), [*locations processors get*](api::ProjectLocationProcessorGetCall), [*locations processors human review config review document*](api::ProjectLocationProcessorHumanReviewConfigReviewDocumentCall), [*locations processors list*](api::ProjectLocationProcessorListCall), [*locations processors process*](api::ProjectLocationProcessorProcesCall), [*locations processors processor versions batch process*](api::ProjectLocationProcessorProcessorVersionBatchProcesCall), [*locations processors processor versions delete*](api::ProjectLocationProcessorProcessorVersionDeleteCall), [*locations processors processor versions deploy*](api::ProjectLocationProcessorProcessorVersionDeployCall), [*locations processors processor versions evaluate processor version*](api::ProjectLocationProcessorProcessorVersionEvaluateProcessorVersionCall), [*locations processors processor versions evaluations get*](api::ProjectLocationProcessorProcessorVersionEvaluationGetCall), [*locations processors processor versions evaluations list*](api::ProjectLocationProcessorProcessorVersionEvaluationListCall), [*locations processors processor versions get*](api::ProjectLocationProcessorProcessorVersionGetCall), [*locations processors processor versions list*](api::ProjectLocationProcessorProcessorVersionListCall), [*locations processors processor versions process*](api::ProjectLocationProcessorProcessorVersionProcesCall), [*locations processors processor versions train*](api::ProjectLocationProcessorProcessorVersionTrainCall), [*locations processors processor versions undeploy*](api::ProjectLocationProcessorProcessorVersionUndeployCall), [*locations processors set default processor version*](api::ProjectLocationProcessorSetDefaultProcessorVersionCall), [*locations schemas create*](api::ProjectLocationSchemaCreateCall), [*locations schemas delete*](api::ProjectLocationSchemaDeleteCall), [*locations schemas get*](api::ProjectLocationSchemaGetCall), [*locations schemas list*](api::ProjectLocationSchemaListCall), [*locations schemas patch*](api::ProjectLocationSchemaPatchCall), [*locations schemas schema versions create*](api::ProjectLocationSchemaSchemaVersionCreateCall), [*locations schemas schema versions delete*](api::ProjectLocationSchemaSchemaVersionDeleteCall), [*locations schemas schema versions generate*](api::ProjectLocationSchemaSchemaVersionGenerateCall), [*locations schemas schema versions get*](api::ProjectLocationSchemaSchemaVersionGetCall), [*locations schemas schema versions list*](api::ProjectLocationSchemaSchemaVersionListCall), [*locations schemas schema versions patch*](api::ProjectLocationSchemaSchemaVersionPatchCall) and [*operations get*](api::ProjectOperationGetCall)
 //!
 //!
 //!
@@ -62,6 +62,8 @@
 //! let r = hub.projects().locations_processors_disable(...).doit().await
 //! let r = hub.projects().locations_processors_enable(...).doit().await
 //! let r = hub.projects().locations_processors_set_default_processor_version(...).doit().await
+//! let r = hub.projects().locations_schemas_schema_versions_delete(...).doit().await
+//! let r = hub.projects().locations_schemas_delete(...).doit().await
 //! let r = hub.projects().operations_get(...).doit().await
 //! ```
 //!
@@ -102,9 +104,20 @@
 //! // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about
 //! // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 //! // retrieve them from storage.
-//! let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+//! let connector = hyper_rustls::HttpsConnectorBuilder::new()
+//!     .with_native_roots()
+//!     .unwrap()
+//!     .https_only()
+//!     .enable_http2()
+//!     .build();
+//!
+//! let executor = hyper_util::rt::TokioExecutor::new();
+//! let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 //!     secret,
 //!     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+//!     yup_oauth2::client::CustomHyperClientBuilder::from(
+//!         hyper_util::client::legacy::Client::builder(executor).build(connector),
+//!     ),
 //! ).build().await.unwrap();
 //!
 //! let client = hyper_util::client::legacy::Client::builder(
@@ -115,7 +128,7 @@
 //!         .with_native_roots()
 //!         .unwrap()
 //!         .https_or_http()
-//!         .enable_http1()
+//!         .enable_http2()
 //!         .build()
 //! );
 //! let mut hub = Document::new(client, auth);

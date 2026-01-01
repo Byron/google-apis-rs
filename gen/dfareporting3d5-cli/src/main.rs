@@ -150,132 +150,6 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
-                "media-request-info.current-bytes" => Some((
-                    "mediaRequestInfo.currentBytes",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "media-request-info.custom-data" => Some((
-                    "mediaRequestInfo.customData",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "media-request-info.diff-object-version" => Some((
-                    "mediaRequestInfo.diffObjectVersion",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "media-request-info.final-status" => Some((
-                    "mediaRequestInfo.finalStatus",
-                    JsonTypeInfo {
-                        jtype: JsonType::Int,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "media-request-info.notification-type" => Some((
-                    "mediaRequestInfo.notificationType",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "media-request-info.request-id" => Some((
-                    "mediaRequestInfo.requestId",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "media-request-info.request-received-params-serving-info" => Some((
-                    "mediaRequestInfo.requestReceivedParamsServingInfo",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "media-request-info.total-bytes" => Some((
-                    "mediaRequestInfo.totalBytes",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "media-request-info.total-bytes-is-estimated" => Some((
-                    "mediaRequestInfo.totalBytesIsEstimated",
-                    JsonTypeInfo {
-                        jtype: JsonType::Boolean,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "media-response-info.custom-data" => Some((
-                    "mediaResponseInfo.customData",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "media-response-info.data-storage-transform" => Some((
-                    "mediaResponseInfo.dataStorageTransform",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "media-response-info.dynamic-drop-target" => Some((
-                    "mediaResponseInfo.dynamicDropTarget",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "media-response-info.dynamic-dropzone" => Some((
-                    "mediaResponseInfo.dynamicDropzone",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "media-response-info.request-class" => Some((
-                    "mediaResponseInfo.requestClass",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "media-response-info.scotty-agent-user-id" => Some((
-                    "mediaResponseInfo.scottyAgentUserId",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "media-response-info.scotty-customer-log" => Some((
-                    "mediaResponseInfo.scottyCustomerLog",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "media-response-info.traffic-class-field" => Some((
-                    "mediaResponseInfo.trafficClassField",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "media-response-info.verify-hash-from-header" => Some((
-                    "mediaResponseInfo.verifyHashFromHeader",
-                    JsonTypeInfo {
-                        jtype: JsonType::Boolean,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
                 "rich-media" => Some((
                     "richMedia",
                     JsonTypeInfo {
@@ -295,36 +169,17 @@ where
                         key,
                         &vec![
                             "asset-identifier",
-                            "current-bytes",
-                            "custom-data",
-                            "data-storage-transform",
                             "detected-features",
-                            "diff-object-version",
                             "dimension-name",
-                            "dynamic-drop-target",
-                            "dynamic-dropzone",
                             "etag",
-                            "final-status",
                             "id",
                             "id-dimension-value",
                             "kind",
                             "match-type",
-                            "media-request-info",
-                            "media-response-info",
                             "name",
-                            "notification-type",
-                            "request-class",
-                            "request-id",
-                            "request-received-params-serving-info",
                             "rich-media",
-                            "scotty-agent-user-id",
-                            "scotty-customer-log",
-                            "total-bytes",
-                            "total-bytes-is-estimated",
-                            "traffic-class-field",
                             "type",
                             "value",
-                            "verify-hash-from-header",
                             "warned-validation-rules",
                         ],
                     );
@@ -348,11 +203,19 @@ where
         }
         let mut request: api::CreativeAssetMetadata =
             serde_json::value::from_value(object).unwrap();
-        let mut call = self.hub.media().upload(
-            request,
-            opt.value_of("profile-id").unwrap_or(""),
-            opt.value_of("advertiser-id").unwrap_or(""),
+        let profile_id: i64 = arg_from_str(
+            &opt.value_of("profile-id").unwrap_or(""),
+            err,
+            "<profile-id>",
+            "int64",
         );
+        let advertiser_id: i64 = arg_from_str(
+            &opt.value_of("advertiser-id").unwrap_or(""),
+            err,
+            "<advertiser-id>",
+            "int64",
+        );
+        let mut call = self.hub.media().upload(request, profile_id, advertiser_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -494,7 +357,9 @@ where
         let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
             secret,
             yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-            hyper_util::client::legacy::Client::builder(executor).build(connector),
+            yup_oauth2::client::CustomHyperClientBuilder::from(
+                hyper_util::client::legacy::Client::builder(executor).build(connector),
+            ),
         )
         .persist_tokens_to_disk(format!("{}/dfareporting3d5", config_dir))
         .build()
@@ -589,7 +454,7 @@ async fn main() {
 
     let mut app = App::new("dfareporting3d5")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("6.0.0+20240625")
+           .version("7.0.0+20251023")
            .about("Build applications to efficiently manage large or complex trafficking, reporting, and attribution workflows for Campaign Manager 360.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_dfareporting3d5_cli")
            .arg(Arg::with_name("url")
@@ -667,7 +532,7 @@ async fn main() {
         .with_native_roots()
         .unwrap()
         .https_or_http()
-        .enable_http1()
+        .enable_http2()
         .build();
 
     match Engine::new(matches, connector).await {

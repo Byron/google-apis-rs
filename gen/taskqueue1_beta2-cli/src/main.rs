@@ -485,13 +485,13 @@ where
             &opt.value_of("num-tasks").unwrap_or(""),
             err,
             "<num-tasks>",
-            "integer",
+            "int32",
         );
         let lease_secs: i32 = arg_from_str(
             &opt.value_of("lease-secs").unwrap_or(""),
             err,
             "<lease-secs>",
-            "integer",
+            "int32",
         );
         let mut call = self.hub.tasks().lease(
             opt.value_of("project").unwrap_or(""),
@@ -786,7 +786,7 @@ where
             &opt.value_of("new-lease-seconds").unwrap_or(""),
             err,
             "<new-lease-seconds>",
-            "integer",
+            "int32",
         );
         let mut call = self.hub.tasks().patch(
             request,
@@ -990,7 +990,7 @@ where
             &opt.value_of("new-lease-seconds").unwrap_or(""),
             err,
             "<new-lease-seconds>",
-            "integer",
+            "int32",
         );
         let mut call = self.hub.tasks().update(
             request,
@@ -1156,7 +1156,9 @@ where
         let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
             secret,
             yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-            hyper_util::client::legacy::Client::builder(executor).build(connector),
+            yup_oauth2::client::CustomHyperClientBuilder::from(
+                hyper_util::client::legacy::Client::builder(executor).build(connector),
+            ),
         )
         .persist_tokens_to_disk(format!("{}/taskqueue1-beta2", config_dir))
         .build()
@@ -1460,7 +1462,7 @@ async fn main() {
 
     let mut app = App::new("taskqueue1-beta2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("6.0.0+20160428")
+           .version("7.0.0+20160428")
            .about("Accesses a Google App Engine Pull Task Queue over REST.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_taskqueue1_beta2_cli")
            .arg(Arg::with_name("url")
@@ -1525,7 +1527,7 @@ async fn main() {
         .with_native_roots()
         .unwrap()
         .https_or_http()
-        .enable_http1()
+        .enable_http2()
         .build();
 
     match Engine::new(matches, connector).await {

@@ -11,7 +11,7 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
 Everything else about the *SQL Admin* API can be found at the
-[official documentation site](https://developers.google.com/cloud-sql/).
+[official documentation site](https://cloud.google.com/sql/docs).
 
 # Installation and Source Code
 
@@ -25,10 +25,16 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *SQL Admin* API at revision *20240618*. The CLI is at version *6.0.0*.
+This documentation was generated from the *SQL Admin* API at revision *20251201*. The CLI is at version *7.0.0*.
 
 ```bash
 sqladmin1 [options]
+        backups
+                create-backup <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                delete-backup <name> [-p <v>]... [-o <out>]
+                get-backup <name> [-p <v>]... [-o <out>]
+                list-backups <parent> [-p <v>]... [-o <out>]
+                update-backup <name> (-r <kv>)... [-p <v>]... [-o <out>]
         backup-runs
                 delete <project> <instance> <id> [-p <v>]... [-o <out>]
                 get <project> <instance> <id> [-p <v>]... [-o <out>]
@@ -47,12 +53,19 @@ sqladmin1 [options]
         flags
                 list [-p <v>]... [-o <out>]
         instances
+                list-entra-id-certificates <project> <instance> [-p <v>]... [-o <out>]
+                list-server-certificates <project> <instance> [-p <v>]... [-o <out>]
+                rotate-entra-id-certificate <project> <instance> (-r <kv>)... [-p <v>]... [-o <out>]
+                rotate-server-certificate <project> <instance> (-r <kv>)... [-p <v>]... [-o <out>]
                 acquire-ssrs-lease <project> <instance> (-r <kv>)... [-p <v>]... [-o <out>]
+                add-entra-id-certificate <project> <instance> [-p <v>]... [-o <out>]
                 add-server-ca <project> <instance> [-p <v>]... [-o <out>]
+                add-server-certificate <project> <instance> [-p <v>]... [-o <out>]
                 clone <project> <instance> (-r <kv>)... [-p <v>]... [-o <out>]
                 delete <project> <instance> [-p <v>]... [-o <out>]
                 demote <project> <instance> (-r <kv>)... [-p <v>]... [-o <out>]
                 demote-master <project> <instance> (-r <kv>)... [-p <v>]... [-o <out>]
+                execute-sql <project> <instance> (-r <kv>)... [-p <v>]... [-o <out>]
                 export <project> <instance> (-r <kv>)... [-p <v>]... [-o <out>]
                 failover <project> <instance> (-r <kv>)... [-p <v>]... [-o <out>]
                 get <project> <instance> [-p <v>]... [-o <out>]
@@ -61,6 +74,8 @@ sqladmin1 [options]
                 list <project> [-p <v>]... [-o <out>]
                 list-server-cas <project> <instance> [-p <v>]... [-o <out>]
                 patch <project> <instance> (-r <kv>)... [-p <v>]... [-o <out>]
+                point-in-time-restore <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                pre-check-major-version-upgrade <project> <instance> (-r <kv>)... [-p <v>]... [-o <out>]
                 promote-replica <project> <instance> [-p <v>]... [-o <out>]
                 reencrypt <project> <instance> (-r <kv>)... [-p <v>]... [-o <out>]
                 release-ssrs-lease <project> <instance> [-p <v>]... [-o <out>]

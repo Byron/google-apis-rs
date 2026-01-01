@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *TPU* API at revision *20240613*. The CLI is at version *6.0.0*.
+This documentation was generated from the *TPU* API at revision *20251130*. The CLI is at version *7.0.0*.
 
 ```bash
 tpu1-alpha1 [options]

@@ -59,9 +59,20 @@ impl Default for Scope {
 /// // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about
 /// // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 /// // retrieve them from storage.
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let connector = hyper_rustls::HttpsConnectorBuilder::new()
+///     .with_native_roots()
+///     .unwrap()
+///     .https_only()
+///     .enable_http2()
+///     .build();
+///
+/// let executor = hyper_util::rt::TokioExecutor::new();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 ///     secret,
 ///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///     yup_oauth2::client::CustomHyperClientBuilder::from(
+///         hyper_util::client::legacy::Client::builder(executor).build(connector),
+///     ),
 /// ).build().await.unwrap();
 ///
 /// let client = hyper_util::client::legacy::Client::builder(
@@ -72,7 +83,7 @@ impl Default for Scope {
 ///         .with_native_roots()
 ///         .unwrap()
 ///         .https_or_http()
-///         .enable_http1()
+///         .enable_http2()
 ///         .build()
 /// );
 /// let mut hub = Dataproc::new(client, auth);
@@ -125,7 +136,7 @@ impl<'a, C> Dataproc<C> {
         Dataproc {
             client,
             auth: Box::new(auth),
-            _user_agent: "google-api-rust-client/6.0.0".to_string(),
+            _user_agent: "google-api-rust-client/7.0.0".to_string(),
             _base_url: "https://dataproc.googleapis.com/".to_string(),
             _root_url: "https://dataproc.googleapis.com/".to_string(),
         }
@@ -136,7 +147,7 @@ impl<'a, C> Dataproc<C> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/6.0.0`.
+    /// It defaults to `google-api-rust-client/7.0.0`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -181,6 +192,292 @@ pub struct AcceleratorConfig {
 
 impl common::Part for AcceleratorConfig {}
 
+/// Environment details of a Saprk Application.
+///
+/// # Activities
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+///
+/// * [locations sessions spark applications access environment info projects](ProjectLocationSessionSparkApplicationAccessEnvironmentInfoCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct AccessSessionSparkApplicationEnvironmentInfoResponse {
+    /// Details about the Environment that the application is running in.
+    #[serde(rename = "applicationEnvironmentInfo")]
+    pub application_environment_info: Option<ApplicationEnvironmentInfo>,
+}
+
+impl common::ResponseResult for AccessSessionSparkApplicationEnvironmentInfoResponse {}
+
+/// Details of a particular job associated with Spark Application
+///
+/// # Activities
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+///
+/// * [locations sessions spark applications access job projects](ProjectLocationSessionSparkApplicationAccessJobCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct AccessSessionSparkApplicationJobResponse {
+    /// Output only. Data corresponding to a spark job.
+    #[serde(rename = "jobData")]
+    pub job_data: Option<JobData>,
+}
+
+impl common::ResponseResult for AccessSessionSparkApplicationJobResponse {}
+
+/// A summary of Spark Application
+///
+/// # Activities
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+///
+/// * [locations sessions spark applications access projects](ProjectLocationSessionSparkApplicationAccesCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct AccessSessionSparkApplicationResponse {
+    /// Output only. High level information corresponding to an application.
+    pub application: Option<ApplicationInfo>,
+}
+
+impl common::ResponseResult for AccessSessionSparkApplicationResponse {}
+
+/// Details of a query for a Spark Application
+///
+/// # Activities
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+///
+/// * [locations sessions spark applications access sql query projects](ProjectLocationSessionSparkApplicationAccessSqlQueryCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct AccessSessionSparkApplicationSqlQueryResponse {
+    /// SQL Execution Data
+    #[serde(rename = "executionData")]
+    pub execution_data: Option<SqlExecutionUiData>,
+}
+
+impl common::ResponseResult for AccessSessionSparkApplicationSqlQueryResponse {}
+
+/// SparkPlanGraph for a Spark Application execution limited to maximum 10000 clusters.
+///
+/// # Activities
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+///
+/// * [locations sessions spark applications access sql plan projects](ProjectLocationSessionSparkApplicationAccessSqlPlanCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct AccessSessionSparkApplicationSqlSparkPlanGraphResponse {
+    /// SparkPlanGraph for a Spark Application execution.
+    #[serde(rename = "sparkPlanGraph")]
+    pub spark_plan_graph: Option<SparkPlanGraph>,
+}
+
+impl common::ResponseResult for AccessSessionSparkApplicationSqlSparkPlanGraphResponse {}
+
+/// Stage Attempt for a Stage of a Spark Application
+///
+/// # Activities
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+///
+/// * [locations sessions spark applications access stage attempt projects](ProjectLocationSessionSparkApplicationAccessStageAttemptCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct AccessSessionSparkApplicationStageAttemptResponse {
+    /// Output only. Data corresponding to a stage.
+    #[serde(rename = "stageData")]
+    pub stage_data: Option<StageData>,
+}
+
+impl common::ResponseResult for AccessSessionSparkApplicationStageAttemptResponse {}
+
+/// RDD operation graph for a Spark Application Stage limited to maximum 10000 clusters.
+///
+/// # Activities
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+///
+/// * [locations sessions spark applications access stage rdd graph projects](ProjectLocationSessionSparkApplicationAccessStageRddGraphCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct AccessSessionSparkApplicationStageRddOperationGraphResponse {
+    /// RDD operation graph for a Spark Application Stage.
+    #[serde(rename = "rddOperationGraph")]
+    pub rdd_operation_graph: Option<RddOperationGraph>,
+}
+
+impl common::ResponseResult for AccessSessionSparkApplicationStageRddOperationGraphResponse {}
+
+/// Environment details of a Saprk Application.
+///
+/// # Activities
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+///
+/// * [locations batches spark applications access environment info projects](ProjectLocationBatchSparkApplicationAccessEnvironmentInfoCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct AccessSparkApplicationEnvironmentInfoResponse {
+    /// Details about the Environment that the application is running in.
+    #[serde(rename = "applicationEnvironmentInfo")]
+    pub application_environment_info: Option<ApplicationEnvironmentInfo>,
+}
+
+impl common::ResponseResult for AccessSparkApplicationEnvironmentInfoResponse {}
+
+/// Details of a particular job associated with Spark Application
+///
+/// # Activities
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+///
+/// * [locations batches spark applications access job projects](ProjectLocationBatchSparkApplicationAccessJobCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct AccessSparkApplicationJobResponse {
+    /// Output only. Data corresponding to a spark job.
+    #[serde(rename = "jobData")]
+    pub job_data: Option<JobData>,
+}
+
+impl common::ResponseResult for AccessSparkApplicationJobResponse {}
+
+/// A summary of Spark Application
+///
+/// # Activities
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+///
+/// * [locations batches spark applications access projects](ProjectLocationBatchSparkApplicationAccesCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct AccessSparkApplicationResponse {
+    /// Output only. High level information corresponding to an application.
+    pub application: Option<ApplicationInfo>,
+}
+
+impl common::ResponseResult for AccessSparkApplicationResponse {}
+
+/// Details of a query for a Spark Application
+///
+/// # Activities
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+///
+/// * [locations batches spark applications access sql query projects](ProjectLocationBatchSparkApplicationAccessSqlQueryCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct AccessSparkApplicationSqlQueryResponse {
+    /// SQL Execution Data
+    #[serde(rename = "executionData")]
+    pub execution_data: Option<SqlExecutionUiData>,
+}
+
+impl common::ResponseResult for AccessSparkApplicationSqlQueryResponse {}
+
+/// SparkPlanGraph for a Spark Application execution limited to maximum 10000 clusters.
+///
+/// # Activities
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+///
+/// * [locations batches spark applications access sql plan projects](ProjectLocationBatchSparkApplicationAccessSqlPlanCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct AccessSparkApplicationSqlSparkPlanGraphResponse {
+    /// SparkPlanGraph for a Spark Application execution.
+    #[serde(rename = "sparkPlanGraph")]
+    pub spark_plan_graph: Option<SparkPlanGraph>,
+}
+
+impl common::ResponseResult for AccessSparkApplicationSqlSparkPlanGraphResponse {}
+
+/// Stage Attempt for a Stage of a Spark Application
+///
+/// # Activities
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+///
+/// * [locations batches spark applications access stage attempt projects](ProjectLocationBatchSparkApplicationAccessStageAttemptCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct AccessSparkApplicationStageAttemptResponse {
+    /// Output only. Data corresponding to a stage.
+    #[serde(rename = "stageData")]
+    pub stage_data: Option<StageData>,
+}
+
+impl common::ResponseResult for AccessSparkApplicationStageAttemptResponse {}
+
+/// RDD operation graph for a Spark Application Stage limited to maximum 10000 clusters.
+///
+/// # Activities
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+///
+/// * [locations batches spark applications access stage rdd graph projects](ProjectLocationBatchSparkApplicationAccessStageRddGraphCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct AccessSparkApplicationStageRddOperationGraphResponse {
+    /// RDD operation graph for a Spark Application Stage.
+    #[serde(rename = "rddOperationGraph")]
+    pub rdd_operation_graph: Option<RddOperationGraph>,
+}
+
+impl common::ResponseResult for AccessSparkApplicationStageRddOperationGraphResponse {}
+
+/// There is no detailed description.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct AccumulableInfo {
+    /// no description provided
+    #[serde(rename = "accumullableInfoId")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub accumullable_info_id: Option<i64>,
+    /// no description provided
+    pub name: Option<String>,
+    /// no description provided
+    pub update: Option<String>,
+    /// no description provided
+    pub value: Option<String>,
+}
+
+impl common::Part for AccumulableInfo {}
+
 /// A request to analyze a batch workload.
 ///
 /// # Activities
@@ -196,9 +493,150 @@ pub struct AnalyzeBatchRequest {
     /// Optional. A unique ID used to identify the request. If the service receives two AnalyzeBatchRequest (http://cloud/dataproc/docs/reference/rpc/google.cloud.dataproc.v1#google.cloud.dataproc.v1.AnalyzeBatchRequest)s with the same request_id, the second request is ignored and the Operation that corresponds to the first request created and stored in the backend is returned.Recommendation: Set this value to a UUID (https://en.wikipedia.org/wiki/Universally_unique_identifier).The value must contain only letters (a-z, A-Z), numbers (0-9), underscores (_), and hyphens (-). The maximum length is 40 characters.
     #[serde(rename = "requestId")]
     pub request_id: Option<String>,
+    /// Optional. The requestor ID is used to identify if the request comes from a GCA investigation or the old Ask Gemini Experience.
+    #[serde(rename = "requestorId")]
+    pub requestor_id: Option<String>,
 }
 
 impl common::RequestValue for AnalyzeBatchRequest {}
+
+/// There is no detailed description.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct AppSummary {
+    /// no description provided
+    #[serde(rename = "numCompletedJobs")]
+    pub num_completed_jobs: Option<i32>,
+    /// no description provided
+    #[serde(rename = "numCompletedStages")]
+    pub num_completed_stages: Option<i32>,
+}
+
+impl common::Part for AppSummary {}
+
+/// Specific attempt of an application.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct ApplicationAttemptInfo {
+    /// no description provided
+    #[serde(rename = "appSparkVersion")]
+    pub app_spark_version: Option<String>,
+    /// no description provided
+    #[serde(rename = "attemptId")]
+    pub attempt_id: Option<String>,
+    /// no description provided
+    pub completed: Option<bool>,
+    /// no description provided
+    #[serde(rename = "durationMillis")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub duration_millis: Option<i64>,
+    /// no description provided
+    #[serde(rename = "endTime")]
+    pub end_time: Option<chrono::DateTime<chrono::offset::Utc>>,
+    /// no description provided
+    #[serde(rename = "lastUpdated")]
+    pub last_updated: Option<chrono::DateTime<chrono::offset::Utc>>,
+    /// no description provided
+    #[serde(rename = "sparkUser")]
+    pub spark_user: Option<String>,
+    /// no description provided
+    #[serde(rename = "startTime")]
+    pub start_time: Option<chrono::DateTime<chrono::offset::Utc>>,
+}
+
+impl common::Part for ApplicationAttemptInfo {}
+
+/// Details about the Environment that the application is running in.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct ApplicationEnvironmentInfo {
+    /// no description provided
+    #[serde(rename = "classpathEntries")]
+    pub classpath_entries: Option<HashMap<String, String>>,
+    /// no description provided
+    #[serde(rename = "hadoopProperties")]
+    pub hadoop_properties: Option<HashMap<String, String>>,
+    /// no description provided
+    #[serde(rename = "metricsProperties")]
+    pub metrics_properties: Option<HashMap<String, String>>,
+    /// no description provided
+    #[serde(rename = "resourceProfiles")]
+    pub resource_profiles: Option<Vec<ResourceProfileInfo>>,
+    /// no description provided
+    pub runtime: Option<SparkRuntimeInfo>,
+    /// no description provided
+    #[serde(rename = "sparkProperties")]
+    pub spark_properties: Option<HashMap<String, String>>,
+    /// no description provided
+    #[serde(rename = "systemProperties")]
+    pub system_properties: Option<HashMap<String, String>>,
+}
+
+impl common::Part for ApplicationEnvironmentInfo {}
+
+/// High level information corresponding to an application.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct ApplicationInfo {
+    /// no description provided
+    #[serde(rename = "applicationContextIngestionStatus")]
+    pub application_context_ingestion_status: Option<String>,
+    /// no description provided
+    #[serde(rename = "applicationId")]
+    pub application_id: Option<String>,
+    /// no description provided
+    pub attempts: Option<Vec<ApplicationAttemptInfo>>,
+    /// no description provided
+    #[serde(rename = "coresGranted")]
+    pub cores_granted: Option<i32>,
+    /// no description provided
+    #[serde(rename = "coresPerExecutor")]
+    pub cores_per_executor: Option<i32>,
+    /// no description provided
+    #[serde(rename = "maxCores")]
+    pub max_cores: Option<i32>,
+    /// no description provided
+    #[serde(rename = "memoryPerExecutorMb")]
+    pub memory_per_executor_mb: Option<i32>,
+    /// no description provided
+    pub name: Option<String>,
+    /// no description provided
+    #[serde(rename = "quantileDataStatus")]
+    pub quantile_data_status: Option<String>,
+}
+
+impl common::Part for ApplicationInfo {}
+
+/// Authentication configuration for a workload is used to set the default identity for the workload execution. The config specifies the type of identity (service account or user) that will be used by workloads to access resources on the project(s).
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct AuthenticationConfig {
+    /// Optional. Authentication type for the user workload running in containers.
+    #[serde(rename = "userWorkloadAuthenticationType")]
+    pub user_workload_authentication_type: Option<String>,
+}
+
+impl common::Part for AuthenticationConfig {}
 
 /// Autoscaling Policy config associated with the cluster.
 ///
@@ -235,6 +673,9 @@ pub struct AutoscalingPolicy {
     /// no description provided
     #[serde(rename = "basicAlgorithm")]
     pub basic_algorithm: Option<BasicAutoscalingAlgorithm>,
+    /// Optional. The type of the clusters for which this autoscaling policy is to be configured.
+    #[serde(rename = "clusterType")]
+    pub cluster_type: Option<String>,
     /// Required. The policy id.The id must contain only letters (a-z, A-Z), numbers (0-9), underscores (_), and hyphens (-). Cannot begin or end with underscore or hyphen. Must consist of between 3 and 50 characters.
     pub id: Option<String>,
     /// Optional. The labels to associate with this autoscaling policy. Label keys must contain 1 to 63 characters, and must conform to RFC 1035 (https://www.ietf.org/rfc/rfc1035.txt). Label values may be empty, but, if present, must contain 1 to 63 characters, and must conform to RFC 1035 (https://www.ietf.org/rfc/rfc1035.txt). No more than 32 labels can be associated with an autoscaling policy.
@@ -433,6 +874,24 @@ pub struct Binding {
 
 impl common::Part for Binding {}
 
+/// Native Build Info
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct BuildInfo {
+    /// Optional. Build key.
+    #[serde(rename = "buildKey")]
+    pub build_key: Option<String>,
+    /// Optional. Build value.
+    #[serde(rename = "buildValue")]
+    pub build_value: Option<String>,
+}
+
+impl common::Part for BuildInfo {}
+
 /// A request to cancel a job.
 ///
 /// # Activities
@@ -506,12 +965,21 @@ pub struct ClusterConfig {
     /// Optional. The node group settings.
     #[serde(rename = "auxiliaryNodeGroups")]
     pub auxiliary_node_groups: Option<Vec<AuxiliaryNodeGroup>>,
+    /// Optional. The cluster tier.
+    #[serde(rename = "clusterTier")]
+    pub cluster_tier: Option<String>,
+    /// Optional. The type of the cluster.
+    #[serde(rename = "clusterType")]
+    pub cluster_type: Option<String>,
     /// Optional. A Cloud Storage bucket used to stage job dependencies, config files, and job driver console output. If you do not specify a staging bucket, Cloud Dataproc will determine a Cloud Storage location (US, ASIA, or EU) for your cluster's staging bucket according to the Compute Engine zone where your cluster is deployed, and then create and manage this project-level, per-location bucket (see Dataproc staging and temp buckets (https://cloud.google.com/dataproc/docs/concepts/configuring-clusters/staging-bucket)). This field requires a Cloud Storage bucket name, not a gs://... URI to a Cloud Storage bucket.
     #[serde(rename = "configBucket")]
     pub config_bucket: Option<String>,
     /// Optional. The config for Dataproc metrics.
     #[serde(rename = "dataprocMetricConfig")]
     pub dataproc_metric_config: Option<DataprocMetricConfig>,
+    /// Optional. A Cloud Storage bucket used to collect checkpoint diagnostic data (https://cloud.google.com/dataproc/docs/support/diagnose-clusters#checkpoint_diagnostic_data). If you do not specify a diagnostic bucket, Cloud Dataproc will use the Dataproc temp bucket to collect the checkpoint diagnostic data. This field requires a Cloud Storage bucket name, not a gs://... URI to a Cloud Storage bucket.
+    #[serde(rename = "diagnosticBucket")]
+    pub diagnostic_bucket: Option<String>,
     /// Optional. Encryption settings for the cluster.
     #[serde(rename = "encryptionConfig")]
     pub encryption_config: Option<EncryptionConfig>,
@@ -613,6 +1081,21 @@ pub struct ClusterStatus {
 
 impl common::Part for ClusterStatus {}
 
+/// Cluster to be repaired
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct ClusterToRepair {
+    /// Required. Repair action to take on the cluster resource.
+    #[serde(rename = "clusterRepairAction")]
+    pub cluster_repair_action: Option<String>,
+}
+
+impl common::Part for ClusterToRepair {}
+
 /// Confidential Instance Config for clusters using Confidential VMs (https://cloud.google.com/compute/confidential-vm/docs)
 ///
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -627,6 +1110,76 @@ pub struct ConfidentialInstanceConfig {
 }
 
 impl common::Part for ConfidentialInstanceConfig {}
+
+/// Consolidated summary about executors used by the application.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct ConsolidatedExecutorSummary {
+    /// no description provided
+    #[serde(rename = "activeTasks")]
+    pub active_tasks: Option<i32>,
+    /// no description provided
+    #[serde(rename = "completedTasks")]
+    pub completed_tasks: Option<i32>,
+    /// no description provided
+    pub count: Option<i32>,
+    /// no description provided
+    #[serde(rename = "diskUsed")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub disk_used: Option<i64>,
+    /// no description provided
+    #[serde(rename = "failedTasks")]
+    pub failed_tasks: Option<i32>,
+    /// no description provided
+    #[serde(rename = "isExcluded")]
+    pub is_excluded: Option<i32>,
+    /// no description provided
+    #[serde(rename = "maxMemory")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub max_memory: Option<i64>,
+    /// no description provided
+    #[serde(rename = "memoryMetrics")]
+    pub memory_metrics: Option<MemoryMetrics>,
+    /// no description provided
+    #[serde(rename = "memoryUsed")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub memory_used: Option<i64>,
+    /// no description provided
+    #[serde(rename = "rddBlocks")]
+    pub rdd_blocks: Option<i32>,
+    /// no description provided
+    #[serde(rename = "totalCores")]
+    pub total_cores: Option<i32>,
+    /// no description provided
+    #[serde(rename = "totalDurationMillis")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub total_duration_millis: Option<i64>,
+    /// no description provided
+    #[serde(rename = "totalGcTimeMillis")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub total_gc_time_millis: Option<i64>,
+    /// no description provided
+    #[serde(rename = "totalInputBytes")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub total_input_bytes: Option<i64>,
+    /// no description provided
+    #[serde(rename = "totalShuffleRead")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub total_shuffle_read: Option<i64>,
+    /// no description provided
+    #[serde(rename = "totalShuffleWrite")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub total_shuffle_write: Option<i64>,
+    /// no description provided
+    #[serde(rename = "totalTasks")]
+    pub total_tasks: Option<i32>,
+}
+
+impl common::Part for ConsolidatedExecutorSummary {}
 
 /// Dataproc metric config.
 ///
@@ -677,7 +1230,7 @@ pub struct DiagnoseClusterRequest {
 
 impl common::RequestValue for DiagnoseClusterRequest {}
 
-/// Specifies the config of disk options for a group of VM instances.
+/// Specifies the config of boot disk and attached disk options for a group of VM instances.
 ///
 /// This type is not used in any activity, and only used as *part* of another schema.
 ///
@@ -685,11 +1238,11 @@ impl common::RequestValue for DiagnoseClusterRequest {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct DiskConfig {
-    /// Optional. Indicates how many IOPS to provision for the disk. This sets the number of I/O operations per second that the disk can handle. Note: This field is only supported if boot_disk_type is hyperdisk-balanced.
+    /// Optional. Indicates how many IOPS to provision for the disk. This sets the number of I/O operations per second that the disk can handle. This field is supported only if boot_disk_type is hyperdisk-balanced.
     #[serde(rename = "bootDiskProvisionedIops")]
     #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
     pub boot_disk_provisioned_iops: Option<i64>,
-    /// Optional. Indicates how much throughput to provision for the disk. This sets the number of throughput mb per second that the disk can handle. Values must be greater than or equal to 1. Note: This field is only supported if boot_disk_type is hyperdisk-balanced.
+    /// Optional. Indicates how much throughput to provision for the disk. This sets the number of throughput mb per second that the disk can handle. Values must be greater than or equal to 1. This field is supported only if boot_disk_type is hyperdisk-balanced.
     #[serde(rename = "bootDiskProvisionedThroughput")]
     #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
     pub boot_disk_provisioned_throughput: Option<i64>,
@@ -815,6 +1368,9 @@ impl common::Part for EnvironmentConfig {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct ExecutionConfig {
+    /// Optional. Authentication configuration used to set the default identity for the workload execution. The config specifies the type of identity (service account or user) that will be used by workloads to access resources on the project(s).
+    #[serde(rename = "authenticationConfig")]
+    pub authentication_config: Option<AuthenticationConfig>,
     /// Optional. Applies to sessions only. The duration to keep the session alive while it's idling. Exceeding this threshold causes the session to terminate. This field cannot be set on a batch workload. Minimum value is 10 minutes; maximum value is 14 days (see JSON representation of Duration (https://developers.google.com/protocol-buffers/docs/proto3#json)). Defaults to 1 hour if not set. If both ttl and idle_ttl are specified for an interactive session, the conditions are treated as OR conditions: the workload will be terminated when it has been idle for idle_ttl or when ttl has been exceeded, whichever occurs first.
     #[serde(rename = "idleTtl")]
     #[serde_as(as = "Option<common::serde::duration::Wrapper>")]
@@ -844,6 +1400,307 @@ pub struct ExecutionConfig {
 
 impl common::Part for ExecutionConfig {}
 
+/// There is no detailed description.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct ExecutorMetrics {
+    /// no description provided
+    #[serde_as(as = "Option<HashMap<_, serde_with::DisplayFromStr>>")]
+    pub metrics: Option<HashMap<String, i64>>,
+}
+
+impl common::Part for ExecutorMetrics {}
+
+/// There is no detailed description.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct ExecutorMetricsDistributions {
+    /// no description provided
+    #[serde(rename = "diskBytesSpilled")]
+    pub disk_bytes_spilled: Option<Vec<f64>>,
+    /// no description provided
+    #[serde(rename = "failedTasks")]
+    pub failed_tasks: Option<Vec<f64>>,
+    /// no description provided
+    #[serde(rename = "inputBytes")]
+    pub input_bytes: Option<Vec<f64>>,
+    /// no description provided
+    #[serde(rename = "inputRecords")]
+    pub input_records: Option<Vec<f64>>,
+    /// no description provided
+    #[serde(rename = "killedTasks")]
+    pub killed_tasks: Option<Vec<f64>>,
+    /// no description provided
+    #[serde(rename = "memoryBytesSpilled")]
+    pub memory_bytes_spilled: Option<Vec<f64>>,
+    /// no description provided
+    #[serde(rename = "outputBytes")]
+    pub output_bytes: Option<Vec<f64>>,
+    /// no description provided
+    #[serde(rename = "outputRecords")]
+    pub output_records: Option<Vec<f64>>,
+    /// no description provided
+    #[serde(rename = "peakMemoryMetrics")]
+    pub peak_memory_metrics: Option<ExecutorPeakMetricsDistributions>,
+    /// no description provided
+    pub quantiles: Option<Vec<f64>>,
+    /// no description provided
+    #[serde(rename = "shuffleRead")]
+    pub shuffle_read: Option<Vec<f64>>,
+    /// no description provided
+    #[serde(rename = "shuffleReadRecords")]
+    pub shuffle_read_records: Option<Vec<f64>>,
+    /// no description provided
+    #[serde(rename = "shuffleWrite")]
+    pub shuffle_write: Option<Vec<f64>>,
+    /// no description provided
+    #[serde(rename = "shuffleWriteRecords")]
+    pub shuffle_write_records: Option<Vec<f64>>,
+    /// no description provided
+    #[serde(rename = "succeededTasks")]
+    pub succeeded_tasks: Option<Vec<f64>>,
+    /// no description provided
+    #[serde(rename = "taskTimeMillis")]
+    pub task_time_millis: Option<Vec<f64>>,
+}
+
+impl common::Part for ExecutorMetricsDistributions {}
+
+/// There is no detailed description.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct ExecutorPeakMetricsDistributions {
+    /// no description provided
+    #[serde(rename = "executorMetrics")]
+    pub executor_metrics: Option<Vec<ExecutorMetrics>>,
+    /// no description provided
+    pub quantiles: Option<Vec<f64>>,
+}
+
+impl common::Part for ExecutorPeakMetricsDistributions {}
+
+/// Resources used per executor used by the application.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct ExecutorResourceRequest {
+    /// no description provided
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub amount: Option<i64>,
+    /// no description provided
+    #[serde(rename = "discoveryScript")]
+    pub discovery_script: Option<String>,
+    /// no description provided
+    #[serde(rename = "resourceName")]
+    pub resource_name: Option<String>,
+    /// no description provided
+    pub vendor: Option<String>,
+}
+
+impl common::Part for ExecutorResourceRequest {}
+
+/// Executor resources consumed by a stage.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct ExecutorStageSummary {
+    /// no description provided
+    #[serde(rename = "diskBytesSpilled")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub disk_bytes_spilled: Option<i64>,
+    /// no description provided
+    #[serde(rename = "executorId")]
+    pub executor_id: Option<String>,
+    /// no description provided
+    #[serde(rename = "failedTasks")]
+    pub failed_tasks: Option<i32>,
+    /// no description provided
+    #[serde(rename = "inputBytes")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub input_bytes: Option<i64>,
+    /// no description provided
+    #[serde(rename = "inputRecords")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub input_records: Option<i64>,
+    /// no description provided
+    #[serde(rename = "isExcludedForStage")]
+    pub is_excluded_for_stage: Option<bool>,
+    /// no description provided
+    #[serde(rename = "killedTasks")]
+    pub killed_tasks: Option<i32>,
+    /// no description provided
+    #[serde(rename = "memoryBytesSpilled")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub memory_bytes_spilled: Option<i64>,
+    /// no description provided
+    #[serde(rename = "outputBytes")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub output_bytes: Option<i64>,
+    /// no description provided
+    #[serde(rename = "outputRecords")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub output_records: Option<i64>,
+    /// no description provided
+    #[serde(rename = "peakMemoryMetrics")]
+    pub peak_memory_metrics: Option<ExecutorMetrics>,
+    /// no description provided
+    #[serde(rename = "shuffleRead")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub shuffle_read: Option<i64>,
+    /// no description provided
+    #[serde(rename = "shuffleReadRecords")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub shuffle_read_records: Option<i64>,
+    /// no description provided
+    #[serde(rename = "shuffleWrite")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub shuffle_write: Option<i64>,
+    /// no description provided
+    #[serde(rename = "shuffleWriteRecords")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub shuffle_write_records: Option<i64>,
+    /// no description provided
+    #[serde(rename = "stageAttemptId")]
+    pub stage_attempt_id: Option<i32>,
+    /// no description provided
+    #[serde(rename = "stageId")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub stage_id: Option<i64>,
+    /// no description provided
+    #[serde(rename = "succeededTasks")]
+    pub succeeded_tasks: Option<i32>,
+    /// no description provided
+    #[serde(rename = "taskTimeMillis")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub task_time_millis: Option<i64>,
+}
+
+impl common::Part for ExecutorStageSummary {}
+
+/// Details about executors used by the application.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct ExecutorSummary {
+    /// no description provided
+    #[serde(rename = "activeTasks")]
+    pub active_tasks: Option<i32>,
+    /// no description provided
+    #[serde(rename = "addTime")]
+    pub add_time: Option<chrono::DateTime<chrono::offset::Utc>>,
+    /// no description provided
+    pub attributes: Option<HashMap<String, String>>,
+    /// no description provided
+    #[serde(rename = "completedTasks")]
+    pub completed_tasks: Option<i32>,
+    /// no description provided
+    #[serde(rename = "diskUsed")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub disk_used: Option<i64>,
+    /// no description provided
+    #[serde(rename = "excludedInStages")]
+    #[serde_as(as = "Option<Vec<serde_with::DisplayFromStr>>")]
+    pub excluded_in_stages: Option<Vec<i64>>,
+    /// no description provided
+    #[serde(rename = "executorId")]
+    pub executor_id: Option<String>,
+    /// no description provided
+    #[serde(rename = "executorLogs")]
+    pub executor_logs: Option<HashMap<String, String>>,
+    /// no description provided
+    #[serde(rename = "failedTasks")]
+    pub failed_tasks: Option<i32>,
+    /// no description provided
+    #[serde(rename = "hostPort")]
+    pub host_port: Option<String>,
+    /// no description provided
+    #[serde(rename = "isActive")]
+    pub is_active: Option<bool>,
+    /// no description provided
+    #[serde(rename = "isExcluded")]
+    pub is_excluded: Option<bool>,
+    /// no description provided
+    #[serde(rename = "maxMemory")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub max_memory: Option<i64>,
+    /// no description provided
+    #[serde(rename = "maxTasks")]
+    pub max_tasks: Option<i32>,
+    /// no description provided
+    #[serde(rename = "memoryMetrics")]
+    pub memory_metrics: Option<MemoryMetrics>,
+    /// no description provided
+    #[serde(rename = "memoryUsed")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub memory_used: Option<i64>,
+    /// no description provided
+    #[serde(rename = "peakMemoryMetrics")]
+    pub peak_memory_metrics: Option<ExecutorMetrics>,
+    /// no description provided
+    #[serde(rename = "rddBlocks")]
+    pub rdd_blocks: Option<i32>,
+    /// no description provided
+    #[serde(rename = "removeReason")]
+    pub remove_reason: Option<String>,
+    /// no description provided
+    #[serde(rename = "removeTime")]
+    pub remove_time: Option<chrono::DateTime<chrono::offset::Utc>>,
+    /// no description provided
+    #[serde(rename = "resourceProfileId")]
+    pub resource_profile_id: Option<i32>,
+    /// no description provided
+    pub resources: Option<HashMap<String, ResourceInformation>>,
+    /// no description provided
+    #[serde(rename = "totalCores")]
+    pub total_cores: Option<i32>,
+    /// no description provided
+    #[serde(rename = "totalDurationMillis")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub total_duration_millis: Option<i64>,
+    /// no description provided
+    #[serde(rename = "totalGcTimeMillis")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub total_gc_time_millis: Option<i64>,
+    /// no description provided
+    #[serde(rename = "totalInputBytes")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub total_input_bytes: Option<i64>,
+    /// no description provided
+    #[serde(rename = "totalShuffleRead")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub total_shuffle_read: Option<i64>,
+    /// no description provided
+    #[serde(rename = "totalShuffleWrite")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub total_shuffle_write: Option<i64>,
+    /// no description provided
+    #[serde(rename = "totalTasks")]
+    pub total_tasks: Option<i32>,
+}
+
+impl common::Part for ExecutorSummary {}
+
 /// Represents a textual expression in the Common Expression Language (CEL) syntax. CEL is a C-like expression language. The syntax and semantics of CEL are documented at https://github.com/google/cel-spec.Example (Comparison): title: "Summary size limit" description: "Determines if a summary is less than 100 chars" expression: "document.summary.size() < 100" Example (Equality): title: "Requestor is owner" description: "Determines if requestor is the document owner" expression: "document.owner == request.auth.claims.email" Example (Logic): title: "Public documents" description: "Determine whether the document should be publicly visible" expression: "document.type != 'private' && document.type != 'internal'" Example (Data Manipulation): title: "Notification string" description: "Create a notification string with a timestamp." expression: "'New message received at ' + string(document.create_time)" The exact variables and functions that may be referenced within an expression are determined by the service that evaluates it. See the service documentation for additional information.
 ///
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -863,6 +1720,24 @@ pub struct Expr {
 }
 
 impl common::Part for Expr {}
+
+/// Native SQL Execution Data
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct FallbackReason {
+    /// Optional. Fallback node information.
+    #[serde(rename = "fallbackNode")]
+    pub fallback_node: Option<String>,
+    /// Optional. Fallback to Spark reason.
+    #[serde(rename = "fallbackReason")]
+    pub fallback_reason: Option<String>,
+}
+
+impl common::Part for FallbackReason {}
 
 /// A Dataproc job for running Apache Flink applications on YARN.
 ///
@@ -886,7 +1761,7 @@ pub struct FlinkJob {
     /// The HCFS URI of the jar file that contains the main class.
     #[serde(rename = "mainJarFileUri")]
     pub main_jar_file_uri: Option<String>,
-    /// Optional. A mapping of property names to values, used to configure Flink. Properties that conflict with values set by the Dataproc API might beoverwritten. Can include properties set in/etc/flink/conf/flink-defaults.conf and classes in user code.
+    /// Optional. A mapping of property names to values, used to configure Flink. Properties that conflict with values set by the Dataproc API might be overwritten. Can include properties set in /etc/flink/conf/flink-defaults.conf and classes in user code.
     pub properties: Option<HashMap<String, String>>,
     /// Optional. HCFS URI of the savepoint, which contains the last saved progress for starting the current job.
     #[serde(rename = "savepointUri")]
@@ -903,6 +1778,9 @@ impl common::Part for FlinkJob {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct GceClusterConfig {
+    /// Optional. An optional list of Compute Engine zones where the Dataproc cluster will not be located when Auto Zone is enabled. Only one of zone_uri or auto_zone_exclude_zone_uris can be set. If both are omitted, the service will pick a zone in the cluster Compute Engine region. If auto_zone_exclude_zone_uris is set and there is more than one non-excluded zone, the service will pick one of the non-excluded zones. Otherwise, cluster creation will fail with INVALID_ARGUMENT error.A full URL, partial URI, or short name are valid. Examples: https://www.googleapis.com/compute/v1/projects/[project_id]/zones/[zone] projects/[project_id]/zones/[zone] [zone]
+    #[serde(rename = "autoZoneExcludeZoneUris")]
+    pub auto_zone_exclude_zone_uris: Option<Vec<String>>,
     /// Optional. Confidential Instance Config for clusters using Confidential VMs (https://cloud.google.com/compute/confidential-vm/docs).
     #[serde(rename = "confidentialInstanceConfig")]
     pub confidential_instance_config: Option<ConfidentialInstanceConfig>,
@@ -923,6 +1801,9 @@ pub struct GceClusterConfig {
     /// Optional. Reservation Affinity for consuming Zonal reservation.
     #[serde(rename = "reservationAffinity")]
     pub reservation_affinity: Option<ReservationAffinity>,
+    /// Optional. Resource manager tags (https://cloud.google.com/resource-manager/docs/tags/tags-creating-and-managing) to add to all instances (see Use secure tags in Dataproc (https://cloud.google.com/dataproc/docs/guides/use-secure-tags)).
+    #[serde(rename = "resourceManagerTags")]
+    pub resource_manager_tags: Option<HashMap<String, String>>,
     /// Optional. The Dataproc service account (https://cloud.google.com/dataproc/docs/concepts/configuring-clusters/service-accounts#service_accounts_in_dataproc) (also see VM Data Plane identity (https://cloud.google.com/dataproc/docs/concepts/iam/dataproc-principals#vm_service_account_data_plane_identity)) used by Dataproc cluster VM instances to access Google Cloud Platform services.If not specified, the Compute Engine default service account (https://cloud.google.com/compute/docs/access/service-accounts#default_service_account) is used.
     #[serde(rename = "serviceAccount")]
     pub service_account: Option<String>,
@@ -1227,6 +2108,44 @@ pub struct InjectCredentialsRequest {
 
 impl common::RequestValue for InjectCredentialsRequest {}
 
+/// Metrics about the input data read by the task.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct InputMetrics {
+    /// no description provided
+    #[serde(rename = "bytesRead")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub bytes_read: Option<i64>,
+    /// no description provided
+    #[serde(rename = "recordsRead")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub records_read: Option<i64>,
+}
+
+impl common::Part for InputMetrics {}
+
+/// There is no detailed description.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct InputQuantileMetrics {
+    /// no description provided
+    #[serde(rename = "bytesRead")]
+    pub bytes_read: Option<Quantiles>,
+    /// no description provided
+    #[serde(rename = "recordsRead")]
+    pub records_read: Option<Quantiles>,
+}
+
+impl common::Part for InputQuantileMetrics {}
+
 /// Instance flexibility Policy allowing a mixture of VM shapes and provisioning models.
 ///
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -1241,6 +2160,9 @@ pub struct InstanceFlexibilityPolicy {
     /// Output only. A list of instance selection results in the group.
     #[serde(rename = "instanceSelectionResults")]
     pub instance_selection_results: Option<Vec<InstanceSelectionResult>>,
+    /// Optional. Defines how the Group selects the provisioning model to ensure required reliability.
+    #[serde(rename = "provisioningModelMix")]
+    pub provisioning_model_mix: Option<ProvisioningModelMix>,
 }
 
 impl common::Part for InstanceFlexibilityPolicy {}
@@ -1498,6 +2420,84 @@ pub struct Job {
 impl common::RequestValue for Job {}
 impl common::ResponseResult for Job {}
 
+/// Data corresponding to a spark job.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct JobData {
+    /// no description provided
+    #[serde(rename = "completionTime")]
+    pub completion_time: Option<chrono::DateTime<chrono::offset::Utc>>,
+    /// no description provided
+    pub description: Option<String>,
+    /// no description provided
+    #[serde(rename = "jobGroup")]
+    pub job_group: Option<String>,
+    /// no description provided
+    #[serde(rename = "jobId")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub job_id: Option<i64>,
+    /// no description provided
+    #[serde(rename = "killTasksSummary")]
+    pub kill_tasks_summary: Option<HashMap<String, i32>>,
+    /// no description provided
+    pub name: Option<String>,
+    /// no description provided
+    #[serde(rename = "numActiveStages")]
+    pub num_active_stages: Option<i32>,
+    /// no description provided
+    #[serde(rename = "numActiveTasks")]
+    pub num_active_tasks: Option<i32>,
+    /// no description provided
+    #[serde(rename = "numCompletedIndices")]
+    pub num_completed_indices: Option<i32>,
+    /// no description provided
+    #[serde(rename = "numCompletedStages")]
+    pub num_completed_stages: Option<i32>,
+    /// no description provided
+    #[serde(rename = "numCompletedTasks")]
+    pub num_completed_tasks: Option<i32>,
+    /// no description provided
+    #[serde(rename = "numFailedStages")]
+    pub num_failed_stages: Option<i32>,
+    /// no description provided
+    #[serde(rename = "numFailedTasks")]
+    pub num_failed_tasks: Option<i32>,
+    /// no description provided
+    #[serde(rename = "numKilledTasks")]
+    pub num_killed_tasks: Option<i32>,
+    /// no description provided
+    #[serde(rename = "numSkippedStages")]
+    pub num_skipped_stages: Option<i32>,
+    /// no description provided
+    #[serde(rename = "numSkippedTasks")]
+    pub num_skipped_tasks: Option<i32>,
+    /// no description provided
+    #[serde(rename = "numTasks")]
+    pub num_tasks: Option<i32>,
+    /// no description provided
+    #[serde(rename = "skippedStages")]
+    pub skipped_stages: Option<Vec<i32>>,
+    /// no description provided
+    #[serde(rename = "sqlExecutionId")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub sql_execution_id: Option<i64>,
+    /// no description provided
+    #[serde(rename = "stageIds")]
+    #[serde_as(as = "Option<Vec<serde_with::DisplayFromStr>>")]
+    pub stage_ids: Option<Vec<i64>>,
+    /// no description provided
+    pub status: Option<String>,
+    /// no description provided
+    #[serde(rename = "submissionTime")]
+    pub submission_time: Option<chrono::DateTime<chrono::offset::Utc>>,
+}
+
+impl common::Part for JobData {}
+
 /// Dataproc job config.
 ///
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -1575,6 +2575,35 @@ pub struct JobStatus {
 }
 
 impl common::Part for JobStatus {}
+
+/// Data related to Jobs page summary
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct JobsSummary {
+    /// Number of active jobs
+    #[serde(rename = "activeJobs")]
+    pub active_jobs: Option<i32>,
+    /// Spark Application Id
+    #[serde(rename = "applicationId")]
+    pub application_id: Option<String>,
+    /// Attempts info
+    pub attempts: Option<Vec<ApplicationAttemptInfo>>,
+    /// Number of completed jobs
+    #[serde(rename = "completedJobs")]
+    pub completed_jobs: Option<i32>,
+    /// Number of failed jobs
+    #[serde(rename = "failedJobs")]
+    pub failed_jobs: Option<i32>,
+    /// Spark Scheduling mode
+    #[serde(rename = "schedulingMode")]
+    pub scheduling_mode: Option<String>,
+}
+
+impl common::Part for JobsSummary {}
 
 /// Jupyter configuration for an interactive session.
 ///
@@ -1702,6 +2731,13 @@ pub struct LifecycleConfig {
     #[serde(rename = "autoDeleteTtl")]
     #[serde_as(as = "Option<common::serde::duration::Wrapper>")]
     pub auto_delete_ttl: Option<chrono::Duration>,
+    /// Optional. The time when cluster will be auto-stopped (see JSON representation of Timestamp (https://developers.google.com/protocol-buffers/docs/proto3#json)).
+    #[serde(rename = "autoStopTime")]
+    pub auto_stop_time: Option<chrono::DateTime<chrono::offset::Utc>>,
+    /// Optional. The lifetime duration of the cluster. The cluster will be auto-stopped at the end of this period, calculated from the time of submission of the create or update cluster request. Minimum value is 10 minutes; maximum value is 14 days (see JSON representation of Duration (https://developers.google.com/protocol-buffers/docs/proto3#json)).
+    #[serde(rename = "autoStopTtl")]
+    #[serde_as(as = "Option<common::serde::duration::Wrapper>")]
+    pub auto_stop_ttl: Option<chrono::Duration>,
     /// Optional. The duration to keep the cluster alive while idling (when no jobs are running). Passing this threshold will cause the cluster to be deleted. Minimum value is 5 minutes; maximum value is 14 days (see JSON representation of Duration (https://developers.google.com/protocol-buffers/docs/proto3#json)).
     #[serde(rename = "idleDeleteTtl")]
     #[serde_as(as = "Option<common::serde::duration::Wrapper>")]
@@ -1709,6 +2745,10 @@ pub struct LifecycleConfig {
     /// Output only. The time when cluster became idle (most recent job finished) and became eligible for deletion due to idleness (see JSON representation of Timestamp (https://developers.google.com/protocol-buffers/docs/proto3#json)).
     #[serde(rename = "idleStartTime")]
     pub idle_start_time: Option<chrono::DateTime<chrono::offset::Utc>>,
+    /// Optional. The duration to keep the cluster started while idling (when no jobs are running). Passing this threshold will cause the cluster to be stopped. Minimum value is 5 minutes; maximum value is 14 days (see JSON representation of Duration (https://developers.google.com/protocol-buffers/docs/proto3#json)).
+    #[serde(rename = "idleStopTtl")]
+    #[serde_as(as = "Option<common::serde::duration::Wrapper>")]
+    pub idle_stop_ttl: Option<chrono::Duration>,
 }
 
 impl common::Part for LifecycleConfig {}
@@ -1820,6 +2860,8 @@ pub struct ListOperationsResponse {
     pub next_page_token: Option<String>,
     /// A list of operations that matches the specified filter in the request.
     pub operations: Option<Vec<Operation>>,
+    /// Unordered list. Unreachable resources. Populated when the request sets ListOperationsRequest.return_partial_success and reads across collections e.g. when attempting to list all resources across all supported locations.
+    pub unreachable: Option<Vec<String>>,
 }
 
 impl common::ResponseResult for ListOperationsResponse {}
@@ -1946,6 +2988,34 @@ pub struct ManagedGroupConfig {
 
 impl common::Part for ManagedGroupConfig {}
 
+/// There is no detailed description.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct MemoryMetrics {
+    /// no description provided
+    #[serde(rename = "totalOffHeapStorageMemory")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub total_off_heap_storage_memory: Option<i64>,
+    /// no description provided
+    #[serde(rename = "totalOnHeapStorageMemory")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub total_on_heap_storage_memory: Option<i64>,
+    /// no description provided
+    #[serde(rename = "usedOffHeapStorageMemory")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub used_off_heap_storage_memory: Option<i64>,
+    /// no description provided
+    #[serde(rename = "usedOnHeapStorageMemory")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub used_on_heap_storage_memory: Option<i64>,
+}
+
+impl common::Part for MemoryMetrics {}
+
 /// Specifies a Metastore configuration.
 ///
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -1969,7 +3039,7 @@ impl common::Part for MetastoreConfig {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct Metric {
-    /// Optional. Specify one or more Custom metrics (https://cloud.google.com/dataproc/docs/guides/dataproc-metrics#custom_metrics) to collect for the metric course (for the SPARK metric source (any Spark metric (https://spark.apache.org/docs/latest/monitoring.html#metrics) can be specified).Provide metrics in the following format: METRIC_SOURCE: INSTANCE:GROUP:METRIC Use camelcase as appropriate.Examples: yarn:ResourceManager:QueueMetrics:AppsCompleted spark:driver:DAGScheduler:job.allJobs sparkHistoryServer:JVM:Memory:NonHeapMemoryUsage.committed hiveserver2:JVM:Memory:NonHeapMemoryUsage.used Notes: Only the specified overridden metrics are collected for the metric source. For example, if one or more spark:executive metrics are listed as metric overrides, other SPARK metrics are not collected. The collection of the metrics for other enabled custom metric sources is unaffected. For example, if both SPARK andd YARN metric sources are enabled, and overrides are provided for Spark metrics only, all YARN metrics are collected.
+    /// Optional. Specify one or more Custom metrics (https://cloud.google.com/dataproc/docs/guides/dataproc-metrics#custom_metrics) to collect for the metric course (for the SPARK metric source (any Spark metric (https://spark.apache.org/docs/latest/monitoring.html#metrics) can be specified).Provide metrics in the following format: METRIC_SOURCE: INSTANCE:GROUP:METRIC Use camelcase as appropriate.Examples: yarn:ResourceManager:QueueMetrics:AppsCompleted spark:driver:DAGScheduler:job.allJobs sparkHistoryServer:JVM:Memory:NonHeapMemoryUsage.committed hiveserver2:JVM:Memory:NonHeapMemoryUsage.used Notes: Only the specified overridden metrics are collected for the metric source. For example, if one or more spark:executive metrics are listed as metric overrides, other SPARK metrics are not collected. The collection of the metrics for other enabled custom metric sources is unaffected. For example, if both SPARK and YARN metric sources are enabled, and overrides are provided for Spark metrics only, all YARN metrics are collected.
     #[serde(rename = "metricOverrides")]
     pub metric_overrides: Option<Vec<String>>,
     /// Required. A standard set of metrics is collected unless metricOverrides are specified for the metric source (see Custom metrics (https://cloud.google.com/dataproc/docs/guides/dataproc-metrics#custom_metrics) for more information).
@@ -1997,6 +3067,54 @@ pub struct NamespacedGkeDeploymentTarget {
 
 impl common::Part for NamespacedGkeDeploymentTarget {}
 
+/// There is no detailed description.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct NativeBuildInfoUiData {
+    /// Optional. Build class of Native.
+    #[serde(rename = "buildClass")]
+    pub build_class: Option<String>,
+    /// Optional. Build related details.
+    #[serde(rename = "buildInfo")]
+    pub build_info: Option<Vec<BuildInfo>>,
+}
+
+impl common::Part for NativeBuildInfoUiData {}
+
+/// Native SQL Execution Data
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct NativeSqlExecutionUiData {
+    /// Optional. Description of the execution.
+    pub description: Option<String>,
+    /// Required. Execution ID of the Native SQL Execution.
+    #[serde(rename = "executionId")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub execution_id: Option<i64>,
+    /// Optional. Description of the fallback.
+    #[serde(rename = "fallbackDescription")]
+    pub fallback_description: Option<String>,
+    /// Optional. Fallback node to reason.
+    #[serde(rename = "fallbackNodeToReason")]
+    pub fallback_node_to_reason: Option<Vec<FallbackReason>>,
+    /// Optional. Number of nodes fallen back to Spark.
+    #[serde(rename = "numFallbackNodes")]
+    pub num_fallback_nodes: Option<i32>,
+    /// Optional. Number of nodes in Native.
+    #[serde(rename = "numNativeNodes")]
+    pub num_native_nodes: Option<i32>,
+}
+
+impl common::Part for NativeSqlExecutionUiData {}
+
 /// Dataproc Node Group. The Dataproc NodeGroup resource is not related to the Dataproc NodeGroupAffinity resource.
 ///
 /// # Activities
@@ -2010,7 +3128,7 @@ impl common::Part for NamespacedGkeDeploymentTarget {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct NodeGroup {
-    /// Optional. Node group labels. Label keys must consist of from 1 to 63 characters and conform to RFC 1035 (https://www.ietf.org/rfc/rfc1035.txt). Label values can be empty. If specified, they must consist of from 1 to 63 characters and conform to RFC 1035 (https://www.ietf.org/rfc/rfc1035.txt). The node group must have no more than 32 labelsn.
+    /// Optional. Node group labels. Label keys must consist of from 1 to 63 characters and conform to RFC 1035 (https://www.ietf.org/rfc/rfc1035.txt). Label values can be empty. If specified, they must consist of from 1 to 63 characters and conform to RFC 1035 (https://www.ietf.org/rfc/rfc1035.txt). The node group must have no more than 32 labels.
     pub labels: Option<HashMap<String, String>>,
     /// The Node group resource name (https://aip.dev/122).
     pub name: Option<String>,
@@ -2178,6 +3296,44 @@ pub struct OrderedJob {
 
 impl common::Part for OrderedJob {}
 
+/// Metrics about the data written by the task.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct OutputMetrics {
+    /// no description provided
+    #[serde(rename = "bytesWritten")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub bytes_written: Option<i64>,
+    /// no description provided
+    #[serde(rename = "recordsWritten")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub records_written: Option<i64>,
+}
+
+impl common::Part for OutputMetrics {}
+
+/// There is no detailed description.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct OutputQuantileMetrics {
+    /// no description provided
+    #[serde(rename = "bytesWritten")]
+    pub bytes_written: Option<Quantiles>,
+    /// no description provided
+    #[serde(rename = "recordsWritten")]
+    pub records_written: Option<Quantiles>,
+}
+
+impl common::Part for OutputQuantileMetrics {}
+
 /// Configuration for parameter validation.
 ///
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -2280,6 +3436,24 @@ pub struct Policy {
 
 impl common::ResponseResult for Policy {}
 
+/// Pool Data
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct PoolData {
+    /// no description provided
+    pub name: Option<String>,
+    /// no description provided
+    #[serde(rename = "stageIds")]
+    #[serde_as(as = "Option<Vec<serde_with::DisplayFromStr>>")]
+    pub stage_ids: Option<Vec<i64>>,
+}
+
+impl common::Part for PoolData {}
+
 /// A Dataproc job for running Presto (https://prestosql.io/) queries. IMPORTANT: The Dataproc Presto Optional Component (https://cloud.google.com/dataproc/docs/concepts/components/presto) must be enabled when the cluster is created to submit a Presto job to the cluster.
 ///
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -2311,6 +3485,72 @@ pub struct PrestoJob {
 }
 
 impl common::Part for PrestoJob {}
+
+/// Process Summary
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct ProcessSummary {
+    /// no description provided
+    #[serde(rename = "addTime")]
+    pub add_time: Option<chrono::DateTime<chrono::offset::Utc>>,
+    /// no description provided
+    #[serde(rename = "hostPort")]
+    pub host_port: Option<String>,
+    /// no description provided
+    #[serde(rename = "isActive")]
+    pub is_active: Option<bool>,
+    /// no description provided
+    #[serde(rename = "processId")]
+    pub process_id: Option<String>,
+    /// no description provided
+    #[serde(rename = "processLogs")]
+    pub process_logs: Option<HashMap<String, String>>,
+    /// no description provided
+    #[serde(rename = "removeTime")]
+    pub remove_time: Option<chrono::DateTime<chrono::offset::Utc>>,
+    /// no description provided
+    #[serde(rename = "totalCores")]
+    pub total_cores: Option<i32>,
+}
+
+impl common::Part for ProcessSummary {}
+
+/// Properties of the workload organized by origin.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct PropertiesInfo {
+    /// Output only. Properties set by autotuning engine.
+    #[serde(rename = "autotuningProperties")]
+    pub autotuning_properties: Option<HashMap<String, ValueInfo>>,
+}
+
+impl common::Part for PropertiesInfo {}
+
+/// Defines how Dataproc should create VMs with a mixture of provisioning models.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct ProvisioningModelMix {
+    /// Optional. The base capacity that will always use Standard VMs to avoid risk of more preemption than the minimum capacity you need. Dataproc will create only standard VMs until it reaches standard_capacity_base, then it will start using standard_capacity_percent_above_base to mix Spot with Standard VMs. eg. If 15 instances are requested and standard_capacity_base is 5, Dataproc will create 5 standard VMs and then start mixing spot and standard VMs for remaining 10 instances.
+    #[serde(rename = "standardCapacityBase")]
+    pub standard_capacity_base: Option<i32>,
+    /// Optional. The percentage of target capacity that should use Standard VM. The remaining percentage will use Spot VMs. The percentage applies only to the capacity above standard_capacity_base. eg. If 15 instances are requested and standard_capacity_base is 5 and standard_capacity_percent_above_base is 30, Dataproc will create 5 standard VMs and then start mixing spot and standard VMs for remaining 10 instances. The mix will be 30% standard and 70% spot.
+    #[serde(rename = "standardCapacityPercentAboveBase")]
+    pub standard_capacity_percent_above_base: Option<i32>,
+}
+
+impl common::Part for ProvisioningModelMix {}
 
 /// Configuration for PyPi repository
 ///
@@ -2356,7 +3596,7 @@ pub struct PySparkBatch {
 
 impl common::Part for PySparkBatch {}
 
-/// A Dataproc job for running Apache PySpark (https://spark.apache.org/docs/0.9.0/python-programming-guide.html) applications on YARN.
+/// A Dataproc job for running Apache PySpark (https://spark.apache.org/docs/latest/api/python/index.html#pyspark-overview) applications on YARN.
 ///
 /// This type is not used in any activity, and only used as *part* of another schema.
 ///
@@ -2364,7 +3604,7 @@ impl common::Part for PySparkBatch {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct PySparkJob {
-    /// Optional. HCFS URIs of archives to be extracted into the working directory of each executor. Supported file types: .jar, .tar, .tar.gz, .tgz, and .zip.
+    /// Optional. HCFS URIs of archives to be extracted into the working directory of each executor. Supported file types: .jar, .tar, .tar.gz, .tgz, and .zip.Note: Spark applications must be deployed in cluster mode (https://spark.apache.org/docs/latest/cluster-overview.html) for correct environment propagation.
     #[serde(rename = "archiveUris")]
     pub archive_uris: Option<Vec<String>>,
     /// Optional. The arguments to pass to the driver. Do not include arguments, such as --conf, that can be set as job properties, since a collision may occur that causes an incorrect job submission.
@@ -2390,6 +3630,39 @@ pub struct PySparkJob {
 
 impl common::Part for PySparkJob {}
 
+/// Quantile metrics data related to Tasks. Units can be seconds, bytes, milliseconds, etc depending on the message type.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct Quantiles {
+    /// no description provided
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub count: Option<i64>,
+    /// no description provided
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub maximum: Option<i64>,
+    /// no description provided
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub minimum: Option<i64>,
+    /// no description provided
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub percentile25: Option<i64>,
+    /// no description provided
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub percentile50: Option<i64>,
+    /// no description provided
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub percentile75: Option<i64>,
+    /// no description provided
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub sum: Option<i64>,
+}
+
+impl common::Part for Quantiles {}
+
 /// A list of queries to run on a cluster.
 ///
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -2403,6 +3676,209 @@ pub struct QueryList {
 }
 
 impl common::Part for QueryList {}
+
+/// Details about RDD usage.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct RddDataDistribution {
+    /// no description provided
+    pub address: Option<String>,
+    /// no description provided
+    #[serde(rename = "diskUsed")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub disk_used: Option<i64>,
+    /// no description provided
+    #[serde(rename = "memoryRemaining")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub memory_remaining: Option<i64>,
+    /// no description provided
+    #[serde(rename = "memoryUsed")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub memory_used: Option<i64>,
+    /// no description provided
+    #[serde(rename = "offHeapMemoryRemaining")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub off_heap_memory_remaining: Option<i64>,
+    /// no description provided
+    #[serde(rename = "offHeapMemoryUsed")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub off_heap_memory_used: Option<i64>,
+    /// no description provided
+    #[serde(rename = "onHeapMemoryRemaining")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub on_heap_memory_remaining: Option<i64>,
+    /// no description provided
+    #[serde(rename = "onHeapMemoryUsed")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub on_heap_memory_used: Option<i64>,
+}
+
+impl common::Part for RddDataDistribution {}
+
+/// A grouping of nodes representing higher level constructs (stage, job etc.).
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct RddOperationCluster {
+    /// no description provided
+    #[serde(rename = "childClusters")]
+    pub child_clusters: Option<Vec<RddOperationCluster>>,
+    /// no description provided
+    #[serde(rename = "childNodes")]
+    pub child_nodes: Option<Vec<RddOperationNode>>,
+    /// no description provided
+    pub name: Option<String>,
+    /// no description provided
+    #[serde(rename = "rddClusterId")]
+    pub rdd_cluster_id: Option<String>,
+}
+
+impl common::Part for RddOperationCluster {}
+
+/// A directed edge representing dependency between two RDDs.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct RddOperationEdge {
+    /// no description provided
+    #[serde(rename = "fromId")]
+    pub from_id: Option<i32>,
+    /// no description provided
+    #[serde(rename = "toId")]
+    pub to_id: Option<i32>,
+}
+
+impl common::Part for RddOperationEdge {}
+
+/// Graph representing RDD dependencies. Consists of edges and a root cluster.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct RddOperationGraph {
+    /// no description provided
+    pub edges: Option<Vec<RddOperationEdge>>,
+    /// no description provided
+    #[serde(rename = "incomingEdges")]
+    pub incoming_edges: Option<Vec<RddOperationEdge>>,
+    /// no description provided
+    #[serde(rename = "outgoingEdges")]
+    pub outgoing_edges: Option<Vec<RddOperationEdge>>,
+    /// no description provided
+    #[serde(rename = "rootCluster")]
+    pub root_cluster: Option<RddOperationCluster>,
+    /// no description provided
+    #[serde(rename = "stageId")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub stage_id: Option<i64>,
+}
+
+impl common::Part for RddOperationGraph {}
+
+/// A node in the RDD operation graph. Corresponds to a single RDD.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct RddOperationNode {
+    /// no description provided
+    pub barrier: Option<bool>,
+    /// no description provided
+    pub cached: Option<bool>,
+    /// no description provided
+    pub callsite: Option<String>,
+    /// no description provided
+    pub name: Option<String>,
+    /// no description provided
+    #[serde(rename = "nodeId")]
+    pub node_id: Option<i32>,
+    /// no description provided
+    #[serde(rename = "outputDeterministicLevel")]
+    pub output_deterministic_level: Option<String>,
+}
+
+impl common::Part for RddOperationNode {}
+
+/// Information about RDD partitions.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct RddPartitionInfo {
+    /// no description provided
+    #[serde(rename = "blockName")]
+    pub block_name: Option<String>,
+    /// no description provided
+    #[serde(rename = "diskUsed")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub disk_used: Option<i64>,
+    /// no description provided
+    pub executors: Option<Vec<String>>,
+    /// no description provided
+    #[serde(rename = "memoryUsed")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub memory_used: Option<i64>,
+    /// no description provided
+    #[serde(rename = "storageLevel")]
+    pub storage_level: Option<String>,
+}
+
+impl common::Part for RddPartitionInfo {}
+
+/// Overall data about RDD storage.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct RddStorageInfo {
+    /// no description provided
+    #[serde(rename = "dataDistribution")]
+    pub data_distribution: Option<Vec<RddDataDistribution>>,
+    /// no description provided
+    #[serde(rename = "diskUsed")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub disk_used: Option<i64>,
+    /// no description provided
+    #[serde(rename = "memoryUsed")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub memory_used: Option<i64>,
+    /// no description provided
+    pub name: Option<String>,
+    /// no description provided
+    #[serde(rename = "numCachedPartitions")]
+    pub num_cached_partitions: Option<i32>,
+    /// no description provided
+    #[serde(rename = "numPartitions")]
+    pub num_partitions: Option<i32>,
+    /// no description provided
+    pub partitions: Option<Vec<RddPartitionInfo>>,
+    /// no description provided
+    #[serde(rename = "rddStorageId")]
+    pub rdd_storage_id: Option<i32>,
+    /// no description provided
+    #[serde(rename = "storageLevel")]
+    pub storage_level: Option<String>,
+}
+
+impl common::Part for RddStorageInfo {}
 
 /// Validation based on regular expressions.
 ///
@@ -2430,9 +3906,14 @@ impl common::Part for RegexValidation {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct RepairClusterRequest {
+    /// Optional. Cluster to be repaired
+    pub cluster: Option<ClusterToRepair>,
     /// Optional. Specifying the cluster_uuid means the RPC will fail (with error NOT_FOUND) if a cluster with the specified UUID does not exist.
     #[serde(rename = "clusterUuid")]
     pub cluster_uuid: Option<String>,
+    /// Optional. Whether the request is submitted by Dataproc super user. If true, IAM will check 'dataproc.clusters.repair' permission instead of 'dataproc.clusters.update' permission. This is to give Dataproc superuser the ability to repair clusters without granting the overly broad update permission.
+    #[serde(rename = "dataprocSuperUser")]
+    pub dataproc_super_user: Option<bool>,
     /// Optional. Timeout for graceful YARN decommissioning. Graceful decommissioning facilitates the removal of cluster nodes without interrupting jobs in progress. The timeout specifies the amount of time to wait for jobs finish before forcefully removing nodes. The default timeout is 0 for forceful decommissioning, and the maximum timeout period is 1 day. (see JSON Mapping—Duration (https://developers.google.com/protocol-buffers/docs/proto3#json)).graceful_decommission_timeout is supported in Dataproc image versions 1.2+.
     #[serde(rename = "gracefulDecommissionTimeout")]
     #[serde_as(as = "Option<common::serde::duration::Wrapper>")]
@@ -2537,6 +4018,43 @@ pub struct ResizeNodeGroupRequest {
 
 impl common::RequestValue for ResizeNodeGroupRequest {}
 
+/// There is no detailed description.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct ResourceInformation {
+    /// no description provided
+    pub addresses: Option<Vec<String>>,
+    /// no description provided
+    pub name: Option<String>,
+}
+
+impl common::Part for ResourceInformation {}
+
+/// Resource profile that contains information about all the resources required by executors and tasks.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct ResourceProfileInfo {
+    /// no description provided
+    #[serde(rename = "executorResources")]
+    pub executor_resources: Option<HashMap<String, ExecutorResourceRequest>>,
+    /// no description provided
+    #[serde(rename = "resourceProfileId")]
+    pub resource_profile_id: Option<i32>,
+    /// no description provided
+    #[serde(rename = "taskResources")]
+    pub task_resources: Option<HashMap<String, TaskResourceRequest>>,
+}
+
+impl common::Part for ResourceProfileInfo {}
+
 /// Runtime configuration for a workload.
 ///
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -2586,9 +4104,364 @@ pub struct RuntimeInfo {
     /// Output only. A URI pointing to the location of the stdout and stderr of the workload.
     #[serde(rename = "outputUri")]
     pub output_uri: Option<String>,
+    /// Optional. Properties of the workload organized by origin.
+    #[serde(rename = "propertiesInfo")]
+    pub properties_info: Option<PropertiesInfo>,
 }
 
 impl common::Part for RuntimeInfo {}
+
+/// List of Executors associated with a Spark Application Stage.
+///
+/// # Activities
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+///
+/// * [locations sessions spark applications search executor stage summary projects](ProjectLocationSessionSparkApplicationSearchExecutorStageSummaryCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct SearchSessionSparkApplicationExecutorStageSummaryResponse {
+    /// This token is included in the response if there are more results to fetch. To fetch additional results, provide this value as the page_token in a subsequent SearchSessionSparkApplicationExecutorStageSummaryRequest.
+    #[serde(rename = "nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// Details about executors used by the application stage.
+    #[serde(rename = "sparkApplicationStageExecutors")]
+    pub spark_application_stage_executors: Option<Vec<ExecutorStageSummary>>,
+}
+
+impl common::ResponseResult for SearchSessionSparkApplicationExecutorStageSummaryResponse {}
+
+/// List of Executors associated with a Spark Application.
+///
+/// # Activities
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+///
+/// * [locations sessions spark applications search executors projects](ProjectLocationSessionSparkApplicationSearchExecutorCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct SearchSessionSparkApplicationExecutorsResponse {
+    /// This token is included in the response if there are more results to fetch. To fetch additional results, provide this value as the page_token in a subsequent SearchSessionSparkApplicationExecutorsRequest.
+    #[serde(rename = "nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// Details about executors used by the application.
+    #[serde(rename = "sparkApplicationExecutors")]
+    pub spark_application_executors: Option<Vec<ExecutorSummary>>,
+}
+
+impl common::ResponseResult for SearchSessionSparkApplicationExecutorsResponse {}
+
+/// A list of Jobs associated with a Spark Application.
+///
+/// # Activities
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+///
+/// * [locations sessions spark applications search jobs projects](ProjectLocationSessionSparkApplicationSearchJobCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct SearchSessionSparkApplicationJobsResponse {
+    /// This token is included in the response if there are more results to fetch. To fetch additional results, provide this value as the page_token in a subsequent SearchSessionSparkApplicationJobsRequest.
+    #[serde(rename = "nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// Output only. Data corresponding to a spark job.
+    #[serde(rename = "sparkApplicationJobs")]
+    pub spark_application_jobs: Option<Vec<JobData>>,
+}
+
+impl common::ResponseResult for SearchSessionSparkApplicationJobsResponse {}
+
+/// List of all queries for a Spark Application.
+///
+/// # Activities
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+///
+/// * [locations sessions spark applications search sql queries projects](ProjectLocationSessionSparkApplicationSearchSqlQueryCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct SearchSessionSparkApplicationSqlQueriesResponse {
+    /// This token is included in the response if there are more results to fetch. To fetch additional results, provide this value as the page_token in a subsequent SearchSessionSparkApplicationSqlQueriesRequest.
+    #[serde(rename = "nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// Output only. SQL Execution Data
+    #[serde(rename = "sparkApplicationSqlQueries")]
+    pub spark_application_sql_queries: Option<Vec<SqlExecutionUiData>>,
+}
+
+impl common::ResponseResult for SearchSessionSparkApplicationSqlQueriesResponse {}
+
+/// List of tasks for a stage of a Spark Application
+///
+/// # Activities
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+///
+/// * [locations sessions spark applications search stage attempt tasks projects](ProjectLocationSessionSparkApplicationSearchStageAttemptTaskCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct SearchSessionSparkApplicationStageAttemptTasksResponse {
+    /// This token is included in the response if there are more results to fetch. To fetch additional results, provide this value as the page_token in a subsequent SearchSessionSparkApplicationStageAttemptTasksRequest.
+    #[serde(rename = "nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// Output only. Data corresponding to tasks created by spark.
+    #[serde(rename = "sparkApplicationStageAttemptTasks")]
+    pub spark_application_stage_attempt_tasks: Option<Vec<TaskData>>,
+}
+
+impl common::ResponseResult for SearchSessionSparkApplicationStageAttemptTasksResponse {}
+
+/// A list of Stage Attempts for a Stage of a Spark Application.
+///
+/// # Activities
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+///
+/// * [locations sessions spark applications search stage attempts projects](ProjectLocationSessionSparkApplicationSearchStageAttemptCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct SearchSessionSparkApplicationStageAttemptsResponse {
+    /// This token is included in the response if there are more results to fetch. To fetch additional results, provide this value as the page_token in a subsequent SearchSessionSparkApplicationStageAttemptsRequest.
+    #[serde(rename = "nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// Output only. Data corresponding to a stage attempts
+    #[serde(rename = "sparkApplicationStageAttempts")]
+    pub spark_application_stage_attempts: Option<Vec<StageData>>,
+}
+
+impl common::ResponseResult for SearchSessionSparkApplicationStageAttemptsResponse {}
+
+/// A list of stages associated with a Spark Application.
+///
+/// # Activities
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+///
+/// * [locations sessions spark applications search stages projects](ProjectLocationSessionSparkApplicationSearchStageCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct SearchSessionSparkApplicationStagesResponse {
+    /// This token is included in the response if there are more results to fetch. To fetch additional results, provide this value as the page_token in a subsequent SearchSessionSparkApplicationStages.
+    #[serde(rename = "nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// Output only. Data corresponding to a stage.
+    #[serde(rename = "sparkApplicationStages")]
+    pub spark_application_stages: Option<Vec<StageData>>,
+}
+
+impl common::ResponseResult for SearchSessionSparkApplicationStagesResponse {}
+
+/// A list of summary of Spark Applications
+///
+/// # Activities
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+///
+/// * [locations sessions spark applications search projects](ProjectLocationSessionSparkApplicationSearchCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct SearchSessionSparkApplicationsResponse {
+    /// This token is included in the response if there are more results to fetch. To fetch additional results, provide this value as the page_token in a subsequent SearchSessionSparkApplicationsRequest.
+    #[serde(rename = "nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// Output only. High level information corresponding to an application.
+    #[serde(rename = "sparkApplications")]
+    pub spark_applications: Option<Vec<SparkApplication>>,
+}
+
+impl common::ResponseResult for SearchSessionSparkApplicationsResponse {}
+
+/// List of Executors associated with a Spark Application Stage.
+///
+/// # Activities
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+///
+/// * [locations batches spark applications search executor stage summary projects](ProjectLocationBatchSparkApplicationSearchExecutorStageSummaryCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct SearchSparkApplicationExecutorStageSummaryResponse {
+    /// This token is included in the response if there are more results to fetch. To fetch additional results, provide this value as the page_token in a subsequent SearchSparkApplicationExecutorsListRequest.
+    #[serde(rename = "nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// Details about executors used by the application stage.
+    #[serde(rename = "sparkApplicationStageExecutors")]
+    pub spark_application_stage_executors: Option<Vec<ExecutorStageSummary>>,
+}
+
+impl common::ResponseResult for SearchSparkApplicationExecutorStageSummaryResponse {}
+
+/// List of Executors associated with a Spark Application.
+///
+/// # Activities
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+///
+/// * [locations batches spark applications search executors projects](ProjectLocationBatchSparkApplicationSearchExecutorCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct SearchSparkApplicationExecutorsResponse {
+    /// This token is included in the response if there are more results to fetch. To fetch additional results, provide this value as the page_token in a subsequent SearchSparkApplicationExecutorsListRequest.
+    #[serde(rename = "nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// Details about executors used by the application.
+    #[serde(rename = "sparkApplicationExecutors")]
+    pub spark_application_executors: Option<Vec<ExecutorSummary>>,
+}
+
+impl common::ResponseResult for SearchSparkApplicationExecutorsResponse {}
+
+/// A list of Jobs associated with a Spark Application.
+///
+/// # Activities
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+///
+/// * [locations batches spark applications search jobs projects](ProjectLocationBatchSparkApplicationSearchJobCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct SearchSparkApplicationJobsResponse {
+    /// This token is included in the response if there are more results to fetch. To fetch additional results, provide this value as the page_token in a subsequent SearchSparkApplicationJobsRequest.
+    #[serde(rename = "nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// Output only. Data corresponding to a spark job.
+    #[serde(rename = "sparkApplicationJobs")]
+    pub spark_application_jobs: Option<Vec<JobData>>,
+}
+
+impl common::ResponseResult for SearchSparkApplicationJobsResponse {}
+
+/// List of all queries for a Spark Application.
+///
+/// # Activities
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+///
+/// * [locations batches spark applications search sql queries projects](ProjectLocationBatchSparkApplicationSearchSqlQueryCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct SearchSparkApplicationSqlQueriesResponse {
+    /// This token is included in the response if there are more results to fetch. To fetch additional results, provide this value as the page_token in a subsequent SearchSparkApplicationSqlQueriesRequest.
+    #[serde(rename = "nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// Output only. SQL Execution Data
+    #[serde(rename = "sparkApplicationSqlQueries")]
+    pub spark_application_sql_queries: Option<Vec<SqlExecutionUiData>>,
+}
+
+impl common::ResponseResult for SearchSparkApplicationSqlQueriesResponse {}
+
+/// List of tasks for a stage of a Spark Application
+///
+/// # Activities
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+///
+/// * [locations batches spark applications search stage attempt tasks projects](ProjectLocationBatchSparkApplicationSearchStageAttemptTaskCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct SearchSparkApplicationStageAttemptTasksResponse {
+    /// This token is included in the response if there are more results to fetch. To fetch additional results, provide this value as the page_token in a subsequent ListSparkApplicationStageAttemptTasksRequest.
+    #[serde(rename = "nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// Output only. Data corresponding to tasks created by spark.
+    #[serde(rename = "sparkApplicationStageAttemptTasks")]
+    pub spark_application_stage_attempt_tasks: Option<Vec<TaskData>>,
+}
+
+impl common::ResponseResult for SearchSparkApplicationStageAttemptTasksResponse {}
+
+/// A list of Stage Attempts for a Stage of a Spark Application.
+///
+/// # Activities
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+///
+/// * [locations batches spark applications search stage attempts projects](ProjectLocationBatchSparkApplicationSearchStageAttemptCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct SearchSparkApplicationStageAttemptsResponse {
+    /// This token is included in the response if there are more results to fetch. To fetch additional results, provide this value as the page_token in a subsequent ListSparkApplicationStageAttemptsRequest.
+    #[serde(rename = "nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// Output only. Data corresponding to a stage attempts
+    #[serde(rename = "sparkApplicationStageAttempts")]
+    pub spark_application_stage_attempts: Option<Vec<StageData>>,
+}
+
+impl common::ResponseResult for SearchSparkApplicationStageAttemptsResponse {}
+
+/// A list of stages associated with a Spark Application.
+///
+/// # Activities
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+///
+/// * [locations batches spark applications search stages projects](ProjectLocationBatchSparkApplicationSearchStageCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct SearchSparkApplicationStagesResponse {
+    /// This token is included in the response if there are more results to fetch. To fetch additional results, provide this value as the page_token in a subsequent SearchSparkApplicationStages.
+    #[serde(rename = "nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// Output only. Data corresponding to a stage.
+    #[serde(rename = "sparkApplicationStages")]
+    pub spark_application_stages: Option<Vec<StageData>>,
+}
+
+impl common::ResponseResult for SearchSparkApplicationStagesResponse {}
+
+/// A list of summary of Spark Applications
+///
+/// # Activities
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+///
+/// * [locations batches spark applications search projects](ProjectLocationBatchSparkApplicationSearchCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct SearchSparkApplicationsResponse {
+    /// This token is included in the response if there are more results to fetch. To fetch additional results, provide this value as the page_token in a subsequent SearchSparkApplicationsRequest.
+    #[serde(rename = "nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// Output only. High level information corresponding to an application.
+    #[serde(rename = "sparkApplications")]
+    pub spark_applications: Option<Vec<SparkApplication>>,
+}
+
+impl common::ResponseResult for SearchSparkApplicationsResponse {}
 
 /// Security related configuration, including encryption, Kerberos, etc.
 ///
@@ -2634,7 +4507,7 @@ pub struct Session {
     pub jupyter_session: Option<JupyterConfig>,
     /// Optional. The labels to associate with the session. Label keys must contain 1 to 63 characters, and must conform to RFC 1035 (https://www.ietf.org/rfc/rfc1035.txt). Label values may be empty, but, if present, must contain 1 to 63 characters, and must conform to RFC 1035 (https://www.ietf.org/rfc/rfc1035.txt). No more than 32 labels can be associated with a session.
     pub labels: Option<HashMap<String, String>>,
-    /// Required. The resource name of the session.
+    /// Identifier. The resource name of the session.
     pub name: Option<String>,
     /// Optional. Runtime configuration for the session execution.
     #[serde(rename = "runtimeConfig")]
@@ -2645,6 +4518,9 @@ pub struct Session {
     /// Optional. The session template used by the session.Only resource names, including project ID and location, are valid.Example: * https://www.googleapis.com/compute/v1/projects/[project_id]/locations/[dataproc_region]/sessionTemplates/[template_id] * projects/[project_id]/locations/[dataproc_region]/sessionTemplates/[template_id]The template must be in the same project and Dataproc region as the session.
     #[serde(rename = "sessionTemplate")]
     pub session_template: Option<String>,
+    /// Optional. Spark connect session config.
+    #[serde(rename = "sparkConnectSession")]
+    pub spark_connect_session: Option<SparkConnectConfig>,
     /// Output only. A state of the session.
     pub state: Option<String>,
     /// Output only. Historical state information for the session.
@@ -2714,11 +4590,14 @@ pub struct SessionTemplate {
     pub jupyter_session: Option<JupyterConfig>,
     /// Optional. Labels to associate with sessions created using this template. Label keys must contain 1 to 63 characters, and must conform to RFC 1035 (https://www.ietf.org/rfc/rfc1035.txt). Label values can be empty, but, if present, must contain 1 to 63 characters and conform to RFC 1035 (https://www.ietf.org/rfc/rfc1035.txt). No more than 32 labels can be associated with a session.
     pub labels: Option<HashMap<String, String>>,
-    /// Required. The resource name of the session template.
+    /// Required. Identifier. The resource name of the session template.
     pub name: Option<String>,
     /// Optional. Runtime configuration for session execution.
     #[serde(rename = "runtimeConfig")]
     pub runtime_config: Option<RuntimeConfig>,
+    /// Optional. Spark connect session config.
+    #[serde(rename = "sparkConnectSession")]
+    pub spark_connect_session: Option<SparkConnectConfig>,
     /// Output only. The time the template was last updated.
     #[serde(rename = "updateTime")]
     pub update_time: Option<chrono::DateTime<chrono::offset::Utc>>,
@@ -2774,6 +4653,247 @@ pub struct ShieldedInstanceConfig {
 
 impl common::Part for ShieldedInstanceConfig {}
 
+/// There is no detailed description.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct ShufflePushReadMetrics {
+    /// no description provided
+    #[serde(rename = "corruptMergedBlockChunks")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub corrupt_merged_block_chunks: Option<i64>,
+    /// no description provided
+    #[serde(rename = "localMergedBlocksFetched")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub local_merged_blocks_fetched: Option<i64>,
+    /// no description provided
+    #[serde(rename = "localMergedBytesRead")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub local_merged_bytes_read: Option<i64>,
+    /// no description provided
+    #[serde(rename = "localMergedChunksFetched")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub local_merged_chunks_fetched: Option<i64>,
+    /// no description provided
+    #[serde(rename = "mergedFetchFallbackCount")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub merged_fetch_fallback_count: Option<i64>,
+    /// no description provided
+    #[serde(rename = "remoteMergedBlocksFetched")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub remote_merged_blocks_fetched: Option<i64>,
+    /// no description provided
+    #[serde(rename = "remoteMergedBytesRead")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub remote_merged_bytes_read: Option<i64>,
+    /// no description provided
+    #[serde(rename = "remoteMergedChunksFetched")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub remote_merged_chunks_fetched: Option<i64>,
+    /// no description provided
+    #[serde(rename = "remoteMergedReqsDuration")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub remote_merged_reqs_duration: Option<i64>,
+}
+
+impl common::Part for ShufflePushReadMetrics {}
+
+/// There is no detailed description.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct ShufflePushReadQuantileMetrics {
+    /// no description provided
+    #[serde(rename = "corruptMergedBlockChunks")]
+    pub corrupt_merged_block_chunks: Option<Quantiles>,
+    /// no description provided
+    #[serde(rename = "localMergedBlocksFetched")]
+    pub local_merged_blocks_fetched: Option<Quantiles>,
+    /// no description provided
+    #[serde(rename = "localMergedBytesRead")]
+    pub local_merged_bytes_read: Option<Quantiles>,
+    /// no description provided
+    #[serde(rename = "localMergedChunksFetched")]
+    pub local_merged_chunks_fetched: Option<Quantiles>,
+    /// no description provided
+    #[serde(rename = "mergedFetchFallbackCount")]
+    pub merged_fetch_fallback_count: Option<Quantiles>,
+    /// no description provided
+    #[serde(rename = "remoteMergedBlocksFetched")]
+    pub remote_merged_blocks_fetched: Option<Quantiles>,
+    /// no description provided
+    #[serde(rename = "remoteMergedBytesRead")]
+    pub remote_merged_bytes_read: Option<Quantiles>,
+    /// no description provided
+    #[serde(rename = "remoteMergedChunksFetched")]
+    pub remote_merged_chunks_fetched: Option<Quantiles>,
+    /// no description provided
+    #[serde(rename = "remoteMergedReqsDuration")]
+    pub remote_merged_reqs_duration: Option<Quantiles>,
+}
+
+impl common::Part for ShufflePushReadQuantileMetrics {}
+
+/// Shuffle data read by the task.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct ShuffleReadMetrics {
+    /// no description provided
+    #[serde(rename = "fetchWaitTimeMillis")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub fetch_wait_time_millis: Option<i64>,
+    /// no description provided
+    #[serde(rename = "localBlocksFetched")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub local_blocks_fetched: Option<i64>,
+    /// no description provided
+    #[serde(rename = "localBytesRead")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub local_bytes_read: Option<i64>,
+    /// no description provided
+    #[serde(rename = "recordsRead")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub records_read: Option<i64>,
+    /// no description provided
+    #[serde(rename = "remoteBlocksFetched")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub remote_blocks_fetched: Option<i64>,
+    /// no description provided
+    #[serde(rename = "remoteBytesRead")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub remote_bytes_read: Option<i64>,
+    /// no description provided
+    #[serde(rename = "remoteBytesReadToDisk")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub remote_bytes_read_to_disk: Option<i64>,
+    /// no description provided
+    #[serde(rename = "remoteReqsDuration")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub remote_reqs_duration: Option<i64>,
+    /// no description provided
+    #[serde(rename = "shufflePushReadMetrics")]
+    pub shuffle_push_read_metrics: Option<ShufflePushReadMetrics>,
+}
+
+impl common::Part for ShuffleReadMetrics {}
+
+/// There is no detailed description.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct ShuffleReadQuantileMetrics {
+    /// no description provided
+    #[serde(rename = "fetchWaitTimeMillis")]
+    pub fetch_wait_time_millis: Option<Quantiles>,
+    /// no description provided
+    #[serde(rename = "localBlocksFetched")]
+    pub local_blocks_fetched: Option<Quantiles>,
+    /// no description provided
+    #[serde(rename = "readBytes")]
+    pub read_bytes: Option<Quantiles>,
+    /// no description provided
+    #[serde(rename = "readRecords")]
+    pub read_records: Option<Quantiles>,
+    /// no description provided
+    #[serde(rename = "remoteBlocksFetched")]
+    pub remote_blocks_fetched: Option<Quantiles>,
+    /// no description provided
+    #[serde(rename = "remoteBytesRead")]
+    pub remote_bytes_read: Option<Quantiles>,
+    /// no description provided
+    #[serde(rename = "remoteBytesReadToDisk")]
+    pub remote_bytes_read_to_disk: Option<Quantiles>,
+    /// no description provided
+    #[serde(rename = "remoteReqsDuration")]
+    pub remote_reqs_duration: Option<Quantiles>,
+    /// no description provided
+    #[serde(rename = "shufflePushReadMetrics")]
+    pub shuffle_push_read_metrics: Option<ShufflePushReadQuantileMetrics>,
+    /// no description provided
+    #[serde(rename = "totalBlocksFetched")]
+    pub total_blocks_fetched: Option<Quantiles>,
+}
+
+impl common::Part for ShuffleReadQuantileMetrics {}
+
+/// Shuffle data written by task.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct ShuffleWriteMetrics {
+    /// no description provided
+    #[serde(rename = "bytesWritten")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub bytes_written: Option<i64>,
+    /// no description provided
+    #[serde(rename = "recordsWritten")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub records_written: Option<i64>,
+    /// no description provided
+    #[serde(rename = "writeTimeNanos")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub write_time_nanos: Option<i64>,
+}
+
+impl common::Part for ShuffleWriteMetrics {}
+
+/// There is no detailed description.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct ShuffleWriteQuantileMetrics {
+    /// no description provided
+    #[serde(rename = "writeBytes")]
+    pub write_bytes: Option<Quantiles>,
+    /// no description provided
+    #[serde(rename = "writeRecords")]
+    pub write_records: Option<Quantiles>,
+    /// no description provided
+    #[serde(rename = "writeTimeNanos")]
+    pub write_time_nanos: Option<Quantiles>,
+}
+
+impl common::Part for ShuffleWriteQuantileMetrics {}
+
+/// There is no detailed description.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct SinkProgress {
+    /// no description provided
+    pub description: Option<String>,
+    /// no description provided
+    pub metrics: Option<HashMap<String, String>>,
+    /// no description provided
+    #[serde(rename = "numOutputRows")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub num_output_rows: Option<i64>,
+}
+
+impl common::Part for SinkProgress {}
+
 /// Specifies the selection and config of software inside the cluster.
 ///
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -2782,7 +4902,7 @@ impl common::Part for ShieldedInstanceConfig {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct SoftwareConfig {
-    /// Optional. The version of software inside the cluster. It must be one of the supported Dataproc Versions (https://cloud.google.com/dataproc/docs/concepts/versioning/dataproc-versions#supported_dataproc_versions), such as "1.2" (including a subminor version, such as "1.2.29"), or the "preview" version (https://cloud.google.com/dataproc/docs/concepts/versioning/dataproc-versions#other_versions). If unspecified, it defaults to the latest Debian version.
+    /// Optional. The version of software inside the cluster. It must be one of the supported Dataproc Versions (https://cloud.google.com/dataproc/docs/concepts/versioning/dataproc-versions#supported-dataproc-image-versions), such as "1.2" (including a subminor version, such as "1.2.29"), or the "preview" version (https://cloud.google.com/dataproc/docs/concepts/versioning/dataproc-versions#other_versions). If unspecified, it defaults to the latest Debian version.
     #[serde(rename = "imageVersion")]
     pub image_version: Option<String>,
     /// Optional. The set of components to activate on the cluster.
@@ -2793,6 +4913,57 @@ pub struct SoftwareConfig {
 }
 
 impl common::Part for SoftwareConfig {}
+
+/// There is no detailed description.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct SourceProgress {
+    /// no description provided
+    pub description: Option<String>,
+    /// no description provided
+    #[serde(rename = "endOffset")]
+    pub end_offset: Option<String>,
+    /// no description provided
+    #[serde(rename = "inputRowsPerSecond")]
+    pub input_rows_per_second: Option<f64>,
+    /// no description provided
+    #[serde(rename = "latestOffset")]
+    pub latest_offset: Option<String>,
+    /// no description provided
+    pub metrics: Option<HashMap<String, String>>,
+    /// no description provided
+    #[serde(rename = "numInputRows")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub num_input_rows: Option<i64>,
+    /// no description provided
+    #[serde(rename = "processedRowsPerSecond")]
+    pub processed_rows_per_second: Option<f64>,
+    /// no description provided
+    #[serde(rename = "startOffset")]
+    pub start_offset: Option<String>,
+}
+
+impl common::Part for SourceProgress {}
+
+/// A summary of Spark Application
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct SparkApplication {
+    /// Output only. High level information corresponding to an application.
+    pub application: Option<ApplicationInfo>,
+    /// Identifier. Name of the spark application
+    pub name: Option<String>,
+}
+
+impl common::Part for SparkApplication {}
 
 /// A configuration for running an Apache Spark (https://spark.apache.org/) batch workload.
 ///
@@ -2822,6 +4993,19 @@ pub struct SparkBatch {
 }
 
 impl common::Part for SparkBatch {}
+
+/// Spark connect configuration for an interactive session.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct SparkConnectConfig {
+    _never_set: Option<bool>,
+}
+
+impl common::Part for SparkConnectConfig {}
 
 /// Spark History Server configuration for the workload.
 ///
@@ -2871,6 +5055,108 @@ pub struct SparkJob {
 }
 
 impl common::Part for SparkJob {}
+
+/// A graph used for storing information of an executionPlan of DataFrame.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct SparkPlanGraph {
+    /// no description provided
+    pub edges: Option<Vec<SparkPlanGraphEdge>>,
+    /// no description provided
+    #[serde(rename = "executionId")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub execution_id: Option<i64>,
+    /// no description provided
+    pub nodes: Option<Vec<SparkPlanGraphNodeWrapper>>,
+}
+
+impl common::Part for SparkPlanGraph {}
+
+/// Represents a tree of spark plan.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct SparkPlanGraphCluster {
+    /// no description provided
+    pub desc: Option<String>,
+    /// no description provided
+    pub metrics: Option<Vec<SqlPlanMetric>>,
+    /// no description provided
+    pub name: Option<String>,
+    /// no description provided
+    pub nodes: Option<Vec<SparkPlanGraphNodeWrapper>>,
+    /// no description provided
+    #[serde(rename = "sparkPlanGraphClusterId")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub spark_plan_graph_cluster_id: Option<i64>,
+}
+
+impl common::Part for SparkPlanGraphCluster {}
+
+/// Represents a directed edge in the spark plan tree from child to parent.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct SparkPlanGraphEdge {
+    /// no description provided
+    #[serde(rename = "fromId")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub from_id: Option<i64>,
+    /// no description provided
+    #[serde(rename = "toId")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub to_id: Option<i64>,
+}
+
+impl common::Part for SparkPlanGraphEdge {}
+
+/// Represents a node in the spark plan tree.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct SparkPlanGraphNode {
+    /// no description provided
+    pub desc: Option<String>,
+    /// no description provided
+    pub metrics: Option<Vec<SqlPlanMetric>>,
+    /// no description provided
+    pub name: Option<String>,
+    /// no description provided
+    #[serde(rename = "sparkPlanGraphNodeId")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub spark_plan_graph_node_id: Option<i64>,
+}
+
+impl common::Part for SparkPlanGraphNode {}
+
+/// Wrapper user to represent either a node or a cluster.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct SparkPlanGraphNodeWrapper {
+    /// no description provided
+    pub cluster: Option<SparkPlanGraphCluster>,
+    /// no description provided
+    pub node: Option<SparkPlanGraphNode>,
+}
+
+impl common::Part for SparkPlanGraphNodeWrapper {}
 
 /// A configuration for running an Apache SparkR (https://spark.apache.org/docs/latest/sparkr.html) batch workload.
 ///
@@ -2922,6 +5208,27 @@ pub struct SparkRJob {
 }
 
 impl common::Part for SparkRJob {}
+
+/// There is no detailed description.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct SparkRuntimeInfo {
+    /// no description provided
+    #[serde(rename = "javaHome")]
+    pub java_home: Option<String>,
+    /// no description provided
+    #[serde(rename = "javaVersion")]
+    pub java_version: Option<String>,
+    /// no description provided
+    #[serde(rename = "scalaVersion")]
+    pub scala_version: Option<String>,
+}
+
+impl common::Part for SparkRuntimeInfo {}
 
 /// A configuration for running Apache Spark SQL (https://spark.apache.org/sql/) queries as a batch workload.
 ///
@@ -3004,6 +5311,601 @@ pub struct SparkStandaloneAutoscalingConfig {
 
 impl common::Part for SparkStandaloneAutoscalingConfig {}
 
+/// Outer message that contains the data obtained from spark listener, packaged with information that is required to process it.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct SparkWrapperObject {
+    /// no description provided
+    #[serde(rename = "appSummary")]
+    pub app_summary: Option<AppSummary>,
+    /// no description provided
+    #[serde(rename = "applicationEnvironmentInfo")]
+    pub application_environment_info: Option<ApplicationEnvironmentInfo>,
+    /// Application Id created by Spark.
+    #[serde(rename = "applicationId")]
+    pub application_id: Option<String>,
+    /// no description provided
+    #[serde(rename = "applicationInfo")]
+    pub application_info: Option<ApplicationInfo>,
+    /// VM Timestamp associated with the data object.
+    #[serde(rename = "eventTimestamp")]
+    pub event_timestamp: Option<chrono::DateTime<chrono::offset::Utc>>,
+    /// no description provided
+    #[serde(rename = "executorStageSummary")]
+    pub executor_stage_summary: Option<ExecutorStageSummary>,
+    /// no description provided
+    #[serde(rename = "executorSummary")]
+    pub executor_summary: Option<ExecutorSummary>,
+    /// no description provided
+    #[serde(rename = "jobData")]
+    pub job_data: Option<JobData>,
+    /// Native Build Info
+    #[serde(rename = "nativeBuildInfoUiData")]
+    pub native_build_info_ui_data: Option<NativeBuildInfoUiData>,
+    /// Native SQL Execution Info
+    #[serde(rename = "nativeSqlExecutionUiData")]
+    pub native_sql_execution_ui_data: Option<NativeSqlExecutionUiData>,
+    /// no description provided
+    #[serde(rename = "poolData")]
+    pub pool_data: Option<PoolData>,
+    /// no description provided
+    #[serde(rename = "processSummary")]
+    pub process_summary: Option<ProcessSummary>,
+    /// no description provided
+    #[serde(rename = "rddOperationGraph")]
+    pub rdd_operation_graph: Option<RddOperationGraph>,
+    /// no description provided
+    #[serde(rename = "rddStorageInfo")]
+    pub rdd_storage_info: Option<RddStorageInfo>,
+    /// no description provided
+    #[serde(rename = "resourceProfileInfo")]
+    pub resource_profile_info: Option<ResourceProfileInfo>,
+    /// no description provided
+    #[serde(rename = "sparkPlanGraph")]
+    pub spark_plan_graph: Option<SparkPlanGraph>,
+    /// no description provided
+    #[serde(rename = "speculationStageSummary")]
+    pub speculation_stage_summary: Option<SpeculationStageSummary>,
+    /// no description provided
+    #[serde(rename = "sqlExecutionUiData")]
+    pub sql_execution_ui_data: Option<SqlExecutionUiData>,
+    /// no description provided
+    #[serde(rename = "stageData")]
+    pub stage_data: Option<StageData>,
+    /// no description provided
+    #[serde(rename = "streamBlockData")]
+    pub stream_block_data: Option<StreamBlockData>,
+    /// no description provided
+    #[serde(rename = "streamingQueryData")]
+    pub streaming_query_data: Option<StreamingQueryData>,
+    /// no description provided
+    #[serde(rename = "streamingQueryProgress")]
+    pub streaming_query_progress: Option<StreamingQueryProgress>,
+    /// no description provided
+    #[serde(rename = "taskData")]
+    pub task_data: Option<TaskData>,
+}
+
+impl common::Part for SparkWrapperObject {}
+
+/// Details of the speculation task when speculative execution is enabled.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct SpeculationStageSummary {
+    /// no description provided
+    #[serde(rename = "numActiveTasks")]
+    pub num_active_tasks: Option<i32>,
+    /// no description provided
+    #[serde(rename = "numCompletedTasks")]
+    pub num_completed_tasks: Option<i32>,
+    /// no description provided
+    #[serde(rename = "numFailedTasks")]
+    pub num_failed_tasks: Option<i32>,
+    /// no description provided
+    #[serde(rename = "numKilledTasks")]
+    pub num_killed_tasks: Option<i32>,
+    /// no description provided
+    #[serde(rename = "numTasks")]
+    pub num_tasks: Option<i32>,
+    /// no description provided
+    #[serde(rename = "stageAttemptId")]
+    pub stage_attempt_id: Option<i32>,
+    /// no description provided
+    #[serde(rename = "stageId")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub stage_id: Option<i64>,
+}
+
+impl common::Part for SpeculationStageSummary {}
+
+/// SQL Execution Data
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct SqlExecutionUiData {
+    /// no description provided
+    #[serde(rename = "completionTime")]
+    pub completion_time: Option<chrono::DateTime<chrono::offset::Utc>>,
+    /// no description provided
+    pub description: Option<String>,
+    /// no description provided
+    pub details: Option<String>,
+    /// no description provided
+    #[serde(rename = "errorMessage")]
+    pub error_message: Option<String>,
+    /// no description provided
+    #[serde(rename = "executionId")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub execution_id: Option<i64>,
+    /// no description provided
+    pub jobs: Option<HashMap<String, String>>,
+    /// no description provided
+    #[serde(rename = "metricValues")]
+    pub metric_values: Option<HashMap<String, String>>,
+    /// no description provided
+    #[serde(rename = "metricValuesIsNull")]
+    pub metric_values_is_null: Option<bool>,
+    /// no description provided
+    pub metrics: Option<Vec<SqlPlanMetric>>,
+    /// no description provided
+    #[serde(rename = "modifiedConfigs")]
+    pub modified_configs: Option<HashMap<String, String>>,
+    /// no description provided
+    #[serde(rename = "physicalPlanDescription")]
+    pub physical_plan_description: Option<String>,
+    /// no description provided
+    #[serde(rename = "rootExecutionId")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub root_execution_id: Option<i64>,
+    /// no description provided
+    #[serde_as(as = "Option<Vec<serde_with::DisplayFromStr>>")]
+    pub stages: Option<Vec<i64>>,
+    /// no description provided
+    #[serde(rename = "submissionTime")]
+    pub submission_time: Option<chrono::DateTime<chrono::offset::Utc>>,
+}
+
+impl common::Part for SqlExecutionUiData {}
+
+/// Metrics related to SQL execution.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct SqlPlanMetric {
+    /// no description provided
+    #[serde(rename = "accumulatorId")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub accumulator_id: Option<i64>,
+    /// no description provided
+    #[serde(rename = "metricType")]
+    pub metric_type: Option<String>,
+    /// no description provided
+    pub name: Option<String>,
+}
+
+impl common::Part for SqlPlanMetric {}
+
+/// Data related to tasks summary for a Spark Stage Attempt
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct StageAttemptTasksSummary {
+    /// no description provided
+    #[serde(rename = "applicationId")]
+    pub application_id: Option<String>,
+    /// no description provided
+    #[serde(rename = "numFailedTasks")]
+    pub num_failed_tasks: Option<i32>,
+    /// no description provided
+    #[serde(rename = "numKilledTasks")]
+    pub num_killed_tasks: Option<i32>,
+    /// no description provided
+    #[serde(rename = "numPendingTasks")]
+    pub num_pending_tasks: Option<i32>,
+    /// no description provided
+    #[serde(rename = "numRunningTasks")]
+    pub num_running_tasks: Option<i32>,
+    /// no description provided
+    #[serde(rename = "numSuccessTasks")]
+    pub num_success_tasks: Option<i32>,
+    /// no description provided
+    #[serde(rename = "numTasks")]
+    pub num_tasks: Option<i32>,
+    /// no description provided
+    #[serde(rename = "stageAttemptId")]
+    pub stage_attempt_id: Option<i32>,
+    /// no description provided
+    #[serde(rename = "stageId")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub stage_id: Option<i64>,
+}
+
+impl common::Part for StageAttemptTasksSummary {}
+
+/// Data corresponding to a stage.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct StageData {
+    /// no description provided
+    #[serde(rename = "accumulatorUpdates")]
+    pub accumulator_updates: Option<Vec<AccumulableInfo>>,
+    /// no description provided
+    #[serde(rename = "completionTime")]
+    pub completion_time: Option<chrono::DateTime<chrono::offset::Utc>>,
+    /// no description provided
+    pub description: Option<String>,
+    /// no description provided
+    pub details: Option<String>,
+    /// no description provided
+    #[serde(rename = "executorMetricsDistributions")]
+    pub executor_metrics_distributions: Option<ExecutorMetricsDistributions>,
+    /// no description provided
+    #[serde(rename = "executorSummary")]
+    pub executor_summary: Option<HashMap<String, ExecutorStageSummary>>,
+    /// no description provided
+    #[serde(rename = "failureReason")]
+    pub failure_reason: Option<String>,
+    /// no description provided
+    #[serde(rename = "firstTaskLaunchedTime")]
+    pub first_task_launched_time: Option<chrono::DateTime<chrono::offset::Utc>>,
+    /// no description provided
+    #[serde(rename = "isShufflePushEnabled")]
+    pub is_shuffle_push_enabled: Option<bool>,
+    /// no description provided
+    #[serde(rename = "jobIds")]
+    #[serde_as(as = "Option<Vec<serde_with::DisplayFromStr>>")]
+    pub job_ids: Option<Vec<i64>>,
+    /// no description provided
+    #[serde(rename = "killedTasksSummary")]
+    pub killed_tasks_summary: Option<HashMap<String, i32>>,
+    /// no description provided
+    #[serde_as(as = "Option<HashMap<_, serde_with::DisplayFromStr>>")]
+    pub locality: Option<HashMap<String, i64>>,
+    /// no description provided
+    pub name: Option<String>,
+    /// no description provided
+    #[serde(rename = "numActiveTasks")]
+    pub num_active_tasks: Option<i32>,
+    /// no description provided
+    #[serde(rename = "numCompleteTasks")]
+    pub num_complete_tasks: Option<i32>,
+    /// no description provided
+    #[serde(rename = "numCompletedIndices")]
+    pub num_completed_indices: Option<i32>,
+    /// no description provided
+    #[serde(rename = "numFailedTasks")]
+    pub num_failed_tasks: Option<i32>,
+    /// no description provided
+    #[serde(rename = "numKilledTasks")]
+    pub num_killed_tasks: Option<i32>,
+    /// no description provided
+    #[serde(rename = "numTasks")]
+    pub num_tasks: Option<i32>,
+    /// no description provided
+    #[serde(rename = "parentStageIds")]
+    #[serde_as(as = "Option<Vec<serde_with::DisplayFromStr>>")]
+    pub parent_stage_ids: Option<Vec<i64>>,
+    /// no description provided
+    #[serde(rename = "peakExecutorMetrics")]
+    pub peak_executor_metrics: Option<ExecutorMetrics>,
+    /// no description provided
+    #[serde(rename = "rddIds")]
+    #[serde_as(as = "Option<Vec<serde_with::DisplayFromStr>>")]
+    pub rdd_ids: Option<Vec<i64>>,
+    /// no description provided
+    #[serde(rename = "resourceProfileId")]
+    pub resource_profile_id: Option<i32>,
+    /// no description provided
+    #[serde(rename = "schedulingPool")]
+    pub scheduling_pool: Option<String>,
+    /// no description provided
+    #[serde(rename = "shuffleMergersCount")]
+    pub shuffle_mergers_count: Option<i32>,
+    /// no description provided
+    #[serde(rename = "speculationSummary")]
+    pub speculation_summary: Option<SpeculationStageSummary>,
+    /// no description provided
+    #[serde(rename = "stageAttemptId")]
+    pub stage_attempt_id: Option<i32>,
+    /// no description provided
+    #[serde(rename = "stageId")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub stage_id: Option<i64>,
+    /// no description provided
+    #[serde(rename = "stageMetrics")]
+    pub stage_metrics: Option<StageMetrics>,
+    /// no description provided
+    pub status: Option<String>,
+    /// no description provided
+    #[serde(rename = "submissionTime")]
+    pub submission_time: Option<chrono::DateTime<chrono::offset::Utc>>,
+    /// Summary metrics fields. These are included in response only if present in summary_metrics_mask field in request
+    #[serde(rename = "taskQuantileMetrics")]
+    pub task_quantile_metrics: Option<TaskQuantileMetrics>,
+    /// no description provided
+    pub tasks: Option<HashMap<String, TaskData>>,
+}
+
+impl common::Part for StageData {}
+
+/// Metrics about the input read by the stage.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct StageInputMetrics {
+    /// no description provided
+    #[serde(rename = "bytesRead")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub bytes_read: Option<i64>,
+    /// no description provided
+    #[serde(rename = "recordsRead")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub records_read: Option<i64>,
+}
+
+impl common::Part for StageInputMetrics {}
+
+/// Stage Level Aggregated Metrics
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct StageMetrics {
+    /// no description provided
+    #[serde(rename = "diskBytesSpilled")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub disk_bytes_spilled: Option<i64>,
+    /// no description provided
+    #[serde(rename = "executorCpuTimeNanos")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub executor_cpu_time_nanos: Option<i64>,
+    /// no description provided
+    #[serde(rename = "executorDeserializeCpuTimeNanos")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub executor_deserialize_cpu_time_nanos: Option<i64>,
+    /// no description provided
+    #[serde(rename = "executorDeserializeTimeMillis")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub executor_deserialize_time_millis: Option<i64>,
+    /// no description provided
+    #[serde(rename = "executorRunTimeMillis")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub executor_run_time_millis: Option<i64>,
+    /// no description provided
+    #[serde(rename = "jvmGcTimeMillis")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub jvm_gc_time_millis: Option<i64>,
+    /// no description provided
+    #[serde(rename = "memoryBytesSpilled")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub memory_bytes_spilled: Option<i64>,
+    /// no description provided
+    #[serde(rename = "peakExecutionMemoryBytes")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub peak_execution_memory_bytes: Option<i64>,
+    /// no description provided
+    #[serde(rename = "resultSerializationTimeMillis")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub result_serialization_time_millis: Option<i64>,
+    /// no description provided
+    #[serde(rename = "resultSize")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub result_size: Option<i64>,
+    /// no description provided
+    #[serde(rename = "stageInputMetrics")]
+    pub stage_input_metrics: Option<StageInputMetrics>,
+    /// no description provided
+    #[serde(rename = "stageOutputMetrics")]
+    pub stage_output_metrics: Option<StageOutputMetrics>,
+    /// no description provided
+    #[serde(rename = "stageShuffleReadMetrics")]
+    pub stage_shuffle_read_metrics: Option<StageShuffleReadMetrics>,
+    /// no description provided
+    #[serde(rename = "stageShuffleWriteMetrics")]
+    pub stage_shuffle_write_metrics: Option<StageShuffleWriteMetrics>,
+}
+
+impl common::Part for StageMetrics {}
+
+/// Metrics about the output written by the stage.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct StageOutputMetrics {
+    /// no description provided
+    #[serde(rename = "bytesWritten")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub bytes_written: Option<i64>,
+    /// no description provided
+    #[serde(rename = "recordsWritten")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub records_written: Option<i64>,
+}
+
+impl common::Part for StageOutputMetrics {}
+
+/// There is no detailed description.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct StageShufflePushReadMetrics {
+    /// no description provided
+    #[serde(rename = "corruptMergedBlockChunks")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub corrupt_merged_block_chunks: Option<i64>,
+    /// no description provided
+    #[serde(rename = "localMergedBlocksFetched")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub local_merged_blocks_fetched: Option<i64>,
+    /// no description provided
+    #[serde(rename = "localMergedBytesRead")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub local_merged_bytes_read: Option<i64>,
+    /// no description provided
+    #[serde(rename = "localMergedChunksFetched")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub local_merged_chunks_fetched: Option<i64>,
+    /// no description provided
+    #[serde(rename = "mergedFetchFallbackCount")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub merged_fetch_fallback_count: Option<i64>,
+    /// no description provided
+    #[serde(rename = "remoteMergedBlocksFetched")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub remote_merged_blocks_fetched: Option<i64>,
+    /// no description provided
+    #[serde(rename = "remoteMergedBytesRead")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub remote_merged_bytes_read: Option<i64>,
+    /// no description provided
+    #[serde(rename = "remoteMergedChunksFetched")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub remote_merged_chunks_fetched: Option<i64>,
+    /// no description provided
+    #[serde(rename = "remoteMergedReqsDuration")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub remote_merged_reqs_duration: Option<i64>,
+}
+
+impl common::Part for StageShufflePushReadMetrics {}
+
+/// Shuffle data read for the stage.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct StageShuffleReadMetrics {
+    /// no description provided
+    #[serde(rename = "bytesRead")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub bytes_read: Option<i64>,
+    /// no description provided
+    #[serde(rename = "fetchWaitTimeMillis")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub fetch_wait_time_millis: Option<i64>,
+    /// no description provided
+    #[serde(rename = "localBlocksFetched")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub local_blocks_fetched: Option<i64>,
+    /// no description provided
+    #[serde(rename = "localBytesRead")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub local_bytes_read: Option<i64>,
+    /// no description provided
+    #[serde(rename = "recordsRead")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub records_read: Option<i64>,
+    /// no description provided
+    #[serde(rename = "remoteBlocksFetched")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub remote_blocks_fetched: Option<i64>,
+    /// no description provided
+    #[serde(rename = "remoteBytesRead")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub remote_bytes_read: Option<i64>,
+    /// no description provided
+    #[serde(rename = "remoteBytesReadToDisk")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub remote_bytes_read_to_disk: Option<i64>,
+    /// no description provided
+    #[serde(rename = "remoteReqsDuration")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub remote_reqs_duration: Option<i64>,
+    /// no description provided
+    #[serde(rename = "stageShufflePushReadMetrics")]
+    pub stage_shuffle_push_read_metrics: Option<StageShufflePushReadMetrics>,
+}
+
+impl common::Part for StageShuffleReadMetrics {}
+
+/// Shuffle data written for the stage.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct StageShuffleWriteMetrics {
+    /// no description provided
+    #[serde(rename = "bytesWritten")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub bytes_written: Option<i64>,
+    /// no description provided
+    #[serde(rename = "recordsWritten")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub records_written: Option<i64>,
+    /// no description provided
+    #[serde(rename = "writeTimeNanos")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub write_time_nanos: Option<i64>,
+}
+
+impl common::Part for StageShuffleWriteMetrics {}
+
+/// Data related to Stages page summary
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct StagesSummary {
+    /// no description provided
+    #[serde(rename = "applicationId")]
+    pub application_id: Option<String>,
+    /// no description provided
+    #[serde(rename = "numActiveStages")]
+    pub num_active_stages: Option<i32>,
+    /// no description provided
+    #[serde(rename = "numCompletedStages")]
+    pub num_completed_stages: Option<i32>,
+    /// no description provided
+    #[serde(rename = "numFailedStages")]
+    pub num_failed_stages: Option<i32>,
+    /// no description provided
+    #[serde(rename = "numPendingStages")]
+    pub num_pending_stages: Option<i32>,
+    /// no description provided
+    #[serde(rename = "numSkippedStages")]
+    pub num_skipped_stages: Option<i32>,
+}
+
+impl common::Part for StagesSummary {}
+
 /// A request to start a cluster.
 ///
 /// # Activities
@@ -3061,6 +5963,65 @@ pub struct StateHistory {
 
 impl common::Part for StateHistory {}
 
+/// There is no detailed description.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct StateOperatorProgress {
+    /// no description provided
+    #[serde(rename = "allRemovalsTimeMs")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub all_removals_time_ms: Option<i64>,
+    /// no description provided
+    #[serde(rename = "allUpdatesTimeMs")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub all_updates_time_ms: Option<i64>,
+    /// no description provided
+    #[serde(rename = "commitTimeMs")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub commit_time_ms: Option<i64>,
+    /// no description provided
+    #[serde(rename = "customMetrics")]
+    #[serde_as(as = "Option<HashMap<_, serde_with::DisplayFromStr>>")]
+    pub custom_metrics: Option<HashMap<String, i64>>,
+    /// no description provided
+    #[serde(rename = "memoryUsedBytes")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub memory_used_bytes: Option<i64>,
+    /// no description provided
+    #[serde(rename = "numRowsDroppedByWatermark")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub num_rows_dropped_by_watermark: Option<i64>,
+    /// no description provided
+    #[serde(rename = "numRowsRemoved")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub num_rows_removed: Option<i64>,
+    /// no description provided
+    #[serde(rename = "numRowsTotal")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub num_rows_total: Option<i64>,
+    /// no description provided
+    #[serde(rename = "numRowsUpdated")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub num_rows_updated: Option<i64>,
+    /// no description provided
+    #[serde(rename = "numShufflePartitions")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub num_shuffle_partitions: Option<i64>,
+    /// no description provided
+    #[serde(rename = "numStateStoreInstances")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub num_state_store_instances: Option<i64>,
+    /// no description provided
+    #[serde(rename = "operatorName")]
+    pub operator_name: Option<String>,
+}
+
+impl common::Part for StateOperatorProgress {}
+
 /// The Status type defines a logical error model that is suitable for different programming environments, including REST APIs and RPC APIs. It is used by gRPC (https://github.com/grpc). Each Status message contains three pieces of data: error code, error message, and error details.You can find out more about this error model and how to work with it in the API Design Guide (https://cloud.google.com/apis/design/errors).
 ///
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -3101,6 +6062,125 @@ pub struct StopClusterRequest {
 
 impl common::RequestValue for StopClusterRequest {}
 
+/// Stream Block Data.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct StreamBlockData {
+    /// no description provided
+    pub deserialized: Option<bool>,
+    /// no description provided
+    #[serde(rename = "diskSize")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub disk_size: Option<i64>,
+    /// no description provided
+    #[serde(rename = "executorId")]
+    pub executor_id: Option<String>,
+    /// no description provided
+    #[serde(rename = "hostPort")]
+    pub host_port: Option<String>,
+    /// no description provided
+    #[serde(rename = "memSize")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub mem_size: Option<i64>,
+    /// no description provided
+    pub name: Option<String>,
+    /// no description provided
+    #[serde(rename = "storageLevel")]
+    pub storage_level: Option<String>,
+    /// no description provided
+    #[serde(rename = "useDisk")]
+    pub use_disk: Option<bool>,
+    /// no description provided
+    #[serde(rename = "useMemory")]
+    pub use_memory: Option<bool>,
+}
+
+impl common::Part for StreamBlockData {}
+
+/// Streaming
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct StreamingQueryData {
+    /// no description provided
+    #[serde(rename = "endTimestamp")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub end_timestamp: Option<i64>,
+    /// no description provided
+    pub exception: Option<String>,
+    /// no description provided
+    #[serde(rename = "isActive")]
+    pub is_active: Option<bool>,
+    /// no description provided
+    pub name: Option<String>,
+    /// no description provided
+    #[serde(rename = "runId")]
+    pub run_id: Option<String>,
+    /// no description provided
+    #[serde(rename = "startTimestamp")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub start_timestamp: Option<i64>,
+    /// no description provided
+    #[serde(rename = "streamingQueryId")]
+    pub streaming_query_id: Option<String>,
+}
+
+impl common::Part for StreamingQueryData {}
+
+/// There is no detailed description.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct StreamingQueryProgress {
+    /// no description provided
+    #[serde(rename = "batchDuration")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub batch_duration: Option<i64>,
+    /// no description provided
+    #[serde(rename = "batchId")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub batch_id: Option<i64>,
+    /// no description provided
+    #[serde(rename = "durationMillis")]
+    #[serde_as(as = "Option<HashMap<_, serde_with::DisplayFromStr>>")]
+    pub duration_millis: Option<HashMap<String, i64>>,
+    /// no description provided
+    #[serde(rename = "eventTime")]
+    pub event_time: Option<HashMap<String, String>>,
+    /// no description provided
+    pub name: Option<String>,
+    /// no description provided
+    #[serde(rename = "observedMetrics")]
+    pub observed_metrics: Option<HashMap<String, String>>,
+    /// no description provided
+    #[serde(rename = "runId")]
+    pub run_id: Option<String>,
+    /// no description provided
+    pub sink: Option<SinkProgress>,
+    /// no description provided
+    pub sources: Option<Vec<SourceProgress>>,
+    /// no description provided
+    #[serde(rename = "stateOperators")]
+    pub state_operators: Option<Vec<StateOperatorProgress>>,
+    /// no description provided
+    #[serde(rename = "streamingQueryProgressId")]
+    pub streaming_query_progress_id: Option<String>,
+    /// no description provided
+    pub timestamp: Option<String>,
+}
+
+impl common::Part for StreamingQueryProgress {}
+
 /// A request to submit a job.
 ///
 /// # Activities
@@ -3122,6 +6202,395 @@ pub struct SubmitJobRequest {
 }
 
 impl common::RequestValue for SubmitJobRequest {}
+
+/// Consolidated summary of executors for a Spark Application.
+///
+/// # Activities
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+///
+/// * [locations sessions spark applications summarize executors projects](ProjectLocationSessionSparkApplicationSummarizeExecutorCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct SummarizeSessionSparkApplicationExecutorsResponse {
+    /// Consolidated summary for active executors.
+    #[serde(rename = "activeExecutorSummary")]
+    pub active_executor_summary: Option<ConsolidatedExecutorSummary>,
+    /// Spark Application Id
+    #[serde(rename = "applicationId")]
+    pub application_id: Option<String>,
+    /// Consolidated summary for dead executors.
+    #[serde(rename = "deadExecutorSummary")]
+    pub dead_executor_summary: Option<ConsolidatedExecutorSummary>,
+    /// Overall consolidated summary for all executors.
+    #[serde(rename = "totalExecutorSummary")]
+    pub total_executor_summary: Option<ConsolidatedExecutorSummary>,
+}
+
+impl common::ResponseResult for SummarizeSessionSparkApplicationExecutorsResponse {}
+
+/// Summary of a Spark Application jobs.
+///
+/// # Activities
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+///
+/// * [locations sessions spark applications summarize jobs projects](ProjectLocationSessionSparkApplicationSummarizeJobCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct SummarizeSessionSparkApplicationJobsResponse {
+    /// Summary of a Spark Application Jobs
+    #[serde(rename = "jobsSummary")]
+    pub jobs_summary: Option<JobsSummary>,
+}
+
+impl common::ResponseResult for SummarizeSessionSparkApplicationJobsResponse {}
+
+/// Summary of tasks for a Spark Application stage attempt.
+///
+/// # Activities
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+///
+/// * [locations sessions spark applications summarize stage attempt tasks projects](ProjectLocationSessionSparkApplicationSummarizeStageAttemptTaskCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct SummarizeSessionSparkApplicationStageAttemptTasksResponse {
+    /// Summary of tasks for a Spark Application Stage Attempt
+    #[serde(rename = "stageAttemptTasksSummary")]
+    pub stage_attempt_tasks_summary: Option<StageAttemptTasksSummary>,
+}
+
+impl common::ResponseResult for SummarizeSessionSparkApplicationStageAttemptTasksResponse {}
+
+/// Summary of a Spark Application stages.
+///
+/// # Activities
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+///
+/// * [locations sessions spark applications summarize stages projects](ProjectLocationSessionSparkApplicationSummarizeStageCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct SummarizeSessionSparkApplicationStagesResponse {
+    /// Summary of a Spark Application Stages
+    #[serde(rename = "stagesSummary")]
+    pub stages_summary: Option<StagesSummary>,
+}
+
+impl common::ResponseResult for SummarizeSessionSparkApplicationStagesResponse {}
+
+/// Consolidated summary of executors for a Spark Application.
+///
+/// # Activities
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+///
+/// * [locations batches spark applications summarize executors projects](ProjectLocationBatchSparkApplicationSummarizeExecutorCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct SummarizeSparkApplicationExecutorsResponse {
+    /// Consolidated summary for active executors.
+    #[serde(rename = "activeExecutorSummary")]
+    pub active_executor_summary: Option<ConsolidatedExecutorSummary>,
+    /// Spark Application Id
+    #[serde(rename = "applicationId")]
+    pub application_id: Option<String>,
+    /// Consolidated summary for dead executors.
+    #[serde(rename = "deadExecutorSummary")]
+    pub dead_executor_summary: Option<ConsolidatedExecutorSummary>,
+    /// Overall consolidated summary for all executors.
+    #[serde(rename = "totalExecutorSummary")]
+    pub total_executor_summary: Option<ConsolidatedExecutorSummary>,
+}
+
+impl common::ResponseResult for SummarizeSparkApplicationExecutorsResponse {}
+
+/// Summary of a Spark Application jobs.
+///
+/// # Activities
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+///
+/// * [locations batches spark applications summarize jobs projects](ProjectLocationBatchSparkApplicationSummarizeJobCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct SummarizeSparkApplicationJobsResponse {
+    /// Summary of a Spark Application Jobs
+    #[serde(rename = "jobsSummary")]
+    pub jobs_summary: Option<JobsSummary>,
+}
+
+impl common::ResponseResult for SummarizeSparkApplicationJobsResponse {}
+
+/// Summary of tasks for a Spark Application stage attempt.
+///
+/// # Activities
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+///
+/// * [locations batches spark applications summarize stage attempt tasks projects](ProjectLocationBatchSparkApplicationSummarizeStageAttemptTaskCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct SummarizeSparkApplicationStageAttemptTasksResponse {
+    /// Summary of tasks for a Spark Application Stage Attempt
+    #[serde(rename = "stageAttemptTasksSummary")]
+    pub stage_attempt_tasks_summary: Option<StageAttemptTasksSummary>,
+}
+
+impl common::ResponseResult for SummarizeSparkApplicationStageAttemptTasksResponse {}
+
+/// Summary of a Spark Application stages.
+///
+/// # Activities
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+///
+/// * [locations batches spark applications summarize stages projects](ProjectLocationBatchSparkApplicationSummarizeStageCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct SummarizeSparkApplicationStagesResponse {
+    /// Summary of a Spark Application Stages
+    #[serde(rename = "stagesSummary")]
+    pub stages_summary: Option<StagesSummary>,
+}
+
+impl common::ResponseResult for SummarizeSparkApplicationStagesResponse {}
+
+/// Data corresponding to tasks created by spark.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct TaskData {
+    /// no description provided
+    #[serde(rename = "accumulatorUpdates")]
+    pub accumulator_updates: Option<Vec<AccumulableInfo>>,
+    /// no description provided
+    pub attempt: Option<i32>,
+    /// no description provided
+    #[serde(rename = "durationMillis")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub duration_millis: Option<i64>,
+    /// no description provided
+    #[serde(rename = "errorMessage")]
+    pub error_message: Option<String>,
+    /// no description provided
+    #[serde(rename = "executorId")]
+    pub executor_id: Option<String>,
+    /// no description provided
+    #[serde(rename = "executorLogs")]
+    pub executor_logs: Option<HashMap<String, String>>,
+    /// no description provided
+    #[serde(rename = "gettingResultTimeMillis")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub getting_result_time_millis: Option<i64>,
+    /// no description provided
+    #[serde(rename = "hasMetrics")]
+    pub has_metrics: Option<bool>,
+    /// no description provided
+    pub host: Option<String>,
+    /// no description provided
+    pub index: Option<i32>,
+    /// no description provided
+    #[serde(rename = "launchTime")]
+    pub launch_time: Option<chrono::DateTime<chrono::offset::Utc>>,
+    /// no description provided
+    #[serde(rename = "partitionId")]
+    pub partition_id: Option<i32>,
+    /// no description provided
+    #[serde(rename = "resultFetchStart")]
+    pub result_fetch_start: Option<chrono::DateTime<chrono::offset::Utc>>,
+    /// no description provided
+    #[serde(rename = "schedulerDelayMillis")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub scheduler_delay_millis: Option<i64>,
+    /// no description provided
+    pub speculative: Option<bool>,
+    /// no description provided
+    #[serde(rename = "stageAttemptId")]
+    pub stage_attempt_id: Option<i32>,
+    /// no description provided
+    #[serde(rename = "stageId")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub stage_id: Option<i64>,
+    /// no description provided
+    pub status: Option<String>,
+    /// no description provided
+    #[serde(rename = "taskId")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub task_id: Option<i64>,
+    /// no description provided
+    #[serde(rename = "taskLocality")]
+    pub task_locality: Option<String>,
+    /// no description provided
+    #[serde(rename = "taskMetrics")]
+    pub task_metrics: Option<TaskMetrics>,
+}
+
+impl common::Part for TaskData {}
+
+/// Executor Task Metrics
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct TaskMetrics {
+    /// no description provided
+    #[serde(rename = "diskBytesSpilled")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub disk_bytes_spilled: Option<i64>,
+    /// no description provided
+    #[serde(rename = "executorCpuTimeNanos")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub executor_cpu_time_nanos: Option<i64>,
+    /// no description provided
+    #[serde(rename = "executorDeserializeCpuTimeNanos")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub executor_deserialize_cpu_time_nanos: Option<i64>,
+    /// no description provided
+    #[serde(rename = "executorDeserializeTimeMillis")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub executor_deserialize_time_millis: Option<i64>,
+    /// no description provided
+    #[serde(rename = "executorRunTimeMillis")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub executor_run_time_millis: Option<i64>,
+    /// no description provided
+    #[serde(rename = "inputMetrics")]
+    pub input_metrics: Option<InputMetrics>,
+    /// no description provided
+    #[serde(rename = "jvmGcTimeMillis")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub jvm_gc_time_millis: Option<i64>,
+    /// no description provided
+    #[serde(rename = "memoryBytesSpilled")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub memory_bytes_spilled: Option<i64>,
+    /// no description provided
+    #[serde(rename = "outputMetrics")]
+    pub output_metrics: Option<OutputMetrics>,
+    /// no description provided
+    #[serde(rename = "peakExecutionMemoryBytes")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub peak_execution_memory_bytes: Option<i64>,
+    /// no description provided
+    #[serde(rename = "resultSerializationTimeMillis")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub result_serialization_time_millis: Option<i64>,
+    /// no description provided
+    #[serde(rename = "resultSize")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub result_size: Option<i64>,
+    /// no description provided
+    #[serde(rename = "shuffleReadMetrics")]
+    pub shuffle_read_metrics: Option<ShuffleReadMetrics>,
+    /// no description provided
+    #[serde(rename = "shuffleWriteMetrics")]
+    pub shuffle_write_metrics: Option<ShuffleWriteMetrics>,
+}
+
+impl common::Part for TaskMetrics {}
+
+/// There is no detailed description.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct TaskQuantileMetrics {
+    /// no description provided
+    #[serde(rename = "diskBytesSpilled")]
+    pub disk_bytes_spilled: Option<Quantiles>,
+    /// no description provided
+    #[serde(rename = "durationMillis")]
+    pub duration_millis: Option<Quantiles>,
+    /// no description provided
+    #[serde(rename = "executorCpuTimeNanos")]
+    pub executor_cpu_time_nanos: Option<Quantiles>,
+    /// no description provided
+    #[serde(rename = "executorDeserializeCpuTimeNanos")]
+    pub executor_deserialize_cpu_time_nanos: Option<Quantiles>,
+    /// no description provided
+    #[serde(rename = "executorDeserializeTimeMillis")]
+    pub executor_deserialize_time_millis: Option<Quantiles>,
+    /// no description provided
+    #[serde(rename = "executorRunTimeMillis")]
+    pub executor_run_time_millis: Option<Quantiles>,
+    /// no description provided
+    #[serde(rename = "gettingResultTimeMillis")]
+    pub getting_result_time_millis: Option<Quantiles>,
+    /// no description provided
+    #[serde(rename = "inputMetrics")]
+    pub input_metrics: Option<InputQuantileMetrics>,
+    /// no description provided
+    #[serde(rename = "jvmGcTimeMillis")]
+    pub jvm_gc_time_millis: Option<Quantiles>,
+    /// no description provided
+    #[serde(rename = "memoryBytesSpilled")]
+    pub memory_bytes_spilled: Option<Quantiles>,
+    /// no description provided
+    #[serde(rename = "outputMetrics")]
+    pub output_metrics: Option<OutputQuantileMetrics>,
+    /// no description provided
+    #[serde(rename = "peakExecutionMemoryBytes")]
+    pub peak_execution_memory_bytes: Option<Quantiles>,
+    /// no description provided
+    #[serde(rename = "resultSerializationTimeMillis")]
+    pub result_serialization_time_millis: Option<Quantiles>,
+    /// no description provided
+    #[serde(rename = "resultSize")]
+    pub result_size: Option<Quantiles>,
+    /// no description provided
+    #[serde(rename = "schedulerDelayMillis")]
+    pub scheduler_delay_millis: Option<Quantiles>,
+    /// no description provided
+    #[serde(rename = "shuffleReadMetrics")]
+    pub shuffle_read_metrics: Option<ShuffleReadQuantileMetrics>,
+    /// no description provided
+    #[serde(rename = "shuffleWriteMetrics")]
+    pub shuffle_write_metrics: Option<ShuffleWriteQuantileMetrics>,
+}
+
+impl common::Part for TaskQuantileMetrics {}
+
+/// Resources used per task created by the application.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct TaskResourceRequest {
+    /// no description provided
+    pub amount: Option<f64>,
+    /// no description provided
+    #[serde(rename = "resourceName")]
+    pub resource_name: Option<String>,
+}
+
+impl common::Part for TaskResourceRequest {}
 
 /// A configurable parameter that replaces one or more fields in the template. Parameterizable fields: - Labels - File uris - Job properties - Job arguments - Script variables - Main class (in HadoopJob and SparkJob) - Zone (in ClusterSelector)
 ///
@@ -3250,10 +6719,10 @@ impl common::Part for TrinoJob {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct UsageMetrics {
-    /// Optional. Accelerator type being used, if any
+    /// Optional. DEPRECATED Accelerator type being used, if any
     #[serde(rename = "acceleratorType")]
     pub accelerator_type: Option<String>,
-    /// Optional. Accelerator usage in (milliAccelerator x seconds) (see Dataproc Serverless pricing (https://cloud.google.com/dataproc-serverless/pricing)).
+    /// Optional. DEPRECATED Accelerator usage in (milliAccelerator x seconds) (see Dataproc Serverless pricing (https://cloud.google.com/dataproc-serverless/pricing)).
     #[serde(rename = "milliAcceleratorSeconds")]
     #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
     pub milli_accelerator_seconds: Option<i64>,
@@ -3265,6 +6734,9 @@ pub struct UsageMetrics {
     #[serde(rename = "shuffleStorageGbSeconds")]
     #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
     pub shuffle_storage_gb_seconds: Option<i64>,
+    /// Optional. The timestamp of the usage metrics.
+    #[serde(rename = "updateTime")]
+    pub update_time: Option<chrono::DateTime<chrono::offset::Utc>>,
 }
 
 impl common::Part for UsageMetrics {}
@@ -3306,6 +6778,25 @@ pub struct UsageSnapshot {
 }
 
 impl common::Part for UsageSnapshot {}
+
+/// Annotatated property value.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct ValueInfo {
+    /// Annotation, comment or explanation why the property was set.
+    pub annotation: Option<String>,
+    /// Optional. Value which was replaced by the corresponding component.
+    #[serde(rename = "overriddenValue")]
+    pub overridden_value: Option<String>,
+    /// Property value.
+    pub value: Option<String>,
+}
+
+impl common::Part for ValueInfo {}
 
 /// Validation based on a list of allowed values.
 ///
@@ -3411,6 +6902,82 @@ pub struct WorkflowTemplatePlacement {
 
 impl common::Part for WorkflowTemplatePlacement {}
 
+/// Write Spark Application data to internal storage systems
+///
+/// # Activities
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+///
+/// * [locations sessions spark applications write projects](ProjectLocationSessionSparkApplicationWriteCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct WriteSessionSparkApplicationContextRequest {
+    /// Required. Parent (Batch) resource reference.
+    pub parent: Option<String>,
+    /// Required. The batch of spark application context objects sent for ingestion.
+    #[serde(rename = "sparkWrapperObjects")]
+    pub spark_wrapper_objects: Option<Vec<SparkWrapperObject>>,
+}
+
+impl common::RequestValue for WriteSessionSparkApplicationContextRequest {}
+
+/// Response returned as an acknowledgement of receipt of data.
+///
+/// # Activities
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+///
+/// * [locations sessions spark applications write projects](ProjectLocationSessionSparkApplicationWriteCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct WriteSessionSparkApplicationContextResponse {
+    _never_set: Option<bool>,
+}
+
+impl common::ResponseResult for WriteSessionSparkApplicationContextResponse {}
+
+/// Write Spark Application data to internal storage systems
+///
+/// # Activities
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+///
+/// * [locations batches spark applications write projects](ProjectLocationBatchSparkApplicationWriteCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct WriteSparkApplicationContextRequest {
+    /// Required. Parent (Batch) resource reference.
+    pub parent: Option<String>,
+    /// no description provided
+    #[serde(rename = "sparkWrapperObjects")]
+    pub spark_wrapper_objects: Option<Vec<SparkWrapperObject>>,
+}
+
+impl common::RequestValue for WriteSparkApplicationContextRequest {}
+
+/// Response returned as an acknowledgement of receipt of data.
+///
+/// # Activities
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+///
+/// * [locations batches spark applications write projects](ProjectLocationBatchSparkApplicationWriteCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct WriteSparkApplicationContextResponse {
+    _never_set: Option<bool>,
+}
+
+impl common::ResponseResult for WriteSparkApplicationContextResponse {}
+
 /// A YARN application created by a job. Application information is a subset of org.apache.hadoop.yarn.proto.YarnProtos.ApplicationReportProto.Beta Feature: This report is available for testing purposes only. It may be changed before final release.
 ///
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -3419,6 +6986,10 @@ impl common::Part for WorkflowTemplatePlacement {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct YarnApplication {
+    /// Optional. The cumulative memory usage of the application for a job, measured in mb-seconds.
+    #[serde(rename = "memoryMbSeconds")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub memory_mb_seconds: Option<i64>,
     /// Required. The application name.
     pub name: Option<String>,
     /// Required. The numerical progress of the application, from 1 to 100.
@@ -3428,6 +6999,10 @@ pub struct YarnApplication {
     /// Optional. The HTTP URL of the ApplicationMaster, HistoryServer, or TimelineServer that provides application-specific information. The URL uses the internal hostname, and requires a proxy server for resolution and, possibly, access.
     #[serde(rename = "trackingUrl")]
     pub tracking_url: Option<String>,
+    /// Optional. The cumulative CPU time consumed by the application for a job, measured in vcore-seconds.
+    #[serde(rename = "vcoreSeconds")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub vcore_seconds: Option<i64>,
 }
 
 impl common::Part for YarnApplication {}
@@ -3452,9 +7027,20 @@ impl common::Part for YarnApplication {}
 /// use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let connector = hyper_rustls::HttpsConnectorBuilder::new()
+///     .with_native_roots()
+///     .unwrap()
+///     .https_only()
+///     .enable_http2()
+///     .build();
+///
+/// let executor = hyper_util::rt::TokioExecutor::new();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 ///     secret,
 ///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///     yup_oauth2::client::CustomHyperClientBuilder::from(
+///         hyper_util::client::legacy::Client::builder(executor).build(connector),
+///     ),
 /// ).build().await.unwrap();
 ///
 /// let client = hyper_util::client::legacy::Client::builder(
@@ -3465,12 +7051,12 @@ impl common::Part for YarnApplication {}
 ///         .with_native_roots()
 ///         .unwrap()
 ///         .https_or_http()
-///         .enable_http1()
+///         .enable_http2()
 ///         .build()
 /// );
 /// let mut hub = Dataproc::new(client, auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `locations_autoscaling_policies_create(...)`, `locations_autoscaling_policies_delete(...)`, `locations_autoscaling_policies_get(...)`, `locations_autoscaling_policies_get_iam_policy(...)`, `locations_autoscaling_policies_list(...)`, `locations_autoscaling_policies_set_iam_policy(...)`, `locations_autoscaling_policies_test_iam_permissions(...)`, `locations_autoscaling_policies_update(...)`, `locations_batches_analyze(...)`, `locations_batches_create(...)`, `locations_batches_delete(...)`, `locations_batches_get(...)`, `locations_batches_list(...)`, `locations_operations_cancel(...)`, `locations_operations_delete(...)`, `locations_operations_get(...)`, `locations_operations_list(...)`, `locations_session_templates_create(...)`, `locations_session_templates_delete(...)`, `locations_session_templates_get(...)`, `locations_session_templates_list(...)`, `locations_session_templates_patch(...)`, `locations_sessions_create(...)`, `locations_sessions_delete(...)`, `locations_sessions_get(...)`, `locations_sessions_list(...)`, `locations_sessions_terminate(...)`, `locations_workflow_templates_create(...)`, `locations_workflow_templates_delete(...)`, `locations_workflow_templates_get(...)`, `locations_workflow_templates_get_iam_policy(...)`, `locations_workflow_templates_instantiate(...)`, `locations_workflow_templates_instantiate_inline(...)`, `locations_workflow_templates_list(...)`, `locations_workflow_templates_set_iam_policy(...)`, `locations_workflow_templates_test_iam_permissions(...)`, `locations_workflow_templates_update(...)`, `regions_autoscaling_policies_create(...)`, `regions_autoscaling_policies_delete(...)`, `regions_autoscaling_policies_get(...)`, `regions_autoscaling_policies_get_iam_policy(...)`, `regions_autoscaling_policies_list(...)`, `regions_autoscaling_policies_set_iam_policy(...)`, `regions_autoscaling_policies_test_iam_permissions(...)`, `regions_autoscaling_policies_update(...)`, `regions_clusters_create(...)`, `regions_clusters_delete(...)`, `regions_clusters_diagnose(...)`, `regions_clusters_get(...)`, `regions_clusters_get_iam_policy(...)`, `regions_clusters_inject_credentials(...)`, `regions_clusters_list(...)`, `regions_clusters_node_groups_create(...)`, `regions_clusters_node_groups_get(...)`, `regions_clusters_node_groups_repair(...)`, `regions_clusters_node_groups_resize(...)`, `regions_clusters_patch(...)`, `regions_clusters_repair(...)`, `regions_clusters_set_iam_policy(...)`, `regions_clusters_start(...)`, `regions_clusters_stop(...)`, `regions_clusters_test_iam_permissions(...)`, `regions_jobs_cancel(...)`, `regions_jobs_delete(...)`, `regions_jobs_get(...)`, `regions_jobs_get_iam_policy(...)`, `regions_jobs_list(...)`, `regions_jobs_patch(...)`, `regions_jobs_set_iam_policy(...)`, `regions_jobs_submit(...)`, `regions_jobs_submit_as_operation(...)`, `regions_jobs_test_iam_permissions(...)`, `regions_operations_cancel(...)`, `regions_operations_delete(...)`, `regions_operations_get(...)`, `regions_operations_get_iam_policy(...)`, `regions_operations_list(...)`, `regions_operations_set_iam_policy(...)`, `regions_operations_test_iam_permissions(...)`, `regions_workflow_templates_create(...)`, `regions_workflow_templates_delete(...)`, `regions_workflow_templates_get(...)`, `regions_workflow_templates_get_iam_policy(...)`, `regions_workflow_templates_instantiate(...)`, `regions_workflow_templates_instantiate_inline(...)`, `regions_workflow_templates_list(...)`, `regions_workflow_templates_set_iam_policy(...)`, `regions_workflow_templates_test_iam_permissions(...)` and `regions_workflow_templates_update(...)`
+/// // like `locations_autoscaling_policies_create(...)`, `locations_autoscaling_policies_delete(...)`, `locations_autoscaling_policies_get(...)`, `locations_autoscaling_policies_get_iam_policy(...)`, `locations_autoscaling_policies_list(...)`, `locations_autoscaling_policies_set_iam_policy(...)`, `locations_autoscaling_policies_test_iam_permissions(...)`, `locations_autoscaling_policies_update(...)`, `locations_batches_analyze(...)`, `locations_batches_create(...)`, `locations_batches_delete(...)`, `locations_batches_get(...)`, `locations_batches_list(...)`, `locations_batches_spark_applications_access(...)`, `locations_batches_spark_applications_access_environment_info(...)`, `locations_batches_spark_applications_access_job(...)`, `locations_batches_spark_applications_access_sql_plan(...)`, `locations_batches_spark_applications_access_sql_query(...)`, `locations_batches_spark_applications_access_stage_attempt(...)`, `locations_batches_spark_applications_access_stage_rdd_graph(...)`, `locations_batches_spark_applications_search(...)`, `locations_batches_spark_applications_search_executor_stage_summary(...)`, `locations_batches_spark_applications_search_executors(...)`, `locations_batches_spark_applications_search_jobs(...)`, `locations_batches_spark_applications_search_sql_queries(...)`, `locations_batches_spark_applications_search_stage_attempt_tasks(...)`, `locations_batches_spark_applications_search_stage_attempts(...)`, `locations_batches_spark_applications_search_stages(...)`, `locations_batches_spark_applications_summarize_executors(...)`, `locations_batches_spark_applications_summarize_jobs(...)`, `locations_batches_spark_applications_summarize_stage_attempt_tasks(...)`, `locations_batches_spark_applications_summarize_stages(...)`, `locations_batches_spark_applications_write(...)`, `locations_operations_cancel(...)`, `locations_operations_delete(...)`, `locations_operations_get(...)`, `locations_operations_list(...)`, `locations_session_templates_create(...)`, `locations_session_templates_delete(...)`, `locations_session_templates_get(...)`, `locations_session_templates_list(...)`, `locations_session_templates_patch(...)`, `locations_sessions_create(...)`, `locations_sessions_delete(...)`, `locations_sessions_get(...)`, `locations_sessions_list(...)`, `locations_sessions_spark_applications_access(...)`, `locations_sessions_spark_applications_access_environment_info(...)`, `locations_sessions_spark_applications_access_job(...)`, `locations_sessions_spark_applications_access_sql_plan(...)`, `locations_sessions_spark_applications_access_sql_query(...)`, `locations_sessions_spark_applications_access_stage_attempt(...)`, `locations_sessions_spark_applications_access_stage_rdd_graph(...)`, `locations_sessions_spark_applications_search(...)`, `locations_sessions_spark_applications_search_executor_stage_summary(...)`, `locations_sessions_spark_applications_search_executors(...)`, `locations_sessions_spark_applications_search_jobs(...)`, `locations_sessions_spark_applications_search_sql_queries(...)`, `locations_sessions_spark_applications_search_stage_attempt_tasks(...)`, `locations_sessions_spark_applications_search_stage_attempts(...)`, `locations_sessions_spark_applications_search_stages(...)`, `locations_sessions_spark_applications_summarize_executors(...)`, `locations_sessions_spark_applications_summarize_jobs(...)`, `locations_sessions_spark_applications_summarize_stage_attempt_tasks(...)`, `locations_sessions_spark_applications_summarize_stages(...)`, `locations_sessions_spark_applications_write(...)`, `locations_sessions_terminate(...)`, `locations_workflow_templates_create(...)`, `locations_workflow_templates_delete(...)`, `locations_workflow_templates_get(...)`, `locations_workflow_templates_get_iam_policy(...)`, `locations_workflow_templates_instantiate(...)`, `locations_workflow_templates_instantiate_inline(...)`, `locations_workflow_templates_list(...)`, `locations_workflow_templates_set_iam_policy(...)`, `locations_workflow_templates_test_iam_permissions(...)`, `locations_workflow_templates_update(...)`, `regions_autoscaling_policies_create(...)`, `regions_autoscaling_policies_delete(...)`, `regions_autoscaling_policies_get(...)`, `regions_autoscaling_policies_get_iam_policy(...)`, `regions_autoscaling_policies_list(...)`, `regions_autoscaling_policies_set_iam_policy(...)`, `regions_autoscaling_policies_test_iam_permissions(...)`, `regions_autoscaling_policies_update(...)`, `regions_clusters_create(...)`, `regions_clusters_delete(...)`, `regions_clusters_diagnose(...)`, `regions_clusters_get(...)`, `regions_clusters_get_iam_policy(...)`, `regions_clusters_inject_credentials(...)`, `regions_clusters_list(...)`, `regions_clusters_node_groups_create(...)`, `regions_clusters_node_groups_get(...)`, `regions_clusters_node_groups_repair(...)`, `regions_clusters_node_groups_resize(...)`, `regions_clusters_patch(...)`, `regions_clusters_repair(...)`, `regions_clusters_set_iam_policy(...)`, `regions_clusters_start(...)`, `regions_clusters_stop(...)`, `regions_clusters_test_iam_permissions(...)`, `regions_jobs_cancel(...)`, `regions_jobs_delete(...)`, `regions_jobs_get(...)`, `regions_jobs_get_iam_policy(...)`, `regions_jobs_list(...)`, `regions_jobs_patch(...)`, `regions_jobs_set_iam_policy(...)`, `regions_jobs_submit(...)`, `regions_jobs_submit_as_operation(...)`, `regions_jobs_test_iam_permissions(...)`, `regions_operations_cancel(...)`, `regions_operations_delete(...)`, `regions_operations_get(...)`, `regions_operations_get_iam_policy(...)`, `regions_operations_list(...)`, `regions_operations_set_iam_policy(...)`, `regions_operations_test_iam_permissions(...)`, `regions_workflow_templates_create(...)`, `regions_workflow_templates_delete(...)`, `regions_workflow_templates_get(...)`, `regions_workflow_templates_get_iam_policy(...)`, `regions_workflow_templates_instantiate(...)`, `regions_workflow_templates_instantiate_inline(...)`, `regions_workflow_templates_list(...)`, `regions_workflow_templates_set_iam_policy(...)`, `regions_workflow_templates_test_iam_permissions(...)` and `regions_workflow_templates_update(...)`
 /// // to build up your call.
 /// let rb = hub.projects();
 /// # }
@@ -3664,6 +7250,473 @@ impl<'a, C> ProjectMethods<'a, C> {
 
     /// Create a builder to help you perform the following task:
     ///
+    /// Obtain high level information corresponding to a single Spark Application.
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - Required. The fully qualified name of the batch to retrieve in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/batches/BATCH_ID/sparkApplications/APPLICATION_ID"
+    pub fn locations_batches_spark_applications_access(
+        &self,
+        name: &str,
+    ) -> ProjectLocationBatchSparkApplicationAccesCall<'a, C> {
+        ProjectLocationBatchSparkApplicationAccesCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _parent: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Obtain environment details for a Spark Application
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - Required. The fully qualified name of the batch to retrieve in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/batches/BATCH_ID/sparkApplications/APPLICATION_ID"
+    pub fn locations_batches_spark_applications_access_environment_info(
+        &self,
+        name: &str,
+    ) -> ProjectLocationBatchSparkApplicationAccessEnvironmentInfoCall<'a, C> {
+        ProjectLocationBatchSparkApplicationAccessEnvironmentInfoCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _parent: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Obtain data corresponding to a spark job for a Spark Application.
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - Required. The fully qualified name of the batch to retrieve in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/batches/BATCH_ID/sparkApplications/APPLICATION_ID"
+    pub fn locations_batches_spark_applications_access_job(
+        &self,
+        name: &str,
+    ) -> ProjectLocationBatchSparkApplicationAccessJobCall<'a, C> {
+        ProjectLocationBatchSparkApplicationAccessJobCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _parent: Default::default(),
+            _job_id: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Obtain Spark Plan Graph for a Spark Application SQL execution. Limits the number of clusters returned as part of the graph to 10000.
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - Required. The fully qualified name of the batch to retrieve in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/batches/BATCH_ID/sparkApplications/APPLICATION_ID"
+    pub fn locations_batches_spark_applications_access_sql_plan(
+        &self,
+        name: &str,
+    ) -> ProjectLocationBatchSparkApplicationAccessSqlPlanCall<'a, C> {
+        ProjectLocationBatchSparkApplicationAccessSqlPlanCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _parent: Default::default(),
+            _execution_id: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Obtain data corresponding to a particular SQL Query for a Spark Application.
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - Required. The fully qualified name of the batch to retrieve in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/batches/BATCH_ID/sparkApplications/APPLICATION_ID"
+    pub fn locations_batches_spark_applications_access_sql_query(
+        &self,
+        name: &str,
+    ) -> ProjectLocationBatchSparkApplicationAccessSqlQueryCall<'a, C> {
+        ProjectLocationBatchSparkApplicationAccessSqlQueryCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _plan_description: Default::default(),
+            _parent: Default::default(),
+            _execution_id: Default::default(),
+            _details: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Obtain data corresponding to a spark stage attempt for a Spark Application.
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - Required. The fully qualified name of the batch to retrieve in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/batches/BATCH_ID/sparkApplications/APPLICATION_ID"
+    pub fn locations_batches_spark_applications_access_stage_attempt(
+        &self,
+        name: &str,
+    ) -> ProjectLocationBatchSparkApplicationAccessStageAttemptCall<'a, C> {
+        ProjectLocationBatchSparkApplicationAccessStageAttemptCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _summary_metrics_mask: Default::default(),
+            _stage_id: Default::default(),
+            _stage_attempt_id: Default::default(),
+            _parent: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Obtain RDD operation graph for a Spark Application Stage. Limits the number of clusters returned as part of the graph to 10000.
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - Required. The fully qualified name of the batch to retrieve in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/batches/BATCH_ID/sparkApplications/APPLICATION_ID"
+    pub fn locations_batches_spark_applications_access_stage_rdd_graph(
+        &self,
+        name: &str,
+    ) -> ProjectLocationBatchSparkApplicationAccessStageRddGraphCall<'a, C> {
+        ProjectLocationBatchSparkApplicationAccessStageRddGraphCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _stage_id: Default::default(),
+            _parent: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Obtain high level information and list of Spark Applications corresponding to a batch
+    ///
+    /// # Arguments
+    ///
+    /// * `parent` - Required. The fully qualified name of the batch to retrieve in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/batches/BATCH_ID"
+    pub fn locations_batches_spark_applications_search(
+        &self,
+        parent: &str,
+    ) -> ProjectLocationBatchSparkApplicationSearchCall<'a, C> {
+        ProjectLocationBatchSparkApplicationSearchCall {
+            hub: self.hub,
+            _parent: parent.to_string(),
+            _page_token: Default::default(),
+            _page_size: Default::default(),
+            _min_time: Default::default(),
+            _min_end_time: Default::default(),
+            _max_time: Default::default(),
+            _max_end_time: Default::default(),
+            _application_status: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Obtain executor summary with respect to a spark stage attempt.
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - Required. The fully qualified name of the batch to retrieve in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/batches/BATCH_ID/sparkApplications/APPLICATION_ID"
+    pub fn locations_batches_spark_applications_search_executor_stage_summary(
+        &self,
+        name: &str,
+    ) -> ProjectLocationBatchSparkApplicationSearchExecutorStageSummaryCall<'a, C> {
+        ProjectLocationBatchSparkApplicationSearchExecutorStageSummaryCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _stage_id: Default::default(),
+            _stage_attempt_id: Default::default(),
+            _parent: Default::default(),
+            _page_token: Default::default(),
+            _page_size: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Obtain data corresponding to executors for a Spark Application.
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - Required. The fully qualified name of the batch to retrieve in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/batches/BATCH_ID/sparkApplications/APPLICATION_ID"
+    pub fn locations_batches_spark_applications_search_executors(
+        &self,
+        name: &str,
+    ) -> ProjectLocationBatchSparkApplicationSearchExecutorCall<'a, C> {
+        ProjectLocationBatchSparkApplicationSearchExecutorCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _parent: Default::default(),
+            _page_token: Default::default(),
+            _page_size: Default::default(),
+            _executor_status: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Obtain list of spark jobs corresponding to a Spark Application.
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - Required. The fully qualified name of the batch to retrieve in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/batches/BATCH_ID/sparkApplications/APPLICATION_ID"
+    pub fn locations_batches_spark_applications_search_jobs(
+        &self,
+        name: &str,
+    ) -> ProjectLocationBatchSparkApplicationSearchJobCall<'a, C> {
+        ProjectLocationBatchSparkApplicationSearchJobCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _parent: Default::default(),
+            _page_token: Default::default(),
+            _page_size: Default::default(),
+            _job_status: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Obtain data corresponding to SQL Queries for a Spark Application.
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - Required. The fully qualified name of the batch to retrieve in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/batches/BATCH_ID/sparkApplications/APPLICATION_ID"
+    pub fn locations_batches_spark_applications_search_sql_queries(
+        &self,
+        name: &str,
+    ) -> ProjectLocationBatchSparkApplicationSearchSqlQueryCall<'a, C> {
+        ProjectLocationBatchSparkApplicationSearchSqlQueryCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _plan_description: Default::default(),
+            _parent: Default::default(),
+            _page_token: Default::default(),
+            _page_size: Default::default(),
+            _details: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Obtain data corresponding to tasks for a spark stage attempt for a Spark Application.
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - Required. The fully qualified name of the batch to retrieve in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/batches/BATCH_ID/sparkApplications/APPLICATION_ID"
+    pub fn locations_batches_spark_applications_search_stage_attempt_tasks(
+        &self,
+        name: &str,
+    ) -> ProjectLocationBatchSparkApplicationSearchStageAttemptTaskCall<'a, C> {
+        ProjectLocationBatchSparkApplicationSearchStageAttemptTaskCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _task_status: Default::default(),
+            _stage_id: Default::default(),
+            _stage_attempt_id: Default::default(),
+            _sort_runtime: Default::default(),
+            _parent: Default::default(),
+            _page_token: Default::default(),
+            _page_size: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Obtain data corresponding to a spark stage attempts for a Spark Application.
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - Required. The fully qualified name of the batch to retrieve in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/batches/BATCH_ID/sparkApplications/APPLICATION_ID"
+    pub fn locations_batches_spark_applications_search_stage_attempts(
+        &self,
+        name: &str,
+    ) -> ProjectLocationBatchSparkApplicationSearchStageAttemptCall<'a, C> {
+        ProjectLocationBatchSparkApplicationSearchStageAttemptCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _summary_metrics_mask: Default::default(),
+            _stage_id: Default::default(),
+            _parent: Default::default(),
+            _page_token: Default::default(),
+            _page_size: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Obtain data corresponding to stages for a Spark Application.
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - Required. The fully qualified name of the batch to retrieve in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/batches/BATCH_ID/sparkApplications/APPLICATION_ID"
+    pub fn locations_batches_spark_applications_search_stages(
+        &self,
+        name: &str,
+    ) -> ProjectLocationBatchSparkApplicationSearchStageCall<'a, C> {
+        ProjectLocationBatchSparkApplicationSearchStageCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _summary_metrics_mask: Default::default(),
+            _stage_status: Default::default(),
+            _parent: Default::default(),
+            _page_token: Default::default(),
+            _page_size: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Obtain summary of Executor Summary for a Spark Application
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - Required. The fully qualified name of the batch to retrieve in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/batches/BATCH_ID/sparkApplications/APPLICATION_ID"
+    pub fn locations_batches_spark_applications_summarize_executors(
+        &self,
+        name: &str,
+    ) -> ProjectLocationBatchSparkApplicationSummarizeExecutorCall<'a, C> {
+        ProjectLocationBatchSparkApplicationSummarizeExecutorCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _parent: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Obtain summary of Jobs for a Spark Application
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - Required. The fully qualified name of the batch to retrieve in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/batches/BATCH_ID/sparkApplications/APPLICATION_ID"
+    pub fn locations_batches_spark_applications_summarize_jobs(
+        &self,
+        name: &str,
+    ) -> ProjectLocationBatchSparkApplicationSummarizeJobCall<'a, C> {
+        ProjectLocationBatchSparkApplicationSummarizeJobCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _parent: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Obtain summary of Tasks for a Spark Application Stage Attempt
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - Required. The fully qualified name of the batch to retrieve in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/batches/BATCH_ID/sparkApplications/APPLICATION_ID"
+    pub fn locations_batches_spark_applications_summarize_stage_attempt_tasks(
+        &self,
+        name: &str,
+    ) -> ProjectLocationBatchSparkApplicationSummarizeStageAttemptTaskCall<'a, C> {
+        ProjectLocationBatchSparkApplicationSummarizeStageAttemptTaskCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _stage_id: Default::default(),
+            _stage_attempt_id: Default::default(),
+            _parent: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Obtain summary of Stages for a Spark Application
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - Required. The fully qualified name of the batch to retrieve in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/batches/BATCH_ID/sparkApplications/APPLICATION_ID"
+    pub fn locations_batches_spark_applications_summarize_stages(
+        &self,
+        name: &str,
+    ) -> ProjectLocationBatchSparkApplicationSummarizeStageCall<'a, C> {
+        ProjectLocationBatchSparkApplicationSummarizeStageCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _parent: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Write wrapper objects from dataplane to spanner
+    ///
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `name` - Required. The fully qualified name of the spark application to write data about in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/batches/BATCH_ID/sparkApplications/APPLICATION_ID"
+    pub fn locations_batches_spark_applications_write(
+        &self,
+        request: WriteSparkApplicationContextRequest,
+        name: &str,
+    ) -> ProjectLocationBatchSparkApplicationWriteCall<'a, C> {
+        ProjectLocationBatchSparkApplicationWriteCall {
+            hub: self.hub,
+            _request: request,
+            _name: name.to_string(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
     /// Analyze a Batch for possible recommendations and insights.
     ///
     /// # Arguments
@@ -3833,6 +7886,7 @@ impl<'a, C> ProjectMethods<'a, C> {
         ProjectLocationOperationListCall {
             hub: self.hub,
             _name: name.to_string(),
+            _return_partial_success: Default::default(),
             _page_token: Default::default(),
             _page_size: Default::default(),
             _filter: Default::default(),
@@ -3935,13 +7989,485 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - Required. The resource name of the session template.
+    /// * `name` - Required. Identifier. The resource name of the session template.
     pub fn locations_session_templates_patch(
         &self,
         request: SessionTemplate,
         name: &str,
     ) -> ProjectLocationSessionTemplatePatchCall<'a, C> {
         ProjectLocationSessionTemplatePatchCall {
+            hub: self.hub,
+            _request: request,
+            _name: name.to_string(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Obtain high level information corresponding to a single Spark Application.
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - Required. The fully qualified name of the session to retrieve in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/sessions/SESSION_ID/sparkApplications/APPLICATION_ID"
+    pub fn locations_sessions_spark_applications_access(
+        &self,
+        name: &str,
+    ) -> ProjectLocationSessionSparkApplicationAccesCall<'a, C> {
+        ProjectLocationSessionSparkApplicationAccesCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _parent: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Obtain environment details for a Spark Application
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - Required. The fully qualified name of the session to retrieve in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/sessions/SESSION_ID/sparkApplications/APPLICATION_ID"
+    pub fn locations_sessions_spark_applications_access_environment_info(
+        &self,
+        name: &str,
+    ) -> ProjectLocationSessionSparkApplicationAccessEnvironmentInfoCall<'a, C> {
+        ProjectLocationSessionSparkApplicationAccessEnvironmentInfoCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _parent: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Obtain data corresponding to a spark job for a Spark Application.
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - Required. The fully qualified name of the session to retrieve in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/sessions/SESSION_ID/sparkApplications/APPLICATION_ID"
+    pub fn locations_sessions_spark_applications_access_job(
+        &self,
+        name: &str,
+    ) -> ProjectLocationSessionSparkApplicationAccessJobCall<'a, C> {
+        ProjectLocationSessionSparkApplicationAccessJobCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _parent: Default::default(),
+            _job_id: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Obtain Spark Plan Graph for a Spark Application SQL execution. Limits the number of clusters returned as part of the graph to 10000.
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - Required. The fully qualified name of the session to retrieve in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/sessions/SESSION_ID/sparkApplications/APPLICATION_ID"
+    pub fn locations_sessions_spark_applications_access_sql_plan(
+        &self,
+        name: &str,
+    ) -> ProjectLocationSessionSparkApplicationAccessSqlPlanCall<'a, C> {
+        ProjectLocationSessionSparkApplicationAccessSqlPlanCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _parent: Default::default(),
+            _execution_id: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Obtain data corresponding to a particular SQL Query for a Spark Application.
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - Required. The fully qualified name of the session to retrieve in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/sessions/SESSION_ID/sparkApplications/APPLICATION_ID"
+    pub fn locations_sessions_spark_applications_access_sql_query(
+        &self,
+        name: &str,
+    ) -> ProjectLocationSessionSparkApplicationAccessSqlQueryCall<'a, C> {
+        ProjectLocationSessionSparkApplicationAccessSqlQueryCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _plan_description: Default::default(),
+            _parent: Default::default(),
+            _execution_id: Default::default(),
+            _details: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Obtain data corresponding to a spark stage attempt for a Spark Application.
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - Required. The fully qualified name of the session to retrieve in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/sessions/SESSION_ID/sparkApplications/APPLICATION_ID"
+    pub fn locations_sessions_spark_applications_access_stage_attempt(
+        &self,
+        name: &str,
+    ) -> ProjectLocationSessionSparkApplicationAccessStageAttemptCall<'a, C> {
+        ProjectLocationSessionSparkApplicationAccessStageAttemptCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _summary_metrics_mask: Default::default(),
+            _stage_id: Default::default(),
+            _stage_attempt_id: Default::default(),
+            _parent: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Obtain RDD operation graph for a Spark Application Stage. Limits the number of clusters returned as part of the graph to 10000.
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - Required. The fully qualified name of the session to retrieve in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/sessions/SESSION_ID/sparkApplications/APPLICATION_ID"
+    pub fn locations_sessions_spark_applications_access_stage_rdd_graph(
+        &self,
+        name: &str,
+    ) -> ProjectLocationSessionSparkApplicationAccessStageRddGraphCall<'a, C> {
+        ProjectLocationSessionSparkApplicationAccessStageRddGraphCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _stage_id: Default::default(),
+            _parent: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Obtain high level information and list of Spark Applications corresponding to a batch
+    ///
+    /// # Arguments
+    ///
+    /// * `parent` - Required. The fully qualified name of the session to retrieve in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/sessions/SESSION_ID"
+    pub fn locations_sessions_spark_applications_search(
+        &self,
+        parent: &str,
+    ) -> ProjectLocationSessionSparkApplicationSearchCall<'a, C> {
+        ProjectLocationSessionSparkApplicationSearchCall {
+            hub: self.hub,
+            _parent: parent.to_string(),
+            _page_token: Default::default(),
+            _page_size: Default::default(),
+            _min_time: Default::default(),
+            _min_end_time: Default::default(),
+            _max_time: Default::default(),
+            _max_end_time: Default::default(),
+            _application_status: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Obtain executor summary with respect to a spark stage attempt.
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - Required. The fully qualified name of the session to retrieve in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/sessions/SESSION_ID/sparkApplications/APPLICATION_ID"
+    pub fn locations_sessions_spark_applications_search_executor_stage_summary(
+        &self,
+        name: &str,
+    ) -> ProjectLocationSessionSparkApplicationSearchExecutorStageSummaryCall<'a, C> {
+        ProjectLocationSessionSparkApplicationSearchExecutorStageSummaryCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _stage_id: Default::default(),
+            _stage_attempt_id: Default::default(),
+            _parent: Default::default(),
+            _page_token: Default::default(),
+            _page_size: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Obtain data corresponding to executors for a Spark Application.
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - Required. The fully qualified name of the session to retrieve in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/sessions/SESSION_ID/sparkApplications/APPLICATION_ID"
+    pub fn locations_sessions_spark_applications_search_executors(
+        &self,
+        name: &str,
+    ) -> ProjectLocationSessionSparkApplicationSearchExecutorCall<'a, C> {
+        ProjectLocationSessionSparkApplicationSearchExecutorCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _parent: Default::default(),
+            _page_token: Default::default(),
+            _page_size: Default::default(),
+            _executor_status: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Obtain list of spark jobs corresponding to a Spark Application.
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - Required. The fully qualified name of the session to retrieve in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/sessions/SESSION_ID/sparkApplications/APPLICATION_ID"
+    pub fn locations_sessions_spark_applications_search_jobs(
+        &self,
+        name: &str,
+    ) -> ProjectLocationSessionSparkApplicationSearchJobCall<'a, C> {
+        ProjectLocationSessionSparkApplicationSearchJobCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _parent: Default::default(),
+            _page_token: Default::default(),
+            _page_size: Default::default(),
+            _job_status: Default::default(),
+            _job_ids: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Obtain data corresponding to SQL Queries for a Spark Application.
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - Required. The fully qualified name of the session to retrieve in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/sessions/SESSION_ID/sparkApplications/APPLICATION_ID"
+    pub fn locations_sessions_spark_applications_search_sql_queries(
+        &self,
+        name: &str,
+    ) -> ProjectLocationSessionSparkApplicationSearchSqlQueryCall<'a, C> {
+        ProjectLocationSessionSparkApplicationSearchSqlQueryCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _plan_description: Default::default(),
+            _parent: Default::default(),
+            _page_token: Default::default(),
+            _page_size: Default::default(),
+            _operation_ids: Default::default(),
+            _details: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Obtain data corresponding to tasks for a spark stage attempt for a Spark Application.
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - Required. The fully qualified name of the session to retrieve in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/sessions/SESSION_ID/sparkApplications/APPLICATION_ID"
+    pub fn locations_sessions_spark_applications_search_stage_attempt_tasks(
+        &self,
+        name: &str,
+    ) -> ProjectLocationSessionSparkApplicationSearchStageAttemptTaskCall<'a, C> {
+        ProjectLocationSessionSparkApplicationSearchStageAttemptTaskCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _task_status: Default::default(),
+            _stage_id: Default::default(),
+            _stage_attempt_id: Default::default(),
+            _sort_runtime: Default::default(),
+            _parent: Default::default(),
+            _page_token: Default::default(),
+            _page_size: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Obtain data corresponding to a spark stage attempts for a Spark Application.
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - Required. The fully qualified name of the session to retrieve in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/sessions/SESSION_ID/sparkApplications/APPLICATION_ID"
+    pub fn locations_sessions_spark_applications_search_stage_attempts(
+        &self,
+        name: &str,
+    ) -> ProjectLocationSessionSparkApplicationSearchStageAttemptCall<'a, C> {
+        ProjectLocationSessionSparkApplicationSearchStageAttemptCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _summary_metrics_mask: Default::default(),
+            _stage_id: Default::default(),
+            _parent: Default::default(),
+            _page_token: Default::default(),
+            _page_size: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Obtain data corresponding to stages for a Spark Application.
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - Required. The fully qualified name of the session to retrieve in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/sessions/SESSION_ID/sparkApplications/APPLICATION_ID"
+    pub fn locations_sessions_spark_applications_search_stages(
+        &self,
+        name: &str,
+    ) -> ProjectLocationSessionSparkApplicationSearchStageCall<'a, C> {
+        ProjectLocationSessionSparkApplicationSearchStageCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _summary_metrics_mask: Default::default(),
+            _stage_status: Default::default(),
+            _stage_ids: Default::default(),
+            _parent: Default::default(),
+            _page_token: Default::default(),
+            _page_size: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Obtain summary of Executor Summary for a Spark Application
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - Required. The fully qualified name of the session to retrieve in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/sessions/SESSION_ID/sparkApplications/APPLICATION_ID"
+    pub fn locations_sessions_spark_applications_summarize_executors(
+        &self,
+        name: &str,
+    ) -> ProjectLocationSessionSparkApplicationSummarizeExecutorCall<'a, C> {
+        ProjectLocationSessionSparkApplicationSummarizeExecutorCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _parent: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Obtain summary of Jobs for a Spark Application
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - Required. The fully qualified name of the session to retrieve in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/sessions/SESSION_ID/sparkApplications/APPLICATION_ID"
+    pub fn locations_sessions_spark_applications_summarize_jobs(
+        &self,
+        name: &str,
+    ) -> ProjectLocationSessionSparkApplicationSummarizeJobCall<'a, C> {
+        ProjectLocationSessionSparkApplicationSummarizeJobCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _parent: Default::default(),
+            _job_ids: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Obtain summary of Tasks for a Spark Application Stage Attempt
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - Required. The fully qualified name of the session to retrieve in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/sessions/SESSION_ID/sparkApplications/APPLICATION_ID"
+    pub fn locations_sessions_spark_applications_summarize_stage_attempt_tasks(
+        &self,
+        name: &str,
+    ) -> ProjectLocationSessionSparkApplicationSummarizeStageAttemptTaskCall<'a, C> {
+        ProjectLocationSessionSparkApplicationSummarizeStageAttemptTaskCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _stage_id: Default::default(),
+            _stage_attempt_id: Default::default(),
+            _parent: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Obtain summary of Stages for a Spark Application
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - Required. The fully qualified name of the session to retrieve in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/sessions/SESSION_ID/sparkApplications/APPLICATION_ID"
+    pub fn locations_sessions_spark_applications_summarize_stages(
+        &self,
+        name: &str,
+    ) -> ProjectLocationSessionSparkApplicationSummarizeStageCall<'a, C> {
+        ProjectLocationSessionSparkApplicationSummarizeStageCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _stage_ids: Default::default(),
+            _parent: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Write wrapper objects from dataplane to spanner
+    ///
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `name` - Required. The fully qualified name of the spark application to write data about in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/sessions/SESSION_ID/sparkApplications/APPLICATION_ID"
+    pub fn locations_sessions_spark_applications_write(
+        &self,
+        request: WriteSessionSparkApplicationContextRequest,
+        name: &str,
+    ) -> ProjectLocationSessionSparkApplicationWriteCall<'a, C> {
+        ProjectLocationSessionSparkApplicationWriteCall {
             hub: self.hub,
             _request: request,
             _name: name.to_string(),
@@ -5249,6 +9775,7 @@ impl<'a, C> ProjectMethods<'a, C> {
         ProjectRegionOperationListCall {
             hub: self.hub,
             _name: name.to_string(),
+            _return_partial_success: Default::default(),
             _page_token: Default::default(),
             _page_size: Default::default(),
             _filter: Default::default(),
@@ -5553,9 +10080,20 @@ impl<'a, C> ProjectMethods<'a, C> {
 /// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -5566,7 +10104,7 @@ impl<'a, C> ProjectMethods<'a, C> {
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Dataproc::new(client, auth);
@@ -5885,9 +10423,20 @@ where
 /// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -5898,7 +10447,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Dataproc::new(client, auth);
@@ -6178,9 +10727,20 @@ where
 /// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -6191,7 +10751,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Dataproc::new(client, auth);
@@ -6465,9 +11025,20 @@ where
 /// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -6478,7 +11049,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Dataproc::new(client, auth);
@@ -6803,9 +11374,20 @@ where
 /// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -6816,7 +11398,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Dataproc::new(client, auth);
@@ -7119,9 +11701,20 @@ where
 /// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -7132,7 +11725,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Dataproc::new(client, auth);
@@ -7458,9 +12051,20 @@ where
 /// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -7471,7 +12075,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Dataproc::new(client, auth);
@@ -7797,9 +12401,20 @@ where
 /// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -7810,7 +12425,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Dataproc::new(client, auth);
@@ -8112,6 +12727,7401 @@ where
     }
 }
 
+/// Obtain high level information corresponding to a single Spark Application.
+///
+/// A builder for the *locations.batches.sparkApplications.access* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_dataproc1 as dataproc1;
+/// # async fn dox() {
+/// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = Dataproc::new(client, auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_batches_spark_applications_access("name")
+///              .parent("gubergren")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationBatchSparkApplicationAccesCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Dataproc<C>,
+    _name: String,
+    _parent: Option<String>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder for ProjectLocationBatchSparkApplicationAccesCall<'a, C> {}
+
+impl<'a, C> ProjectLocationBatchSparkApplicationAccesCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(
+        mut self,
+    ) -> common::Result<(common::Response, AccessSparkApplicationResponse)> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "dataproc.projects.locations.batches.sparkApplications.access",
+            http_method: hyper::Method::GET,
+        });
+
+        for &field in ["alt", "name", "parent"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("name", self._name);
+        if let Some(value) = self._parent.as_ref() {
+            params.push("parent", value);
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+name}:access";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    /// Required. The fully qualified name of the batch to retrieve in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/batches/BATCH_ID/sparkApplications/APPLICATION_ID"
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectLocationBatchSparkApplicationAccesCall<'a, C> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// Required. Parent (Batch) resource reference.
+    ///
+    /// Sets the *parent* query property to the given value.
+    pub fn parent(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationBatchSparkApplicationAccesCall<'a, C> {
+        self._parent = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> ProjectLocationBatchSparkApplicationAccesCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(
+        mut self,
+        name: T,
+        value: T,
+    ) -> ProjectLocationBatchSparkApplicationAccesCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(
+        mut self,
+        scope: St,
+    ) -> ProjectLocationBatchSparkApplicationAccesCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(
+        mut self,
+        scopes: I,
+    ) -> ProjectLocationBatchSparkApplicationAccesCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationBatchSparkApplicationAccesCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
+/// Obtain environment details for a Spark Application
+///
+/// A builder for the *locations.batches.sparkApplications.accessEnvironmentInfo* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_dataproc1 as dataproc1;
+/// # async fn dox() {
+/// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = Dataproc::new(client, auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_batches_spark_applications_access_environment_info("name")
+///              .parent("est")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationBatchSparkApplicationAccessEnvironmentInfoCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Dataproc<C>,
+    _name: String,
+    _parent: Option<String>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder
+    for ProjectLocationBatchSparkApplicationAccessEnvironmentInfoCall<'a, C>
+{
+}
+
+impl<'a, C> ProjectLocationBatchSparkApplicationAccessEnvironmentInfoCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(
+        mut self,
+    ) -> common::Result<(
+        common::Response,
+        AccessSparkApplicationEnvironmentInfoResponse,
+    )> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "dataproc.projects.locations.batches.sparkApplications.accessEnvironmentInfo",
+            http_method: hyper::Method::GET,
+        });
+
+        for &field in ["alt", "name", "parent"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("name", self._name);
+        if let Some(value) = self._parent.as_ref() {
+            params.push("parent", value);
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+name}:accessEnvironmentInfo";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    /// Required. The fully qualified name of the batch to retrieve in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/batches/BATCH_ID/sparkApplications/APPLICATION_ID"
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationBatchSparkApplicationAccessEnvironmentInfoCall<'a, C> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// Required. Parent (Batch) resource reference.
+    ///
+    /// Sets the *parent* query property to the given value.
+    pub fn parent(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationBatchSparkApplicationAccessEnvironmentInfoCall<'a, C> {
+        self._parent = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> ProjectLocationBatchSparkApplicationAccessEnvironmentInfoCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(
+        mut self,
+        name: T,
+        value: T,
+    ) -> ProjectLocationBatchSparkApplicationAccessEnvironmentInfoCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(
+        mut self,
+        scope: St,
+    ) -> ProjectLocationBatchSparkApplicationAccessEnvironmentInfoCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(
+        mut self,
+        scopes: I,
+    ) -> ProjectLocationBatchSparkApplicationAccessEnvironmentInfoCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(
+        mut self,
+    ) -> ProjectLocationBatchSparkApplicationAccessEnvironmentInfoCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
+/// Obtain data corresponding to a spark job for a Spark Application.
+///
+/// A builder for the *locations.batches.sparkApplications.accessJob* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_dataproc1 as dataproc1;
+/// # async fn dox() {
+/// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = Dataproc::new(client, auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_batches_spark_applications_access_job("name")
+///              .parent("ipsum")
+///              .job_id(-7)
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationBatchSparkApplicationAccessJobCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Dataproc<C>,
+    _name: String,
+    _parent: Option<String>,
+    _job_id: Option<i64>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder for ProjectLocationBatchSparkApplicationAccessJobCall<'a, C> {}
+
+impl<'a, C> ProjectLocationBatchSparkApplicationAccessJobCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(
+        mut self,
+    ) -> common::Result<(common::Response, AccessSparkApplicationJobResponse)> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "dataproc.projects.locations.batches.sparkApplications.accessJob",
+            http_method: hyper::Method::GET,
+        });
+
+        for &field in ["alt", "name", "parent", "jobId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(5 + self._additional_params.len());
+        params.push("name", self._name);
+        if let Some(value) = self._parent.as_ref() {
+            params.push("parent", value);
+        }
+        if let Some(value) = self._job_id.as_ref() {
+            params.push("jobId", value.to_string());
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+name}:accessJob";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    /// Required. The fully qualified name of the batch to retrieve in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/batches/BATCH_ID/sparkApplications/APPLICATION_ID"
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationBatchSparkApplicationAccessJobCall<'a, C> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// Required. Parent (Batch) resource reference.
+    ///
+    /// Sets the *parent* query property to the given value.
+    pub fn parent(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationBatchSparkApplicationAccessJobCall<'a, C> {
+        self._parent = Some(new_value.to_string());
+        self
+    }
+    /// Required. Job ID to fetch data for.
+    ///
+    /// Sets the *job id* query property to the given value.
+    pub fn job_id(
+        mut self,
+        new_value: i64,
+    ) -> ProjectLocationBatchSparkApplicationAccessJobCall<'a, C> {
+        self._job_id = Some(new_value);
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> ProjectLocationBatchSparkApplicationAccessJobCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(
+        mut self,
+        name: T,
+        value: T,
+    ) -> ProjectLocationBatchSparkApplicationAccessJobCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(
+        mut self,
+        scope: St,
+    ) -> ProjectLocationBatchSparkApplicationAccessJobCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(
+        mut self,
+        scopes: I,
+    ) -> ProjectLocationBatchSparkApplicationAccessJobCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationBatchSparkApplicationAccessJobCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
+/// Obtain Spark Plan Graph for a Spark Application SQL execution. Limits the number of clusters returned as part of the graph to 10000.
+///
+/// A builder for the *locations.batches.sparkApplications.accessSqlPlan* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_dataproc1 as dataproc1;
+/// # async fn dox() {
+/// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = Dataproc::new(client, auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_batches_spark_applications_access_sql_plan("name")
+///              .parent("ea")
+///              .execution_id(-99)
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationBatchSparkApplicationAccessSqlPlanCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Dataproc<C>,
+    _name: String,
+    _parent: Option<String>,
+    _execution_id: Option<i64>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder for ProjectLocationBatchSparkApplicationAccessSqlPlanCall<'a, C> {}
+
+impl<'a, C> ProjectLocationBatchSparkApplicationAccessSqlPlanCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(
+        mut self,
+    ) -> common::Result<(
+        common::Response,
+        AccessSparkApplicationSqlSparkPlanGraphResponse,
+    )> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "dataproc.projects.locations.batches.sparkApplications.accessSqlPlan",
+            http_method: hyper::Method::GET,
+        });
+
+        for &field in ["alt", "name", "parent", "executionId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(5 + self._additional_params.len());
+        params.push("name", self._name);
+        if let Some(value) = self._parent.as_ref() {
+            params.push("parent", value);
+        }
+        if let Some(value) = self._execution_id.as_ref() {
+            params.push("executionId", value.to_string());
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+name}:accessSqlPlan";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    /// Required. The fully qualified name of the batch to retrieve in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/batches/BATCH_ID/sparkApplications/APPLICATION_ID"
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationBatchSparkApplicationAccessSqlPlanCall<'a, C> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// Required. Parent (Batch) resource reference.
+    ///
+    /// Sets the *parent* query property to the given value.
+    pub fn parent(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationBatchSparkApplicationAccessSqlPlanCall<'a, C> {
+        self._parent = Some(new_value.to_string());
+        self
+    }
+    /// Required. Execution ID
+    ///
+    /// Sets the *execution id* query property to the given value.
+    pub fn execution_id(
+        mut self,
+        new_value: i64,
+    ) -> ProjectLocationBatchSparkApplicationAccessSqlPlanCall<'a, C> {
+        self._execution_id = Some(new_value);
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> ProjectLocationBatchSparkApplicationAccessSqlPlanCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(
+        mut self,
+        name: T,
+        value: T,
+    ) -> ProjectLocationBatchSparkApplicationAccessSqlPlanCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(
+        mut self,
+        scope: St,
+    ) -> ProjectLocationBatchSparkApplicationAccessSqlPlanCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(
+        mut self,
+        scopes: I,
+    ) -> ProjectLocationBatchSparkApplicationAccessSqlPlanCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationBatchSparkApplicationAccessSqlPlanCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
+/// Obtain data corresponding to a particular SQL Query for a Spark Application.
+///
+/// A builder for the *locations.batches.sparkApplications.accessSqlQuery* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_dataproc1 as dataproc1;
+/// # async fn dox() {
+/// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = Dataproc::new(client, auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_batches_spark_applications_access_sql_query("name")
+///              .plan_description(false)
+///              .parent("sed")
+///              .execution_id(-70)
+///              .details(false)
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationBatchSparkApplicationAccessSqlQueryCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Dataproc<C>,
+    _name: String,
+    _plan_description: Option<bool>,
+    _parent: Option<String>,
+    _execution_id: Option<i64>,
+    _details: Option<bool>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder for ProjectLocationBatchSparkApplicationAccessSqlQueryCall<'a, C> {}
+
+impl<'a, C> ProjectLocationBatchSparkApplicationAccessSqlQueryCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(
+        mut self,
+    ) -> common::Result<(common::Response, AccessSparkApplicationSqlQueryResponse)> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "dataproc.projects.locations.batches.sparkApplications.accessSqlQuery",
+            http_method: hyper::Method::GET,
+        });
+
+        for &field in [
+            "alt",
+            "name",
+            "planDescription",
+            "parent",
+            "executionId",
+            "details",
+        ]
+        .iter()
+        {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(7 + self._additional_params.len());
+        params.push("name", self._name);
+        if let Some(value) = self._plan_description.as_ref() {
+            params.push("planDescription", value.to_string());
+        }
+        if let Some(value) = self._parent.as_ref() {
+            params.push("parent", value);
+        }
+        if let Some(value) = self._execution_id.as_ref() {
+            params.push("executionId", value.to_string());
+        }
+        if let Some(value) = self._details.as_ref() {
+            params.push("details", value.to_string());
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+name}:accessSqlQuery";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    /// Required. The fully qualified name of the batch to retrieve in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/batches/BATCH_ID/sparkApplications/APPLICATION_ID"
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationBatchSparkApplicationAccessSqlQueryCall<'a, C> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// Optional. Enables/ disables physical plan description on demand
+    ///
+    /// Sets the *plan description* query property to the given value.
+    pub fn plan_description(
+        mut self,
+        new_value: bool,
+    ) -> ProjectLocationBatchSparkApplicationAccessSqlQueryCall<'a, C> {
+        self._plan_description = Some(new_value);
+        self
+    }
+    /// Required. Parent (Batch) resource reference.
+    ///
+    /// Sets the *parent* query property to the given value.
+    pub fn parent(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationBatchSparkApplicationAccessSqlQueryCall<'a, C> {
+        self._parent = Some(new_value.to_string());
+        self
+    }
+    /// Required. Execution ID
+    ///
+    /// Sets the *execution id* query property to the given value.
+    pub fn execution_id(
+        mut self,
+        new_value: i64,
+    ) -> ProjectLocationBatchSparkApplicationAccessSqlQueryCall<'a, C> {
+        self._execution_id = Some(new_value);
+        self
+    }
+    /// Optional. Lists/ hides details of Spark plan nodes. True is set to list and false to hide.
+    ///
+    /// Sets the *details* query property to the given value.
+    pub fn details(
+        mut self,
+        new_value: bool,
+    ) -> ProjectLocationBatchSparkApplicationAccessSqlQueryCall<'a, C> {
+        self._details = Some(new_value);
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> ProjectLocationBatchSparkApplicationAccessSqlQueryCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(
+        mut self,
+        name: T,
+        value: T,
+    ) -> ProjectLocationBatchSparkApplicationAccessSqlQueryCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(
+        mut self,
+        scope: St,
+    ) -> ProjectLocationBatchSparkApplicationAccessSqlQueryCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(
+        mut self,
+        scopes: I,
+    ) -> ProjectLocationBatchSparkApplicationAccessSqlQueryCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationBatchSparkApplicationAccessSqlQueryCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
+/// Obtain data corresponding to a spark stage attempt for a Spark Application.
+///
+/// A builder for the *locations.batches.sparkApplications.accessStageAttempt* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_dataproc1 as dataproc1;
+/// # async fn dox() {
+/// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = Dataproc::new(client, auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_batches_spark_applications_access_stage_attempt("name")
+///              .summary_metrics_mask(FieldMask::new::<&str>(&[]))
+///              .stage_id(-15)
+///              .stage_attempt_id(-13)
+///              .parent("et")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationBatchSparkApplicationAccessStageAttemptCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Dataproc<C>,
+    _name: String,
+    _summary_metrics_mask: Option<common::FieldMask>,
+    _stage_id: Option<i64>,
+    _stage_attempt_id: Option<i32>,
+    _parent: Option<String>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder
+    for ProjectLocationBatchSparkApplicationAccessStageAttemptCall<'a, C>
+{
+}
+
+impl<'a, C> ProjectLocationBatchSparkApplicationAccessStageAttemptCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(
+        mut self,
+    ) -> common::Result<(common::Response, AccessSparkApplicationStageAttemptResponse)> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "dataproc.projects.locations.batches.sparkApplications.accessStageAttempt",
+            http_method: hyper::Method::GET,
+        });
+
+        for &field in [
+            "alt",
+            "name",
+            "summaryMetricsMask",
+            "stageId",
+            "stageAttemptId",
+            "parent",
+        ]
+        .iter()
+        {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(7 + self._additional_params.len());
+        params.push("name", self._name);
+        if let Some(value) = self._summary_metrics_mask.as_ref() {
+            params.push("summaryMetricsMask", value.to_string());
+        }
+        if let Some(value) = self._stage_id.as_ref() {
+            params.push("stageId", value.to_string());
+        }
+        if let Some(value) = self._stage_attempt_id.as_ref() {
+            params.push("stageAttemptId", value.to_string());
+        }
+        if let Some(value) = self._parent.as_ref() {
+            params.push("parent", value);
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+name}:accessStageAttempt";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    /// Required. The fully qualified name of the batch to retrieve in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/batches/BATCH_ID/sparkApplications/APPLICATION_ID"
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationBatchSparkApplicationAccessStageAttemptCall<'a, C> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// Optional. The list of summary metrics fields to include. Empty list will default to skip all summary metrics fields. Example, if the response should include TaskQuantileMetrics, the request should have task_quantile_metrics in summary_metrics_mask field
+    ///
+    /// Sets the *summary metrics mask* query property to the given value.
+    pub fn summary_metrics_mask(
+        mut self,
+        new_value: common::FieldMask,
+    ) -> ProjectLocationBatchSparkApplicationAccessStageAttemptCall<'a, C> {
+        self._summary_metrics_mask = Some(new_value);
+        self
+    }
+    /// Required. Stage ID
+    ///
+    /// Sets the *stage id* query property to the given value.
+    pub fn stage_id(
+        mut self,
+        new_value: i64,
+    ) -> ProjectLocationBatchSparkApplicationAccessStageAttemptCall<'a, C> {
+        self._stage_id = Some(new_value);
+        self
+    }
+    /// Required. Stage Attempt ID
+    ///
+    /// Sets the *stage attempt id* query property to the given value.
+    pub fn stage_attempt_id(
+        mut self,
+        new_value: i32,
+    ) -> ProjectLocationBatchSparkApplicationAccessStageAttemptCall<'a, C> {
+        self._stage_attempt_id = Some(new_value);
+        self
+    }
+    /// Required. Parent (Batch) resource reference.
+    ///
+    /// Sets the *parent* query property to the given value.
+    pub fn parent(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationBatchSparkApplicationAccessStageAttemptCall<'a, C> {
+        self._parent = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> ProjectLocationBatchSparkApplicationAccessStageAttemptCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(
+        mut self,
+        name: T,
+        value: T,
+    ) -> ProjectLocationBatchSparkApplicationAccessStageAttemptCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(
+        mut self,
+        scope: St,
+    ) -> ProjectLocationBatchSparkApplicationAccessStageAttemptCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(
+        mut self,
+        scopes: I,
+    ) -> ProjectLocationBatchSparkApplicationAccessStageAttemptCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(
+        mut self,
+    ) -> ProjectLocationBatchSparkApplicationAccessStageAttemptCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
+/// Obtain RDD operation graph for a Spark Application Stage. Limits the number of clusters returned as part of the graph to 10000.
+///
+/// A builder for the *locations.batches.sparkApplications.accessStageRddGraph* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_dataproc1 as dataproc1;
+/// # async fn dox() {
+/// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = Dataproc::new(client, auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_batches_spark_applications_access_stage_rdd_graph("name")
+///              .stage_id(-24)
+///              .parent("et")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationBatchSparkApplicationAccessStageRddGraphCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Dataproc<C>,
+    _name: String,
+    _stage_id: Option<i64>,
+    _parent: Option<String>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder
+    for ProjectLocationBatchSparkApplicationAccessStageRddGraphCall<'a, C>
+{
+}
+
+impl<'a, C> ProjectLocationBatchSparkApplicationAccessStageRddGraphCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(
+        mut self,
+    ) -> common::Result<(
+        common::Response,
+        AccessSparkApplicationStageRddOperationGraphResponse,
+    )> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "dataproc.projects.locations.batches.sparkApplications.accessStageRddGraph",
+            http_method: hyper::Method::GET,
+        });
+
+        for &field in ["alt", "name", "stageId", "parent"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(5 + self._additional_params.len());
+        params.push("name", self._name);
+        if let Some(value) = self._stage_id.as_ref() {
+            params.push("stageId", value.to_string());
+        }
+        if let Some(value) = self._parent.as_ref() {
+            params.push("parent", value);
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+name}:accessStageRddGraph";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    /// Required. The fully qualified name of the batch to retrieve in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/batches/BATCH_ID/sparkApplications/APPLICATION_ID"
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationBatchSparkApplicationAccessStageRddGraphCall<'a, C> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// Required. Stage ID
+    ///
+    /// Sets the *stage id* query property to the given value.
+    pub fn stage_id(
+        mut self,
+        new_value: i64,
+    ) -> ProjectLocationBatchSparkApplicationAccessStageRddGraphCall<'a, C> {
+        self._stage_id = Some(new_value);
+        self
+    }
+    /// Required. Parent (Batch) resource reference.
+    ///
+    /// Sets the *parent* query property to the given value.
+    pub fn parent(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationBatchSparkApplicationAccessStageRddGraphCall<'a, C> {
+        self._parent = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> ProjectLocationBatchSparkApplicationAccessStageRddGraphCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(
+        mut self,
+        name: T,
+        value: T,
+    ) -> ProjectLocationBatchSparkApplicationAccessStageRddGraphCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(
+        mut self,
+        scope: St,
+    ) -> ProjectLocationBatchSparkApplicationAccessStageRddGraphCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(
+        mut self,
+        scopes: I,
+    ) -> ProjectLocationBatchSparkApplicationAccessStageRddGraphCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(
+        mut self,
+    ) -> ProjectLocationBatchSparkApplicationAccessStageRddGraphCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
+/// Obtain high level information and list of Spark Applications corresponding to a batch
+///
+/// A builder for the *locations.batches.sparkApplications.search* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_dataproc1 as dataproc1;
+/// # async fn dox() {
+/// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = Dataproc::new(client, auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_batches_spark_applications_search("parent")
+///              .page_token("erat")
+///              .page_size(-93)
+///              .min_time(chrono::Utc::now())
+///              .min_end_time(chrono::Utc::now())
+///              .max_time(chrono::Utc::now())
+///              .max_end_time(chrono::Utc::now())
+///              .application_status("duo")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationBatchSparkApplicationSearchCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Dataproc<C>,
+    _parent: String,
+    _page_token: Option<String>,
+    _page_size: Option<i32>,
+    _min_time: Option<chrono::DateTime<chrono::offset::Utc>>,
+    _min_end_time: Option<chrono::DateTime<chrono::offset::Utc>>,
+    _max_time: Option<chrono::DateTime<chrono::offset::Utc>>,
+    _max_end_time: Option<chrono::DateTime<chrono::offset::Utc>>,
+    _application_status: Option<String>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder for ProjectLocationBatchSparkApplicationSearchCall<'a, C> {}
+
+impl<'a, C> ProjectLocationBatchSparkApplicationSearchCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(
+        mut self,
+    ) -> common::Result<(common::Response, SearchSparkApplicationsResponse)> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "dataproc.projects.locations.batches.sparkApplications.search",
+            http_method: hyper::Method::GET,
+        });
+
+        for &field in [
+            "alt",
+            "parent",
+            "pageToken",
+            "pageSize",
+            "minTime",
+            "minEndTime",
+            "maxTime",
+            "maxEndTime",
+            "applicationStatus",
+        ]
+        .iter()
+        {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(10 + self._additional_params.len());
+        params.push("parent", self._parent);
+        if let Some(value) = self._page_token.as_ref() {
+            params.push("pageToken", value);
+        }
+        if let Some(value) = self._page_size.as_ref() {
+            params.push("pageSize", value.to_string());
+        }
+        if let Some(value) = self._min_time.as_ref() {
+            params.push("minTime", common::serde::datetime_to_string(&value));
+        }
+        if let Some(value) = self._min_end_time.as_ref() {
+            params.push("minEndTime", common::serde::datetime_to_string(&value));
+        }
+        if let Some(value) = self._max_time.as_ref() {
+            params.push("maxTime", common::serde::datetime_to_string(&value));
+        }
+        if let Some(value) = self._max_end_time.as_ref() {
+            params.push("maxEndTime", common::serde::datetime_to_string(&value));
+        }
+        if let Some(value) = self._application_status.as_ref() {
+            params.push("applicationStatus", value);
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+parent}/sparkApplications:search";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["parent"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    /// Required. The fully qualified name of the batch to retrieve in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/batches/BATCH_ID"
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationBatchSparkApplicationSearchCall<'a, C> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// Optional. A page token received from a previous SearchSparkApplications call. Provide this token to retrieve the subsequent page.
+    ///
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationBatchSparkApplicationSearchCall<'a, C> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// Optional. Maximum number of applications to return in each response. The service may return fewer than this. The default page size is 10; the maximum page size is 100.
+    ///
+    /// Sets the *page size* query property to the given value.
+    pub fn page_size(
+        mut self,
+        new_value: i32,
+    ) -> ProjectLocationBatchSparkApplicationSearchCall<'a, C> {
+        self._page_size = Some(new_value);
+        self
+    }
+    /// Optional. Earliest start timestamp to list.
+    ///
+    /// Sets the *min time* query property to the given value.
+    pub fn min_time(
+        mut self,
+        new_value: chrono::DateTime<chrono::offset::Utc>,
+    ) -> ProjectLocationBatchSparkApplicationSearchCall<'a, C> {
+        self._min_time = Some(new_value);
+        self
+    }
+    /// Optional. Earliest end timestamp to list.
+    ///
+    /// Sets the *min end time* query property to the given value.
+    pub fn min_end_time(
+        mut self,
+        new_value: chrono::DateTime<chrono::offset::Utc>,
+    ) -> ProjectLocationBatchSparkApplicationSearchCall<'a, C> {
+        self._min_end_time = Some(new_value);
+        self
+    }
+    /// Optional. Latest start timestamp to list.
+    ///
+    /// Sets the *max time* query property to the given value.
+    pub fn max_time(
+        mut self,
+        new_value: chrono::DateTime<chrono::offset::Utc>,
+    ) -> ProjectLocationBatchSparkApplicationSearchCall<'a, C> {
+        self._max_time = Some(new_value);
+        self
+    }
+    /// Optional. Latest end timestamp to list.
+    ///
+    /// Sets the *max end time* query property to the given value.
+    pub fn max_end_time(
+        mut self,
+        new_value: chrono::DateTime<chrono::offset::Utc>,
+    ) -> ProjectLocationBatchSparkApplicationSearchCall<'a, C> {
+        self._max_end_time = Some(new_value);
+        self
+    }
+    /// Optional. Search only applications in the chosen state.
+    ///
+    /// Sets the *application status* query property to the given value.
+    pub fn application_status(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationBatchSparkApplicationSearchCall<'a, C> {
+        self._application_status = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> ProjectLocationBatchSparkApplicationSearchCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(
+        mut self,
+        name: T,
+        value: T,
+    ) -> ProjectLocationBatchSparkApplicationSearchCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(
+        mut self,
+        scope: St,
+    ) -> ProjectLocationBatchSparkApplicationSearchCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(
+        mut self,
+        scopes: I,
+    ) -> ProjectLocationBatchSparkApplicationSearchCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationBatchSparkApplicationSearchCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
+/// Obtain executor summary with respect to a spark stage attempt.
+///
+/// A builder for the *locations.batches.sparkApplications.searchExecutorStageSummary* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_dataproc1 as dataproc1;
+/// # async fn dox() {
+/// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = Dataproc::new(client, auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_batches_spark_applications_search_executor_stage_summary("name")
+///              .stage_id(-22)
+///              .stage_attempt_id(-28)
+///              .parent("amet.")
+///              .page_token("consetetur")
+///              .page_size(-92)
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationBatchSparkApplicationSearchExecutorStageSummaryCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Dataproc<C>,
+    _name: String,
+    _stage_id: Option<i64>,
+    _stage_attempt_id: Option<i32>,
+    _parent: Option<String>,
+    _page_token: Option<String>,
+    _page_size: Option<i32>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder
+    for ProjectLocationBatchSparkApplicationSearchExecutorStageSummaryCall<'a, C>
+{
+}
+
+impl<'a, C> ProjectLocationBatchSparkApplicationSearchExecutorStageSummaryCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(
+        mut self,
+    ) -> common::Result<(
+        common::Response,
+        SearchSparkApplicationExecutorStageSummaryResponse,
+    )> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "dataproc.projects.locations.batches.sparkApplications.searchExecutorStageSummary",
+            http_method: hyper::Method::GET,
+        });
+
+        for &field in [
+            "alt",
+            "name",
+            "stageId",
+            "stageAttemptId",
+            "parent",
+            "pageToken",
+            "pageSize",
+        ]
+        .iter()
+        {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(8 + self._additional_params.len());
+        params.push("name", self._name);
+        if let Some(value) = self._stage_id.as_ref() {
+            params.push("stageId", value.to_string());
+        }
+        if let Some(value) = self._stage_attempt_id.as_ref() {
+            params.push("stageAttemptId", value.to_string());
+        }
+        if let Some(value) = self._parent.as_ref() {
+            params.push("parent", value);
+        }
+        if let Some(value) = self._page_token.as_ref() {
+            params.push("pageToken", value);
+        }
+        if let Some(value) = self._page_size.as_ref() {
+            params.push("pageSize", value.to_string());
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+name}:searchExecutorStageSummary";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    /// Required. The fully qualified name of the batch to retrieve in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/batches/BATCH_ID/sparkApplications/APPLICATION_ID"
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationBatchSparkApplicationSearchExecutorStageSummaryCall<'a, C> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// Required. Stage ID
+    ///
+    /// Sets the *stage id* query property to the given value.
+    pub fn stage_id(
+        mut self,
+        new_value: i64,
+    ) -> ProjectLocationBatchSparkApplicationSearchExecutorStageSummaryCall<'a, C> {
+        self._stage_id = Some(new_value);
+        self
+    }
+    /// Required. Stage Attempt ID
+    ///
+    /// Sets the *stage attempt id* query property to the given value.
+    pub fn stage_attempt_id(
+        mut self,
+        new_value: i32,
+    ) -> ProjectLocationBatchSparkApplicationSearchExecutorStageSummaryCall<'a, C> {
+        self._stage_attempt_id = Some(new_value);
+        self
+    }
+    /// Required. Parent (Batch) resource reference.
+    ///
+    /// Sets the *parent* query property to the given value.
+    pub fn parent(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationBatchSparkApplicationSearchExecutorStageSummaryCall<'a, C> {
+        self._parent = Some(new_value.to_string());
+        self
+    }
+    /// Optional. A page token received from a previous AccessSparkApplicationExecutorsList call. Provide this token to retrieve the subsequent page.
+    ///
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationBatchSparkApplicationSearchExecutorStageSummaryCall<'a, C> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// Optional. Maximum number of executors to return in each response. The service may return fewer than this. The default page size is 10; the maximum page size is 100.
+    ///
+    /// Sets the *page size* query property to the given value.
+    pub fn page_size(
+        mut self,
+        new_value: i32,
+    ) -> ProjectLocationBatchSparkApplicationSearchExecutorStageSummaryCall<'a, C> {
+        self._page_size = Some(new_value);
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> ProjectLocationBatchSparkApplicationSearchExecutorStageSummaryCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(
+        mut self,
+        name: T,
+        value: T,
+    ) -> ProjectLocationBatchSparkApplicationSearchExecutorStageSummaryCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(
+        mut self,
+        scope: St,
+    ) -> ProjectLocationBatchSparkApplicationSearchExecutorStageSummaryCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(
+        mut self,
+        scopes: I,
+    ) -> ProjectLocationBatchSparkApplicationSearchExecutorStageSummaryCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(
+        mut self,
+    ) -> ProjectLocationBatchSparkApplicationSearchExecutorStageSummaryCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
+/// Obtain data corresponding to executors for a Spark Application.
+///
+/// A builder for the *locations.batches.sparkApplications.searchExecutors* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_dataproc1 as dataproc1;
+/// # async fn dox() {
+/// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = Dataproc::new(client, auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_batches_spark_applications_search_executors("name")
+///              .parent("et")
+///              .page_token("et")
+///              .page_size(-95)
+///              .executor_status("Stet")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationBatchSparkApplicationSearchExecutorCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Dataproc<C>,
+    _name: String,
+    _parent: Option<String>,
+    _page_token: Option<String>,
+    _page_size: Option<i32>,
+    _executor_status: Option<String>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder for ProjectLocationBatchSparkApplicationSearchExecutorCall<'a, C> {}
+
+impl<'a, C> ProjectLocationBatchSparkApplicationSearchExecutorCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(
+        mut self,
+    ) -> common::Result<(common::Response, SearchSparkApplicationExecutorsResponse)> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "dataproc.projects.locations.batches.sparkApplications.searchExecutors",
+            http_method: hyper::Method::GET,
+        });
+
+        for &field in [
+            "alt",
+            "name",
+            "parent",
+            "pageToken",
+            "pageSize",
+            "executorStatus",
+        ]
+        .iter()
+        {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(7 + self._additional_params.len());
+        params.push("name", self._name);
+        if let Some(value) = self._parent.as_ref() {
+            params.push("parent", value);
+        }
+        if let Some(value) = self._page_token.as_ref() {
+            params.push("pageToken", value);
+        }
+        if let Some(value) = self._page_size.as_ref() {
+            params.push("pageSize", value.to_string());
+        }
+        if let Some(value) = self._executor_status.as_ref() {
+            params.push("executorStatus", value);
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+name}:searchExecutors";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    /// Required. The fully qualified name of the batch to retrieve in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/batches/BATCH_ID/sparkApplications/APPLICATION_ID"
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationBatchSparkApplicationSearchExecutorCall<'a, C> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// Required. Parent (Batch) resource reference.
+    ///
+    /// Sets the *parent* query property to the given value.
+    pub fn parent(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationBatchSparkApplicationSearchExecutorCall<'a, C> {
+        self._parent = Some(new_value.to_string());
+        self
+    }
+    /// Optional. A page token received from a previous AccessSparkApplicationExecutorsList call. Provide this token to retrieve the subsequent page.
+    ///
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationBatchSparkApplicationSearchExecutorCall<'a, C> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// Optional. Maximum number of executors to return in each response. The service may return fewer than this. The default page size is 10; the maximum page size is 100.
+    ///
+    /// Sets the *page size* query property to the given value.
+    pub fn page_size(
+        mut self,
+        new_value: i32,
+    ) -> ProjectLocationBatchSparkApplicationSearchExecutorCall<'a, C> {
+        self._page_size = Some(new_value);
+        self
+    }
+    /// Optional. Filter to select whether active/ dead or all executors should be selected.
+    ///
+    /// Sets the *executor status* query property to the given value.
+    pub fn executor_status(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationBatchSparkApplicationSearchExecutorCall<'a, C> {
+        self._executor_status = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> ProjectLocationBatchSparkApplicationSearchExecutorCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(
+        mut self,
+        name: T,
+        value: T,
+    ) -> ProjectLocationBatchSparkApplicationSearchExecutorCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(
+        mut self,
+        scope: St,
+    ) -> ProjectLocationBatchSparkApplicationSearchExecutorCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(
+        mut self,
+        scopes: I,
+    ) -> ProjectLocationBatchSparkApplicationSearchExecutorCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationBatchSparkApplicationSearchExecutorCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
+/// Obtain list of spark jobs corresponding to a Spark Application.
+///
+/// A builder for the *locations.batches.sparkApplications.searchJobs* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_dataproc1 as dataproc1;
+/// # async fn dox() {
+/// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = Dataproc::new(client, auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_batches_spark_applications_search_jobs("name")
+///              .parent("duo")
+///              .page_token("vero")
+///              .page_size(-76)
+///              .job_status("invidunt")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationBatchSparkApplicationSearchJobCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Dataproc<C>,
+    _name: String,
+    _parent: Option<String>,
+    _page_token: Option<String>,
+    _page_size: Option<i32>,
+    _job_status: Option<String>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder for ProjectLocationBatchSparkApplicationSearchJobCall<'a, C> {}
+
+impl<'a, C> ProjectLocationBatchSparkApplicationSearchJobCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(
+        mut self,
+    ) -> common::Result<(common::Response, SearchSparkApplicationJobsResponse)> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "dataproc.projects.locations.batches.sparkApplications.searchJobs",
+            http_method: hyper::Method::GET,
+        });
+
+        for &field in [
+            "alt",
+            "name",
+            "parent",
+            "pageToken",
+            "pageSize",
+            "jobStatus",
+        ]
+        .iter()
+        {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(7 + self._additional_params.len());
+        params.push("name", self._name);
+        if let Some(value) = self._parent.as_ref() {
+            params.push("parent", value);
+        }
+        if let Some(value) = self._page_token.as_ref() {
+            params.push("pageToken", value);
+        }
+        if let Some(value) = self._page_size.as_ref() {
+            params.push("pageSize", value.to_string());
+        }
+        if let Some(value) = self._job_status.as_ref() {
+            params.push("jobStatus", value);
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+name}:searchJobs";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    /// Required. The fully qualified name of the batch to retrieve in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/batches/BATCH_ID/sparkApplications/APPLICATION_ID"
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationBatchSparkApplicationSearchJobCall<'a, C> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// Required. Parent (Batch) resource reference.
+    ///
+    /// Sets the *parent* query property to the given value.
+    pub fn parent(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationBatchSparkApplicationSearchJobCall<'a, C> {
+        self._parent = Some(new_value.to_string());
+        self
+    }
+    /// Optional. A page token received from a previous SearchSparkApplicationJobs call. Provide this token to retrieve the subsequent page.
+    ///
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationBatchSparkApplicationSearchJobCall<'a, C> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// Optional. Maximum number of jobs to return in each response. The service may return fewer than this. The default page size is 10; the maximum page size is 100.
+    ///
+    /// Sets the *page size* query property to the given value.
+    pub fn page_size(
+        mut self,
+        new_value: i32,
+    ) -> ProjectLocationBatchSparkApplicationSearchJobCall<'a, C> {
+        self._page_size = Some(new_value);
+        self
+    }
+    /// Optional. List only jobs in the specific state.
+    ///
+    /// Sets the *job status* query property to the given value.
+    pub fn job_status(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationBatchSparkApplicationSearchJobCall<'a, C> {
+        self._job_status = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> ProjectLocationBatchSparkApplicationSearchJobCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(
+        mut self,
+        name: T,
+        value: T,
+    ) -> ProjectLocationBatchSparkApplicationSearchJobCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(
+        mut self,
+        scope: St,
+    ) -> ProjectLocationBatchSparkApplicationSearchJobCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(
+        mut self,
+        scopes: I,
+    ) -> ProjectLocationBatchSparkApplicationSearchJobCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationBatchSparkApplicationSearchJobCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
+/// Obtain data corresponding to SQL Queries for a Spark Application.
+///
+/// A builder for the *locations.batches.sparkApplications.searchSqlQueries* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_dataproc1 as dataproc1;
+/// # async fn dox() {
+/// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = Dataproc::new(client, auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_batches_spark_applications_search_sql_queries("name")
+///              .plan_description(false)
+///              .parent("elitr")
+///              .page_token("Lorem")
+///              .page_size(-29)
+///              .details(true)
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationBatchSparkApplicationSearchSqlQueryCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Dataproc<C>,
+    _name: String,
+    _plan_description: Option<bool>,
+    _parent: Option<String>,
+    _page_token: Option<String>,
+    _page_size: Option<i32>,
+    _details: Option<bool>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder for ProjectLocationBatchSparkApplicationSearchSqlQueryCall<'a, C> {}
+
+impl<'a, C> ProjectLocationBatchSparkApplicationSearchSqlQueryCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(
+        mut self,
+    ) -> common::Result<(common::Response, SearchSparkApplicationSqlQueriesResponse)> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "dataproc.projects.locations.batches.sparkApplications.searchSqlQueries",
+            http_method: hyper::Method::GET,
+        });
+
+        for &field in [
+            "alt",
+            "name",
+            "planDescription",
+            "parent",
+            "pageToken",
+            "pageSize",
+            "details",
+        ]
+        .iter()
+        {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(8 + self._additional_params.len());
+        params.push("name", self._name);
+        if let Some(value) = self._plan_description.as_ref() {
+            params.push("planDescription", value.to_string());
+        }
+        if let Some(value) = self._parent.as_ref() {
+            params.push("parent", value);
+        }
+        if let Some(value) = self._page_token.as_ref() {
+            params.push("pageToken", value);
+        }
+        if let Some(value) = self._page_size.as_ref() {
+            params.push("pageSize", value.to_string());
+        }
+        if let Some(value) = self._details.as_ref() {
+            params.push("details", value.to_string());
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+name}:searchSqlQueries";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    /// Required. The fully qualified name of the batch to retrieve in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/batches/BATCH_ID/sparkApplications/APPLICATION_ID"
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationBatchSparkApplicationSearchSqlQueryCall<'a, C> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// Optional. Enables/ disables physical plan description on demand
+    ///
+    /// Sets the *plan description* query property to the given value.
+    pub fn plan_description(
+        mut self,
+        new_value: bool,
+    ) -> ProjectLocationBatchSparkApplicationSearchSqlQueryCall<'a, C> {
+        self._plan_description = Some(new_value);
+        self
+    }
+    /// Required. Parent (Batch) resource reference.
+    ///
+    /// Sets the *parent* query property to the given value.
+    pub fn parent(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationBatchSparkApplicationSearchSqlQueryCall<'a, C> {
+        self._parent = Some(new_value.to_string());
+        self
+    }
+    /// Optional. A page token received from a previous SearchSparkApplicationSqlQueries call. Provide this token to retrieve the subsequent page.
+    ///
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationBatchSparkApplicationSearchSqlQueryCall<'a, C> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// Optional. Maximum number of queries to return in each response. The service may return fewer than this. The default page size is 10; the maximum page size is 100.
+    ///
+    /// Sets the *page size* query property to the given value.
+    pub fn page_size(
+        mut self,
+        new_value: i32,
+    ) -> ProjectLocationBatchSparkApplicationSearchSqlQueryCall<'a, C> {
+        self._page_size = Some(new_value);
+        self
+    }
+    /// Optional. Lists/ hides details of Spark plan nodes. True is set to list and false to hide.
+    ///
+    /// Sets the *details* query property to the given value.
+    pub fn details(
+        mut self,
+        new_value: bool,
+    ) -> ProjectLocationBatchSparkApplicationSearchSqlQueryCall<'a, C> {
+        self._details = Some(new_value);
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> ProjectLocationBatchSparkApplicationSearchSqlQueryCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(
+        mut self,
+        name: T,
+        value: T,
+    ) -> ProjectLocationBatchSparkApplicationSearchSqlQueryCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(
+        mut self,
+        scope: St,
+    ) -> ProjectLocationBatchSparkApplicationSearchSqlQueryCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(
+        mut self,
+        scopes: I,
+    ) -> ProjectLocationBatchSparkApplicationSearchSqlQueryCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationBatchSparkApplicationSearchSqlQueryCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
+/// Obtain data corresponding to tasks for a spark stage attempt for a Spark Application.
+///
+/// A builder for the *locations.batches.sparkApplications.searchStageAttemptTasks* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_dataproc1 as dataproc1;
+/// # async fn dox() {
+/// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = Dataproc::new(client, auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_batches_spark_applications_search_stage_attempt_tasks("name")
+///              .task_status("accusam")
+///              .stage_id(-59)
+///              .stage_attempt_id(-46)
+///              .sort_runtime(false)
+///              .parent("erat")
+///              .page_token("consetetur")
+///              .page_size(-2)
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationBatchSparkApplicationSearchStageAttemptTaskCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Dataproc<C>,
+    _name: String,
+    _task_status: Option<String>,
+    _stage_id: Option<i64>,
+    _stage_attempt_id: Option<i32>,
+    _sort_runtime: Option<bool>,
+    _parent: Option<String>,
+    _page_token: Option<String>,
+    _page_size: Option<i32>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder
+    for ProjectLocationBatchSparkApplicationSearchStageAttemptTaskCall<'a, C>
+{
+}
+
+impl<'a, C> ProjectLocationBatchSparkApplicationSearchStageAttemptTaskCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(
+        mut self,
+    ) -> common::Result<(
+        common::Response,
+        SearchSparkApplicationStageAttemptTasksResponse,
+    )> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "dataproc.projects.locations.batches.sparkApplications.searchStageAttemptTasks",
+            http_method: hyper::Method::GET,
+        });
+
+        for &field in [
+            "alt",
+            "name",
+            "taskStatus",
+            "stageId",
+            "stageAttemptId",
+            "sortRuntime",
+            "parent",
+            "pageToken",
+            "pageSize",
+        ]
+        .iter()
+        {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(10 + self._additional_params.len());
+        params.push("name", self._name);
+        if let Some(value) = self._task_status.as_ref() {
+            params.push("taskStatus", value);
+        }
+        if let Some(value) = self._stage_id.as_ref() {
+            params.push("stageId", value.to_string());
+        }
+        if let Some(value) = self._stage_attempt_id.as_ref() {
+            params.push("stageAttemptId", value.to_string());
+        }
+        if let Some(value) = self._sort_runtime.as_ref() {
+            params.push("sortRuntime", value.to_string());
+        }
+        if let Some(value) = self._parent.as_ref() {
+            params.push("parent", value);
+        }
+        if let Some(value) = self._page_token.as_ref() {
+            params.push("pageToken", value);
+        }
+        if let Some(value) = self._page_size.as_ref() {
+            params.push("pageSize", value.to_string());
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+name}:searchStageAttemptTasks";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    /// Required. The fully qualified name of the batch to retrieve in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/batches/BATCH_ID/sparkApplications/APPLICATION_ID"
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationBatchSparkApplicationSearchStageAttemptTaskCall<'a, C> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// Optional. List only tasks in the state.
+    ///
+    /// Sets the *task status* query property to the given value.
+    pub fn task_status(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationBatchSparkApplicationSearchStageAttemptTaskCall<'a, C> {
+        self._task_status = Some(new_value.to_string());
+        self
+    }
+    /// Optional. Stage ID
+    ///
+    /// Sets the *stage id* query property to the given value.
+    pub fn stage_id(
+        mut self,
+        new_value: i64,
+    ) -> ProjectLocationBatchSparkApplicationSearchStageAttemptTaskCall<'a, C> {
+        self._stage_id = Some(new_value);
+        self
+    }
+    /// Optional. Stage Attempt ID
+    ///
+    /// Sets the *stage attempt id* query property to the given value.
+    pub fn stage_attempt_id(
+        mut self,
+        new_value: i32,
+    ) -> ProjectLocationBatchSparkApplicationSearchStageAttemptTaskCall<'a, C> {
+        self._stage_attempt_id = Some(new_value);
+        self
+    }
+    /// Optional. Sort the tasks by runtime.
+    ///
+    /// Sets the *sort runtime* query property to the given value.
+    pub fn sort_runtime(
+        mut self,
+        new_value: bool,
+    ) -> ProjectLocationBatchSparkApplicationSearchStageAttemptTaskCall<'a, C> {
+        self._sort_runtime = Some(new_value);
+        self
+    }
+    /// Required. Parent (Batch) resource reference.
+    ///
+    /// Sets the *parent* query property to the given value.
+    pub fn parent(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationBatchSparkApplicationSearchStageAttemptTaskCall<'a, C> {
+        self._parent = Some(new_value.to_string());
+        self
+    }
+    /// Optional. A page token received from a previous ListSparkApplicationStageAttemptTasks call. Provide this token to retrieve the subsequent page.
+    ///
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationBatchSparkApplicationSearchStageAttemptTaskCall<'a, C> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// Optional. Maximum number of tasks to return in each response. The service may return fewer than this. The default page size is 10; the maximum page size is 100.
+    ///
+    /// Sets the *page size* query property to the given value.
+    pub fn page_size(
+        mut self,
+        new_value: i32,
+    ) -> ProjectLocationBatchSparkApplicationSearchStageAttemptTaskCall<'a, C> {
+        self._page_size = Some(new_value);
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> ProjectLocationBatchSparkApplicationSearchStageAttemptTaskCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(
+        mut self,
+        name: T,
+        value: T,
+    ) -> ProjectLocationBatchSparkApplicationSearchStageAttemptTaskCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(
+        mut self,
+        scope: St,
+    ) -> ProjectLocationBatchSparkApplicationSearchStageAttemptTaskCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(
+        mut self,
+        scopes: I,
+    ) -> ProjectLocationBatchSparkApplicationSearchStageAttemptTaskCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(
+        mut self,
+    ) -> ProjectLocationBatchSparkApplicationSearchStageAttemptTaskCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
+/// Obtain data corresponding to a spark stage attempts for a Spark Application.
+///
+/// A builder for the *locations.batches.sparkApplications.searchStageAttempts* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_dataproc1 as dataproc1;
+/// # async fn dox() {
+/// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = Dataproc::new(client, auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_batches_spark_applications_search_stage_attempts("name")
+///              .summary_metrics_mask(FieldMask::new::<&str>(&[]))
+///              .stage_id(-9)
+///              .parent("dolores")
+///              .page_token("gubergren")
+///              .page_size(-74)
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationBatchSparkApplicationSearchStageAttemptCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Dataproc<C>,
+    _name: String,
+    _summary_metrics_mask: Option<common::FieldMask>,
+    _stage_id: Option<i64>,
+    _parent: Option<String>,
+    _page_token: Option<String>,
+    _page_size: Option<i32>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder
+    for ProjectLocationBatchSparkApplicationSearchStageAttemptCall<'a, C>
+{
+}
+
+impl<'a, C> ProjectLocationBatchSparkApplicationSearchStageAttemptCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(
+        mut self,
+    ) -> common::Result<(
+        common::Response,
+        SearchSparkApplicationStageAttemptsResponse,
+    )> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "dataproc.projects.locations.batches.sparkApplications.searchStageAttempts",
+            http_method: hyper::Method::GET,
+        });
+
+        for &field in [
+            "alt",
+            "name",
+            "summaryMetricsMask",
+            "stageId",
+            "parent",
+            "pageToken",
+            "pageSize",
+        ]
+        .iter()
+        {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(8 + self._additional_params.len());
+        params.push("name", self._name);
+        if let Some(value) = self._summary_metrics_mask.as_ref() {
+            params.push("summaryMetricsMask", value.to_string());
+        }
+        if let Some(value) = self._stage_id.as_ref() {
+            params.push("stageId", value.to_string());
+        }
+        if let Some(value) = self._parent.as_ref() {
+            params.push("parent", value);
+        }
+        if let Some(value) = self._page_token.as_ref() {
+            params.push("pageToken", value);
+        }
+        if let Some(value) = self._page_size.as_ref() {
+            params.push("pageSize", value.to_string());
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+name}:searchStageAttempts";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    /// Required. The fully qualified name of the batch to retrieve in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/batches/BATCH_ID/sparkApplications/APPLICATION_ID"
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationBatchSparkApplicationSearchStageAttemptCall<'a, C> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// Optional. The list of summary metrics fields to include. Empty list will default to skip all summary metrics fields. Example, if the response should include TaskQuantileMetrics, the request should have task_quantile_metrics in summary_metrics_mask field
+    ///
+    /// Sets the *summary metrics mask* query property to the given value.
+    pub fn summary_metrics_mask(
+        mut self,
+        new_value: common::FieldMask,
+    ) -> ProjectLocationBatchSparkApplicationSearchStageAttemptCall<'a, C> {
+        self._summary_metrics_mask = Some(new_value);
+        self
+    }
+    /// Required. Stage ID for which attempts are to be fetched
+    ///
+    /// Sets the *stage id* query property to the given value.
+    pub fn stage_id(
+        mut self,
+        new_value: i64,
+    ) -> ProjectLocationBatchSparkApplicationSearchStageAttemptCall<'a, C> {
+        self._stage_id = Some(new_value);
+        self
+    }
+    /// Required. Parent (Batch) resource reference.
+    ///
+    /// Sets the *parent* query property to the given value.
+    pub fn parent(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationBatchSparkApplicationSearchStageAttemptCall<'a, C> {
+        self._parent = Some(new_value.to_string());
+        self
+    }
+    /// Optional. A page token received from a previous SearchSparkApplicationStageAttempts call. Provide this token to retrieve the subsequent page.
+    ///
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationBatchSparkApplicationSearchStageAttemptCall<'a, C> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// Optional. Maximum number of stage attempts (paging based on stage_attempt_id) to return in each response. The service may return fewer than this. The default page size is 10; the maximum page size is 100.
+    ///
+    /// Sets the *page size* query property to the given value.
+    pub fn page_size(
+        mut self,
+        new_value: i32,
+    ) -> ProjectLocationBatchSparkApplicationSearchStageAttemptCall<'a, C> {
+        self._page_size = Some(new_value);
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> ProjectLocationBatchSparkApplicationSearchStageAttemptCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(
+        mut self,
+        name: T,
+        value: T,
+    ) -> ProjectLocationBatchSparkApplicationSearchStageAttemptCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(
+        mut self,
+        scope: St,
+    ) -> ProjectLocationBatchSparkApplicationSearchStageAttemptCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(
+        mut self,
+        scopes: I,
+    ) -> ProjectLocationBatchSparkApplicationSearchStageAttemptCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(
+        mut self,
+    ) -> ProjectLocationBatchSparkApplicationSearchStageAttemptCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
+/// Obtain data corresponding to stages for a Spark Application.
+///
+/// A builder for the *locations.batches.sparkApplications.searchStages* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_dataproc1 as dataproc1;
+/// # async fn dox() {
+/// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = Dataproc::new(client, auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_batches_spark_applications_search_stages("name")
+///              .summary_metrics_mask(FieldMask::new::<&str>(&[]))
+///              .stage_status("voluptua.")
+///              .parent("dolore")
+///              .page_token("dolore")
+///              .page_size(-34)
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationBatchSparkApplicationSearchStageCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Dataproc<C>,
+    _name: String,
+    _summary_metrics_mask: Option<common::FieldMask>,
+    _stage_status: Option<String>,
+    _parent: Option<String>,
+    _page_token: Option<String>,
+    _page_size: Option<i32>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder for ProjectLocationBatchSparkApplicationSearchStageCall<'a, C> {}
+
+impl<'a, C> ProjectLocationBatchSparkApplicationSearchStageCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(
+        mut self,
+    ) -> common::Result<(common::Response, SearchSparkApplicationStagesResponse)> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "dataproc.projects.locations.batches.sparkApplications.searchStages",
+            http_method: hyper::Method::GET,
+        });
+
+        for &field in [
+            "alt",
+            "name",
+            "summaryMetricsMask",
+            "stageStatus",
+            "parent",
+            "pageToken",
+            "pageSize",
+        ]
+        .iter()
+        {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(8 + self._additional_params.len());
+        params.push("name", self._name);
+        if let Some(value) = self._summary_metrics_mask.as_ref() {
+            params.push("summaryMetricsMask", value.to_string());
+        }
+        if let Some(value) = self._stage_status.as_ref() {
+            params.push("stageStatus", value);
+        }
+        if let Some(value) = self._parent.as_ref() {
+            params.push("parent", value);
+        }
+        if let Some(value) = self._page_token.as_ref() {
+            params.push("pageToken", value);
+        }
+        if let Some(value) = self._page_size.as_ref() {
+            params.push("pageSize", value.to_string());
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+name}:searchStages";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    /// Required. The fully qualified name of the batch to retrieve in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/batches/BATCH_ID/sparkApplications/APPLICATION_ID"
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationBatchSparkApplicationSearchStageCall<'a, C> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// Optional. The list of summary metrics fields to include. Empty list will default to skip all summary metrics fields. Example, if the response should include TaskQuantileMetrics, the request should have task_quantile_metrics in summary_metrics_mask field
+    ///
+    /// Sets the *summary metrics mask* query property to the given value.
+    pub fn summary_metrics_mask(
+        mut self,
+        new_value: common::FieldMask,
+    ) -> ProjectLocationBatchSparkApplicationSearchStageCall<'a, C> {
+        self._summary_metrics_mask = Some(new_value);
+        self
+    }
+    /// Optional. List only stages in the given state.
+    ///
+    /// Sets the *stage status* query property to the given value.
+    pub fn stage_status(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationBatchSparkApplicationSearchStageCall<'a, C> {
+        self._stage_status = Some(new_value.to_string());
+        self
+    }
+    /// Required. Parent (Batch) resource reference.
+    ///
+    /// Sets the *parent* query property to the given value.
+    pub fn parent(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationBatchSparkApplicationSearchStageCall<'a, C> {
+        self._parent = Some(new_value.to_string());
+        self
+    }
+    /// Optional. A page token received from a previous FetchSparkApplicationStagesList call. Provide this token to retrieve the subsequent page.
+    ///
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationBatchSparkApplicationSearchStageCall<'a, C> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// Optional. Maximum number of stages (paging based on stage_id) to return in each response. The service may return fewer than this. The default page size is 10; the maximum page size is 100.
+    ///
+    /// Sets the *page size* query property to the given value.
+    pub fn page_size(
+        mut self,
+        new_value: i32,
+    ) -> ProjectLocationBatchSparkApplicationSearchStageCall<'a, C> {
+        self._page_size = Some(new_value);
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> ProjectLocationBatchSparkApplicationSearchStageCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(
+        mut self,
+        name: T,
+        value: T,
+    ) -> ProjectLocationBatchSparkApplicationSearchStageCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(
+        mut self,
+        scope: St,
+    ) -> ProjectLocationBatchSparkApplicationSearchStageCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(
+        mut self,
+        scopes: I,
+    ) -> ProjectLocationBatchSparkApplicationSearchStageCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationBatchSparkApplicationSearchStageCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
+/// Obtain summary of Executor Summary for a Spark Application
+///
+/// A builder for the *locations.batches.sparkApplications.summarizeExecutors* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_dataproc1 as dataproc1;
+/// # async fn dox() {
+/// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = Dataproc::new(client, auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_batches_spark_applications_summarize_executors("name")
+///              .parent("amet.")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationBatchSparkApplicationSummarizeExecutorCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Dataproc<C>,
+    _name: String,
+    _parent: Option<String>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder
+    for ProjectLocationBatchSparkApplicationSummarizeExecutorCall<'a, C>
+{
+}
+
+impl<'a, C> ProjectLocationBatchSparkApplicationSummarizeExecutorCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(
+        mut self,
+    ) -> common::Result<(common::Response, SummarizeSparkApplicationExecutorsResponse)> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "dataproc.projects.locations.batches.sparkApplications.summarizeExecutors",
+            http_method: hyper::Method::GET,
+        });
+
+        for &field in ["alt", "name", "parent"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("name", self._name);
+        if let Some(value) = self._parent.as_ref() {
+            params.push("parent", value);
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+name}:summarizeExecutors";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    /// Required. The fully qualified name of the batch to retrieve in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/batches/BATCH_ID/sparkApplications/APPLICATION_ID"
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationBatchSparkApplicationSummarizeExecutorCall<'a, C> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// Required. Parent (Batch) resource reference.
+    ///
+    /// Sets the *parent* query property to the given value.
+    pub fn parent(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationBatchSparkApplicationSummarizeExecutorCall<'a, C> {
+        self._parent = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> ProjectLocationBatchSparkApplicationSummarizeExecutorCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(
+        mut self,
+        name: T,
+        value: T,
+    ) -> ProjectLocationBatchSparkApplicationSummarizeExecutorCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(
+        mut self,
+        scope: St,
+    ) -> ProjectLocationBatchSparkApplicationSummarizeExecutorCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(
+        mut self,
+        scopes: I,
+    ) -> ProjectLocationBatchSparkApplicationSummarizeExecutorCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(
+        mut self,
+    ) -> ProjectLocationBatchSparkApplicationSummarizeExecutorCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
+/// Obtain summary of Jobs for a Spark Application
+///
+/// A builder for the *locations.batches.sparkApplications.summarizeJobs* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_dataproc1 as dataproc1;
+/// # async fn dox() {
+/// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = Dataproc::new(client, auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_batches_spark_applications_summarize_jobs("name")
+///              .parent("sadipscing")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationBatchSparkApplicationSummarizeJobCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Dataproc<C>,
+    _name: String,
+    _parent: Option<String>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder for ProjectLocationBatchSparkApplicationSummarizeJobCall<'a, C> {}
+
+impl<'a, C> ProjectLocationBatchSparkApplicationSummarizeJobCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(
+        mut self,
+    ) -> common::Result<(common::Response, SummarizeSparkApplicationJobsResponse)> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "dataproc.projects.locations.batches.sparkApplications.summarizeJobs",
+            http_method: hyper::Method::GET,
+        });
+
+        for &field in ["alt", "name", "parent"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("name", self._name);
+        if let Some(value) = self._parent.as_ref() {
+            params.push("parent", value);
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+name}:summarizeJobs";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    /// Required. The fully qualified name of the batch to retrieve in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/batches/BATCH_ID/sparkApplications/APPLICATION_ID"
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationBatchSparkApplicationSummarizeJobCall<'a, C> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// Required. Parent (Batch) resource reference.
+    ///
+    /// Sets the *parent* query property to the given value.
+    pub fn parent(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationBatchSparkApplicationSummarizeJobCall<'a, C> {
+        self._parent = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> ProjectLocationBatchSparkApplicationSummarizeJobCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(
+        mut self,
+        name: T,
+        value: T,
+    ) -> ProjectLocationBatchSparkApplicationSummarizeJobCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(
+        mut self,
+        scope: St,
+    ) -> ProjectLocationBatchSparkApplicationSummarizeJobCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(
+        mut self,
+        scopes: I,
+    ) -> ProjectLocationBatchSparkApplicationSummarizeJobCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationBatchSparkApplicationSummarizeJobCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
+/// Obtain summary of Tasks for a Spark Application Stage Attempt
+///
+/// A builder for the *locations.batches.sparkApplications.summarizeStageAttemptTasks* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_dataproc1 as dataproc1;
+/// # async fn dox() {
+/// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = Dataproc::new(client, auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_batches_spark_applications_summarize_stage_attempt_tasks("name")
+///              .stage_id(-38)
+///              .stage_attempt_id(-11)
+///              .parent("est")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationBatchSparkApplicationSummarizeStageAttemptTaskCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Dataproc<C>,
+    _name: String,
+    _stage_id: Option<i64>,
+    _stage_attempt_id: Option<i32>,
+    _parent: Option<String>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder
+    for ProjectLocationBatchSparkApplicationSummarizeStageAttemptTaskCall<'a, C>
+{
+}
+
+impl<'a, C> ProjectLocationBatchSparkApplicationSummarizeStageAttemptTaskCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(
+        mut self,
+    ) -> common::Result<(
+        common::Response,
+        SummarizeSparkApplicationStageAttemptTasksResponse,
+    )> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "dataproc.projects.locations.batches.sparkApplications.summarizeStageAttemptTasks",
+            http_method: hyper::Method::GET,
+        });
+
+        for &field in ["alt", "name", "stageId", "stageAttemptId", "parent"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(6 + self._additional_params.len());
+        params.push("name", self._name);
+        if let Some(value) = self._stage_id.as_ref() {
+            params.push("stageId", value.to_string());
+        }
+        if let Some(value) = self._stage_attempt_id.as_ref() {
+            params.push("stageAttemptId", value.to_string());
+        }
+        if let Some(value) = self._parent.as_ref() {
+            params.push("parent", value);
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+name}:summarizeStageAttemptTasks";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    /// Required. The fully qualified name of the batch to retrieve in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/batches/BATCH_ID/sparkApplications/APPLICATION_ID"
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationBatchSparkApplicationSummarizeStageAttemptTaskCall<'a, C> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// Required. Stage ID
+    ///
+    /// Sets the *stage id* query property to the given value.
+    pub fn stage_id(
+        mut self,
+        new_value: i64,
+    ) -> ProjectLocationBatchSparkApplicationSummarizeStageAttemptTaskCall<'a, C> {
+        self._stage_id = Some(new_value);
+        self
+    }
+    /// Required. Stage Attempt ID
+    ///
+    /// Sets the *stage attempt id* query property to the given value.
+    pub fn stage_attempt_id(
+        mut self,
+        new_value: i32,
+    ) -> ProjectLocationBatchSparkApplicationSummarizeStageAttemptTaskCall<'a, C> {
+        self._stage_attempt_id = Some(new_value);
+        self
+    }
+    /// Required. Parent (Batch) resource reference.
+    ///
+    /// Sets the *parent* query property to the given value.
+    pub fn parent(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationBatchSparkApplicationSummarizeStageAttemptTaskCall<'a, C> {
+        self._parent = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> ProjectLocationBatchSparkApplicationSummarizeStageAttemptTaskCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(
+        mut self,
+        name: T,
+        value: T,
+    ) -> ProjectLocationBatchSparkApplicationSummarizeStageAttemptTaskCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(
+        mut self,
+        scope: St,
+    ) -> ProjectLocationBatchSparkApplicationSummarizeStageAttemptTaskCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(
+        mut self,
+        scopes: I,
+    ) -> ProjectLocationBatchSparkApplicationSummarizeStageAttemptTaskCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(
+        mut self,
+    ) -> ProjectLocationBatchSparkApplicationSummarizeStageAttemptTaskCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
+/// Obtain summary of Stages for a Spark Application
+///
+/// A builder for the *locations.batches.sparkApplications.summarizeStages* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_dataproc1 as dataproc1;
+/// # async fn dox() {
+/// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = Dataproc::new(client, auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_batches_spark_applications_summarize_stages("name")
+///              .parent("sed")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationBatchSparkApplicationSummarizeStageCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Dataproc<C>,
+    _name: String,
+    _parent: Option<String>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder for ProjectLocationBatchSparkApplicationSummarizeStageCall<'a, C> {}
+
+impl<'a, C> ProjectLocationBatchSparkApplicationSummarizeStageCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(
+        mut self,
+    ) -> common::Result<(common::Response, SummarizeSparkApplicationStagesResponse)> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "dataproc.projects.locations.batches.sparkApplications.summarizeStages",
+            http_method: hyper::Method::GET,
+        });
+
+        for &field in ["alt", "name", "parent"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("name", self._name);
+        if let Some(value) = self._parent.as_ref() {
+            params.push("parent", value);
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+name}:summarizeStages";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    /// Required. The fully qualified name of the batch to retrieve in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/batches/BATCH_ID/sparkApplications/APPLICATION_ID"
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationBatchSparkApplicationSummarizeStageCall<'a, C> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// Required. Parent (Batch) resource reference.
+    ///
+    /// Sets the *parent* query property to the given value.
+    pub fn parent(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationBatchSparkApplicationSummarizeStageCall<'a, C> {
+        self._parent = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> ProjectLocationBatchSparkApplicationSummarizeStageCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(
+        mut self,
+        name: T,
+        value: T,
+    ) -> ProjectLocationBatchSparkApplicationSummarizeStageCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(
+        mut self,
+        scope: St,
+    ) -> ProjectLocationBatchSparkApplicationSummarizeStageCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(
+        mut self,
+        scopes: I,
+    ) -> ProjectLocationBatchSparkApplicationSummarizeStageCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationBatchSparkApplicationSummarizeStageCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
+/// Write wrapper objects from dataplane to spanner
+///
+/// A builder for the *locations.batches.sparkApplications.write* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_dataproc1 as dataproc1;
+/// use dataproc1::api::WriteSparkApplicationContextRequest;
+/// # async fn dox() {
+/// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = Dataproc::new(client, auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = WriteSparkApplicationContextRequest::default();
+///
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_batches_spark_applications_write(req, "name")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationBatchSparkApplicationWriteCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Dataproc<C>,
+    _request: WriteSparkApplicationContextRequest,
+    _name: String,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder for ProjectLocationBatchSparkApplicationWriteCall<'a, C> {}
+
+impl<'a, C> ProjectLocationBatchSparkApplicationWriteCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(
+        mut self,
+    ) -> common::Result<(common::Response, WriteSparkApplicationContextResponse)> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "dataproc.projects.locations.batches.sparkApplications.write",
+            http_method: hyper::Method::POST,
+        });
+
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("name", self._name);
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+name}:write";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader = {
+            let mut value = serde_json::value::to_value(&self._request).expect("serde to work");
+            common::remove_json_null_values(&mut value);
+            let mut dst = std::io::Cursor::new(Vec::with_capacity(128));
+            serde_json::to_writer(&mut dst, &value).unwrap();
+            dst
+        };
+        let request_size = request_value_reader
+            .seek(std::io::SeekFrom::End(0))
+            .unwrap();
+        request_value_reader
+            .seek(std::io::SeekFrom::Start(0))
+            .unwrap();
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            request_value_reader
+                .seek(std::io::SeekFrom::Start(0))
+                .unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_TYPE, json_mime_type.to_string())
+                    .header(CONTENT_LENGTH, request_size as u64)
+                    .body(common::to_body(
+                        request_value_reader.get_ref().clone().into(),
+                    ));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(
+        mut self,
+        new_value: WriteSparkApplicationContextRequest,
+    ) -> ProjectLocationBatchSparkApplicationWriteCall<'a, C> {
+        self._request = new_value;
+        self
+    }
+    /// Required. The fully qualified name of the spark application to write data about in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/batches/BATCH_ID/sparkApplications/APPLICATION_ID"
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectLocationBatchSparkApplicationWriteCall<'a, C> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> ProjectLocationBatchSparkApplicationWriteCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(
+        mut self,
+        name: T,
+        value: T,
+    ) -> ProjectLocationBatchSparkApplicationWriteCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(
+        mut self,
+        scope: St,
+    ) -> ProjectLocationBatchSparkApplicationWriteCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(
+        mut self,
+        scopes: I,
+    ) -> ProjectLocationBatchSparkApplicationWriteCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationBatchSparkApplicationWriteCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
 /// Analyze a Batch for possible recommendations and insights.
 ///
 /// A builder for the *locations.batches.analyze* method supported by a *project* resource.
@@ -8130,9 +20140,20 @@ where
 /// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -8143,7 +20164,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Dataproc::new(client, auth);
@@ -8456,9 +20477,20 @@ where
 /// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -8469,7 +20501,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Dataproc::new(client, auth);
@@ -8482,8 +20514,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_batches_create(req, "parent")
-///              .request_id("rebum.")
-///              .batch_id("est")
+///              .request_id("aliquyam")
+///              .batch_id("ipsum")
 ///              .doit().await;
 /// # }
 /// ```
@@ -8802,9 +20834,20 @@ where
 /// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -8815,7 +20858,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Dataproc::new(client, auth);
@@ -9088,9 +21131,20 @@ where
 /// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -9101,7 +21155,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Dataproc::new(client, auth);
@@ -9374,9 +21428,20 @@ where
 /// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -9387,7 +21452,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Dataproc::new(client, auth);
@@ -9395,10 +21460,10 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_batches_list("parent")
-///              .page_token("gubergren")
-///              .page_size(-17)
-///              .order_by("dolor")
-///              .filter("Lorem")
+///              .page_token("est")
+///              .page_size(-30)
+///              .order_by("diam")
+///              .filter("dolores")
 ///              .doit().await;
 /// # }
 /// ```
@@ -9717,9 +21782,20 @@ where
 /// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -9730,7 +21806,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Dataproc::new(client, auth);
@@ -10003,9 +22079,20 @@ where
 /// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -10016,7 +22103,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Dataproc::new(client, auth);
@@ -10289,9 +22376,20 @@ where
 /// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -10302,7 +22400,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Dataproc::new(client, auth);
@@ -10575,9 +22673,20 @@ where
 /// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -10588,7 +22697,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Dataproc::new(client, auth);
@@ -10596,9 +22705,10 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_operations_list("name")
-///              .page_token("sed")
-///              .page_size(-61)
-///              .filter("Stet")
+///              .return_partial_success(false)
+///              .page_token("elitr")
+///              .page_size(-80)
+///              .filter("no")
 ///              .doit().await;
 /// # }
 /// ```
@@ -10608,6 +22718,7 @@ where
 {
     hub: &'a Dataproc<C>,
     _name: String,
+    _return_partial_success: Option<bool>,
     _page_token: Option<String>,
     _page_size: Option<i32>,
     _filter: Option<String>,
@@ -10637,15 +22748,27 @@ where
             http_method: hyper::Method::GET,
         });
 
-        for &field in ["alt", "name", "pageToken", "pageSize", "filter"].iter() {
+        for &field in [
+            "alt",
+            "name",
+            "returnPartialSuccess",
+            "pageToken",
+            "pageSize",
+            "filter",
+        ]
+        .iter()
+        {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(common::Error::FieldClash(field));
             }
         }
 
-        let mut params = Params::with_capacity(6 + self._additional_params.len());
+        let mut params = Params::with_capacity(7 + self._additional_params.len());
         params.push("name", self._name);
+        if let Some(value) = self._return_partial_success.as_ref() {
+            params.push("returnPartialSuccess", value.to_string());
+        }
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -10774,6 +22897,16 @@ where
         self._name = new_value.to_string();
         self
     }
+    /// When set to true, operations that are reachable are returned as normal, and those that are unreachable are returned in the ListOperationsResponse.unreachable field.This can only be true when reading across collections e.g. when parent is set to "projects/example/locations/-".This field is not by default supported and will result in an UNIMPLEMENTED error if set unless explicitly documented otherwise in service or product specific documentation.
+    ///
+    /// Sets the *return partial success* query property to the given value.
+    pub fn return_partial_success(
+        mut self,
+        new_value: bool,
+    ) -> ProjectLocationOperationListCall<'a, C> {
+        self._return_partial_success = Some(new_value);
+        self
+    }
     /// The standard list page token.
     ///
     /// Sets the *page token* query property to the given value.
@@ -10898,9 +23031,20 @@ where
 /// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -10911,7 +23055,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Dataproc::new(client, auth);
@@ -11223,9 +23367,20 @@ where
 /// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -11236,7 +23391,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Dataproc::new(client, auth);
@@ -11509,9 +23664,20 @@ where
 /// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -11522,7 +23688,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Dataproc::new(client, auth);
@@ -11795,9 +23961,20 @@ where
 /// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -11808,7 +23985,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Dataproc::new(client, auth);
@@ -11816,8 +23993,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_session_templates_list("parent")
-///              .page_token("et")
-///              .page_size(-76)
+///              .page_token("dolores")
+///              .page_size(-95)
 ///              .filter("erat")
 ///              .doit().await;
 /// # }
@@ -12120,9 +24297,20 @@ where
 /// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -12133,7 +24321,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Dataproc::new(client, auth);
@@ -12333,7 +24521,7 @@ where
         self._request = new_value;
         self
     }
-    /// Required. The resource name of the session template.
+    /// Required. Identifier. The resource name of the session template.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -12428,6 +24616,7549 @@ where
     }
 }
 
+/// Obtain high level information corresponding to a single Spark Application.
+///
+/// A builder for the *locations.sessions.sparkApplications.access* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_dataproc1 as dataproc1;
+/// # async fn dox() {
+/// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = Dataproc::new(client, auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_sessions_spark_applications_access("name")
+///              .parent("est")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationSessionSparkApplicationAccesCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Dataproc<C>,
+    _name: String,
+    _parent: Option<String>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder for ProjectLocationSessionSparkApplicationAccesCall<'a, C> {}
+
+impl<'a, C> ProjectLocationSessionSparkApplicationAccesCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(
+        mut self,
+    ) -> common::Result<(common::Response, AccessSessionSparkApplicationResponse)> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "dataproc.projects.locations.sessions.sparkApplications.access",
+            http_method: hyper::Method::GET,
+        });
+
+        for &field in ["alt", "name", "parent"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("name", self._name);
+        if let Some(value) = self._parent.as_ref() {
+            params.push("parent", value);
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+name}:access";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    /// Required. The fully qualified name of the session to retrieve in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/sessions/SESSION_ID/sparkApplications/APPLICATION_ID"
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationSessionSparkApplicationAccesCall<'a, C> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// Required. Parent (Session) resource reference.
+    ///
+    /// Sets the *parent* query property to the given value.
+    pub fn parent(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationSessionSparkApplicationAccesCall<'a, C> {
+        self._parent = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> ProjectLocationSessionSparkApplicationAccesCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(
+        mut self,
+        name: T,
+        value: T,
+    ) -> ProjectLocationSessionSparkApplicationAccesCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(
+        mut self,
+        scope: St,
+    ) -> ProjectLocationSessionSparkApplicationAccesCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(
+        mut self,
+        scopes: I,
+    ) -> ProjectLocationSessionSparkApplicationAccesCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationSessionSparkApplicationAccesCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
+/// Obtain environment details for a Spark Application
+///
+/// A builder for the *locations.sessions.sparkApplications.accessEnvironmentInfo* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_dataproc1 as dataproc1;
+/// # async fn dox() {
+/// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = Dataproc::new(client, auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_sessions_spark_applications_access_environment_info("name")
+///              .parent("sea")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationSessionSparkApplicationAccessEnvironmentInfoCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Dataproc<C>,
+    _name: String,
+    _parent: Option<String>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder
+    for ProjectLocationSessionSparkApplicationAccessEnvironmentInfoCall<'a, C>
+{
+}
+
+impl<'a, C> ProjectLocationSessionSparkApplicationAccessEnvironmentInfoCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(
+        mut self,
+    ) -> common::Result<(
+        common::Response,
+        AccessSessionSparkApplicationEnvironmentInfoResponse,
+    )> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "dataproc.projects.locations.sessions.sparkApplications.accessEnvironmentInfo",
+            http_method: hyper::Method::GET,
+        });
+
+        for &field in ["alt", "name", "parent"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("name", self._name);
+        if let Some(value) = self._parent.as_ref() {
+            params.push("parent", value);
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+name}:accessEnvironmentInfo";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    /// Required. The fully qualified name of the session to retrieve in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/sessions/SESSION_ID/sparkApplications/APPLICATION_ID"
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationSessionSparkApplicationAccessEnvironmentInfoCall<'a, C> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// Required. Parent (Session) resource reference.
+    ///
+    /// Sets the *parent* query property to the given value.
+    pub fn parent(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationSessionSparkApplicationAccessEnvironmentInfoCall<'a, C> {
+        self._parent = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> ProjectLocationSessionSparkApplicationAccessEnvironmentInfoCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(
+        mut self,
+        name: T,
+        value: T,
+    ) -> ProjectLocationSessionSparkApplicationAccessEnvironmentInfoCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(
+        mut self,
+        scope: St,
+    ) -> ProjectLocationSessionSparkApplicationAccessEnvironmentInfoCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(
+        mut self,
+        scopes: I,
+    ) -> ProjectLocationSessionSparkApplicationAccessEnvironmentInfoCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(
+        mut self,
+    ) -> ProjectLocationSessionSparkApplicationAccessEnvironmentInfoCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
+/// Obtain data corresponding to a spark job for a Spark Application.
+///
+/// A builder for the *locations.sessions.sparkApplications.accessJob* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_dataproc1 as dataproc1;
+/// # async fn dox() {
+/// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = Dataproc::new(client, auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_sessions_spark_applications_access_job("name")
+///              .parent("consetetur")
+///              .job_id(-65)
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationSessionSparkApplicationAccessJobCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Dataproc<C>,
+    _name: String,
+    _parent: Option<String>,
+    _job_id: Option<i64>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder for ProjectLocationSessionSparkApplicationAccessJobCall<'a, C> {}
+
+impl<'a, C> ProjectLocationSessionSparkApplicationAccessJobCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(
+        mut self,
+    ) -> common::Result<(common::Response, AccessSessionSparkApplicationJobResponse)> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "dataproc.projects.locations.sessions.sparkApplications.accessJob",
+            http_method: hyper::Method::GET,
+        });
+
+        for &field in ["alt", "name", "parent", "jobId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(5 + self._additional_params.len());
+        params.push("name", self._name);
+        if let Some(value) = self._parent.as_ref() {
+            params.push("parent", value);
+        }
+        if let Some(value) = self._job_id.as_ref() {
+            params.push("jobId", value.to_string());
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+name}:accessJob";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    /// Required. The fully qualified name of the session to retrieve in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/sessions/SESSION_ID/sparkApplications/APPLICATION_ID"
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationSessionSparkApplicationAccessJobCall<'a, C> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// Required. Parent (Session) resource reference.
+    ///
+    /// Sets the *parent* query property to the given value.
+    pub fn parent(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationSessionSparkApplicationAccessJobCall<'a, C> {
+        self._parent = Some(new_value.to_string());
+        self
+    }
+    /// Required. Job ID to fetch data for.
+    ///
+    /// Sets the *job id* query property to the given value.
+    pub fn job_id(
+        mut self,
+        new_value: i64,
+    ) -> ProjectLocationSessionSparkApplicationAccessJobCall<'a, C> {
+        self._job_id = Some(new_value);
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> ProjectLocationSessionSparkApplicationAccessJobCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(
+        mut self,
+        name: T,
+        value: T,
+    ) -> ProjectLocationSessionSparkApplicationAccessJobCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(
+        mut self,
+        scope: St,
+    ) -> ProjectLocationSessionSparkApplicationAccessJobCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(
+        mut self,
+        scopes: I,
+    ) -> ProjectLocationSessionSparkApplicationAccessJobCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationSessionSparkApplicationAccessJobCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
+/// Obtain Spark Plan Graph for a Spark Application SQL execution. Limits the number of clusters returned as part of the graph to 10000.
+///
+/// A builder for the *locations.sessions.sparkApplications.accessSqlPlan* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_dataproc1 as dataproc1;
+/// # async fn dox() {
+/// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = Dataproc::new(client, auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_sessions_spark_applications_access_sql_plan("name")
+///              .parent("aliquyam")
+///              .execution_id(-94)
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationSessionSparkApplicationAccessSqlPlanCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Dataproc<C>,
+    _name: String,
+    _parent: Option<String>,
+    _execution_id: Option<i64>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder for ProjectLocationSessionSparkApplicationAccessSqlPlanCall<'a, C> {}
+
+impl<'a, C> ProjectLocationSessionSparkApplicationAccessSqlPlanCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(
+        mut self,
+    ) -> common::Result<(
+        common::Response,
+        AccessSessionSparkApplicationSqlSparkPlanGraphResponse,
+    )> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "dataproc.projects.locations.sessions.sparkApplications.accessSqlPlan",
+            http_method: hyper::Method::GET,
+        });
+
+        for &field in ["alt", "name", "parent", "executionId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(5 + self._additional_params.len());
+        params.push("name", self._name);
+        if let Some(value) = self._parent.as_ref() {
+            params.push("parent", value);
+        }
+        if let Some(value) = self._execution_id.as_ref() {
+            params.push("executionId", value.to_string());
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+name}:accessSqlPlan";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    /// Required. The fully qualified name of the session to retrieve in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/sessions/SESSION_ID/sparkApplications/APPLICATION_ID"
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationSessionSparkApplicationAccessSqlPlanCall<'a, C> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// Required. Parent (Session) resource reference.
+    ///
+    /// Sets the *parent* query property to the given value.
+    pub fn parent(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationSessionSparkApplicationAccessSqlPlanCall<'a, C> {
+        self._parent = Some(new_value.to_string());
+        self
+    }
+    /// Required. Execution ID
+    ///
+    /// Sets the *execution id* query property to the given value.
+    pub fn execution_id(
+        mut self,
+        new_value: i64,
+    ) -> ProjectLocationSessionSparkApplicationAccessSqlPlanCall<'a, C> {
+        self._execution_id = Some(new_value);
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> ProjectLocationSessionSparkApplicationAccessSqlPlanCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(
+        mut self,
+        name: T,
+        value: T,
+    ) -> ProjectLocationSessionSparkApplicationAccessSqlPlanCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(
+        mut self,
+        scope: St,
+    ) -> ProjectLocationSessionSparkApplicationAccessSqlPlanCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(
+        mut self,
+        scopes: I,
+    ) -> ProjectLocationSessionSparkApplicationAccessSqlPlanCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(
+        mut self,
+    ) -> ProjectLocationSessionSparkApplicationAccessSqlPlanCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
+/// Obtain data corresponding to a particular SQL Query for a Spark Application.
+///
+/// A builder for the *locations.sessions.sparkApplications.accessSqlQuery* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_dataproc1 as dataproc1;
+/// # async fn dox() {
+/// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = Dataproc::new(client, auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_sessions_spark_applications_access_sql_query("name")
+///              .plan_description(true)
+///              .parent("est")
+///              .execution_id(-53)
+///              .details(false)
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationSessionSparkApplicationAccessSqlQueryCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Dataproc<C>,
+    _name: String,
+    _plan_description: Option<bool>,
+    _parent: Option<String>,
+    _execution_id: Option<i64>,
+    _details: Option<bool>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder
+    for ProjectLocationSessionSparkApplicationAccessSqlQueryCall<'a, C>
+{
+}
+
+impl<'a, C> ProjectLocationSessionSparkApplicationAccessSqlQueryCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(
+        mut self,
+    ) -> common::Result<(
+        common::Response,
+        AccessSessionSparkApplicationSqlQueryResponse,
+    )> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "dataproc.projects.locations.sessions.sparkApplications.accessSqlQuery",
+            http_method: hyper::Method::GET,
+        });
+
+        for &field in [
+            "alt",
+            "name",
+            "planDescription",
+            "parent",
+            "executionId",
+            "details",
+        ]
+        .iter()
+        {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(7 + self._additional_params.len());
+        params.push("name", self._name);
+        if let Some(value) = self._plan_description.as_ref() {
+            params.push("planDescription", value.to_string());
+        }
+        if let Some(value) = self._parent.as_ref() {
+            params.push("parent", value);
+        }
+        if let Some(value) = self._execution_id.as_ref() {
+            params.push("executionId", value.to_string());
+        }
+        if let Some(value) = self._details.as_ref() {
+            params.push("details", value.to_string());
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+name}:accessSqlQuery";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    /// Required. The fully qualified name of the session to retrieve in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/sessions/SESSION_ID/sparkApplications/APPLICATION_ID"
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationSessionSparkApplicationAccessSqlQueryCall<'a, C> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// Optional. Enables/ disables physical plan description on demand
+    ///
+    /// Sets the *plan description* query property to the given value.
+    pub fn plan_description(
+        mut self,
+        new_value: bool,
+    ) -> ProjectLocationSessionSparkApplicationAccessSqlQueryCall<'a, C> {
+        self._plan_description = Some(new_value);
+        self
+    }
+    /// Required. Parent (Session) resource reference.
+    ///
+    /// Sets the *parent* query property to the given value.
+    pub fn parent(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationSessionSparkApplicationAccessSqlQueryCall<'a, C> {
+        self._parent = Some(new_value.to_string());
+        self
+    }
+    /// Required. Execution ID
+    ///
+    /// Sets the *execution id* query property to the given value.
+    pub fn execution_id(
+        mut self,
+        new_value: i64,
+    ) -> ProjectLocationSessionSparkApplicationAccessSqlQueryCall<'a, C> {
+        self._execution_id = Some(new_value);
+        self
+    }
+    /// Optional. Lists/ hides details of Spark plan nodes. True is set to list and false to hide.
+    ///
+    /// Sets the *details* query property to the given value.
+    pub fn details(
+        mut self,
+        new_value: bool,
+    ) -> ProjectLocationSessionSparkApplicationAccessSqlQueryCall<'a, C> {
+        self._details = Some(new_value);
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> ProjectLocationSessionSparkApplicationAccessSqlQueryCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(
+        mut self,
+        name: T,
+        value: T,
+    ) -> ProjectLocationSessionSparkApplicationAccessSqlQueryCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(
+        mut self,
+        scope: St,
+    ) -> ProjectLocationSessionSparkApplicationAccessSqlQueryCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(
+        mut self,
+        scopes: I,
+    ) -> ProjectLocationSessionSparkApplicationAccessSqlQueryCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(
+        mut self,
+    ) -> ProjectLocationSessionSparkApplicationAccessSqlQueryCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
+/// Obtain data corresponding to a spark stage attempt for a Spark Application.
+///
+/// A builder for the *locations.sessions.sparkApplications.accessStageAttempt* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_dataproc1 as dataproc1;
+/// # async fn dox() {
+/// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = Dataproc::new(client, auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_sessions_spark_applications_access_stage_attempt("name")
+///              .summary_metrics_mask(FieldMask::new::<&str>(&[]))
+///              .stage_id(-56)
+///              .stage_attempt_id(-17)
+///              .parent("Stet")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationSessionSparkApplicationAccessStageAttemptCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Dataproc<C>,
+    _name: String,
+    _summary_metrics_mask: Option<common::FieldMask>,
+    _stage_id: Option<i64>,
+    _stage_attempt_id: Option<i32>,
+    _parent: Option<String>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder
+    for ProjectLocationSessionSparkApplicationAccessStageAttemptCall<'a, C>
+{
+}
+
+impl<'a, C> ProjectLocationSessionSparkApplicationAccessStageAttemptCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(
+        mut self,
+    ) -> common::Result<(
+        common::Response,
+        AccessSessionSparkApplicationStageAttemptResponse,
+    )> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "dataproc.projects.locations.sessions.sparkApplications.accessStageAttempt",
+            http_method: hyper::Method::GET,
+        });
+
+        for &field in [
+            "alt",
+            "name",
+            "summaryMetricsMask",
+            "stageId",
+            "stageAttemptId",
+            "parent",
+        ]
+        .iter()
+        {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(7 + self._additional_params.len());
+        params.push("name", self._name);
+        if let Some(value) = self._summary_metrics_mask.as_ref() {
+            params.push("summaryMetricsMask", value.to_string());
+        }
+        if let Some(value) = self._stage_id.as_ref() {
+            params.push("stageId", value.to_string());
+        }
+        if let Some(value) = self._stage_attempt_id.as_ref() {
+            params.push("stageAttemptId", value.to_string());
+        }
+        if let Some(value) = self._parent.as_ref() {
+            params.push("parent", value);
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+name}:accessStageAttempt";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    /// Required. The fully qualified name of the session to retrieve in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/sessions/SESSION_ID/sparkApplications/APPLICATION_ID"
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationSessionSparkApplicationAccessStageAttemptCall<'a, C> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// Optional. The list of summary metrics fields to include. Empty list will default to skip all summary metrics fields. Example, if the response should include TaskQuantileMetrics, the request should have task_quantile_metrics in summary_metrics_mask field
+    ///
+    /// Sets the *summary metrics mask* query property to the given value.
+    pub fn summary_metrics_mask(
+        mut self,
+        new_value: common::FieldMask,
+    ) -> ProjectLocationSessionSparkApplicationAccessStageAttemptCall<'a, C> {
+        self._summary_metrics_mask = Some(new_value);
+        self
+    }
+    /// Required. Stage ID
+    ///
+    /// Sets the *stage id* query property to the given value.
+    pub fn stage_id(
+        mut self,
+        new_value: i64,
+    ) -> ProjectLocationSessionSparkApplicationAccessStageAttemptCall<'a, C> {
+        self._stage_id = Some(new_value);
+        self
+    }
+    /// Required. Stage Attempt ID
+    ///
+    /// Sets the *stage attempt id* query property to the given value.
+    pub fn stage_attempt_id(
+        mut self,
+        new_value: i32,
+    ) -> ProjectLocationSessionSparkApplicationAccessStageAttemptCall<'a, C> {
+        self._stage_attempt_id = Some(new_value);
+        self
+    }
+    /// Required. Parent (Session) resource reference.
+    ///
+    /// Sets the *parent* query property to the given value.
+    pub fn parent(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationSessionSparkApplicationAccessStageAttemptCall<'a, C> {
+        self._parent = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> ProjectLocationSessionSparkApplicationAccessStageAttemptCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(
+        mut self,
+        name: T,
+        value: T,
+    ) -> ProjectLocationSessionSparkApplicationAccessStageAttemptCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(
+        mut self,
+        scope: St,
+    ) -> ProjectLocationSessionSparkApplicationAccessStageAttemptCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(
+        mut self,
+        scopes: I,
+    ) -> ProjectLocationSessionSparkApplicationAccessStageAttemptCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(
+        mut self,
+    ) -> ProjectLocationSessionSparkApplicationAccessStageAttemptCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
+/// Obtain RDD operation graph for a Spark Application Stage. Limits the number of clusters returned as part of the graph to 10000.
+///
+/// A builder for the *locations.sessions.sparkApplications.accessStageRddGraph* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_dataproc1 as dataproc1;
+/// # async fn dox() {
+/// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = Dataproc::new(client, auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_sessions_spark_applications_access_stage_rdd_graph("name")
+///              .stage_id(-25)
+///              .parent("et")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationSessionSparkApplicationAccessStageRddGraphCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Dataproc<C>,
+    _name: String,
+    _stage_id: Option<i64>,
+    _parent: Option<String>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder
+    for ProjectLocationSessionSparkApplicationAccessStageRddGraphCall<'a, C>
+{
+}
+
+impl<'a, C> ProjectLocationSessionSparkApplicationAccessStageRddGraphCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(
+        mut self,
+    ) -> common::Result<(
+        common::Response,
+        AccessSessionSparkApplicationStageRddOperationGraphResponse,
+    )> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "dataproc.projects.locations.sessions.sparkApplications.accessStageRddGraph",
+            http_method: hyper::Method::GET,
+        });
+
+        for &field in ["alt", "name", "stageId", "parent"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(5 + self._additional_params.len());
+        params.push("name", self._name);
+        if let Some(value) = self._stage_id.as_ref() {
+            params.push("stageId", value.to_string());
+        }
+        if let Some(value) = self._parent.as_ref() {
+            params.push("parent", value);
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+name}:accessStageRddGraph";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    /// Required. The fully qualified name of the session to retrieve in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/sessions/SESSION_ID/sparkApplications/APPLICATION_ID"
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationSessionSparkApplicationAccessStageRddGraphCall<'a, C> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// Required. Stage ID
+    ///
+    /// Sets the *stage id* query property to the given value.
+    pub fn stage_id(
+        mut self,
+        new_value: i64,
+    ) -> ProjectLocationSessionSparkApplicationAccessStageRddGraphCall<'a, C> {
+        self._stage_id = Some(new_value);
+        self
+    }
+    /// Required. Parent (Session) resource reference.
+    ///
+    /// Sets the *parent* query property to the given value.
+    pub fn parent(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationSessionSparkApplicationAccessStageRddGraphCall<'a, C> {
+        self._parent = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> ProjectLocationSessionSparkApplicationAccessStageRddGraphCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(
+        mut self,
+        name: T,
+        value: T,
+    ) -> ProjectLocationSessionSparkApplicationAccessStageRddGraphCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(
+        mut self,
+        scope: St,
+    ) -> ProjectLocationSessionSparkApplicationAccessStageRddGraphCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(
+        mut self,
+        scopes: I,
+    ) -> ProjectLocationSessionSparkApplicationAccessStageRddGraphCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(
+        mut self,
+    ) -> ProjectLocationSessionSparkApplicationAccessStageRddGraphCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
+/// Obtain high level information and list of Spark Applications corresponding to a batch
+///
+/// A builder for the *locations.sessions.sparkApplications.search* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_dataproc1 as dataproc1;
+/// # async fn dox() {
+/// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = Dataproc::new(client, auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_sessions_spark_applications_search("parent")
+///              .page_token("et")
+///              .page_size(-77)
+///              .min_time(chrono::Utc::now())
+///              .min_end_time(chrono::Utc::now())
+///              .max_time(chrono::Utc::now())
+///              .max_end_time(chrono::Utc::now())
+///              .application_status("dolore")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationSessionSparkApplicationSearchCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Dataproc<C>,
+    _parent: String,
+    _page_token: Option<String>,
+    _page_size: Option<i32>,
+    _min_time: Option<chrono::DateTime<chrono::offset::Utc>>,
+    _min_end_time: Option<chrono::DateTime<chrono::offset::Utc>>,
+    _max_time: Option<chrono::DateTime<chrono::offset::Utc>>,
+    _max_end_time: Option<chrono::DateTime<chrono::offset::Utc>>,
+    _application_status: Option<String>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder for ProjectLocationSessionSparkApplicationSearchCall<'a, C> {}
+
+impl<'a, C> ProjectLocationSessionSparkApplicationSearchCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(
+        mut self,
+    ) -> common::Result<(common::Response, SearchSessionSparkApplicationsResponse)> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "dataproc.projects.locations.sessions.sparkApplications.search",
+            http_method: hyper::Method::GET,
+        });
+
+        for &field in [
+            "alt",
+            "parent",
+            "pageToken",
+            "pageSize",
+            "minTime",
+            "minEndTime",
+            "maxTime",
+            "maxEndTime",
+            "applicationStatus",
+        ]
+        .iter()
+        {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(10 + self._additional_params.len());
+        params.push("parent", self._parent);
+        if let Some(value) = self._page_token.as_ref() {
+            params.push("pageToken", value);
+        }
+        if let Some(value) = self._page_size.as_ref() {
+            params.push("pageSize", value.to_string());
+        }
+        if let Some(value) = self._min_time.as_ref() {
+            params.push("minTime", common::serde::datetime_to_string(&value));
+        }
+        if let Some(value) = self._min_end_time.as_ref() {
+            params.push("minEndTime", common::serde::datetime_to_string(&value));
+        }
+        if let Some(value) = self._max_time.as_ref() {
+            params.push("maxTime", common::serde::datetime_to_string(&value));
+        }
+        if let Some(value) = self._max_end_time.as_ref() {
+            params.push("maxEndTime", common::serde::datetime_to_string(&value));
+        }
+        if let Some(value) = self._application_status.as_ref() {
+            params.push("applicationStatus", value);
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+parent}/sparkApplications:search";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["parent"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    /// Required. The fully qualified name of the session to retrieve in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/sessions/SESSION_ID"
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationSessionSparkApplicationSearchCall<'a, C> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// Optional. A page token received from a previous SearchSessionSparkApplications call. Provide this token to retrieve the subsequent page.
+    ///
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationSessionSparkApplicationSearchCall<'a, C> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// Optional. Maximum number of applications to return in each response. The service may return fewer than this. The default page size is 10; the maximum page size is 100.
+    ///
+    /// Sets the *page size* query property to the given value.
+    pub fn page_size(
+        mut self,
+        new_value: i32,
+    ) -> ProjectLocationSessionSparkApplicationSearchCall<'a, C> {
+        self._page_size = Some(new_value);
+        self
+    }
+    /// Optional. Earliest start timestamp to list.
+    ///
+    /// Sets the *min time* query property to the given value.
+    pub fn min_time(
+        mut self,
+        new_value: chrono::DateTime<chrono::offset::Utc>,
+    ) -> ProjectLocationSessionSparkApplicationSearchCall<'a, C> {
+        self._min_time = Some(new_value);
+        self
+    }
+    /// Optional. Earliest end timestamp to list.
+    ///
+    /// Sets the *min end time* query property to the given value.
+    pub fn min_end_time(
+        mut self,
+        new_value: chrono::DateTime<chrono::offset::Utc>,
+    ) -> ProjectLocationSessionSparkApplicationSearchCall<'a, C> {
+        self._min_end_time = Some(new_value);
+        self
+    }
+    /// Optional. Latest start timestamp to list.
+    ///
+    /// Sets the *max time* query property to the given value.
+    pub fn max_time(
+        mut self,
+        new_value: chrono::DateTime<chrono::offset::Utc>,
+    ) -> ProjectLocationSessionSparkApplicationSearchCall<'a, C> {
+        self._max_time = Some(new_value);
+        self
+    }
+    /// Optional. Latest end timestamp to list.
+    ///
+    /// Sets the *max end time* query property to the given value.
+    pub fn max_end_time(
+        mut self,
+        new_value: chrono::DateTime<chrono::offset::Utc>,
+    ) -> ProjectLocationSessionSparkApplicationSearchCall<'a, C> {
+        self._max_end_time = Some(new_value);
+        self
+    }
+    /// Optional. Search only applications in the chosen state.
+    ///
+    /// Sets the *application status* query property to the given value.
+    pub fn application_status(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationSessionSparkApplicationSearchCall<'a, C> {
+        self._application_status = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> ProjectLocationSessionSparkApplicationSearchCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(
+        mut self,
+        name: T,
+        value: T,
+    ) -> ProjectLocationSessionSparkApplicationSearchCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(
+        mut self,
+        scope: St,
+    ) -> ProjectLocationSessionSparkApplicationSearchCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(
+        mut self,
+        scopes: I,
+    ) -> ProjectLocationSessionSparkApplicationSearchCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationSessionSparkApplicationSearchCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
+/// Obtain executor summary with respect to a spark stage attempt.
+///
+/// A builder for the *locations.sessions.sparkApplications.searchExecutorStageSummary* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_dataproc1 as dataproc1;
+/// # async fn dox() {
+/// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = Dataproc::new(client, auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_sessions_spark_applications_search_executor_stage_summary("name")
+///              .stage_id(-51)
+///              .stage_attempt_id(-23)
+///              .parent("amet")
+///              .page_token("erat")
+///              .page_size(-69)
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationSessionSparkApplicationSearchExecutorStageSummaryCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Dataproc<C>,
+    _name: String,
+    _stage_id: Option<i64>,
+    _stage_attempt_id: Option<i32>,
+    _parent: Option<String>,
+    _page_token: Option<String>,
+    _page_size: Option<i32>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder
+    for ProjectLocationSessionSparkApplicationSearchExecutorStageSummaryCall<'a, C>
+{
+}
+
+impl<'a, C> ProjectLocationSessionSparkApplicationSearchExecutorStageSummaryCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(
+        mut self,
+    ) -> common::Result<(
+        common::Response,
+        SearchSessionSparkApplicationExecutorStageSummaryResponse,
+    )> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "dataproc.projects.locations.sessions.sparkApplications.searchExecutorStageSummary",
+            http_method: hyper::Method::GET,
+        });
+
+        for &field in [
+            "alt",
+            "name",
+            "stageId",
+            "stageAttemptId",
+            "parent",
+            "pageToken",
+            "pageSize",
+        ]
+        .iter()
+        {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(8 + self._additional_params.len());
+        params.push("name", self._name);
+        if let Some(value) = self._stage_id.as_ref() {
+            params.push("stageId", value.to_string());
+        }
+        if let Some(value) = self._stage_attempt_id.as_ref() {
+            params.push("stageAttemptId", value.to_string());
+        }
+        if let Some(value) = self._parent.as_ref() {
+            params.push("parent", value);
+        }
+        if let Some(value) = self._page_token.as_ref() {
+            params.push("pageToken", value);
+        }
+        if let Some(value) = self._page_size.as_ref() {
+            params.push("pageSize", value.to_string());
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+name}:searchExecutorStageSummary";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    /// Required. The fully qualified name of the session to retrieve in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/sessions/SESSION_ID/sparkApplications/APPLICATION_ID"
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationSessionSparkApplicationSearchExecutorStageSummaryCall<'a, C> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// Required. Stage ID
+    ///
+    /// Sets the *stage id* query property to the given value.
+    pub fn stage_id(
+        mut self,
+        new_value: i64,
+    ) -> ProjectLocationSessionSparkApplicationSearchExecutorStageSummaryCall<'a, C> {
+        self._stage_id = Some(new_value);
+        self
+    }
+    /// Required. Stage Attempt ID
+    ///
+    /// Sets the *stage attempt id* query property to the given value.
+    pub fn stage_attempt_id(
+        mut self,
+        new_value: i32,
+    ) -> ProjectLocationSessionSparkApplicationSearchExecutorStageSummaryCall<'a, C> {
+        self._stage_attempt_id = Some(new_value);
+        self
+    }
+    /// Required. Parent (Session) resource reference.
+    ///
+    /// Sets the *parent* query property to the given value.
+    pub fn parent(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationSessionSparkApplicationSearchExecutorStageSummaryCall<'a, C> {
+        self._parent = Some(new_value.to_string());
+        self
+    }
+    /// Optional. A page token received from a previous SearchSessionSparkApplicationExecutorStageSummary call. Provide this token to retrieve the subsequent page.
+    ///
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationSessionSparkApplicationSearchExecutorStageSummaryCall<'a, C> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// Optional. Maximum number of executors to return in each response. The service may return fewer than this. The default page size is 10; the maximum page size is 100.
+    ///
+    /// Sets the *page size* query property to the given value.
+    pub fn page_size(
+        mut self,
+        new_value: i32,
+    ) -> ProjectLocationSessionSparkApplicationSearchExecutorStageSummaryCall<'a, C> {
+        self._page_size = Some(new_value);
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> ProjectLocationSessionSparkApplicationSearchExecutorStageSummaryCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(
+        mut self,
+        name: T,
+        value: T,
+    ) -> ProjectLocationSessionSparkApplicationSearchExecutorStageSummaryCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(
+        mut self,
+        scope: St,
+    ) -> ProjectLocationSessionSparkApplicationSearchExecutorStageSummaryCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(
+        mut self,
+        scopes: I,
+    ) -> ProjectLocationSessionSparkApplicationSearchExecutorStageSummaryCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(
+        mut self,
+    ) -> ProjectLocationSessionSparkApplicationSearchExecutorStageSummaryCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
+/// Obtain data corresponding to executors for a Spark Application.
+///
+/// A builder for the *locations.sessions.sparkApplications.searchExecutors* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_dataproc1 as dataproc1;
+/// # async fn dox() {
+/// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = Dataproc::new(client, auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_sessions_spark_applications_search_executors("name")
+///              .parent("accusam")
+///              .page_token("sea")
+///              .page_size(-59)
+///              .executor_status("Lorem")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationSessionSparkApplicationSearchExecutorCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Dataproc<C>,
+    _name: String,
+    _parent: Option<String>,
+    _page_token: Option<String>,
+    _page_size: Option<i32>,
+    _executor_status: Option<String>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder
+    for ProjectLocationSessionSparkApplicationSearchExecutorCall<'a, C>
+{
+}
+
+impl<'a, C> ProjectLocationSessionSparkApplicationSearchExecutorCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(
+        mut self,
+    ) -> common::Result<(
+        common::Response,
+        SearchSessionSparkApplicationExecutorsResponse,
+    )> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "dataproc.projects.locations.sessions.sparkApplications.searchExecutors",
+            http_method: hyper::Method::GET,
+        });
+
+        for &field in [
+            "alt",
+            "name",
+            "parent",
+            "pageToken",
+            "pageSize",
+            "executorStatus",
+        ]
+        .iter()
+        {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(7 + self._additional_params.len());
+        params.push("name", self._name);
+        if let Some(value) = self._parent.as_ref() {
+            params.push("parent", value);
+        }
+        if let Some(value) = self._page_token.as_ref() {
+            params.push("pageToken", value);
+        }
+        if let Some(value) = self._page_size.as_ref() {
+            params.push("pageSize", value.to_string());
+        }
+        if let Some(value) = self._executor_status.as_ref() {
+            params.push("executorStatus", value);
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+name}:searchExecutors";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    /// Required. The fully qualified name of the session to retrieve in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/sessions/SESSION_ID/sparkApplications/APPLICATION_ID"
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationSessionSparkApplicationSearchExecutorCall<'a, C> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// Required. Parent (Session) resource reference.
+    ///
+    /// Sets the *parent* query property to the given value.
+    pub fn parent(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationSessionSparkApplicationSearchExecutorCall<'a, C> {
+        self._parent = Some(new_value.to_string());
+        self
+    }
+    /// Optional. A page token received from a previous SearchSessionSparkApplicationExecutors call. Provide this token to retrieve the subsequent page.
+    ///
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationSessionSparkApplicationSearchExecutorCall<'a, C> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// Optional. Maximum number of executors to return in each response. The service may return fewer than this. The default page size is 10; the maximum page size is 100.
+    ///
+    /// Sets the *page size* query property to the given value.
+    pub fn page_size(
+        mut self,
+        new_value: i32,
+    ) -> ProjectLocationSessionSparkApplicationSearchExecutorCall<'a, C> {
+        self._page_size = Some(new_value);
+        self
+    }
+    /// Optional. Filter to select whether active/ dead or all executors should be selected.
+    ///
+    /// Sets the *executor status* query property to the given value.
+    pub fn executor_status(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationSessionSparkApplicationSearchExecutorCall<'a, C> {
+        self._executor_status = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> ProjectLocationSessionSparkApplicationSearchExecutorCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(
+        mut self,
+        name: T,
+        value: T,
+    ) -> ProjectLocationSessionSparkApplicationSearchExecutorCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(
+        mut self,
+        scope: St,
+    ) -> ProjectLocationSessionSparkApplicationSearchExecutorCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(
+        mut self,
+        scopes: I,
+    ) -> ProjectLocationSessionSparkApplicationSearchExecutorCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(
+        mut self,
+    ) -> ProjectLocationSessionSparkApplicationSearchExecutorCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
+/// Obtain list of spark jobs corresponding to a Spark Application.
+///
+/// A builder for the *locations.sessions.sparkApplications.searchJobs* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_dataproc1 as dataproc1;
+/// # async fn dox() {
+/// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = Dataproc::new(client, auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_sessions_spark_applications_search_jobs("name")
+///              .parent("At")
+///              .page_token("dolor")
+///              .page_size(-22)
+///              .job_status("sit")
+///              .add_job_ids(-81)
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationSessionSparkApplicationSearchJobCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Dataproc<C>,
+    _name: String,
+    _parent: Option<String>,
+    _page_token: Option<String>,
+    _page_size: Option<i32>,
+    _job_status: Option<String>,
+    _job_ids: Vec<i64>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder for ProjectLocationSessionSparkApplicationSearchJobCall<'a, C> {}
+
+impl<'a, C> ProjectLocationSessionSparkApplicationSearchJobCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(
+        mut self,
+    ) -> common::Result<(common::Response, SearchSessionSparkApplicationJobsResponse)> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "dataproc.projects.locations.sessions.sparkApplications.searchJobs",
+            http_method: hyper::Method::GET,
+        });
+
+        for &field in [
+            "alt",
+            "name",
+            "parent",
+            "pageToken",
+            "pageSize",
+            "jobStatus",
+            "jobIds",
+        ]
+        .iter()
+        {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(8 + self._additional_params.len());
+        params.push("name", self._name);
+        if let Some(value) = self._parent.as_ref() {
+            params.push("parent", value);
+        }
+        if let Some(value) = self._page_token.as_ref() {
+            params.push("pageToken", value);
+        }
+        if let Some(value) = self._page_size.as_ref() {
+            params.push("pageSize", value.to_string());
+        }
+        if let Some(value) = self._job_status.as_ref() {
+            params.push("jobStatus", value);
+        }
+        if !self._job_ids.is_empty() {
+            for f in self._job_ids.iter() {
+                params.push("jobIds", f.to_string());
+            }
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+name}:searchJobs";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    /// Required. The fully qualified name of the session to retrieve in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/sessions/SESSION_ID/sparkApplications/APPLICATION_ID"
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationSessionSparkApplicationSearchJobCall<'a, C> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// Required. Parent (Session) resource reference.
+    ///
+    /// Sets the *parent* query property to the given value.
+    pub fn parent(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationSessionSparkApplicationSearchJobCall<'a, C> {
+        self._parent = Some(new_value.to_string());
+        self
+    }
+    /// Optional. A page token received from a previous SearchSessionSparkApplicationJobs call. Provide this token to retrieve the subsequent page.
+    ///
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationSessionSparkApplicationSearchJobCall<'a, C> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// Optional. Maximum number of jobs to return in each response. The service may return fewer than this. The default page size is 10; the maximum page size is 100.
+    ///
+    /// Sets the *page size* query property to the given value.
+    pub fn page_size(
+        mut self,
+        new_value: i32,
+    ) -> ProjectLocationSessionSparkApplicationSearchJobCall<'a, C> {
+        self._page_size = Some(new_value);
+        self
+    }
+    /// Optional. List only jobs in the specific state.
+    ///
+    /// Sets the *job status* query property to the given value.
+    pub fn job_status(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationSessionSparkApplicationSearchJobCall<'a, C> {
+        self._job_status = Some(new_value.to_string());
+        self
+    }
+    /// Optional. List of Job IDs to filter by if provided.
+    ///
+    /// Append the given value to the *job ids* query property.
+    /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
+    pub fn add_job_ids(
+        mut self,
+        new_value: i64,
+    ) -> ProjectLocationSessionSparkApplicationSearchJobCall<'a, C> {
+        self._job_ids.push(new_value);
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> ProjectLocationSessionSparkApplicationSearchJobCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(
+        mut self,
+        name: T,
+        value: T,
+    ) -> ProjectLocationSessionSparkApplicationSearchJobCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(
+        mut self,
+        scope: St,
+    ) -> ProjectLocationSessionSparkApplicationSearchJobCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(
+        mut self,
+        scopes: I,
+    ) -> ProjectLocationSessionSparkApplicationSearchJobCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationSessionSparkApplicationSearchJobCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
+/// Obtain data corresponding to SQL Queries for a Spark Application.
+///
+/// A builder for the *locations.sessions.sparkApplications.searchSqlQueries* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_dataproc1 as dataproc1;
+/// # async fn dox() {
+/// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = Dataproc::new(client, auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_sessions_spark_applications_search_sql_queries("name")
+///              .plan_description(true)
+///              .parent("et")
+///              .page_token("gubergren")
+///              .page_size(-21)
+///              .add_operation_ids("sea")
+///              .details(false)
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationSessionSparkApplicationSearchSqlQueryCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Dataproc<C>,
+    _name: String,
+    _plan_description: Option<bool>,
+    _parent: Option<String>,
+    _page_token: Option<String>,
+    _page_size: Option<i32>,
+    _operation_ids: Vec<String>,
+    _details: Option<bool>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder
+    for ProjectLocationSessionSparkApplicationSearchSqlQueryCall<'a, C>
+{
+}
+
+impl<'a, C> ProjectLocationSessionSparkApplicationSearchSqlQueryCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(
+        mut self,
+    ) -> common::Result<(
+        common::Response,
+        SearchSessionSparkApplicationSqlQueriesResponse,
+    )> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "dataproc.projects.locations.sessions.sparkApplications.searchSqlQueries",
+            http_method: hyper::Method::GET,
+        });
+
+        for &field in [
+            "alt",
+            "name",
+            "planDescription",
+            "parent",
+            "pageToken",
+            "pageSize",
+            "operationIds",
+            "details",
+        ]
+        .iter()
+        {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(9 + self._additional_params.len());
+        params.push("name", self._name);
+        if let Some(value) = self._plan_description.as_ref() {
+            params.push("planDescription", value.to_string());
+        }
+        if let Some(value) = self._parent.as_ref() {
+            params.push("parent", value);
+        }
+        if let Some(value) = self._page_token.as_ref() {
+            params.push("pageToken", value);
+        }
+        if let Some(value) = self._page_size.as_ref() {
+            params.push("pageSize", value.to_string());
+        }
+        if !self._operation_ids.is_empty() {
+            for f in self._operation_ids.iter() {
+                params.push("operationIds", f);
+            }
+        }
+        if let Some(value) = self._details.as_ref() {
+            params.push("details", value.to_string());
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+name}:searchSqlQueries";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    /// Required. The fully qualified name of the session to retrieve in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/sessions/SESSION_ID/sparkApplications/APPLICATION_ID"
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationSessionSparkApplicationSearchSqlQueryCall<'a, C> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// Optional. Enables/ disables physical plan description on demand
+    ///
+    /// Sets the *plan description* query property to the given value.
+    pub fn plan_description(
+        mut self,
+        new_value: bool,
+    ) -> ProjectLocationSessionSparkApplicationSearchSqlQueryCall<'a, C> {
+        self._plan_description = Some(new_value);
+        self
+    }
+    /// Required. Parent (Session) resource reference.
+    ///
+    /// Sets the *parent* query property to the given value.
+    pub fn parent(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationSessionSparkApplicationSearchSqlQueryCall<'a, C> {
+        self._parent = Some(new_value.to_string());
+        self
+    }
+    /// Optional. A page token received from a previous SearchSessionSparkApplicationSqlQueries call. Provide this token to retrieve the subsequent page.
+    ///
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationSessionSparkApplicationSearchSqlQueryCall<'a, C> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// Optional. Maximum number of queries to return in each response. The service may return fewer than this. The default page size is 10; the maximum page size is 100.
+    ///
+    /// Sets the *page size* query property to the given value.
+    pub fn page_size(
+        mut self,
+        new_value: i32,
+    ) -> ProjectLocationSessionSparkApplicationSearchSqlQueryCall<'a, C> {
+        self._page_size = Some(new_value);
+        self
+    }
+    /// Optional. List of Spark Connect operation IDs to filter by if provided.
+    ///
+    /// Append the given value to the *operation ids* query property.
+    /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
+    pub fn add_operation_ids(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationSessionSparkApplicationSearchSqlQueryCall<'a, C> {
+        self._operation_ids.push(new_value.to_string());
+        self
+    }
+    /// Optional. Lists/ hides details of Spark plan nodes. True is set to list and false to hide.
+    ///
+    /// Sets the *details* query property to the given value.
+    pub fn details(
+        mut self,
+        new_value: bool,
+    ) -> ProjectLocationSessionSparkApplicationSearchSqlQueryCall<'a, C> {
+        self._details = Some(new_value);
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> ProjectLocationSessionSparkApplicationSearchSqlQueryCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(
+        mut self,
+        name: T,
+        value: T,
+    ) -> ProjectLocationSessionSparkApplicationSearchSqlQueryCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(
+        mut self,
+        scope: St,
+    ) -> ProjectLocationSessionSparkApplicationSearchSqlQueryCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(
+        mut self,
+        scopes: I,
+    ) -> ProjectLocationSessionSparkApplicationSearchSqlQueryCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(
+        mut self,
+    ) -> ProjectLocationSessionSparkApplicationSearchSqlQueryCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
+/// Obtain data corresponding to tasks for a spark stage attempt for a Spark Application.
+///
+/// A builder for the *locations.sessions.sparkApplications.searchStageAttemptTasks* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_dataproc1 as dataproc1;
+/// # async fn dox() {
+/// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = Dataproc::new(client, auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_sessions_spark_applications_search_stage_attempt_tasks("name")
+///              .task_status("aliquyam")
+///              .stage_id(-25)
+///              .stage_attempt_id(-77)
+///              .sort_runtime(true)
+///              .parent("gubergren")
+///              .page_token("dolor")
+///              .page_size(-32)
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationSessionSparkApplicationSearchStageAttemptTaskCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Dataproc<C>,
+    _name: String,
+    _task_status: Option<String>,
+    _stage_id: Option<i64>,
+    _stage_attempt_id: Option<i32>,
+    _sort_runtime: Option<bool>,
+    _parent: Option<String>,
+    _page_token: Option<String>,
+    _page_size: Option<i32>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder
+    for ProjectLocationSessionSparkApplicationSearchStageAttemptTaskCall<'a, C>
+{
+}
+
+impl<'a, C> ProjectLocationSessionSparkApplicationSearchStageAttemptTaskCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(
+        mut self,
+    ) -> common::Result<(
+        common::Response,
+        SearchSessionSparkApplicationStageAttemptTasksResponse,
+    )> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "dataproc.projects.locations.sessions.sparkApplications.searchStageAttemptTasks",
+            http_method: hyper::Method::GET,
+        });
+
+        for &field in [
+            "alt",
+            "name",
+            "taskStatus",
+            "stageId",
+            "stageAttemptId",
+            "sortRuntime",
+            "parent",
+            "pageToken",
+            "pageSize",
+        ]
+        .iter()
+        {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(10 + self._additional_params.len());
+        params.push("name", self._name);
+        if let Some(value) = self._task_status.as_ref() {
+            params.push("taskStatus", value);
+        }
+        if let Some(value) = self._stage_id.as_ref() {
+            params.push("stageId", value.to_string());
+        }
+        if let Some(value) = self._stage_attempt_id.as_ref() {
+            params.push("stageAttemptId", value.to_string());
+        }
+        if let Some(value) = self._sort_runtime.as_ref() {
+            params.push("sortRuntime", value.to_string());
+        }
+        if let Some(value) = self._parent.as_ref() {
+            params.push("parent", value);
+        }
+        if let Some(value) = self._page_token.as_ref() {
+            params.push("pageToken", value);
+        }
+        if let Some(value) = self._page_size.as_ref() {
+            params.push("pageSize", value.to_string());
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+name}:searchStageAttemptTasks";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    /// Required. The fully qualified name of the session to retrieve in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/sessions/SESSION_ID/sparkApplications/APPLICATION_ID"
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationSessionSparkApplicationSearchStageAttemptTaskCall<'a, C> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// Optional. List only tasks in the state.
+    ///
+    /// Sets the *task status* query property to the given value.
+    pub fn task_status(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationSessionSparkApplicationSearchStageAttemptTaskCall<'a, C> {
+        self._task_status = Some(new_value.to_string());
+        self
+    }
+    /// Optional. Stage ID
+    ///
+    /// Sets the *stage id* query property to the given value.
+    pub fn stage_id(
+        mut self,
+        new_value: i64,
+    ) -> ProjectLocationSessionSparkApplicationSearchStageAttemptTaskCall<'a, C> {
+        self._stage_id = Some(new_value);
+        self
+    }
+    /// Optional. Stage Attempt ID
+    ///
+    /// Sets the *stage attempt id* query property to the given value.
+    pub fn stage_attempt_id(
+        mut self,
+        new_value: i32,
+    ) -> ProjectLocationSessionSparkApplicationSearchStageAttemptTaskCall<'a, C> {
+        self._stage_attempt_id = Some(new_value);
+        self
+    }
+    /// Optional. Sort the tasks by runtime.
+    ///
+    /// Sets the *sort runtime* query property to the given value.
+    pub fn sort_runtime(
+        mut self,
+        new_value: bool,
+    ) -> ProjectLocationSessionSparkApplicationSearchStageAttemptTaskCall<'a, C> {
+        self._sort_runtime = Some(new_value);
+        self
+    }
+    /// Required. Parent (Session) resource reference.
+    ///
+    /// Sets the *parent* query property to the given value.
+    pub fn parent(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationSessionSparkApplicationSearchStageAttemptTaskCall<'a, C> {
+        self._parent = Some(new_value.to_string());
+        self
+    }
+    /// Optional. A page token received from a previous SearchSessionSparkApplicationStageAttemptTasks call. Provide this token to retrieve the subsequent page.
+    ///
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationSessionSparkApplicationSearchStageAttemptTaskCall<'a, C> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// Optional. Maximum number of tasks to return in each response. The service may return fewer than this. The default page size is 10; the maximum page size is 100.
+    ///
+    /// Sets the *page size* query property to the given value.
+    pub fn page_size(
+        mut self,
+        new_value: i32,
+    ) -> ProjectLocationSessionSparkApplicationSearchStageAttemptTaskCall<'a, C> {
+        self._page_size = Some(new_value);
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> ProjectLocationSessionSparkApplicationSearchStageAttemptTaskCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(
+        mut self,
+        name: T,
+        value: T,
+    ) -> ProjectLocationSessionSparkApplicationSearchStageAttemptTaskCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(
+        mut self,
+        scope: St,
+    ) -> ProjectLocationSessionSparkApplicationSearchStageAttemptTaskCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(
+        mut self,
+        scopes: I,
+    ) -> ProjectLocationSessionSparkApplicationSearchStageAttemptTaskCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(
+        mut self,
+    ) -> ProjectLocationSessionSparkApplicationSearchStageAttemptTaskCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
+/// Obtain data corresponding to a spark stage attempts for a Spark Application.
+///
+/// A builder for the *locations.sessions.sparkApplications.searchStageAttempts* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_dataproc1 as dataproc1;
+/// # async fn dox() {
+/// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = Dataproc::new(client, auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_sessions_spark_applications_search_stage_attempts("name")
+///              .summary_metrics_mask(FieldMask::new::<&str>(&[]))
+///              .stage_id(-2)
+///              .parent("ipsum")
+///              .page_token("Lorem")
+///              .page_size(-73)
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationSessionSparkApplicationSearchStageAttemptCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Dataproc<C>,
+    _name: String,
+    _summary_metrics_mask: Option<common::FieldMask>,
+    _stage_id: Option<i64>,
+    _parent: Option<String>,
+    _page_token: Option<String>,
+    _page_size: Option<i32>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder
+    for ProjectLocationSessionSparkApplicationSearchStageAttemptCall<'a, C>
+{
+}
+
+impl<'a, C> ProjectLocationSessionSparkApplicationSearchStageAttemptCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(
+        mut self,
+    ) -> common::Result<(
+        common::Response,
+        SearchSessionSparkApplicationStageAttemptsResponse,
+    )> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "dataproc.projects.locations.sessions.sparkApplications.searchStageAttempts",
+            http_method: hyper::Method::GET,
+        });
+
+        for &field in [
+            "alt",
+            "name",
+            "summaryMetricsMask",
+            "stageId",
+            "parent",
+            "pageToken",
+            "pageSize",
+        ]
+        .iter()
+        {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(8 + self._additional_params.len());
+        params.push("name", self._name);
+        if let Some(value) = self._summary_metrics_mask.as_ref() {
+            params.push("summaryMetricsMask", value.to_string());
+        }
+        if let Some(value) = self._stage_id.as_ref() {
+            params.push("stageId", value.to_string());
+        }
+        if let Some(value) = self._parent.as_ref() {
+            params.push("parent", value);
+        }
+        if let Some(value) = self._page_token.as_ref() {
+            params.push("pageToken", value);
+        }
+        if let Some(value) = self._page_size.as_ref() {
+            params.push("pageSize", value.to_string());
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+name}:searchStageAttempts";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    /// Required. The fully qualified name of the session to retrieve in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/sessions/SESSION_ID/sparkApplications/APPLICATION_ID"
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationSessionSparkApplicationSearchStageAttemptCall<'a, C> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// Optional. The list of summary metrics fields to include. Empty list will default to skip all summary metrics fields. Example, if the response should include TaskQuantileMetrics, the request should have task_quantile_metrics in summary_metrics_mask field
+    ///
+    /// Sets the *summary metrics mask* query property to the given value.
+    pub fn summary_metrics_mask(
+        mut self,
+        new_value: common::FieldMask,
+    ) -> ProjectLocationSessionSparkApplicationSearchStageAttemptCall<'a, C> {
+        self._summary_metrics_mask = Some(new_value);
+        self
+    }
+    /// Required. Stage ID for which attempts are to be fetched
+    ///
+    /// Sets the *stage id* query property to the given value.
+    pub fn stage_id(
+        mut self,
+        new_value: i64,
+    ) -> ProjectLocationSessionSparkApplicationSearchStageAttemptCall<'a, C> {
+        self._stage_id = Some(new_value);
+        self
+    }
+    /// Required. Parent (Session) resource reference.
+    ///
+    /// Sets the *parent* query property to the given value.
+    pub fn parent(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationSessionSparkApplicationSearchStageAttemptCall<'a, C> {
+        self._parent = Some(new_value.to_string());
+        self
+    }
+    /// Optional. A page token received from a previous SearchSessionSparkApplicationStageAttempts call. Provide this token to retrieve the subsequent page.
+    ///
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationSessionSparkApplicationSearchStageAttemptCall<'a, C> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// Optional. Maximum number of stage attempts (paging based on stage_attempt_id) to return in each response. The service may return fewer than this. The default page size is 10; the maximum page size is 100.
+    ///
+    /// Sets the *page size* query property to the given value.
+    pub fn page_size(
+        mut self,
+        new_value: i32,
+    ) -> ProjectLocationSessionSparkApplicationSearchStageAttemptCall<'a, C> {
+        self._page_size = Some(new_value);
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> ProjectLocationSessionSparkApplicationSearchStageAttemptCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(
+        mut self,
+        name: T,
+        value: T,
+    ) -> ProjectLocationSessionSparkApplicationSearchStageAttemptCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(
+        mut self,
+        scope: St,
+    ) -> ProjectLocationSessionSparkApplicationSearchStageAttemptCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(
+        mut self,
+        scopes: I,
+    ) -> ProjectLocationSessionSparkApplicationSearchStageAttemptCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(
+        mut self,
+    ) -> ProjectLocationSessionSparkApplicationSearchStageAttemptCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
+/// Obtain data corresponding to stages for a Spark Application.
+///
+/// A builder for the *locations.sessions.sparkApplications.searchStages* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_dataproc1 as dataproc1;
+/// # async fn dox() {
+/// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = Dataproc::new(client, auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_sessions_spark_applications_search_stages("name")
+///              .summary_metrics_mask(FieldMask::new::<&str>(&[]))
+///              .stage_status("sadipscing")
+///              .add_stage_ids(-27)
+///              .parent("sit")
+///              .page_token("duo")
+///              .page_size(-53)
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationSessionSparkApplicationSearchStageCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Dataproc<C>,
+    _name: String,
+    _summary_metrics_mask: Option<common::FieldMask>,
+    _stage_status: Option<String>,
+    _stage_ids: Vec<i64>,
+    _parent: Option<String>,
+    _page_token: Option<String>,
+    _page_size: Option<i32>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder for ProjectLocationSessionSparkApplicationSearchStageCall<'a, C> {}
+
+impl<'a, C> ProjectLocationSessionSparkApplicationSearchStageCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(
+        mut self,
+    ) -> common::Result<(
+        common::Response,
+        SearchSessionSparkApplicationStagesResponse,
+    )> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "dataproc.projects.locations.sessions.sparkApplications.searchStages",
+            http_method: hyper::Method::GET,
+        });
+
+        for &field in [
+            "alt",
+            "name",
+            "summaryMetricsMask",
+            "stageStatus",
+            "stageIds",
+            "parent",
+            "pageToken",
+            "pageSize",
+        ]
+        .iter()
+        {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(9 + self._additional_params.len());
+        params.push("name", self._name);
+        if let Some(value) = self._summary_metrics_mask.as_ref() {
+            params.push("summaryMetricsMask", value.to_string());
+        }
+        if let Some(value) = self._stage_status.as_ref() {
+            params.push("stageStatus", value);
+        }
+        if !self._stage_ids.is_empty() {
+            for f in self._stage_ids.iter() {
+                params.push("stageIds", f.to_string());
+            }
+        }
+        if let Some(value) = self._parent.as_ref() {
+            params.push("parent", value);
+        }
+        if let Some(value) = self._page_token.as_ref() {
+            params.push("pageToken", value);
+        }
+        if let Some(value) = self._page_size.as_ref() {
+            params.push("pageSize", value.to_string());
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+name}:searchStages";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    /// Required. The fully qualified name of the session to retrieve in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/sessions/SESSION_ID/sparkApplications/APPLICATION_ID"
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationSessionSparkApplicationSearchStageCall<'a, C> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// Optional. The list of summary metrics fields to include. Empty list will default to skip all summary metrics fields. Example, if the response should include TaskQuantileMetrics, the request should have task_quantile_metrics in summary_metrics_mask field
+    ///
+    /// Sets the *summary metrics mask* query property to the given value.
+    pub fn summary_metrics_mask(
+        mut self,
+        new_value: common::FieldMask,
+    ) -> ProjectLocationSessionSparkApplicationSearchStageCall<'a, C> {
+        self._summary_metrics_mask = Some(new_value);
+        self
+    }
+    /// Optional. List only stages in the given state.
+    ///
+    /// Sets the *stage status* query property to the given value.
+    pub fn stage_status(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationSessionSparkApplicationSearchStageCall<'a, C> {
+        self._stage_status = Some(new_value.to_string());
+        self
+    }
+    /// Optional. List of Stage IDs to filter by if provided.
+    ///
+    /// Append the given value to the *stage ids* query property.
+    /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
+    pub fn add_stage_ids(
+        mut self,
+        new_value: i64,
+    ) -> ProjectLocationSessionSparkApplicationSearchStageCall<'a, C> {
+        self._stage_ids.push(new_value);
+        self
+    }
+    /// Required. Parent (Session) resource reference.
+    ///
+    /// Sets the *parent* query property to the given value.
+    pub fn parent(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationSessionSparkApplicationSearchStageCall<'a, C> {
+        self._parent = Some(new_value.to_string());
+        self
+    }
+    /// Optional. A page token received from a previous SearchSessionSparkApplicationStages call. Provide this token to retrieve the subsequent page.
+    ///
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationSessionSparkApplicationSearchStageCall<'a, C> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// Optional. Maximum number of stages (paging based on stage_id) to return in each response. The service may return fewer than this. The default page size is 10; the maximum page size is 100.
+    ///
+    /// Sets the *page size* query property to the given value.
+    pub fn page_size(
+        mut self,
+        new_value: i32,
+    ) -> ProjectLocationSessionSparkApplicationSearchStageCall<'a, C> {
+        self._page_size = Some(new_value);
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> ProjectLocationSessionSparkApplicationSearchStageCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(
+        mut self,
+        name: T,
+        value: T,
+    ) -> ProjectLocationSessionSparkApplicationSearchStageCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(
+        mut self,
+        scope: St,
+    ) -> ProjectLocationSessionSparkApplicationSearchStageCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(
+        mut self,
+        scopes: I,
+    ) -> ProjectLocationSessionSparkApplicationSearchStageCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationSessionSparkApplicationSearchStageCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
+/// Obtain summary of Executor Summary for a Spark Application
+///
+/// A builder for the *locations.sessions.sparkApplications.summarizeExecutors* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_dataproc1 as dataproc1;
+/// # async fn dox() {
+/// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = Dataproc::new(client, auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_sessions_spark_applications_summarize_executors("name")
+///              .parent("et")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationSessionSparkApplicationSummarizeExecutorCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Dataproc<C>,
+    _name: String,
+    _parent: Option<String>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder
+    for ProjectLocationSessionSparkApplicationSummarizeExecutorCall<'a, C>
+{
+}
+
+impl<'a, C> ProjectLocationSessionSparkApplicationSummarizeExecutorCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(
+        mut self,
+    ) -> common::Result<(
+        common::Response,
+        SummarizeSessionSparkApplicationExecutorsResponse,
+    )> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "dataproc.projects.locations.sessions.sparkApplications.summarizeExecutors",
+            http_method: hyper::Method::GET,
+        });
+
+        for &field in ["alt", "name", "parent"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("name", self._name);
+        if let Some(value) = self._parent.as_ref() {
+            params.push("parent", value);
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+name}:summarizeExecutors";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    /// Required. The fully qualified name of the session to retrieve in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/sessions/SESSION_ID/sparkApplications/APPLICATION_ID"
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationSessionSparkApplicationSummarizeExecutorCall<'a, C> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// Required. Parent (Session) resource reference.
+    ///
+    /// Sets the *parent* query property to the given value.
+    pub fn parent(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationSessionSparkApplicationSummarizeExecutorCall<'a, C> {
+        self._parent = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> ProjectLocationSessionSparkApplicationSummarizeExecutorCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(
+        mut self,
+        name: T,
+        value: T,
+    ) -> ProjectLocationSessionSparkApplicationSummarizeExecutorCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(
+        mut self,
+        scope: St,
+    ) -> ProjectLocationSessionSparkApplicationSummarizeExecutorCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(
+        mut self,
+        scopes: I,
+    ) -> ProjectLocationSessionSparkApplicationSummarizeExecutorCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(
+        mut self,
+    ) -> ProjectLocationSessionSparkApplicationSummarizeExecutorCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
+/// Obtain summary of Jobs for a Spark Application
+///
+/// A builder for the *locations.sessions.sparkApplications.summarizeJobs* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_dataproc1 as dataproc1;
+/// # async fn dox() {
+/// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = Dataproc::new(client, auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_sessions_spark_applications_summarize_jobs("name")
+///              .parent("dolor")
+///              .add_job_ids(-6)
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationSessionSparkApplicationSummarizeJobCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Dataproc<C>,
+    _name: String,
+    _parent: Option<String>,
+    _job_ids: Vec<i64>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder for ProjectLocationSessionSparkApplicationSummarizeJobCall<'a, C> {}
+
+impl<'a, C> ProjectLocationSessionSparkApplicationSummarizeJobCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(
+        mut self,
+    ) -> common::Result<(
+        common::Response,
+        SummarizeSessionSparkApplicationJobsResponse,
+    )> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "dataproc.projects.locations.sessions.sparkApplications.summarizeJobs",
+            http_method: hyper::Method::GET,
+        });
+
+        for &field in ["alt", "name", "parent", "jobIds"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(5 + self._additional_params.len());
+        params.push("name", self._name);
+        if let Some(value) = self._parent.as_ref() {
+            params.push("parent", value);
+        }
+        if !self._job_ids.is_empty() {
+            for f in self._job_ids.iter() {
+                params.push("jobIds", f.to_string());
+            }
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+name}:summarizeJobs";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    /// Required. The fully qualified name of the session to retrieve in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/sessions/SESSION_ID/sparkApplications/APPLICATION_ID"
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationSessionSparkApplicationSummarizeJobCall<'a, C> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// Required. Parent (Session) resource reference.
+    ///
+    /// Sets the *parent* query property to the given value.
+    pub fn parent(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationSessionSparkApplicationSummarizeJobCall<'a, C> {
+        self._parent = Some(new_value.to_string());
+        self
+    }
+    /// Optional. List of Job IDs to filter by if provided.
+    ///
+    /// Append the given value to the *job ids* query property.
+    /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
+    pub fn add_job_ids(
+        mut self,
+        new_value: i64,
+    ) -> ProjectLocationSessionSparkApplicationSummarizeJobCall<'a, C> {
+        self._job_ids.push(new_value);
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> ProjectLocationSessionSparkApplicationSummarizeJobCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(
+        mut self,
+        name: T,
+        value: T,
+    ) -> ProjectLocationSessionSparkApplicationSummarizeJobCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(
+        mut self,
+        scope: St,
+    ) -> ProjectLocationSessionSparkApplicationSummarizeJobCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(
+        mut self,
+        scopes: I,
+    ) -> ProjectLocationSessionSparkApplicationSummarizeJobCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationSessionSparkApplicationSummarizeJobCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
+/// Obtain summary of Tasks for a Spark Application Stage Attempt
+///
+/// A builder for the *locations.sessions.sparkApplications.summarizeStageAttemptTasks* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_dataproc1 as dataproc1;
+/// # async fn dox() {
+/// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = Dataproc::new(client, auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_sessions_spark_applications_summarize_stage_attempt_tasks("name")
+///              .stage_id(-52)
+///              .stage_attempt_id(-11)
+///              .parent("nonumy")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationSessionSparkApplicationSummarizeStageAttemptTaskCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Dataproc<C>,
+    _name: String,
+    _stage_id: Option<i64>,
+    _stage_attempt_id: Option<i32>,
+    _parent: Option<String>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder
+    for ProjectLocationSessionSparkApplicationSummarizeStageAttemptTaskCall<'a, C>
+{
+}
+
+impl<'a, C> ProjectLocationSessionSparkApplicationSummarizeStageAttemptTaskCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(
+        mut self,
+    ) -> common::Result<(
+        common::Response,
+        SummarizeSessionSparkApplicationStageAttemptTasksResponse,
+    )> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "dataproc.projects.locations.sessions.sparkApplications.summarizeStageAttemptTasks",
+            http_method: hyper::Method::GET,
+        });
+
+        for &field in ["alt", "name", "stageId", "stageAttemptId", "parent"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(6 + self._additional_params.len());
+        params.push("name", self._name);
+        if let Some(value) = self._stage_id.as_ref() {
+            params.push("stageId", value.to_string());
+        }
+        if let Some(value) = self._stage_attempt_id.as_ref() {
+            params.push("stageAttemptId", value.to_string());
+        }
+        if let Some(value) = self._parent.as_ref() {
+            params.push("parent", value);
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+name}:summarizeStageAttemptTasks";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    /// Required. The fully qualified name of the session to retrieve in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/sessions/SESSION_ID/sparkApplications/APPLICATION_ID"
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationSessionSparkApplicationSummarizeStageAttemptTaskCall<'a, C> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// Required. Stage ID
+    ///
+    /// Sets the *stage id* query property to the given value.
+    pub fn stage_id(
+        mut self,
+        new_value: i64,
+    ) -> ProjectLocationSessionSparkApplicationSummarizeStageAttemptTaskCall<'a, C> {
+        self._stage_id = Some(new_value);
+        self
+    }
+    /// Required. Stage Attempt ID
+    ///
+    /// Sets the *stage attempt id* query property to the given value.
+    pub fn stage_attempt_id(
+        mut self,
+        new_value: i32,
+    ) -> ProjectLocationSessionSparkApplicationSummarizeStageAttemptTaskCall<'a, C> {
+        self._stage_attempt_id = Some(new_value);
+        self
+    }
+    /// Required. Parent (Session) resource reference.
+    ///
+    /// Sets the *parent* query property to the given value.
+    pub fn parent(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationSessionSparkApplicationSummarizeStageAttemptTaskCall<'a, C> {
+        self._parent = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> ProjectLocationSessionSparkApplicationSummarizeStageAttemptTaskCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(
+        mut self,
+        name: T,
+        value: T,
+    ) -> ProjectLocationSessionSparkApplicationSummarizeStageAttemptTaskCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(
+        mut self,
+        scope: St,
+    ) -> ProjectLocationSessionSparkApplicationSummarizeStageAttemptTaskCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(
+        mut self,
+        scopes: I,
+    ) -> ProjectLocationSessionSparkApplicationSummarizeStageAttemptTaskCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(
+        mut self,
+    ) -> ProjectLocationSessionSparkApplicationSummarizeStageAttemptTaskCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
+/// Obtain summary of Stages for a Spark Application
+///
+/// A builder for the *locations.sessions.sparkApplications.summarizeStages* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_dataproc1 as dataproc1;
+/// # async fn dox() {
+/// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = Dataproc::new(client, auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_sessions_spark_applications_summarize_stages("name")
+///              .add_stage_ids(-13)
+///              .parent("Lorem")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationSessionSparkApplicationSummarizeStageCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Dataproc<C>,
+    _name: String,
+    _stage_ids: Vec<i64>,
+    _parent: Option<String>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder
+    for ProjectLocationSessionSparkApplicationSummarizeStageCall<'a, C>
+{
+}
+
+impl<'a, C> ProjectLocationSessionSparkApplicationSummarizeStageCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(
+        mut self,
+    ) -> common::Result<(
+        common::Response,
+        SummarizeSessionSparkApplicationStagesResponse,
+    )> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "dataproc.projects.locations.sessions.sparkApplications.summarizeStages",
+            http_method: hyper::Method::GET,
+        });
+
+        for &field in ["alt", "name", "stageIds", "parent"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(5 + self._additional_params.len());
+        params.push("name", self._name);
+        if !self._stage_ids.is_empty() {
+            for f in self._stage_ids.iter() {
+                params.push("stageIds", f.to_string());
+            }
+        }
+        if let Some(value) = self._parent.as_ref() {
+            params.push("parent", value);
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+name}:summarizeStages";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    /// Required. The fully qualified name of the session to retrieve in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/sessions/SESSION_ID/sparkApplications/APPLICATION_ID"
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationSessionSparkApplicationSummarizeStageCall<'a, C> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// Optional. List of Stage IDs to filter by if provided.
+    ///
+    /// Append the given value to the *stage ids* query property.
+    /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
+    pub fn add_stage_ids(
+        mut self,
+        new_value: i64,
+    ) -> ProjectLocationSessionSparkApplicationSummarizeStageCall<'a, C> {
+        self._stage_ids.push(new_value);
+        self
+    }
+    /// Required. Parent (Session) resource reference.
+    ///
+    /// Sets the *parent* query property to the given value.
+    pub fn parent(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationSessionSparkApplicationSummarizeStageCall<'a, C> {
+        self._parent = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> ProjectLocationSessionSparkApplicationSummarizeStageCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(
+        mut self,
+        name: T,
+        value: T,
+    ) -> ProjectLocationSessionSparkApplicationSummarizeStageCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(
+        mut self,
+        scope: St,
+    ) -> ProjectLocationSessionSparkApplicationSummarizeStageCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(
+        mut self,
+        scopes: I,
+    ) -> ProjectLocationSessionSparkApplicationSummarizeStageCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(
+        mut self,
+    ) -> ProjectLocationSessionSparkApplicationSummarizeStageCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
+/// Write wrapper objects from dataplane to spanner
+///
+/// A builder for the *locations.sessions.sparkApplications.write* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_dataproc1 as dataproc1;
+/// use dataproc1::api::WriteSessionSparkApplicationContextRequest;
+/// # async fn dox() {
+/// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = Dataproc::new(client, auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = WriteSessionSparkApplicationContextRequest::default();
+///
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_sessions_spark_applications_write(req, "name")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationSessionSparkApplicationWriteCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Dataproc<C>,
+    _request: WriteSessionSparkApplicationContextRequest,
+    _name: String,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder for ProjectLocationSessionSparkApplicationWriteCall<'a, C> {}
+
+impl<'a, C> ProjectLocationSessionSparkApplicationWriteCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(
+        mut self,
+    ) -> common::Result<(
+        common::Response,
+        WriteSessionSparkApplicationContextResponse,
+    )> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "dataproc.projects.locations.sessions.sparkApplications.write",
+            http_method: hyper::Method::POST,
+        });
+
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("name", self._name);
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+name}:write";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader = {
+            let mut value = serde_json::value::to_value(&self._request).expect("serde to work");
+            common::remove_json_null_values(&mut value);
+            let mut dst = std::io::Cursor::new(Vec::with_capacity(128));
+            serde_json::to_writer(&mut dst, &value).unwrap();
+            dst
+        };
+        let request_size = request_value_reader
+            .seek(std::io::SeekFrom::End(0))
+            .unwrap();
+        request_value_reader
+            .seek(std::io::SeekFrom::Start(0))
+            .unwrap();
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            request_value_reader
+                .seek(std::io::SeekFrom::Start(0))
+                .unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_TYPE, json_mime_type.to_string())
+                    .header(CONTENT_LENGTH, request_size as u64)
+                    .body(common::to_body(
+                        request_value_reader.get_ref().clone().into(),
+                    ));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(
+        mut self,
+        new_value: WriteSessionSparkApplicationContextRequest,
+    ) -> ProjectLocationSessionSparkApplicationWriteCall<'a, C> {
+        self._request = new_value;
+        self
+    }
+    /// Required. The fully qualified name of the spark application to write data about in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/sessions/SESSION_ID/sparkApplications/APPLICATION_ID"
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationSessionSparkApplicationWriteCall<'a, C> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> ProjectLocationSessionSparkApplicationWriteCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(
+        mut self,
+        name: T,
+        value: T,
+    ) -> ProjectLocationSessionSparkApplicationWriteCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(
+        mut self,
+        scope: St,
+    ) -> ProjectLocationSessionSparkApplicationWriteCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(
+        mut self,
+        scopes: I,
+    ) -> ProjectLocationSessionSparkApplicationWriteCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationSessionSparkApplicationWriteCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
 /// Create an interactive session asynchronously.
 ///
 /// A builder for the *locations.sessions.create* method supported by a *project* resource.
@@ -12446,9 +32177,20 @@ where
 /// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -12459,7 +32201,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Dataproc::new(client, auth);
@@ -12472,8 +32214,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_sessions_create(req, "parent")
-///              .session_id("dolore")
-///              .request_id("et")
+///              .session_id("rebum.")
+///              .request_id("tempor")
 ///              .doit().await;
 /// # }
 /// ```
@@ -12792,9 +32534,20 @@ where
 /// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -12805,7 +32558,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Dataproc::new(client, auth);
@@ -12813,7 +32566,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_sessions_delete("name")
-///              .request_id("amet.")
+///              .request_id("eos")
 ///              .doit().await;
 /// # }
 /// ```
@@ -13090,9 +32843,20 @@ where
 /// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -13103,7 +32867,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Dataproc::new(client, auth);
@@ -13376,9 +33140,20 @@ where
 /// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -13389,7 +33164,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Dataproc::new(client, auth);
@@ -13397,9 +33172,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_sessions_list("parent")
-///              .page_token("dolor")
-///              .page_size(-18)
-///              .filter("et")
+///              .page_token("amet")
+///              .page_size(-37)
+///              .filter("At")
 ///              .doit().await;
 /// # }
 /// ```
@@ -13699,9 +33474,20 @@ where
 /// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -13712,7 +33498,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Dataproc::new(client, auth);
@@ -14025,9 +33811,20 @@ where
 /// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -14038,7 +33835,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Dataproc::new(client, auth);
@@ -14353,9 +34150,20 @@ where
 /// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -14366,7 +34174,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Dataproc::new(client, auth);
@@ -14374,7 +34182,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_workflow_templates_delete("name")
-///              .version(-20)
+///              .version(-45)
 ///              .doit().await;
 /// # }
 /// ```
@@ -14654,9 +34462,20 @@ where
 /// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -14667,7 +34486,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Dataproc::new(client, auth);
@@ -14675,7 +34494,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_workflow_templates_get("name")
-///              .version(-76)
+///              .version(-16)
 ///              .doit().await;
 /// # }
 /// ```
@@ -14953,9 +34772,20 @@ where
 /// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -14966,7 +34796,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Dataproc::new(client, auth);
@@ -15292,9 +35122,20 @@ where
 /// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -15305,7 +35146,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Dataproc::new(client, auth);
@@ -15631,9 +35472,20 @@ where
 /// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -15644,7 +35496,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Dataproc::new(client, auth);
@@ -15657,7 +35509,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_workflow_templates_instantiate_inline(req, "parent")
-///              .request_id("elitr")
+///              .request_id("tempor")
 ///              .doit().await;
 /// # }
 /// ```
@@ -15985,9 +35837,20 @@ where
 /// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -15998,7 +35861,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Dataproc::new(client, auth);
@@ -16006,8 +35869,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_workflow_templates_list("parent")
-///              .page_token("diam")
-///              .page_size(-61)
+///              .page_token("et")
+///              .page_size(-56)
 ///              .doit().await;
 /// # }
 /// ```
@@ -16298,9 +36161,20 @@ where
 /// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -16311,7 +36185,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Dataproc::new(client, auth);
@@ -16637,9 +36511,20 @@ where
 /// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -16650,7 +36535,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Dataproc::new(client, auth);
@@ -16976,9 +36861,20 @@ where
 /// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -16989,7 +36885,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Dataproc::new(client, auth);
@@ -17305,9 +37201,20 @@ where
 /// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -17318,7 +37225,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Dataproc::new(client, auth);
@@ -17630,9 +37537,20 @@ where
 /// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -17643,7 +37561,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Dataproc::new(client, auth);
@@ -17916,9 +37834,20 @@ where
 /// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -17929,7 +37858,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Dataproc::new(client, auth);
@@ -18203,9 +38132,20 @@ where
 /// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -18216,7 +38156,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Dataproc::new(client, auth);
@@ -18541,9 +38481,20 @@ where
 /// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -18554,7 +38505,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Dataproc::new(client, auth);
@@ -18562,8 +38513,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().regions_autoscaling_policies_list("parent")
-///              .page_token("amet.")
-///              .page_size(-30)
+///              .page_token("ut")
+///              .page_size(-3)
 ///              .doit().await;
 /// # }
 /// ```
@@ -18854,9 +38805,20 @@ where
 /// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -18867,7 +38829,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Dataproc::new(client, auth);
@@ -19193,9 +39155,20 @@ where
 /// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -19206,7 +39179,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Dataproc::new(client, auth);
@@ -19532,9 +39505,20 @@ where
 /// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -19545,7 +39529,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Dataproc::new(client, auth);
@@ -19858,9 +39842,20 @@ where
 /// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -19871,7 +39866,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Dataproc::new(client, auth);
@@ -19884,9 +39879,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().regions_clusters_node_groups_create(req, "parent")
-///              .request_id("accusam")
-///              .parent_operation_id("voluptua.")
-///              .node_group_id("dolore")
+///              .request_id("dolores")
+///              .parent_operation_id("sed")
+///              .node_group_id("invidunt")
 ///              .doit().await;
 /// # }
 /// ```
@@ -20233,9 +40228,20 @@ where
 /// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -20246,7 +40252,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Dataproc::new(client, auth);
@@ -20520,9 +40526,20 @@ where
 /// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -20533,7 +40550,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Dataproc::new(client, auth);
@@ -20846,9 +40863,20 @@ where
 /// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -20859,7 +40887,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Dataproc::new(client, auth);
@@ -21172,9 +41200,20 @@ where
 /// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -21185,7 +41224,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Dataproc::new(client, auth);
@@ -21198,8 +41237,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().regions_clusters_create(req, "projectId", "region")
-///              .request_id("sadipscing")
-///              .action_on_failed_primary_workers("Lorem")
+///              .request_id("nonumy")
+///              .action_on_failed_primary_workers("et")
 ///              .doit().await;
 /// # }
 /// ```
@@ -21544,9 +41583,20 @@ where
 /// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -21557,7 +41607,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Dataproc::new(client, auth);
@@ -21565,9 +41615,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().regions_clusters_delete("projectId", "region", "clusterName")
-///              .request_id("At")
-///              .graceful_termination_timeout(chrono::Duration::seconds(7636745))
-///              .cluster_uuid("sit")
+///              .request_id("sed")
+///              .graceful_termination_timeout(chrono::Duration::seconds(349905))
+///              .cluster_uuid("diam")
 ///              .doit().await;
 /// # }
 /// ```
@@ -21914,9 +41964,20 @@ where
 /// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -21927,7 +41988,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Dataproc::new(client, auth);
@@ -22270,9 +42331,20 @@ where
 /// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -22283,7 +42355,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Dataproc::new(client, auth);
@@ -22588,9 +42660,20 @@ where
 /// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -22601,7 +42684,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Dataproc::new(client, auth);
@@ -22914,9 +42997,20 @@ where
 /// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -22927,7 +43021,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Dataproc::new(client, auth);
@@ -23270,9 +43364,20 @@ where
 /// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -23283,7 +43388,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Dataproc::new(client, auth);
@@ -23291,9 +43396,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().regions_clusters_list("projectId", "region")
-///              .page_token("et")
-///              .page_size(-93)
-///              .filter("no")
+///              .page_token("ipsum")
+///              .page_size(-15)
+///              .filter("gubergren")
 ///              .doit().await;
 /// # }
 /// ```
@@ -23617,9 +43722,20 @@ where
 /// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -23630,7 +43746,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Dataproc::new(client, auth);
@@ -23644,8 +43760,8 @@ where
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().regions_clusters_patch(req, "projectId", "region", "clusterName")
 ///              .update_mask(FieldMask::new::<&str>(&[]))
-///              .request_id("no")
-///              .graceful_decommission_timeout(chrono::Duration::seconds(1315765))
+///              .request_id("kasd")
+///              .graceful_decommission_timeout(chrono::Duration::seconds(7151805))
 ///              .doit().await;
 /// # }
 /// ```
@@ -24026,9 +44142,20 @@ where
 /// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -24039,7 +44166,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Dataproc::new(client, auth);
@@ -24383,9 +44510,20 @@ where
 /// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -24396,7 +44534,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Dataproc::new(client, auth);
@@ -24709,9 +44847,20 @@ where
 /// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -24722,7 +44871,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Dataproc::new(client, auth);
@@ -25066,9 +45215,20 @@ where
 /// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -25079,7 +45239,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Dataproc::new(client, auth);
@@ -25420,9 +45580,20 @@ where
 /// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -25433,7 +45604,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Dataproc::new(client, auth);
@@ -25749,9 +45920,20 @@ where
 /// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -25762,7 +45944,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Dataproc::new(client, auth);
@@ -26102,9 +46284,20 @@ where
 /// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -26115,7 +46308,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Dataproc::new(client, auth);
@@ -26419,9 +46612,20 @@ where
 /// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -26432,7 +46636,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Dataproc::new(client, auth);
@@ -26737,9 +46941,20 @@ where
 /// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -26750,7 +46965,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Dataproc::new(client, auth);
@@ -27062,9 +47277,20 @@ where
 /// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -27075,7 +47301,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Dataproc::new(client, auth);
@@ -27083,11 +47309,11 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().regions_jobs_list("projectId", "region")
-///              .page_token("Lorem")
-///              .page_size(-17)
-///              .job_state_matcher("Stet")
-///              .filter("dolores")
-///              .cluster_name("eos")
+///              .page_token("elitr")
+///              .page_size(-46)
+///              .job_state_matcher("et")
+///              .filter("clita")
+///              .cluster_name("sit")
 ///              .doit().await;
 /// # }
 /// ```
@@ -27434,9 +47660,20 @@ where
 /// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -27447,7 +47684,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Dataproc::new(client, auth);
@@ -27800,9 +48037,20 @@ where
 /// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -27813,7 +48061,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Dataproc::new(client, auth);
@@ -28126,9 +48374,20 @@ where
 /// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -28139,7 +48398,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Dataproc::new(client, auth);
@@ -28464,9 +48723,20 @@ where
 /// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -28477,7 +48747,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Dataproc::new(client, auth);
@@ -28805,9 +49075,20 @@ where
 /// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -28818,7 +49099,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Dataproc::new(client, auth);
@@ -29130,9 +49411,20 @@ where
 /// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -29143,7 +49435,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Dataproc::new(client, auth);
@@ -29416,9 +49708,20 @@ where
 /// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -29429,7 +49732,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Dataproc::new(client, auth);
@@ -29702,9 +50005,20 @@ where
 /// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -29715,7 +50029,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Dataproc::new(client, auth);
@@ -29989,9 +50303,20 @@ where
 /// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -30002,7 +50327,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Dataproc::new(client, auth);
@@ -30314,9 +50639,20 @@ where
 /// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -30327,7 +50663,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Dataproc::new(client, auth);
@@ -30335,9 +50671,10 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().regions_operations_list("name")
-///              .page_token("takimata")
-///              .page_size(-51)
-///              .filter("et")
+///              .return_partial_success(true)
+///              .page_token("sit")
+///              .page_size(-101)
+///              .filter("Stet")
 ///              .doit().await;
 /// # }
 /// ```
@@ -30347,6 +50684,7 @@ where
 {
     hub: &'a Dataproc<C>,
     _name: String,
+    _return_partial_success: Option<bool>,
     _page_token: Option<String>,
     _page_size: Option<i32>,
     _filter: Option<String>,
@@ -30376,15 +50714,27 @@ where
             http_method: hyper::Method::GET,
         });
 
-        for &field in ["alt", "name", "pageToken", "pageSize", "filter"].iter() {
+        for &field in [
+            "alt",
+            "name",
+            "returnPartialSuccess",
+            "pageToken",
+            "pageSize",
+            "filter",
+        ]
+        .iter()
+        {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(common::Error::FieldClash(field));
             }
         }
 
-        let mut params = Params::with_capacity(6 + self._additional_params.len());
+        let mut params = Params::with_capacity(7 + self._additional_params.len());
         params.push("name", self._name);
+        if let Some(value) = self._return_partial_success.as_ref() {
+            params.push("returnPartialSuccess", value.to_string());
+        }
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -30513,6 +50863,16 @@ where
         self._name = new_value.to_string();
         self
     }
+    /// When set to true, operations that are reachable are returned as normal, and those that are unreachable are returned in the ListOperationsResponse.unreachable field.This can only be true when reading across collections e.g. when parent is set to "projects/example/locations/-".This field is not by default supported and will result in an UNIMPLEMENTED error if set unless explicitly documented otherwise in service or product specific documentation.
+    ///
+    /// Sets the *return partial success* query property to the given value.
+    pub fn return_partial_success(
+        mut self,
+        new_value: bool,
+    ) -> ProjectRegionOperationListCall<'a, C> {
+        self._return_partial_success = Some(new_value);
+        self
+    }
     /// The standard list page token.
     ///
     /// Sets the *page token* query property to the given value.
@@ -30637,9 +50997,20 @@ where
 /// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -30650,7 +51021,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Dataproc::new(client, auth);
@@ -30963,9 +51334,20 @@ where
 /// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -30976,7 +51358,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Dataproc::new(client, auth);
@@ -31299,9 +51681,20 @@ where
 /// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -31312,7 +51705,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Dataproc::new(client, auth);
@@ -31624,9 +52017,20 @@ where
 /// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -31637,7 +52041,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Dataproc::new(client, auth);
@@ -31645,7 +52049,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().regions_workflow_templates_delete("name")
-///              .version(-81)
+///              .version(-87)
 ///              .doit().await;
 /// # }
 /// ```
@@ -31922,9 +52326,20 @@ where
 /// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -31935,7 +52350,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Dataproc::new(client, auth);
@@ -31943,7 +52358,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().regions_workflow_templates_get("name")
-///              .version(-41)
+///              .version(-51)
 ///              .doit().await;
 /// # }
 /// ```
@@ -32221,9 +52636,20 @@ where
 /// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -32234,7 +52660,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Dataproc::new(client, auth);
@@ -32560,9 +52986,20 @@ where
 /// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -32573,7 +53010,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Dataproc::new(client, auth);
@@ -32893,9 +53330,20 @@ where
 /// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -32906,7 +53354,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Dataproc::new(client, auth);
@@ -32919,7 +53367,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().regions_workflow_templates_instantiate_inline(req, "parent")
-///              .request_id("sea")
+///              .request_id("Stet")
 ///              .doit().await;
 /// # }
 /// ```
@@ -33247,9 +53695,20 @@ where
 /// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -33260,7 +53719,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Dataproc::new(client, auth);
@@ -33268,8 +53727,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().regions_workflow_templates_list("parent")
-///              .page_token("sit")
-///              .page_size(-32)
+///              .page_token("kasd")
+///              .page_size(-101)
 ///              .doit().await;
 /// # }
 /// ```
@@ -33560,9 +54019,20 @@ where
 /// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -33573,7 +54043,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Dataproc::new(client, auth);
@@ -33899,9 +54369,20 @@ where
 /// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -33912,7 +54393,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Dataproc::new(client, auth);
@@ -34238,9 +54719,20 @@ where
 /// # use dataproc1::{Dataproc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -34251,7 +54743,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Dataproc::new(client, auth);

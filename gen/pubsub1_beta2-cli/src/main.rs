@@ -2567,7 +2567,9 @@ where
         let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
             secret,
             yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-            hyper_util::client::legacy::Client::builder(executor).build(connector),
+            yup_oauth2::client::CustomHyperClientBuilder::from(
+                hyper_util::client::legacy::Client::builder(executor).build(connector),
+            ),
         )
         .persist_tokens_to_disk(format!("{}/pubsub1-beta2", config_dir))
         .build()
@@ -3081,7 +3083,7 @@ async fn main() {
 
     let mut app = App::new("pubsub1-beta2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("6.0.0+20240618")
+           .version("7.0.0+20251212")
            .about("Provides reliable, many-to-many, asynchronous messaging between applications. ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_pubsub1_beta2_cli")
            .arg(Arg::with_name("url")
@@ -3146,7 +3148,7 @@ async fn main() {
         .with_native_roots()
         .unwrap()
         .https_or_http()
-        .enable_http1()
+        .enable_http2()
         .build();
 
     match Engine::new(matches, connector).await {

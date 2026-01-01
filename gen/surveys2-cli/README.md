@@ -22,7 +22,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Surveys* API at revision *20180508*. The CLI is at version *6.0.0*.
+This documentation was generated from the *Surveys* API at revision *20180508*. The CLI is at version *7.0.0*.
 
 ```bash
 surveys2 [options]

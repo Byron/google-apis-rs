@@ -2349,6 +2349,7 @@ where
                     "statistics.subscriber-count" => Some(("statistics.subscriberCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "statistics.video-count" => Some(("statistics.videoCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "statistics.view-count" => Some(("statistics.viewCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "status.is-channel-monetization-enabled" => Some(("status.isChannelMonetizationEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "status.is-linked" => Some(("status.isLinked", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "status.long-uploads-status" => Some(("status.longUploadsStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "status.made-for-kids" => Some(("status.madeForKids", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -2357,7 +2358,7 @@ where
                     "topic-details.topic-categories" => Some(("topicDetails.topicCategories", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "topic-details.topic-ids" => Some(("topicDetails.topicIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["audit-details", "background-color", "background-image-url", "banner-external-url", "banner-image-url", "banner-mobile-extra-hd-image-url", "banner-mobile-hd-image-url", "banner-mobile-image-url", "banner-mobile-low-image-url", "banner-mobile-medium-hd-image-url", "banner-tablet-extra-hd-image-url", "banner-tablet-hd-image-url", "banner-tablet-image-url", "banner-tablet-low-image-url", "banner-tv-high-image-url", "banner-tv-image-url", "banner-tv-low-image-url", "banner-tv-medium-image-url", "branding-settings", "channel", "comment-count", "community-guidelines-good-standing", "content-details", "content-id-claims-good-standing", "content-owner", "content-owner-details", "copyright-strikes-good-standing", "country", "custom-url", "default", "default-language", "default-tab", "description", "etag", "favorites", "featured-channels-title", "featured-channels-urls", "featured-playlist-id", "height", "hidden-subscriber-count", "high", "id", "image", "is-linked", "keywords", "kind", "large-branded-banner-image-imap-script", "large-branded-banner-image-url", "likes", "localized", "long-uploads-status", "made-for-kids", "maxres", "medium", "moderate-comments", "privacy-status", "profile-color", "published-at", "related-playlists", "self-declared-made-for-kids", "show-browse-view", "show-related-channels", "small-branded-banner-image-imap-script", "small-branded-banner-image-url", "snippet", "standard", "statistics", "status", "subscriber-count", "text-color", "thumbnails", "time-linked", "title", "topic-categories", "topic-details", "topic-ids", "tracking-analytics-account-id", "tracking-image-url", "unsubscribed-trailer", "uploads", "url", "value", "video-count", "view-count", "watch", "watch-history", "watch-icon-image-url", "watch-later", "width"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["audit-details", "background-color", "background-image-url", "banner-external-url", "banner-image-url", "banner-mobile-extra-hd-image-url", "banner-mobile-hd-image-url", "banner-mobile-image-url", "banner-mobile-low-image-url", "banner-mobile-medium-hd-image-url", "banner-tablet-extra-hd-image-url", "banner-tablet-hd-image-url", "banner-tablet-image-url", "banner-tablet-low-image-url", "banner-tv-high-image-url", "banner-tv-image-url", "banner-tv-low-image-url", "banner-tv-medium-image-url", "branding-settings", "channel", "comment-count", "community-guidelines-good-standing", "content-details", "content-id-claims-good-standing", "content-owner", "content-owner-details", "copyright-strikes-good-standing", "country", "custom-url", "default", "default-language", "default-tab", "description", "etag", "favorites", "featured-channels-title", "featured-channels-urls", "featured-playlist-id", "height", "hidden-subscriber-count", "high", "id", "image", "is-channel-monetization-enabled", "is-linked", "keywords", "kind", "large-branded-banner-image-imap-script", "large-branded-banner-image-url", "likes", "localized", "long-uploads-status", "made-for-kids", "maxres", "medium", "moderate-comments", "privacy-status", "profile-color", "published-at", "related-playlists", "self-declared-made-for-kids", "show-browse-view", "show-related-channels", "small-branded-banner-image-imap-script", "small-branded-banner-image-url", "snippet", "standard", "statistics", "status", "subscriber-count", "text-color", "thumbnails", "time-linked", "title", "topic-categories", "topic-details", "topic-ids", "tracking-analytics-account-id", "tracking-image-url", "unsubscribed-trailer", "uploads", "url", "value", "video-count", "view-count", "watch", "watch-history", "watch-icon-image-url", "watch-later", "width"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2522,6 +2523,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "snippet.post-id" => Some((
+                    "snippet.postId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "snippet.top-level-comment.etag" => Some((
                     "snippet.topLevelComment.etag",
                     JsonTypeInfo {
@@ -2606,6 +2614,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "snippet.top-level-comment.snippet.post-id" => Some((
+                    "snippet.topLevelComment.snippet.postId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "snippet.top-level-comment.snippet.published-at" => Some((
                     "snippet.topLevelComment.snippet.publishedAt",
                     JsonTypeInfo {
@@ -2680,6 +2695,7 @@ where
                             "like-count",
                             "moderation-status",
                             "parent-id",
+                            "post-id",
                             "published-at",
                             "snippet",
                             "text-display",
@@ -2814,6 +2830,9 @@ where
                 "search-terms" => {
                     call = call.search_terms(value.unwrap_or(""));
                 }
+                "post-id" => {
+                    call = call.post_id(value.unwrap_or(""));
+                }
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
                 }
@@ -2865,6 +2884,7 @@ where
                                         "moderation-status",
                                         "order",
                                         "page-token",
+                                        "post-id",
                                         "search-terms",
                                         "text-format",
                                         "video-id",
@@ -3095,6 +3115,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "snippet.post-id" => Some((
+                    "snippet.postId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "snippet.published-at" => Some((
                     "snippet.publishedAt",
                     JsonTypeInfo {
@@ -3153,6 +3180,7 @@ where
                             "like-count",
                             "moderation-status",
                             "parent-id",
+                            "post-id",
                             "published-at",
                             "snippet",
                             "text-display",
@@ -3631,6 +3659,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "snippet.post-id" => Some((
+                    "snippet.postId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "snippet.published-at" => Some((
                     "snippet.publishedAt",
                     JsonTypeInfo {
@@ -3689,6 +3724,7 @@ where
                             "like-count",
                             "moderation-status",
                             "parent-id",
+                            "post-id",
                             "published-at",
                             "snippet",
                             "text-display",
@@ -9835,6 +9871,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "status.podcast-status" => Some((
+                    "status.podcastStatus",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "status.privacy-status" => Some((
                     "status.privacyStatus",
                     JsonTypeInfo {
@@ -9863,6 +9906,7 @@ where
                             "maxres",
                             "medium",
                             "player",
+                            "podcast-status",
                             "privacy-status",
                             "published-at",
                             "snippet",
@@ -10353,6 +10397,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "status.podcast-status" => Some((
+                    "status.podcastStatus",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "status.privacy-status" => Some((
                     "status.privacyStatus",
                     JsonTypeInfo {
@@ -10381,6 +10432,7 @@ where
                             "maxres",
                             "medium",
                             "player",
+                            "podcast-status",
                             "privacy-status",
                             "published-at",
                             "snippet",
@@ -10869,13 +10921,6 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
-                "snippet.channel-title" => Some((
-                    "snippet.channelTitle",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
                 "snippet.description" => Some((
                     "snippet.description",
                     JsonTypeInfo {
@@ -11162,7 +11207,6 @@ where
                         &vec![
                             "activity-type",
                             "channel-id",
-                            "channel-title",
                             "content-details",
                             "default",
                             "description",
@@ -11560,6 +11604,13 @@ where
 
             let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
             {
+                "etag" => Some((
+                    "etag",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "featured-part" => Some((
                     "featuredPart",
                     JsonTypeInfo {
@@ -11582,8 +11633,10 @@ where
                     },
                 )),
                 _ => {
-                    let suggestion =
-                        FieldCursor::did_you_mean(key, &vec!["featured-part", "gaia", "id"]);
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec!["etag", "featured-part", "gaia", "id"],
+                    );
                     err.issues.push(CLIError::Field(FieldError::Unknown(
                         temp_cursor.to_string(),
                         suggestion,
@@ -11801,6 +11854,15 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "snippet.channel-to-store-link.merchant-affiliate-program-details.status" => {
+                    Some((
+                        "snippet.channelToStoreLink.merchantAffiliateProgramDetails.status",
+                        JsonTypeInfo {
+                            jtype: JsonType::String,
+                            ctype: ComplexType::Pod,
+                        },
+                    ))
+                }
                 "snippet.channel-to-store-link.merchant-id" => Some((
                     "snippet.channelToStoreLink.merchantId",
                     JsonTypeInfo {
@@ -11847,6 +11909,7 @@ where
                             "kind",
                             "link-status",
                             "linking-token",
+                            "merchant-affiliate-program-details",
                             "merchant-id",
                             "snippet",
                             "status",
@@ -12090,6 +12153,15 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "snippet.channel-to-store-link.merchant-affiliate-program-details.status" => {
+                    Some((
+                        "snippet.channelToStoreLink.merchantAffiliateProgramDetails.status",
+                        JsonTypeInfo {
+                            jtype: JsonType::String,
+                            ctype: ComplexType::Pod,
+                        },
+                    ))
+                }
                 "snippet.channel-to-store-link.merchant-id" => Some((
                     "snippet.channelToStoreLink.merchantId",
                     JsonTypeInfo {
@@ -12136,6 +12208,7 @@ where
                             "kind",
                             "link-status",
                             "linking-token",
+                            "merchant-affiliate-program-details",
                             "merchant-id",
                             "snippet",
                             "status",
@@ -12465,6 +12538,88 @@ where
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
                                 v.extend(["hl", "id", "region-code"].iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _video_trainability_get(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self.hub.video_trainability().get();
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "id" => {
+                    call = call.id(value.unwrap_or(""));
+                }
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["id"].iter().map(|v| *v));
                                 v
                             }));
                     }
@@ -13418,6 +13573,13 @@ where
                         ctype: ComplexType::Vec,
                     },
                 )),
+                "paid-product-placement-details.has-paid-product-placement" => Some((
+                    "paidProductPlacementDetails.hasPaidProductPlacement",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "player.embed-height" => Some((
                     "player.embedHeight",
                     JsonTypeInfo {
@@ -13768,6 +13930,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "status.contains-synthetic-media" => Some((
+                    "status.containsSyntheticMedia",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "status.embeddable" => Some((
                     "status.embeddable",
                     JsonTypeInfo {
@@ -13924,6 +14093,7 @@ where
                             "comment-count",
                             "concurrent-viewers",
                             "container",
+                            "contains-synthetic-media",
                             "content-details",
                             "content-rating",
                             "country-restriction",
@@ -13969,6 +14139,7 @@ where
                             "fsk-rating",
                             "grfilm-rating",
                             "has-custom-thumbnail",
+                            "has-paid-product-placement",
                             "height",
                             "high",
                             "icaa-rating",
@@ -14015,6 +14186,7 @@ where
                             "nkclv-rating",
                             "nmc-rating",
                             "oflc-rating",
+                            "paid-product-placement-details",
                             "parts-processed",
                             "parts-total",
                             "pefilm-rating",
@@ -15337,6 +15509,13 @@ where
                         ctype: ComplexType::Vec,
                     },
                 )),
+                "paid-product-placement-details.has-paid-product-placement" => Some((
+                    "paidProductPlacementDetails.hasPaidProductPlacement",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "player.embed-height" => Some((
                     "player.embedHeight",
                     JsonTypeInfo {
@@ -15687,6 +15866,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "status.contains-synthetic-media" => Some((
+                    "status.containsSyntheticMedia",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "status.embeddable" => Some((
                     "status.embeddable",
                     JsonTypeInfo {
@@ -15843,6 +16029,7 @@ where
                             "comment-count",
                             "concurrent-viewers",
                             "container",
+                            "contains-synthetic-media",
                             "content-details",
                             "content-rating",
                             "country-restriction",
@@ -15888,6 +16075,7 @@ where
                             "fsk-rating",
                             "grfilm-rating",
                             "has-custom-thumbnail",
+                            "has-paid-product-placement",
                             "height",
                             "high",
                             "icaa-rating",
@@ -15934,6 +16122,7 @@ where
                             "nkclv-rating",
                             "nmc-rating",
                             "oflc-rating",
+                            "paid-product-placement-details",
                             "parts-processed",
                             "parts-total",
                             "pefilm-rating",
@@ -16351,6 +16540,122 @@ where
         }
     }
 
+    async fn _youtube_v3_live_chat_messages_stream(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self.hub.youtube().v3_live_chat_messages_stream();
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "profile-image-size" => {
+                    call = call.profile_image_size(
+                        value
+                            .map(|v| arg_from_str(v, err, "profile-image-size", "uint32"))
+                            .unwrap_or(0),
+                    );
+                }
+                "part" => {
+                    call = call.add_part(value.unwrap_or(""));
+                }
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                }
+                "max-results" => {
+                    call = call.max_results(
+                        value
+                            .map(|v| arg_from_str(v, err, "max-results", "uint32"))
+                            .unwrap_or(0),
+                    );
+                }
+                "live-chat-id" => {
+                    call = call.live_chat_id(value.unwrap_or(""));
+                }
+                "hl" => {
+                    call = call.hl(value.unwrap_or(""));
+                }
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(
+                                    [
+                                        "hl",
+                                        "live-chat-id",
+                                        "max-results",
+                                        "page-token",
+                                        "part",
+                                        "profile-image-size",
+                                    ]
+                                    .iter()
+                                    .map(|v| *v),
+                                );
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _youtube_v3_update_comment_threads(
         &self,
         opt: &ArgMatches<'n>,
@@ -16421,6 +16726,13 @@ where
                     "snippet.isPublic",
                     JsonTypeInfo {
                         jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "snippet.post-id" => Some((
+                    "snippet.postId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
                         ctype: ComplexType::Pod,
                     },
                 )),
@@ -16508,6 +16820,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "snippet.top-level-comment.snippet.post-id" => Some((
+                    "snippet.topLevelComment.snippet.postId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "snippet.top-level-comment.snippet.published-at" => Some((
                     "snippet.topLevelComment.snippet.publishedAt",
                     JsonTypeInfo {
@@ -16582,6 +16901,7 @@ where
                             "like-count",
                             "moderation-status",
                             "parent-id",
+                            "post-id",
                             "published-at",
                             "snippet",
                             "text-display",
@@ -16643,6 +16963,89 @@ where
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
                                 v.extend(["part"].iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _youtube_v3_videos_batch_get_stats(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self.hub.youtube().v3_videos_batch_get_stats();
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "part" => {
+                    call = call.add_part(value.unwrap_or(""));
+                }
+                "on-behalf-of-content-owner" => {
+                    call = call.on_behalf_of_content_owner(value.unwrap_or(""));
+                }
+                "id" => {
+                    call = call.add_id(value.unwrap_or(""));
+                }
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(
+                                    ["id", "on-behalf-of-content-owner", "part"]
+                                        .iter()
+                                        .map(|v| *v),
+                                );
                                 v
                             }));
                     }
@@ -17123,6 +17526,17 @@ where
                     writeln!(std::io::stderr(), "{}\n", opt.usage()).ok();
                 }
             },
+            ("video-trainability", Some(opt)) => match opt.subcommand() {
+                ("get", Some(opt)) => {
+                    call_result = self._video_trainability_get(opt, dry_run, &mut err).await;
+                }
+                _ => {
+                    err.issues.push(CLIError::MissingMethodError(
+                        "video-trainability".to_string(),
+                    ));
+                    writeln!(std::io::stderr(), "{}\n", opt.usage()).ok();
+                }
+            },
             ("videos", Some(opt)) => match opt.subcommand() {
                 ("delete", Some(opt)) => {
                     call_result = self._videos_delete(opt, dry_run, &mut err).await;
@@ -17165,9 +17579,19 @@ where
                 }
             },
             ("youtube", Some(opt)) => match opt.subcommand() {
+                ("v3-live-chat-messages-stream", Some(opt)) => {
+                    call_result = self
+                        ._youtube_v3_live_chat_messages_stream(opt, dry_run, &mut err)
+                        .await;
+                }
                 ("v3-update-comment-threads", Some(opt)) => {
                     call_result = self
                         ._youtube_v3_update_comment_threads(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("v3-videos-batch-get-stats", Some(opt)) => {
+                    call_result = self
+                        ._youtube_v3_videos_batch_get_stats(opt, dry_run, &mut err)
                         .await;
                 }
                 _ => {
@@ -17233,7 +17657,9 @@ where
         let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
             secret,
             yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-            hyper_util::client::legacy::Client::builder(executor).build(connector),
+            yup_oauth2::client::CustomHyperClientBuilder::from(
+                hyper_util::client::legacy::Client::builder(executor).build(connector),
+            ),
         )
         .persist_tokens_to_disk(format!("{}/youtube3", config_dir))
         .build()
@@ -18023,7 +18449,7 @@ async fn main() {
                      Some(false)),
                     (Some(r##"part"##),
                      None,
-                     Some(r##"The *part* parameter specifies the liveChatComment resource parts that the API response will include. Supported values are id and snippet."##),
+                     Some(r##"The *part* parameter specifies the liveChatComment resource parts that the API response will include. Supported values are id, snippet, and authorDetails."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -18743,6 +19169,23 @@ async fn main() {
                      Some(false)),
                   ]),
             ]),
+            ("video-trainability", "methods: 'get'", vec![
+            ("get",
+                    Some(r##"Returns the trainability status of a video."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/video-trainability_get",
+                  vec![
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ]),
             ("videos", "methods: 'delete', 'get-rating', 'insert', 'list', 'rate', 'report-abuse' and 'update'", vec![
             ("delete",
                     Some(r##"Deletes a resource."##),
@@ -18922,7 +19365,22 @@ async fn main() {
                      Some(true)),
                   ]),
             ]),
-            ("youtube", "methods: 'v3-update-comment-threads'", vec![
+            ("youtube", "methods: 'v3-live-chat-messages-stream', 'v3-update-comment-threads' and 'v3-videos-batch-get-stats'", vec![
+            ("v3-live-chat-messages-stream",
+                    Some(r##"Allows a user to load live chat through a server-streamed RPC."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/youtube_v3-live-chat-messages-stream",
+                  vec![
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("v3-update-comment-threads",
                     Some(r##"Updates an existing resource."##),
                     "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/youtube_v3-update-comment-threads",
@@ -18943,12 +19401,27 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("v3-videos-batch-get-stats",
+                    Some(r##"Retrieves a batch of VideoStat resources, possibly filtered."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/youtube_v3-videos-batch-get-stats",
+                  vec![
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ]),
         ];
 
     let mut app = App::new("youtube3")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("6.0.0+20240626")
+           .version("7.0.0+20251222")
            .about("The YouTube Data API v3 is an API that provides access to YouTube data, such as videos, playlists, and channels.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_youtube3_cli")
            .arg(Arg::with_name("url")
@@ -19026,7 +19499,7 @@ async fn main() {
         .with_native_roots()
         .unwrap()
         .https_or_http()
-        .enable_http1()
+        .enable_http2()
         .build();
 
     match Engine::new(matches, connector).await {

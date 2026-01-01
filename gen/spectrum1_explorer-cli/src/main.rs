@@ -2231,7 +2231,9 @@ where
         let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
             secret,
             yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-            hyper_util::client::legacy::Client::builder(executor).build(connector),
+            yup_oauth2::client::CustomHyperClientBuilder::from(
+                hyper_util::client::legacy::Client::builder(executor).build(connector),
+            ),
         )
         .persist_tokens_to_disk(format!("{}/spectrum1-explorer", config_dir))
         .build()
@@ -2403,7 +2405,7 @@ async fn main() {
 
     let mut app = App::new("spectrum1-explorer")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("6.0.0+20170306")
+           .version("7.0.0+20170306")
            .about("API for spectrum-management functions.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_spectrum1_explorer_cli")
            .arg(Arg::with_name("folder")
@@ -2463,7 +2465,7 @@ async fn main() {
         .with_native_roots()
         .unwrap()
         .https_or_http()
-        .enable_http1()
+        .enable_http2()
         .build();
 
     match Engine::new(matches, connector).await {

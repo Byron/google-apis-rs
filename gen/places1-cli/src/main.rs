@@ -73,17 +73,17 @@ where
 
             let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
             {
-                "include-query-predictions" => Some((
-                    "includeQueryPredictions",
+                "include-pure-service-area-businesses" => Some((
+                    "includePureServiceAreaBusinesses",
                     JsonTypeInfo {
                         jtype: JsonType::Boolean,
                         ctype: ComplexType::Pod,
                     },
                 )),
-                "input-offset" => Some((
-                    "inputOffset",
+                "include-query-predictions" => Some((
+                    "includeQueryPredictions",
                     JsonTypeInfo {
-                        jtype: JsonType::Int,
+                        jtype: JsonType::Boolean,
                         ctype: ComplexType::Pod,
                     },
                 )),
@@ -101,41 +101,6 @@ where
                         ctype: ComplexType::Vec,
                     },
                 )),
-                "language-code" => Some((
-                    "languageCode",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "session-token" => Some((
-                    "sessionToken",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "region-code" => Some((
-                    "regionCode",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "origin.longitude" => Some((
-                    "origin.longitude",
-                    JsonTypeInfo {
-                        jtype: JsonType::Float,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "origin.latitude" => Some((
-                    "origin.latitude",
-                    JsonTypeInfo {
-                        jtype: JsonType::Float,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
                 "input" => Some((
                     "input",
                     JsonTypeInfo {
@@ -143,8 +108,22 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
-                "location-bias.circle.radius" => Some((
-                    "locationBias.circle.radius",
+                "input-offset" => Some((
+                    "inputOffset",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "language-code" => Some((
+                    "languageCode",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "location-bias.circle.center.latitude" => Some((
+                    "locationBias.circle.center.latitude",
                     JsonTypeInfo {
                         jtype: JsonType::Float,
                         ctype: ComplexType::Pod,
@@ -157,15 +136,8 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
-                "location-bias.circle.center.latitude" => Some((
-                    "locationBias.circle.center.latitude",
-                    JsonTypeInfo {
-                        jtype: JsonType::Float,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "location-bias.rectangle.high.longitude" => Some((
-                    "locationBias.rectangle.high.longitude",
+                "location-bias.circle.radius" => Some((
+                    "locationBias.circle.radius",
                     JsonTypeInfo {
                         jtype: JsonType::Float,
                         ctype: ComplexType::Pod,
@@ -178,8 +150,8 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
-                "location-bias.rectangle.low.longitude" => Some((
-                    "locationBias.rectangle.low.longitude",
+                "location-bias.rectangle.high.longitude" => Some((
+                    "locationBias.rectangle.high.longitude",
                     JsonTypeInfo {
                         jtype: JsonType::Float,
                         ctype: ComplexType::Pod,
@@ -192,43 +164,8 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
-                "location-restriction.rectangle.high.longitude" => Some((
-                    "locationRestriction.rectangle.high.longitude",
-                    JsonTypeInfo {
-                        jtype: JsonType::Float,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "location-restriction.rectangle.high.latitude" => Some((
-                    "locationRestriction.rectangle.high.latitude",
-                    JsonTypeInfo {
-                        jtype: JsonType::Float,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "location-restriction.rectangle.low.longitude" => Some((
-                    "locationRestriction.rectangle.low.longitude",
-                    JsonTypeInfo {
-                        jtype: JsonType::Float,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "location-restriction.rectangle.low.latitude" => Some((
-                    "locationRestriction.rectangle.low.latitude",
-                    JsonTypeInfo {
-                        jtype: JsonType::Float,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "location-restriction.circle.radius" => Some((
-                    "locationRestriction.circle.radius",
-                    JsonTypeInfo {
-                        jtype: JsonType::Float,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "location-restriction.circle.center.longitude" => Some((
-                    "locationRestriction.circle.center.longitude",
+                "location-bias.rectangle.low.longitude" => Some((
+                    "locationBias.rectangle.low.longitude",
                     JsonTypeInfo {
                         jtype: JsonType::Float,
                         ctype: ComplexType::Pod,
@@ -241,6 +178,76 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "location-restriction.circle.center.longitude" => Some((
+                    "locationRestriction.circle.center.longitude",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "location-restriction.circle.radius" => Some((
+                    "locationRestriction.circle.radius",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "location-restriction.rectangle.high.latitude" => Some((
+                    "locationRestriction.rectangle.high.latitude",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "location-restriction.rectangle.high.longitude" => Some((
+                    "locationRestriction.rectangle.high.longitude",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "location-restriction.rectangle.low.latitude" => Some((
+                    "locationRestriction.rectangle.low.latitude",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "location-restriction.rectangle.low.longitude" => Some((
+                    "locationRestriction.rectangle.low.longitude",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "origin.latitude" => Some((
+                    "origin.latitude",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "origin.longitude" => Some((
+                    "origin.longitude",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "region-code" => Some((
+                    "regionCode",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "session-token" => Some((
+                    "sessionToken",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 _ => {
                     let suggestion = FieldCursor::did_you_mean(
                         key,
@@ -248,6 +255,7 @@ where
                             "center",
                             "circle",
                             "high",
+                            "include-pure-service-area-businesses",
                             "include-query-predictions",
                             "included-primary-types",
                             "included-region-codes",
@@ -588,11 +596,11 @@ where
 
             let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
             {
-                "region-code" => Some((
-                    "regionCode",
+                "excluded-primary-types" => Some((
+                    "excludedPrimaryTypes",
                     JsonTypeInfo {
                         jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
+                        ctype: ComplexType::Vec,
                     },
                 )),
                 "excluded-types" => Some((
@@ -602,10 +610,66 @@ where
                         ctype: ComplexType::Vec,
                     },
                 )),
-                "routing-parameters.origin.longitude" => Some((
-                    "routingParameters.origin.longitude",
+                "included-primary-types" => Some((
+                    "includedPrimaryTypes",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "included-types" => Some((
+                    "includedTypes",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "language-code" => Some((
+                    "languageCode",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "location-restriction.circle.center.latitude" => Some((
+                    "locationRestriction.circle.center.latitude",
                     JsonTypeInfo {
                         jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "location-restriction.circle.center.longitude" => Some((
+                    "locationRestriction.circle.center.longitude",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "location-restriction.circle.radius" => Some((
+                    "locationRestriction.circle.radius",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "max-result-count" => Some((
+                    "maxResultCount",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "rank-preference" => Some((
+                    "rankPreference",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "region-code" => Some((
+                    "regionCode",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
                         ctype: ComplexType::Pod,
                     },
                 )),
@@ -616,17 +680,10 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
-                "routing-parameters.route-modifiers.avoid-indoor" => Some((
-                    "routingParameters.routeModifiers.avoidIndoor",
+                "routing-parameters.origin.longitude" => Some((
+                    "routingParameters.origin.longitude",
                     JsonTypeInfo {
-                        jtype: JsonType::Boolean,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "routing-parameters.route-modifiers.avoid-tolls" => Some((
-                    "routingParameters.routeModifiers.avoidTolls",
-                    JsonTypeInfo {
-                        jtype: JsonType::Boolean,
+                        jtype: JsonType::Float,
                         ctype: ComplexType::Pod,
                     },
                 )),
@@ -644,6 +701,20 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "routing-parameters.route-modifiers.avoid-indoor" => Some((
+                    "routingParameters.routeModifiers.avoidIndoor",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "routing-parameters.route-modifiers.avoid-tolls" => Some((
+                    "routingParameters.routeModifiers.avoidTolls",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "routing-parameters.routing-preference" => Some((
                     "routingParameters.routingPreference",
                     JsonTypeInfo {
@@ -655,69 +726,6 @@ where
                     "routingParameters.travelMode",
                     JsonTypeInfo {
                         jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "excluded-primary-types" => Some((
-                    "excludedPrimaryTypes",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Vec,
-                    },
-                )),
-                "included-types" => Some((
-                    "includedTypes",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Vec,
-                    },
-                )),
-                "included-primary-types" => Some((
-                    "includedPrimaryTypes",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Vec,
-                    },
-                )),
-                "location-restriction.circle.radius" => Some((
-                    "locationRestriction.circle.radius",
-                    JsonTypeInfo {
-                        jtype: JsonType::Float,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "location-restriction.circle.center.longitude" => Some((
-                    "locationRestriction.circle.center.longitude",
-                    JsonTypeInfo {
-                        jtype: JsonType::Float,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "location-restriction.circle.center.latitude" => Some((
-                    "locationRestriction.circle.center.latitude",
-                    JsonTypeInfo {
-                        jtype: JsonType::Float,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "rank-preference" => Some((
-                    "rankPreference",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "language-code" => Some((
-                    "languageCode",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "max-result-count" => Some((
-                    "maxResultCount",
-                    JsonTypeInfo {
-                        jtype: JsonType::Int,
                         ctype: ComplexType::Pod,
                     },
                 )),
@@ -873,17 +881,122 @@ where
 
             let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
             {
-                "price-levels" => Some((
-                    "priceLevels",
+                "ev-options.connector-types" => Some((
+                    "evOptions.connectorTypes",
                     JsonTypeInfo {
                         jtype: JsonType::String,
                         ctype: ComplexType::Vec,
                     },
                 )),
-                "region-code" => Some((
-                    "regionCode",
+                "ev-options.minimum-charging-rate-kw" => Some((
+                    "evOptions.minimumChargingRateKw",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "include-pure-service-area-businesses" => Some((
+                    "includePureServiceAreaBusinesses",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "included-type" => Some((
+                    "includedType",
                     JsonTypeInfo {
                         jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "language-code" => Some((
+                    "languageCode",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "location-bias.circle.center.latitude" => Some((
+                    "locationBias.circle.center.latitude",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "location-bias.circle.center.longitude" => Some((
+                    "locationBias.circle.center.longitude",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "location-bias.circle.radius" => Some((
+                    "locationBias.circle.radius",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "location-bias.rectangle.high.latitude" => Some((
+                    "locationBias.rectangle.high.latitude",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "location-bias.rectangle.high.longitude" => Some((
+                    "locationBias.rectangle.high.longitude",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "location-bias.rectangle.low.latitude" => Some((
+                    "locationBias.rectangle.low.latitude",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "location-bias.rectangle.low.longitude" => Some((
+                    "locationBias.rectangle.low.longitude",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "location-restriction.rectangle.high.latitude" => Some((
+                    "locationRestriction.rectangle.high.latitude",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "location-restriction.rectangle.high.longitude" => Some((
+                    "locationRestriction.rectangle.high.longitude",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "location-restriction.rectangle.low.latitude" => Some((
+                    "locationRestriction.rectangle.low.latitude",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "location-restriction.rectangle.low.longitude" => Some((
+                    "locationRestriction.rectangle.low.longitude",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "max-result-count" => Some((
+                    "maxResultCount",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
                         ctype: ComplexType::Pod,
                     },
                 )),
@@ -894,25 +1007,32 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
-                "ev-options.minimum-charging-rate-kw" => Some((
-                    "evOptions.minimumChargingRateKw",
+                "open-now" => Some((
+                    "openNow",
                     JsonTypeInfo {
-                        jtype: JsonType::Float,
+                        jtype: JsonType::Boolean,
                         ctype: ComplexType::Pod,
                     },
                 )),
-                "ev-options.connector-types" => Some((
-                    "evOptions.connectorTypes",
+                "page-size" => Some((
+                    "pageSize",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "page-token" => Some((
+                    "pageToken",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "price-levels" => Some((
+                    "priceLevels",
                     JsonTypeInfo {
                         jtype: JsonType::String,
                         ctype: ComplexType::Vec,
-                    },
-                )),
-                "text-query" => Some((
-                    "textQuery",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
                     },
                 )),
                 "rank-preference" => Some((
@@ -922,24 +1042,10 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
-                "search-along-route-parameters.polyline.encoded-polyline" => Some((
-                    "searchAlongRouteParameters.polyline.encodedPolyline",
+                "region-code" => Some((
+                    "regionCode",
                     JsonTypeInfo {
                         jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "open-now" => Some((
-                    "openNow",
-                    JsonTypeInfo {
-                        jtype: JsonType::Boolean,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "routing-parameters.origin.longitude" => Some((
-                    "routingParameters.origin.longitude",
-                    JsonTypeInfo {
-                        jtype: JsonType::Float,
                         ctype: ComplexType::Pod,
                     },
                 )),
@@ -950,17 +1056,10 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
-                "routing-parameters.route-modifiers.avoid-indoor" => Some((
-                    "routingParameters.routeModifiers.avoidIndoor",
+                "routing-parameters.origin.longitude" => Some((
+                    "routingParameters.origin.longitude",
                     JsonTypeInfo {
-                        jtype: JsonType::Boolean,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "routing-parameters.route-modifiers.avoid-tolls" => Some((
-                    "routingParameters.routeModifiers.avoidTolls",
-                    JsonTypeInfo {
-                        jtype: JsonType::Boolean,
+                        jtype: JsonType::Float,
                         ctype: ComplexType::Pod,
                     },
                 )),
@@ -973,6 +1072,20 @@ where
                 )),
                 "routing-parameters.route-modifiers.avoid-highways" => Some((
                     "routingParameters.routeModifiers.avoidHighways",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "routing-parameters.route-modifiers.avoid-indoor" => Some((
+                    "routingParameters.routeModifiers.avoidIndoor",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "routing-parameters.route-modifiers.avoid-tolls" => Some((
+                    "routingParameters.routeModifiers.avoidTolls",
                     JsonTypeInfo {
                         jtype: JsonType::Boolean,
                         ctype: ComplexType::Pod,
@@ -992,31 +1105,10 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
-                "location-restriction.rectangle.high.longitude" => Some((
-                    "locationRestriction.rectangle.high.longitude",
+                "search-along-route-parameters.polyline.encoded-polyline" => Some((
+                    "searchAlongRouteParameters.polyline.encodedPolyline",
                     JsonTypeInfo {
-                        jtype: JsonType::Float,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "location-restriction.rectangle.high.latitude" => Some((
-                    "locationRestriction.rectangle.high.latitude",
-                    JsonTypeInfo {
-                        jtype: JsonType::Float,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "location-restriction.rectangle.low.longitude" => Some((
-                    "locationRestriction.rectangle.low.longitude",
-                    JsonTypeInfo {
-                        jtype: JsonType::Float,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "location-restriction.rectangle.low.latitude" => Some((
-                    "locationRestriction.rectangle.low.latitude",
-                    JsonTypeInfo {
-                        jtype: JsonType::Float,
+                        jtype: JsonType::String,
                         ctype: ComplexType::Pod,
                     },
                 )),
@@ -1027,85 +1119,8 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
-                "language-code" => Some((
-                    "languageCode",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "location-bias.rectangle.high.longitude" => Some((
-                    "locationBias.rectangle.high.longitude",
-                    JsonTypeInfo {
-                        jtype: JsonType::Float,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "location-bias.rectangle.high.latitude" => Some((
-                    "locationBias.rectangle.high.latitude",
-                    JsonTypeInfo {
-                        jtype: JsonType::Float,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "location-bias.rectangle.low.longitude" => Some((
-                    "locationBias.rectangle.low.longitude",
-                    JsonTypeInfo {
-                        jtype: JsonType::Float,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "location-bias.rectangle.low.latitude" => Some((
-                    "locationBias.rectangle.low.latitude",
-                    JsonTypeInfo {
-                        jtype: JsonType::Float,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "location-bias.circle.radius" => Some((
-                    "locationBias.circle.radius",
-                    JsonTypeInfo {
-                        jtype: JsonType::Float,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "location-bias.circle.center.longitude" => Some((
-                    "locationBias.circle.center.longitude",
-                    JsonTypeInfo {
-                        jtype: JsonType::Float,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "location-bias.circle.center.latitude" => Some((
-                    "locationBias.circle.center.latitude",
-                    JsonTypeInfo {
-                        jtype: JsonType::Float,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "page-size" => Some((
-                    "pageSize",
-                    JsonTypeInfo {
-                        jtype: JsonType::Int,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "page-token" => Some((
-                    "pageToken",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "max-result-count" => Some((
-                    "maxResultCount",
-                    JsonTypeInfo {
-                        jtype: JsonType::Int,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "included-type" => Some((
-                    "includedType",
+                "text-query" => Some((
+                    "textQuery",
                     JsonTypeInfo {
                         jtype: JsonType::String,
                         ctype: ComplexType::Pod,
@@ -1125,6 +1140,7 @@ where
                             "encoded-polyline",
                             "ev-options",
                             "high",
+                            "include-pure-service-area-businesses",
                             "included-type",
                             "language-code",
                             "latitude",
@@ -1316,7 +1332,9 @@ where
         let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
             secret,
             yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-            hyper_util::client::legacy::Client::builder(executor).build(connector),
+            yup_oauth2::client::CustomHyperClientBuilder::from(
+                hyper_util::client::legacy::Client::builder(executor).build(connector),
+            ),
         )
         .persist_tokens_to_disk(format!("{}/places1", config_dir))
         .build()
@@ -1475,7 +1493,7 @@ async fn main() {
 
     let mut app = App::new("places1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("6.0.0+20241013")
+           .version("7.0.0+20251210")
            .about("")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_places1_cli")
            .arg(Arg::with_name("url")
@@ -1540,7 +1558,7 @@ async fn main() {
         .with_native_roots()
         .unwrap()
         .https_or_http()
-        .enable_http1()
+        .enable_http2()
         .build();
 
     match Engine::new(matches, connector).await {

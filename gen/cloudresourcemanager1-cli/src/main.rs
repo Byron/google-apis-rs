@@ -3193,6 +3193,13 @@ where
 
             let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
             {
+                "configured-capabilities" => Some((
+                    "configuredCapabilities",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
                 "create-time" => Some((
                     "createTime",
                     JsonTypeInfo {
@@ -3260,6 +3267,7 @@ where
                     let suggestion = FieldCursor::did_you_mean(
                         key,
                         &vec![
+                            "configured-capabilities",
                             "create-time",
                             "id",
                             "labels",
@@ -5095,6 +5103,13 @@ where
 
             let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
             {
+                "configured-capabilities" => Some((
+                    "configuredCapabilities",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
                 "create-time" => Some((
                     "createTime",
                     JsonTypeInfo {
@@ -5162,6 +5177,7 @@ where
                     let suggestion = FieldCursor::did_you_mean(
                         key,
                         &vec![
+                            "configured-capabilities",
                             "create-time",
                             "id",
                             "labels",
@@ -5501,7 +5517,9 @@ where
         let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
             secret,
             yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-            hyper_util::client::legacy::Client::builder(executor).build(connector),
+            yup_oauth2::client::CustomHyperClientBuilder::from(
+                hyper_util::client::legacy::Client::builder(executor).build(connector),
+            ),
         )
         .persist_tokens_to_disk(format!("{}/cloudresourcemanager1", config_dir))
         .build()
@@ -6453,7 +6471,7 @@ async fn main() {
 
     let mut app = App::new("cloudresourcemanager1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("6.0.0+20240617")
+           .version("7.0.0+20251103")
            .about("Creates, reads, and updates metadata for Google Cloud Platform resource containers.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_cli")
            .arg(Arg::with_name("url")
@@ -6518,7 +6536,7 @@ async fn main() {
         .with_native_roots()
         .unwrap()
         .https_or_http()
-        .enable_http1()
+        .enable_http2()
         .build();
 
     match Engine::new(matches, connector).await {

@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Payments Reseller Subscription* API at revision *20240626*. The CLI is at version *6.0.0*.
+This documentation was generated from the *Payments Reseller Subscription* API at revision *20251210*. The CLI is at version *7.0.0*.
 
 ```bash
 paymentsresellersubscription1 [options]
@@ -38,8 +38,12 @@ paymentsresellersubscription1 [options]
                 subscriptions-entitle <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 subscriptions-extend <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 subscriptions-get <name> [-p <v>]... [-o <out>]
+                subscriptions-line-items-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 subscriptions-provision <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                subscriptions-resume <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                subscriptions-suspend <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 subscriptions-undo-cancel <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                user-sessions-generate <parent> (-r <kv>)... [-p <v>]... [-o <out>]
   paymentsresellersubscription1 --help
 
 Configuration:

@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Android Enterprise* API at revision *20240625*. The CLI is at version *6.0.0*.
+This documentation was generated from the *Android Enterprise* API at revision *20251211*. The CLI is at version *7.0.0*.
 
 ```bash
 androidenterprise1 [options]
@@ -36,12 +36,14 @@ androidenterprise1 [options]
                 list <enterprise-id> <user-id> [-p <v>]... [-o <out>]
                 set-state <enterprise-id> <user-id> <device-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 update <enterprise-id> <user-id> <device-id> (-r <kv>)... [-p <v>]... [-o <out>]
+        enrollment-tokens
+                create <enterprise-id> (-r <kv>)... [-p <v>]... [-o <out>]
         enterprises
                 acknowledge-notification-set [-p <v>]...
                 complete-signup [-p <v>]... [-o <out>]
-                create-enrollment-token <enterprise-id> [-p <v>]... [-o <out>]
                 create-web-token <enterprise-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 enroll <token> (-r <kv>)... [-p <v>]... [-o <out>]
+                generate-enterprise-upgrade-url <enterprise-id> [-p <v>]... [-o <out>]
                 generate-signup-url [-p <v>]... [-o <out>]
                 get <enterprise-id> [-p <v>]... [-o <out>]
                 get-service-account <enterprise-id> [-p <v>]... [-o <out>]

@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *CustomSearch API* crate version *6.0.0+20240625*, where *20240625* is the exact revision of the *customsearch:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v6.0.0*.
+//! This documentation was generated from *CustomSearch API* crate version *7.0.0+20251211*, where *20251211* is the exact revision of the *customsearch:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v7.0.0*.
 //!
 //! Everything else about the *CustomSearch API* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/custom-search/v1/introduction).
@@ -87,9 +87,20 @@
 //! // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about
 //! // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 //! // retrieve them from storage.
-//! let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+//! let connector = hyper_rustls::HttpsConnectorBuilder::new()
+//!     .with_native_roots()
+//!     .unwrap()
+//!     .https_only()
+//!     .enable_http2()
+//!     .build();
+//!
+//! let executor = hyper_util::rt::TokioExecutor::new();
+//! let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 //!     secret,
 //!     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+//!     yup_oauth2::client::CustomHyperClientBuilder::from(
+//!         hyper_util::client::legacy::Client::builder(executor).build(connector),
+//!     ),
 //! ).build().await.unwrap();
 //!
 //! let client = hyper_util::client::legacy::Client::builder(
@@ -100,7 +111,7 @@
 //!         .with_native_roots()
 //!         .unwrap()
 //!         .https_or_http()
-//!         .enable_http1()
+//!         .enable_http2()
 //!         .build()
 //! );
 //! let mut hub = CustomSearchAPI::new(client, auth);
@@ -108,38 +119,39 @@
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
 //! let result = hub.cse().siterestrict_list()
-//!              .start(39)
-//!              .sort("ea")
-//!              .snippet_length(-99)
-//!              .site_search_filter("Lorem")
-//!              .site_search("eos")
-//!              .search_type("labore")
-//!              .safe("sed")
-//!              .rights("duo")
-//!              .related_site("sed")
-//!              .q("no")
-//!              .or_terms("Stet")
-//!              .num(-13)
-//!              .lr("et")
-//!              .low_range("sed")
+//!              .start(84)
+//!              .sort("dolor")
+//!              .snippet_length(-56)
+//!              .site_search_filter("eos")
+//!              .site_search("labore")
+//!              .search_type("sed")
+//!              .safe("duo")
+//!              .rights("sed")
+//!              .related_site("no")
+//!              .q("Stet")
+//!              .or_terms("kasd")
+//!              .num(-24)
+//!              .lr("sed")
+//!              .low_range("et")
 //!              .link_site("et")
-//!              .img_type("et")
-//!              .img_size("vero")
-//!              .img_dominant_color("erat")
-//!              .img_color_type("sed")
-//!              .hq("duo")
-//!              .hl("dolore")
-//!              .high_range("et")
-//!              .googlehost("voluptua.")
-//!              .gl("amet.")
-//!              .filter("consetetur")
-//!              .file_type("diam")
-//!              .exclude_terms("dolor")
+//!              .img_type("vero")
+//!              .img_size("erat")
+//!              .img_dominant_color("sed")
+//!              .img_color_type("duo")
+//!              .hq("dolore")
+//!              .hl("et")
+//!              .high_range("voluptua.")
+//!              .googlehost("amet.")
+//!              .gl("consetetur")
+//!              .filter("diam")
+//!              .file_type("dolor")
+//!              .exclude_terms("et")
 //!              .exact_terms("et")
-//!              .date_restrict("et")
-//!              .cx("sadipscing")
-//!              .cr("Stet")
-//!              .c2coff("dolor")
+//!              .enable_alternate_search_handler(false)
+//!              .date_restrict("Stet")
+//!              .cx("dolor")
+//!              .cr("duo")
+//!              .c2coff("vero")
 //!              .doit().await;
 //!
 //! match result {

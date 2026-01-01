@@ -168,6 +168,12 @@
                                 "name"
                             ],
                             "parameters": {
+                                "extraLocationTypes": {
+                                    "description": "Optional. Do not use this field. It is unsupported and is ignored unless explicitly documented otherwise. This is primarily for internal usage.",
+                                    "location": "query",
+                                    "repeated": true,
+                                    "type": "string"
+                                },
                                 "filter": {
                                     "description": "A filter to narrow down results to a preferred subset. The filtering language accepts strings like `\"displayName=tokyo\"`, and is documented in more detail in [AIP-160](https://google.aip.dev/160).",
                                     "location": "query",
@@ -652,7 +658,7 @@
                                             ]
                                         },
                                         "get": {
-                                            "description": "Gets a task.",
+                                            "description": "Gets a task. After a task is successfully executed or has exhausted its retry attempts, the task is deleted. A `GetTask` request for a deleted task returns a `NOT_FOUND` error.",
                                             "flatPath": "v2/projects/{projectsId}/locations/{locationsId}/queues/{queuesId}/tasks/{tasksId}",
                                             "httpMethod": "GET",
                                             "id": "cloudtasks.projects.locations.queues.tasks.get",
@@ -743,7 +749,7 @@
                                             ]
                                         },
                                         "run": {
-                                            "description": "Forces a task to run now. When this method is called, Cloud Tasks will dispatch the task, even if the task is already running, the queue has reached its RateLimits or is PAUSED. This command is meant to be used for manual debugging. For example, RunTask can be used to retry a failed task after a fix has been made or to manually force a task to be dispatched now. The dispatched task is returned. That is, the task that is returned contains the status after the task is dispatched but before the task is received by its target. If Cloud Tasks receives a successful response from the task's target, then the task will be deleted; otherwise the task's schedule_time will be reset to the time that RunTask was called plus the retry delay specified in the queue's RetryConfig. RunTask returns NOT_FOUND when it is called on a task that has already succeeded or permanently failed.",
+                                            "description": "Forces a task to run now. When this method is called, Cloud Tasks will dispatch the task, even if the task is already running, the queue has reached its RateLimits or is PAUSED. This command is meant to be used for manual debugging. For example, RunTask can be used to retry a failed task after a fix has been made or to manually force a task to be dispatched now. If Cloud Tasks receives a successful response from the task's target, then the task will be deleted; otherwise the task's schedule_time will be reset to the time that RunTask was called plus the retry delay specified in the queue's RetryConfig. RunTask returns NOT_FOUND when it is called on a task that has already succeeded or permanently failed.",
                                             "flatPath": "v2/projects/{projectsId}/locations/{locationsId}/queues/{queuesId}/tasks/{tasksId}:run",
                                             "httpMethod": "POST",
                                             "id": "cloudtasks.projects.locations.queues.tasks.run",
@@ -779,7 +785,7 @@
             }
         }
     },
-    "revision": "20240614",
+    "revision": "20251216",
     "rootUrl": "https://cloudtasks.googleapis.com/",
     "schemas": {
         "AppEngineHttpRequest": {
@@ -962,7 +968,7 @@
                 },
                 "task": {
                     "$ref": "Task",
-                    "description": "Required. The task to add. Task names have the following format: `projects/PROJECT_ID/locations/LOCATION_ID/queues/QUEUE_ID/tasks/TASK_ID`. The user can optionally specify a task name. If a name is not specified then the system will generate a random unique task id, which will be set in the task returned in the response. If schedule_time is not set or is in the past then Cloud Tasks will set it to the current time. Task De-duplication: Explicitly specifying a task ID enables task de-duplication. If a task's ID is identical to that of an existing task or a task that was deleted or executed recently then the call will fail with ALREADY_EXISTS. The IDs of deleted tasks are not immediately available for reuse. It can take up to 4 hours (or 9 days if the task's queue was created using a queue.yaml or queue.xml) for the task ID to be released and made available again. Because there is an extra lookup cost to identify duplicate task names, these CreateTask calls have significantly increased latency. Using hashed strings for the task id or for the prefix of the task id is recommended. Choosing task ids that are sequential or have sequential prefixes, for example using a timestamp, causes an increase in latency and error rates in all task commands. The infrastructure relies on an approximately uniform distribution of task ids to store and serve tasks efficiently."
+                    "description": "Required. The task to add. Task names have the following format: `projects/PROJECT_ID/locations/LOCATION_ID/queues/QUEUE_ID/tasks/TASK_ID`. The user can optionally specify a task name. If a name is not specified then the system will generate a random unique task id, which will be set in the task returned in the response. If schedule_time is not set or is in the past then Cloud Tasks will set it to the current time. Task De-duplication: Explicitly specifying a task ID enables task de-duplication. If a task's ID is identical to that of an existing task or a task that was deleted or executed recently then the call will fail with ALREADY_EXISTS. The IDs of deleted tasks are not immediately available for reuse. It can take up to 24 hours (or 9 days if the task's queue was created using a queue.yaml or queue.xml) for the task ID to be released and made available again. Because there is an extra lookup cost to identify duplicate task names, these CreateTask calls have significantly increased latency. Using hashed strings for the task id or for the prefix of the task id is recommended. Choosing task ids that are sequential or have sequential prefixes, for example using a timestamp, causes an increase in latency and error rates in all task commands. The infrastructure relies on an approximately uniform distribution of task ids to store and serve tasks efficiently."
                 }
             },
             "type": "object"
@@ -1164,11 +1170,11 @@
                 },
                 "oauthToken": {
                     "$ref": "OAuthToken",
-                    "description": "If specified, an [OAuth token](https://developers.google.com/identity/protocols/OAuth2) will be generated and attached as the `Authorization` header in the HTTP request. This type of authorization should generally only be used when calling Google APIs hosted on *.googleapis.com."
+                    "description": "If specified, an [OAuth token](https://developers.google.com/identity/protocols/OAuth2) is generated and attached as the `Authorization` header in the HTTP request. This type of authorization should generally be used only when calling Google APIs hosted on *.googleapis.com. Note that both the service account email and the scope MUST be specified when using the queue-level authorization override."
                 },
                 "oidcToken": {
                     "$ref": "OidcToken",
-                    "description": "If specified, an [OIDC](https://developers.google.com/identity/protocols/OpenIDConnect) token will be generated and attached as an `Authorization` header in the HTTP request. This type of authorization can be used for many scenarios, including calling Cloud Run, or endpoints where you intend to validate the token yourself."
+                    "description": "If specified, an [OIDC](https://developers.google.com/identity/protocols/OpenIDConnect) token is generated and attached as an `Authorization` header in the HTTP request. This type of authorization can be used for many scenarios, including calling Cloud Run, or endpoints where you intend to validate the token yourself. Note that both the service account email and the audience MUST be specified when using the queue-level authorization override."
                 },
                 "uriOverride": {
                     "$ref": "UriOverride",
@@ -1438,7 +1444,7 @@
             "id": "RetryConfig",
             "properties": {
                 "maxAttempts": {
-                    "description": "Number of attempts per task. Cloud Tasks will attempt the task `max_attempts` times (that is, if the first attempt fails, then there will be `max_attempts - 1` retries). Must be >= -1. If unspecified when the queue is created, Cloud Tasks will pick the default. -1 indicates unlimited attempts. This field has the same meaning as [task_retry_limit in queue.yaml/xml](https://cloud.google.com/appengine/docs/standard/python/config/queueref#retry_parameters).",
+                    "description": "Number of attempts per task. Cloud Tasks will attempt the task `max_attempts` times (that is, if the first attempt fails, then there will be `max_attempts - 1` retries). Must be >= -1. If unspecified when the queue is created, Cloud Tasks will pick the default. -1 indicates unlimited attempts. This field has the same meaning as [task_retry_limit in queue.yaml/xml](https://cloud.google.com/appengine/docs/standard/python/config/queueref#retry_parameters). Note: Cloud Tasks stops retrying only when `max_attempts` and `max_retry_duration` are both satisfied. When the task has been attempted `max_attempts` times and when the `max_retry_duration` time has passed, no further attempts are made, and the task is deleted. If you want your task to retry infinitely, you must set `max_attempts` to -1 and `max_retry_duration` to 0.",
                     "format": "int32",
                     "type": "integer"
                 },
@@ -1643,7 +1649,7 @@
                     "description": "URI path. When specified, replaces the existing path of the task URL. Setting the path value to an empty string clears the URI path segment."
                 },
                 "port": {
-                    "description": "Port override. When specified, replaces the port part of the task URI. For instance, for a URI http://www.google.com/foo and port=123, the overridden URI becomes http://www.google.com:123/foo. Note that the port value must be a positive integer. Setting the port to 0 (Zero) clears the URI port.",
+                    "description": "Port override. When specified, replaces the port part of the task URI. For instance, for a URI \"https://www.example.com/example\" and port=123, the overridden URI becomes \"https://www.example.com:123/example\". Note that the port value must be a positive integer. Setting the port to 0 (Zero) clears the URI port.",
                     "format": "int64",
                     "type": "string"
                 },
@@ -1660,8 +1666,8 @@
                     ],
                     "enumDescriptions": [
                         "Scheme unspecified. Defaults to HTTPS.",
-                        "Convert the scheme to HTTP, e.g., https://www.google.ca will change to http://www.google.ca.",
-                        "Convert the scheme to HTTPS, e.g., http://www.google.ca will change to https://www.google.ca."
+                        "Convert the scheme to HTTP, e.g., \"https://www.example.com\" will change to \"http://www.example.com\".",
+                        "Convert the scheme to HTTPS, e.g., \"http://www.example.com\" will change to \"https://www.example.com\"."
                     ],
                     "type": "string"
                 },

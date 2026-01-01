@@ -1499,7 +1499,9 @@ where
         let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
             secret,
             yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-            hyper_util::client::legacy::Client::builder(executor).build(connector),
+            yup_oauth2::client::CustomHyperClientBuilder::from(
+                hyper_util::client::legacy::Client::builder(executor).build(connector),
+            ),
         )
         .persist_tokens_to_disk(format!("{}/sourcerepo1", config_dir))
         .build()
@@ -1808,7 +1810,7 @@ async fn main() {
 
     let mut app = App::new("sourcerepo1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("6.0.0+20240623")
+           .version("7.0.0+20251222")
            .about("Accesses source code repositories hosted by Google. Important: Cloud Source Repositories is scheduled for end of sales starting June 17, 2024. Customers who have enabled the API prior to this date will not be affected and can continue to use Cloud Source Repositories. Organizations or projects who have not previously enabled the API cannot use Cloud Source Repositories after this date. View Cloud Source Repositories documentation for more info. ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_sourcerepo1_cli")
            .arg(Arg::with_name("url")
@@ -1873,7 +1875,7 @@ async fn main() {
         .with_native_roots()
         .unwrap()
         .https_or_http()
-        .enable_http1()
+        .enable_http2()
         .build();
 
     match Engine::new(matches, connector).await {

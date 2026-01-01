@@ -48,10 +48,16 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
+        let size_bytes: i64 = arg_from_str(
+            &opt.value_of("size-bytes").unwrap_or(""),
+            err,
+            "<size-bytes>",
+            "int64",
+        );
         let mut call = self.hub.action_results().get(
             opt.value_of("instance-name").unwrap_or(""),
             opt.value_of("hash").unwrap_or(""),
-            opt.value_of("size-bytes").unwrap_or(""),
+            size_bytes,
         );
         for parg in opt
             .values_of("v")
@@ -340,11 +346,17 @@ where
         }
         let mut request: api::BuildBazelRemoteExecutionV2ActionResult =
             serde_json::value::from_value(object).unwrap();
+        let size_bytes: i64 = arg_from_str(
+            &opt.value_of("size-bytes").unwrap_or(""),
+            err,
+            "<size-bytes>",
+            "int64",
+        );
         let mut call = self.hub.action_results().update(
             request,
             opt.value_of("instance-name").unwrap_or(""),
             opt.value_of("hash").unwrap_or(""),
-            opt.value_of("size-bytes").unwrap_or(""),
+            size_bytes,
         );
         for parg in opt
             .values_of("v")
@@ -989,10 +1001,16 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
+        let size_bytes: i64 = arg_from_str(
+            &opt.value_of("size-bytes").unwrap_or(""),
+            err,
+            "<size-bytes>",
+            "int64",
+        );
         let mut call = self.hub.blobs().get_tree(
             opt.value_of("instance-name").unwrap_or(""),
             opt.value_of("hash").unwrap_or(""),
-            opt.value_of("size-bytes").unwrap_or(""),
+            size_bytes,
         );
         for parg in opt
             .values_of("v")
@@ -1397,7 +1415,9 @@ where
         let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
             secret,
             yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-            hyper_util::client::legacy::Client::builder(executor).build(connector),
+            yup_oauth2::client::CustomHyperClientBuilder::from(
+                hyper_util::client::legacy::Client::builder(executor).build(connector),
+            ),
         )
         .persist_tokens_to_disk(format!("{}/remotebuildexecution2", config_dir))
         .build()
@@ -1704,7 +1724,7 @@ async fn main() {
 
     let mut app = App::new("remotebuildexecution2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("6.0.0+20210329")
+           .version("7.0.0+20210329")
            .about("Supplies a Remote Execution API service for tools such as bazel.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_remotebuildexecution2_cli")
            .arg(Arg::with_name("url")
@@ -1769,7 +1789,7 @@ async fn main() {
         .with_native_roots()
         .unwrap()
         .https_or_http()
-        .enable_http1()
+        .enable_http2()
         .build();
 
     match Engine::new(matches, connector).await {

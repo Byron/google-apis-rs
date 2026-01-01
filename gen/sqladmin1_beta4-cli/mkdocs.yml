@@ -1,4 +1,4 @@
-site_name: SQL Admin v6.0.0+20240618
+site_name: SQL Admin v7.0.0+20251201
 site_url: http://byron.github.io/google-apis-rs/google-sqladmin1_beta4-cli
 site_description: A complete library to interact with SQL Admin (protocol v1beta4)
 
@@ -14,6 +14,12 @@ nav:
     - 'Get': 'backup-runs_get.md'
     - 'Insert': 'backup-runs_insert.md'
     - 'List': 'backup-runs_list.md'
+- 'Backups':
+    - 'Create Backup': 'backups_create-backup.md'
+    - 'Delete Backup': 'backups_delete-backup.md'
+    - 'Get Backup': 'backups_get-backup.md'
+    - 'List Backups': 'backups_list-backups.md'
+    - 'Update Backup': 'backups_update-backup.md'
 - 'Connect':
     - 'Generate Ephemeral': 'connect_generate-ephemeral.md'
     - 'Get': 'connect_get.md'
@@ -27,12 +33,19 @@ nav:
 - 'Flags':
     - 'List': 'flags_list.md'
 - 'Instances':
+    - 'List Entra Id Certificates': 'instances_list-entra-id-certificates.md'
+    - 'List Server Certificates': 'instances_list-server-certificates.md'
+    - 'Rotate Entra Id Certificate': 'instances_rotate-entra-id-certificate.md'
+    - 'Rotate Server Certificate': 'instances_rotate-server-certificate.md'
     - 'Acquire Ssrs Lease': 'instances_acquire-ssrs-lease.md'
+    - 'Add Entra Id Certificate': 'instances_add-entra-id-certificate.md'
     - 'Add Server Ca': 'instances_add-server-ca.md'
+    - 'Add Server Certificate': 'instances_add-server-certificate.md'
     - 'Clone': 'instances_clone.md'
     - 'Delete': 'instances_delete.md'
     - 'Demote': 'instances_demote.md'
     - 'Demote Master': 'instances_demote-master.md'
+    - 'Execute Sql': 'instances_execute-sql.md'
     - 'Export': 'instances_export.md'
     - 'Failover': 'instances_failover.md'
     - 'Get': 'instances_get.md'
@@ -41,6 +54,8 @@ nav:
     - 'List': 'instances_list.md'
     - 'List Server Cas': 'instances_list-server-cas.md'
     - 'Patch': 'instances_patch.md'
+    - 'Point In Time Restore': 'instances_point-in-time-restore.md'
+    - 'Pre Check Major Version Upgrade': 'instances_pre-check-major-version-upgrade.md'
     - 'Promote Replica': 'instances_promote-replica.md'
     - 'Reencrypt': 'instances_reencrypt.md'
     - 'Release Ssrs Lease': 'instances_release-ssrs-lease.md'

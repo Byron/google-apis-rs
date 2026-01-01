@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *appengine* crate version *6.0.0+20240624*, where *20240624* is the exact revision of the *appengine:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v6.0.0*.
+//! This documentation was generated from *appengine* crate version *7.0.0+20251210*, where *20251210* is the exact revision of the *appengine:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v7.0.0*.
 //!
 //! Everything else about the *appengine* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/appengine/docs/admin-api/).
@@ -12,9 +12,9 @@
 //! Handle the following *Resources* with ease from the central [hub](Appengine) ...
 //!
 //! * apps
-//!  * [*authorized certificates create*](api::AppAuthorizedCertificateCreateCall), [*authorized certificates delete*](api::AppAuthorizedCertificateDeleteCall), [*authorized certificates get*](api::AppAuthorizedCertificateGetCall), [*authorized certificates list*](api::AppAuthorizedCertificateListCall), [*authorized certificates patch*](api::AppAuthorizedCertificatePatchCall), [*authorized domains list*](api::AppAuthorizedDomainListCall), [*create*](api::AppCreateCall), [*domain mappings create*](api::AppDomainMappingCreateCall), [*domain mappings delete*](api::AppDomainMappingDeleteCall), [*domain mappings get*](api::AppDomainMappingGetCall), [*domain mappings list*](api::AppDomainMappingListCall), [*domain mappings patch*](api::AppDomainMappingPatchCall), [*firewall ingress rules batch update*](api::AppFirewallIngressRuleBatchUpdateCall), [*firewall ingress rules create*](api::AppFirewallIngressRuleCreateCall), [*firewall ingress rules delete*](api::AppFirewallIngressRuleDeleteCall), [*firewall ingress rules get*](api::AppFirewallIngressRuleGetCall), [*firewall ingress rules list*](api::AppFirewallIngressRuleListCall), [*firewall ingress rules patch*](api::AppFirewallIngressRulePatchCall), [*get*](api::AppGetCall), [*list runtimes*](api::AppListRuntimeCall), [*locations get*](api::AppLocationGetCall), [*locations list*](api::AppLocationListCall), [*operations get*](api::AppOperationGetCall), [*operations list*](api::AppOperationListCall), [*patch*](api::AppPatchCall), [*repair*](api::AppRepairCall), [*services delete*](api::AppServiceDeleteCall), [*services get*](api::AppServiceGetCall), [*services list*](api::AppServiceListCall), [*services patch*](api::AppServicePatchCall), [*services versions create*](api::AppServiceVersionCreateCall), [*services versions delete*](api::AppServiceVersionDeleteCall), [*services versions get*](api::AppServiceVersionGetCall), [*services versions instances debug*](api::AppServiceVersionInstanceDebugCall), [*services versions instances delete*](api::AppServiceVersionInstanceDeleteCall), [*services versions instances get*](api::AppServiceVersionInstanceGetCall), [*services versions instances list*](api::AppServiceVersionInstanceListCall), [*services versions list*](api::AppServiceVersionListCall) and [*services versions patch*](api::AppServiceVersionPatchCall)
+//!  * [*authorized certificates create*](api::AppAuthorizedCertificateCreateCall), [*authorized certificates delete*](api::AppAuthorizedCertificateDeleteCall), [*authorized certificates get*](api::AppAuthorizedCertificateGetCall), [*authorized certificates list*](api::AppAuthorizedCertificateListCall), [*authorized certificates patch*](api::AppAuthorizedCertificatePatchCall), [*authorized domains list*](api::AppAuthorizedDomainListCall), [*create*](api::AppCreateCall), [*domain mappings create*](api::AppDomainMappingCreateCall), [*domain mappings delete*](api::AppDomainMappingDeleteCall), [*domain mappings get*](api::AppDomainMappingGetCall), [*domain mappings list*](api::AppDomainMappingListCall), [*domain mappings patch*](api::AppDomainMappingPatchCall), [*firewall ingress rules batch update*](api::AppFirewallIngressRuleBatchUpdateCall), [*firewall ingress rules create*](api::AppFirewallIngressRuleCreateCall), [*firewall ingress rules delete*](api::AppFirewallIngressRuleDeleteCall), [*firewall ingress rules get*](api::AppFirewallIngressRuleGetCall), [*firewall ingress rules list*](api::AppFirewallIngressRuleListCall), [*firewall ingress rules patch*](api::AppFirewallIngressRulePatchCall), [*get*](api::AppGetCall), [*list runtimes*](api::AppListRuntimeCall), [*locations get*](api::AppLocationGetCall), [*locations list*](api::AppLocationListCall), [*operations get*](api::AppOperationGetCall), [*operations list*](api::AppOperationListCall), [*patch*](api::AppPatchCall), [*repair*](api::AppRepairCall), [*services delete*](api::AppServiceDeleteCall), [*services get*](api::AppServiceGetCall), [*services list*](api::AppServiceListCall), [*services patch*](api::AppServicePatchCall), [*services versions create*](api::AppServiceVersionCreateCall), [*services versions delete*](api::AppServiceVersionDeleteCall), [*services versions export app image*](api::AppServiceVersionExportAppImageCall), [*services versions get*](api::AppServiceVersionGetCall), [*services versions instances debug*](api::AppServiceVersionInstanceDebugCall), [*services versions instances delete*](api::AppServiceVersionInstanceDeleteCall), [*services versions instances get*](api::AppServiceVersionInstanceGetCall), [*services versions instances list*](api::AppServiceVersionInstanceListCall), [*services versions list*](api::AppServiceVersionListCall) and [*services versions patch*](api::AppServiceVersionPatchCall)
 //! * projects
-//!  * [*locations applications authorized domains list*](api::ProjectLocationApplicationAuthorizedDomainListCall)
+//!  * [*locations applications authorized certificates create*](api::ProjectLocationApplicationAuthorizedCertificateCreateCall), [*locations applications authorized certificates delete*](api::ProjectLocationApplicationAuthorizedCertificateDeleteCall), [*locations applications authorized certificates get*](api::ProjectLocationApplicationAuthorizedCertificateGetCall), [*locations applications authorized certificates list*](api::ProjectLocationApplicationAuthorizedCertificateListCall), [*locations applications authorized certificates patch*](api::ProjectLocationApplicationAuthorizedCertificatePatchCall), [*locations applications authorized domains list*](api::ProjectLocationApplicationAuthorizedDomainListCall), [*locations applications domain mappings create*](api::ProjectLocationApplicationDomainMappingCreateCall), [*locations applications domain mappings delete*](api::ProjectLocationApplicationDomainMappingDeleteCall), [*locations applications domain mappings get*](api::ProjectLocationApplicationDomainMappingGetCall), [*locations applications domain mappings list*](api::ProjectLocationApplicationDomainMappingListCall), [*locations applications domain mappings patch*](api::ProjectLocationApplicationDomainMappingPatchCall), [*locations applications patch*](api::ProjectLocationApplicationPatchCall), [*locations applications services delete*](api::ProjectLocationApplicationServiceDeleteCall), [*locations applications services patch*](api::ProjectLocationApplicationServicePatchCall), [*locations applications services versions delete*](api::ProjectLocationApplicationServiceVersionDeleteCall), [*locations applications services versions export app image*](api::ProjectLocationApplicationServiceVersionExportAppImageCall) and [*locations applications services versions patch*](api::ProjectLocationApplicationServiceVersionPatchCall)
 //!
 //!
 //!
@@ -57,12 +57,22 @@
 //! let r = hub.apps().services_versions_instances_delete(...).doit().await
 //! let r = hub.apps().services_versions_create(...).doit().await
 //! let r = hub.apps().services_versions_delete(...).doit().await
+//! let r = hub.apps().services_versions_export_app_image(...).doit().await
 //! let r = hub.apps().services_versions_patch(...).doit().await
 //! let r = hub.apps().services_delete(...).doit().await
 //! let r = hub.apps().services_patch(...).doit().await
 //! let r = hub.apps().create(...).doit().await
 //! let r = hub.apps().patch(...).doit().await
 //! let r = hub.apps().repair(...).doit().await
+//! let r = hub.projects().locations_applications_domain_mappings_create(...).doit().await
+//! let r = hub.projects().locations_applications_domain_mappings_delete(...).doit().await
+//! let r = hub.projects().locations_applications_domain_mappings_patch(...).doit().await
+//! let r = hub.projects().locations_applications_services_versions_delete(...).doit().await
+//! let r = hub.projects().locations_applications_services_versions_export_app_image(...).doit().await
+//! let r = hub.projects().locations_applications_services_versions_patch(...).doit().await
+//! let r = hub.projects().locations_applications_services_delete(...).doit().await
+//! let r = hub.projects().locations_applications_services_patch(...).doit().await
+//! let r = hub.projects().locations_applications_patch(...).doit().await
 //! ```
 //!
 //! The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities`
@@ -89,7 +99,7 @@
 //! extern crate hyper;
 //! extern crate hyper_rustls;
 //! extern crate google_appengine1 as appengine1;
-//! use appengine1::api::DebugInstanceRequest;
+//! use appengine1::api::Version;
 //! use appengine1::{Result, Error};
 //! # async fn dox() {
 //! use appengine1::{Appengine, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
@@ -102,9 +112,20 @@
 //! // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about
 //! // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 //! // retrieve them from storage.
-//! let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+//! let connector = hyper_rustls::HttpsConnectorBuilder::new()
+//!     .with_native_roots()
+//!     .unwrap()
+//!     .https_only()
+//!     .enable_http2()
+//!     .build();
+//!
+//! let executor = hyper_util::rt::TokioExecutor::new();
+//! let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 //!     secret,
 //!     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+//!     yup_oauth2::client::CustomHyperClientBuilder::from(
+//!         hyper_util::client::legacy::Client::builder(executor).build(connector),
+//!     ),
 //! ).build().await.unwrap();
 //!
 //! let client = hyper_util::client::legacy::Client::builder(
@@ -115,19 +136,20 @@
 //!         .with_native_roots()
 //!         .unwrap()
 //!         .https_or_http()
-//!         .enable_http1()
+//!         .enable_http2()
 //!         .build()
 //! );
 //! let mut hub = Appengine::new(client, auth);
 //! // As the method needs a request, you would usually fill it with the desired information
 //! // into the respective structure. Some of the parts shown here might not be applicable !
 //! // Values shown here are possibly random and not representative !
-//! let mut req = DebugInstanceRequest::default();
+//! let mut req = Version::default();
 //!
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
-//! let result = hub.apps().services_versions_instances_debug(req, "appsId", "servicesId", "versionsId", "instancesId")
+//! let result = hub.projects().locations_applications_services_versions_patch(req, "projectsId", "locationsId", "applicationsId", "servicesId", "versionsId")
+//!              .update_mask(FieldMask::new::<&str>(&[]))
 //!              .doit().await;
 //!
 //! match result {

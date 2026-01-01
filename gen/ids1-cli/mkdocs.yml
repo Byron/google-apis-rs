@@ -1,4 +1,4 @@
-site_name: IDS v6.0.0+20240613
+site_name: IDS v7.0.0+20251201
 site_url: http://byron.github.io/google-apis-rs/google-ids1-cli
 site_description: A complete library to interact with IDS (protocol v1)
 
@@ -13,11 +13,8 @@ nav:
     - 'Locations Endpoints Create': 'projects_locations-endpoints-create.md'
     - 'Locations Endpoints Delete': 'projects_locations-endpoints-delete.md'
     - 'Locations Endpoints Get': 'projects_locations-endpoints-get.md'
-    - 'Locations Endpoints Get Iam Policy': 'projects_locations-endpoints-get-iam-policy.md'
     - 'Locations Endpoints List': 'projects_locations-endpoints-list.md'
     - 'Locations Endpoints Patch': 'projects_locations-endpoints-patch.md'
-    - 'Locations Endpoints Set Iam Policy': 'projects_locations-endpoints-set-iam-policy.md'
-    - 'Locations Endpoints Test Iam Permissions': 'projects_locations-endpoints-test-iam-permissions.md'
     - 'Locations Get': 'projects_locations-get.md'
     - 'Locations List': 'projects_locations-list.md'
     - 'Locations Operations Cancel': 'projects_locations-operations-cancel.md'

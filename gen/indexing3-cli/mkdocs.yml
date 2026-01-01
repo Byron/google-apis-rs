@@ -1,4 +1,4 @@
-site_name: Indexing v6.0.0+20240604
+site_name: Indexing v7.0.0+20251208
 site_url: http://byron.github.io/google-apis-rs/google-indexing3-cli
 site_description: A complete library to interact with Indexing (protocol v3)
 

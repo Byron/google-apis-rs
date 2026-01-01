@@ -1,4 +1,4 @@
-site_name: Database Migration Service v6.0.0+20240621
+site_name: Database Migration Service v7.0.0+20251210
 site_url: http://byron.github.io/google-apis-rs/google-datamigration1-cli
 site_description: A complete library to interact with Database Migration Service (protocol v1)
 
@@ -45,11 +45,18 @@ nav:
     - 'Locations Migration Jobs Create': 'projects_locations-migration-jobs-create.md'
     - 'Locations Migration Jobs Delete': 'projects_locations-migration-jobs-delete.md'
     - 'Locations Migration Jobs Demote Destination': 'projects_locations-migration-jobs-demote-destination.md'
+    - 'Locations Migration Jobs Fetch Source Objects': 'projects_locations-migration-jobs-fetch-source-objects.md'
     - 'Locations Migration Jobs Generate Ssh Script': 'projects_locations-migration-jobs-generate-ssh-script.md'
     - 'Locations Migration Jobs Generate Tcp Proxy Script': 'projects_locations-migration-jobs-generate-tcp-proxy-script.md'
     - 'Locations Migration Jobs Get': 'projects_locations-migration-jobs-get.md'
     - 'Locations Migration Jobs Get Iam Policy': 'projects_locations-migration-jobs-get-iam-policy.md'
     - 'Locations Migration Jobs List': 'projects_locations-migration-jobs-list.md'
+    - 'Locations Migration Jobs Objects Get': 'projects_locations-migration-jobs-objects-get.md'
+    - 'Locations Migration Jobs Objects Get Iam Policy': 'projects_locations-migration-jobs-objects-get-iam-policy.md'
+    - 'Locations Migration Jobs Objects List': 'projects_locations-migration-jobs-objects-list.md'
+    - 'Locations Migration Jobs Objects Lookup': 'projects_locations-migration-jobs-objects-lookup.md'
+    - 'Locations Migration Jobs Objects Set Iam Policy': 'projects_locations-migration-jobs-objects-set-iam-policy.md'
+    - 'Locations Migration Jobs Objects Test Iam Permissions': 'projects_locations-migration-jobs-objects-test-iam-permissions.md'
     - 'Locations Migration Jobs Patch': 'projects_locations-migration-jobs-patch.md'
     - 'Locations Migration Jobs Promote': 'projects_locations-migration-jobs-promote.md'
     - 'Locations Migration Jobs Restart': 'projects_locations-migration-jobs-restart.md'

@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Cloudchannel* crate version *6.0.0+20240625*, where *20240625* is the exact revision of the *cloudchannel:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v6.0.0*.
+//! This documentation was generated from *Cloudchannel* crate version *7.0.0+20251216*, where *20251216* is the exact revision of the *cloudchannel:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v7.0.0*.
 //!
 //! Everything else about the *Cloudchannel* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/channel).
@@ -13,6 +13,8 @@
 //!
 //! * accounts
 //!  * [*channel partner links channel partner repricing configs create*](api::AccountChannelPartnerLinkChannelPartnerRepricingConfigCreateCall), [*channel partner links channel partner repricing configs delete*](api::AccountChannelPartnerLinkChannelPartnerRepricingConfigDeleteCall), [*channel partner links channel partner repricing configs get*](api::AccountChannelPartnerLinkChannelPartnerRepricingConfigGetCall), [*channel partner links channel partner repricing configs list*](api::AccountChannelPartnerLinkChannelPartnerRepricingConfigListCall), [*channel partner links channel partner repricing configs patch*](api::AccountChannelPartnerLinkChannelPartnerRepricingConfigPatchCall), [*channel partner links create*](api::AccountChannelPartnerLinkCreateCall), [*channel partner links customers create*](api::AccountChannelPartnerLinkCustomerCreateCall), [*channel partner links customers delete*](api::AccountChannelPartnerLinkCustomerDeleteCall), [*channel partner links customers get*](api::AccountChannelPartnerLinkCustomerGetCall), [*channel partner links customers import*](api::AccountChannelPartnerLinkCustomerImportCall), [*channel partner links customers list*](api::AccountChannelPartnerLinkCustomerListCall), [*channel partner links customers patch*](api::AccountChannelPartnerLinkCustomerPatchCall), [*channel partner links get*](api::AccountChannelPartnerLinkGetCall), [*channel partner links list*](api::AccountChannelPartnerLinkListCall), [*channel partner links patch*](api::AccountChannelPartnerLinkPatchCall), [*check cloud identity accounts exist*](api::AccountCheckCloudIdentityAccountsExistCall), [*customers create*](api::AccountCustomerCreateCall), [*customers customer repricing configs create*](api::AccountCustomerCustomerRepricingConfigCreateCall), [*customers customer repricing configs delete*](api::AccountCustomerCustomerRepricingConfigDeleteCall), [*customers customer repricing configs get*](api::AccountCustomerCustomerRepricingConfigGetCall), [*customers customer repricing configs list*](api::AccountCustomerCustomerRepricingConfigListCall), [*customers customer repricing configs patch*](api::AccountCustomerCustomerRepricingConfigPatchCall), [*customers delete*](api::AccountCustomerDeleteCall), [*customers entitlements activate*](api::AccountCustomerEntitlementActivateCall), [*customers entitlements cancel*](api::AccountCustomerEntitlementCancelCall), [*customers entitlements change offer*](api::AccountCustomerEntitlementChangeOfferCall), [*customers entitlements change parameters*](api::AccountCustomerEntitlementChangeParameterCall), [*customers entitlements change renewal settings*](api::AccountCustomerEntitlementChangeRenewalSettingCall), [*customers entitlements create*](api::AccountCustomerEntitlementCreateCall), [*customers entitlements get*](api::AccountCustomerEntitlementGetCall), [*customers entitlements list*](api::AccountCustomerEntitlementListCall), [*customers entitlements list entitlement changes*](api::AccountCustomerEntitlementListEntitlementChangeCall), [*customers entitlements lookup offer*](api::AccountCustomerEntitlementLookupOfferCall), [*customers entitlements start paid service*](api::AccountCustomerEntitlementStartPaidServiceCall), [*customers entitlements suspend*](api::AccountCustomerEntitlementSuspendCall), [*customers get*](api::AccountCustomerGetCall), [*customers import*](api::AccountCustomerImportCall), [*customers list*](api::AccountCustomerListCall), [*customers list purchasable offers*](api::AccountCustomerListPurchasableOfferCall), [*customers list purchasable skus*](api::AccountCustomerListPurchasableSkuCall), [*customers patch*](api::AccountCustomerPatchCall), [*customers provision cloud identity*](api::AccountCustomerProvisionCloudIdentityCall), [*customers query eligible billing accounts*](api::AccountCustomerQueryEligibleBillingAccountCall), [*customers transfer entitlements*](api::AccountCustomerTransferEntitlementCall), [*customers transfer entitlements to google*](api::AccountCustomerTransferEntitlementsToGoogleCall), [*list subscribers*](api::AccountListSubscriberCall), [*list transferable offers*](api::AccountListTransferableOfferCall), [*list transferable skus*](api::AccountListTransferableSkuCall), [*offers list*](api::AccountOfferListCall), [*register*](api::AccountRegisterCall), [*report jobs fetch report results*](api::AccountReportJobFetchReportResultCall), [*reports list*](api::AccountReportListCall), [*reports run*](api::AccountReportRunCall), [*sku groups billable skus list*](api::AccountSkuGroupBillableSkuListCall), [*sku groups list*](api::AccountSkuGroupListCall) and [*unregister*](api::AccountUnregisterCall)
+//! * integrators
+//!  * [*list subscribers*](api::IntegratorListSubscriberCall), [*register subscriber*](api::IntegratorRegisterSubscriberCall) and [*unregister subscriber*](api::IntegratorUnregisterSubscriberCall)
 //! * operations
 //!  * [*cancel*](api::OperationCancelCall), [*delete*](api::OperationDeleteCall), [*get*](api::OperationGetCall) and [*list*](api::OperationListCall)
 //! * products
@@ -103,9 +105,20 @@
 //! // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about
 //! // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 //! // retrieve them from storage.
-//! let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+//! let connector = hyper_rustls::HttpsConnectorBuilder::new()
+//!     .with_native_roots()
+//!     .unwrap()
+//!     .https_only()
+//!     .enable_http2()
+//!     .build();
+//!
+//! let executor = hyper_util::rt::TokioExecutor::new();
+//! let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 //!     secret,
 //!     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+//!     yup_oauth2::client::CustomHyperClientBuilder::from(
+//!         hyper_util::client::legacy::Client::builder(executor).build(connector),
+//!     ),
 //! ).build().await.unwrap();
 //!
 //! let client = hyper_util::client::legacy::Client::builder(
@@ -116,7 +129,7 @@
 //!         .with_native_roots()
 //!         .unwrap()
 //!         .https_or_http()
-//!         .enable_http1()
+//!         .enable_http2()
 //!         .build()
 //! );
 //! let mut hub = Cloudchannel::new(client, auth);

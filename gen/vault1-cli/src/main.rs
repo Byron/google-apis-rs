@@ -421,6 +421,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "query.drive-document-info.document-ids.ids" => Some((
+                    "query.driveDocumentInfo.documentIds.ids",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
                 "query.drive-options.client-side-encrypted-option" => Some((
                     "query.driveOptions.clientSideEncryptedOption",
                     JsonTypeInfo {
@@ -439,6 +446,13 @@ where
                     "query.driveOptions.includeTeamDrives",
                     JsonTypeInfo {
                         jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "query.drive-options.shared-drives-option" => Some((
+                    "query.driveOptions.sharedDrivesOption",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
                         ctype: ComplexType::Pod,
                     },
                 )),
@@ -571,12 +585,15 @@ where
                             "corpus",
                             "covered-data",
                             "data-scope",
+                            "document-ids",
+                            "drive-document-info",
                             "drive-options",
                             "emails",
                             "end-time",
                             "exclude-drafts",
                             "hangouts-chat-info",
                             "hangouts-chat-options",
+                            "ids",
                             "include-rooms",
                             "include-shared-drives",
                             "include-team-drives",
@@ -593,6 +610,7 @@ where
                             "search-method",
                             "shared-drive-ids",
                             "shared-drive-info",
+                            "shared-drives-option",
                             "sites-url-info",
                             "start-time",
                             "team-drive-ids",
@@ -745,6 +763,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "matter-region" => Some((
+                    "matterRegion",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "name" => Some((
                     "name",
                     JsonTypeInfo {
@@ -762,7 +787,7 @@ where
                 _ => {
                     let suggestion = FieldCursor::did_you_mean(
                         key,
-                        &vec!["description", "matter-id", "name", "state"],
+                        &vec!["description", "matter-id", "matter-region", "name", "state"],
                     );
                     err.issues.push(CLIError::Field(FieldError::Unknown(
                         temp_cursor.to_string(),
@@ -988,6 +1013,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "export-options.gemini-options.export-format" => Some((
+                    "exportOptions.geminiOptions.exportFormat",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "export-options.groups-options.export-format" => Some((
                     "exportOptions.groupsOptions.exportFormat",
                     JsonTypeInfo {
@@ -1128,6 +1160,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "query.drive-document-info.document-ids.ids" => Some((
+                    "query.driveDocumentInfo.documentIds.ids",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
                 "query.drive-options.client-side-encrypted-option" => Some((
                     "query.driveOptions.clientSideEncryptedOption",
                     JsonTypeInfo {
@@ -1146,6 +1185,13 @@ where
                     "query.driveOptions.includeTeamDrives",
                     JsonTypeInfo {
                         jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "query.drive-options.shared-drives-option" => Some((
+                    "query.driveOptions.sharedDrivesOption",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
                         ctype: ComplexType::Pod,
                     },
                 )),
@@ -1315,6 +1361,8 @@ where
                             "create-time",
                             "data-scope",
                             "display-name",
+                            "document-ids",
+                            "drive-document-info",
                             "drive-options",
                             "email",
                             "emails",
@@ -1324,10 +1372,12 @@ where
                             "export-linked-drive-files",
                             "export-options",
                             "exported-artifact-count",
+                            "gemini-options",
                             "groups-options",
                             "hangouts-chat-info",
                             "hangouts-chat-options",
                             "id",
+                            "ids",
                             "include-access-info",
                             "include-rooms",
                             "include-shared-drives",
@@ -1350,6 +1400,7 @@ where
                             "search-method",
                             "shared-drive-ids",
                             "shared-drive-info",
+                            "shared-drives-option",
                             "show-confidential-mode-content",
                             "sites-url-info",
                             "size-in-bytes",
@@ -3671,6 +3722,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "query.drive-document-info.document-ids.ids" => Some((
+                    "query.driveDocumentInfo.documentIds.ids",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
                 "query.drive-options.client-side-encrypted-option" => Some((
                     "query.driveOptions.clientSideEncryptedOption",
                     JsonTypeInfo {
@@ -3689,6 +3747,13 @@ where
                     "query.driveOptions.includeTeamDrives",
                     JsonTypeInfo {
                         jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "query.drive-options.shared-drives-option" => Some((
+                    "query.driveOptions.sharedDrivesOption",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
                         ctype: ComplexType::Pod,
                     },
                 )),
@@ -3823,12 +3888,15 @@ where
                             "create-time",
                             "data-scope",
                             "display-name",
+                            "document-ids",
+                            "drive-document-info",
                             "drive-options",
                             "emails",
                             "end-time",
                             "exclude-drafts",
                             "hangouts-chat-info",
                             "hangouts-chat-options",
+                            "ids",
                             "include-rooms",
                             "include-shared-drives",
                             "include-team-drives",
@@ -3847,6 +3915,7 @@ where
                             "search-method",
                             "shared-drive-ids",
                             "shared-drive-info",
+                            "shared-drives-option",
                             "sites-url-info",
                             "start-time",
                             "team-drive-ids",
@@ -4379,6 +4448,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "matter-region" => Some((
+                    "matterRegion",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "name" => Some((
                     "name",
                     JsonTypeInfo {
@@ -4396,7 +4472,7 @@ where
                 _ => {
                     let suggestion = FieldCursor::did_you_mean(
                         key,
-                        &vec!["description", "matter-id", "name", "state"],
+                        &vec!["description", "matter-id", "matter-region", "name", "state"],
                     );
                     err.issues.push(CLIError::Field(FieldError::Unknown(
                         temp_cursor.to_string(),
@@ -4800,6 +4876,13 @@ where
         {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "return-partial-success" => {
+                    call = call.return_partial_success(
+                        value
+                            .map(|v| arg_from_str(v, err, "return-partial-success", "boolean"))
+                            .unwrap_or(false),
+                    );
+                }
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
                 }
@@ -4830,7 +4913,16 @@ where
                             .push(CLIError::UnknownParameter(key.to_string(), {
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
-                                v.extend(["filter", "page-size", "page-token"].iter().map(|v| *v));
+                                v.extend(
+                                    [
+                                        "filter",
+                                        "page-size",
+                                        "page-token",
+                                        "return-partial-success",
+                                    ]
+                                    .iter()
+                                    .map(|v| *v),
+                                );
                                 v
                             }));
                     }
@@ -5058,7 +5150,9 @@ where
         let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
             secret,
             yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-            hyper_util::client::legacy::Client::builder(executor).build(connector),
+            yup_oauth2::client::CustomHyperClientBuilder::from(
+                hyper_util::client::legacy::Client::builder(executor).build(connector),
+            ),
         )
         .persist_tokens_to_disk(format!("{}/vault1", config_dir))
         .build()
@@ -5825,7 +5919,7 @@ async fn main() {
             ]),
             ("operations", "methods: 'cancel', 'delete', 'get' and 'list'", vec![
             ("cancel",
-                    Some(r##"Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of 1, corresponding to `Code.CANCELLED`."##),
+                    Some(r##"Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of `1`, corresponding to `Code.CANCELLED`."##),
                     "Details at http://byron.github.io/google-apis-rs/google_vault1_cli/operations_cancel",
                   vec![
                     (Some(r##"name"##),
@@ -5914,7 +6008,7 @@ async fn main() {
 
     let mut app = App::new("vault1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("6.0.0+20240617")
+           .version("7.0.0+20251209")
            .about("Retention and eDiscovery for Google Workspace. To work with Vault resources, the account must have the [required Vault privileges](https://support.google.com/vault/answer/2799699) and access to the matter. To access a matter, the account must have created the matter, have the matter shared with them, or have the **View All Matters** privilege. For example, to download an export, an account needs the **Manage Exports** privilege and the matter shared with them. ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_vault1_cli")
            .arg(Arg::with_name("url")
@@ -5979,7 +6073,7 @@ async fn main() {
         .with_native_roots()
         .unwrap()
         .https_or_http()
-        .enable_http1()
+        .enable_http2()
         .build();
 
     match Engine::new(matches, connector).await {

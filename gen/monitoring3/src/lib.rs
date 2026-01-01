@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Monitoring* crate version *6.0.0+20240623*, where *20240623* is the exact revision of the *monitoring:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v6.0.0*.
+//! This documentation was generated from *Monitoring* crate version *7.0.0+20251215*, where *20251215* is the exact revision of the *monitoring:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v7.0.0*.
 //!
 //! Everything else about the *Monitoring* *v3* API can be found at the
 //! [official documentation site](https://cloud.google.com/monitoring/api/).
@@ -16,7 +16,7 @@
 //! * organizations
 //!  * [*time series list*](api::OrganizationTimeSeryListCall)
 //! * projects
-//!  * [*alert policies create*](api::ProjectAlertPolicyCreateCall), [*alert policies delete*](api::ProjectAlertPolicyDeleteCall), [*alert policies get*](api::ProjectAlertPolicyGetCall), [*alert policies list*](api::ProjectAlertPolicyListCall), [*alert policies patch*](api::ProjectAlertPolicyPatchCall), [*collectd time series create*](api::ProjectCollectdTimeSeryCreateCall), [*groups create*](api::ProjectGroupCreateCall), [*groups delete*](api::ProjectGroupDeleteCall), [*groups get*](api::ProjectGroupGetCall), [*groups list*](api::ProjectGroupListCall), [*groups members list*](api::ProjectGroupMemberListCall), [*groups update*](api::ProjectGroupUpdateCall), [*metric descriptors create*](api::ProjectMetricDescriptorCreateCall), [*metric descriptors delete*](api::ProjectMetricDescriptorDeleteCall), [*metric descriptors get*](api::ProjectMetricDescriptorGetCall), [*metric descriptors list*](api::ProjectMetricDescriptorListCall), [*monitored resource descriptors get*](api::ProjectMonitoredResourceDescriptorGetCall), [*monitored resource descriptors list*](api::ProjectMonitoredResourceDescriptorListCall), [*notification channel descriptors get*](api::ProjectNotificationChannelDescriptorGetCall), [*notification channel descriptors list*](api::ProjectNotificationChannelDescriptorListCall), [*notification channels create*](api::ProjectNotificationChannelCreateCall), [*notification channels delete*](api::ProjectNotificationChannelDeleteCall), [*notification channels get*](api::ProjectNotificationChannelGetCall), [*notification channels get verification code*](api::ProjectNotificationChannelGetVerificationCodeCall), [*notification channels list*](api::ProjectNotificationChannelListCall), [*notification channels patch*](api::ProjectNotificationChannelPatchCall), [*notification channels send verification code*](api::ProjectNotificationChannelSendVerificationCodeCall), [*notification channels verify*](api::ProjectNotificationChannelVerifyCall), [*snoozes create*](api::ProjectSnoozeCreateCall), [*snoozes get*](api::ProjectSnoozeGetCall), [*snoozes list*](api::ProjectSnoozeListCall), [*snoozes patch*](api::ProjectSnoozePatchCall), [*time series create*](api::ProjectTimeSeryCreateCall), [*time series create service*](api::ProjectTimeSeryCreateServiceCall), [*time series list*](api::ProjectTimeSeryListCall), [*time series query*](api::ProjectTimeSeryQueryCall), [*uptime check configs create*](api::ProjectUptimeCheckConfigCreateCall), [*uptime check configs delete*](api::ProjectUptimeCheckConfigDeleteCall), [*uptime check configs get*](api::ProjectUptimeCheckConfigGetCall), [*uptime check configs list*](api::ProjectUptimeCheckConfigListCall) and [*uptime check configs patch*](api::ProjectUptimeCheckConfigPatchCall)
+//!  * [*alert policies create*](api::ProjectAlertPolicyCreateCall), [*alert policies delete*](api::ProjectAlertPolicyDeleteCall), [*alert policies get*](api::ProjectAlertPolicyGetCall), [*alert policies list*](api::ProjectAlertPolicyListCall), [*alert policies patch*](api::ProjectAlertPolicyPatchCall), [*alerts get*](api::ProjectAlertGetCall), [*alerts list*](api::ProjectAlertListCall), [*collectd time series create*](api::ProjectCollectdTimeSeryCreateCall), [*groups create*](api::ProjectGroupCreateCall), [*groups delete*](api::ProjectGroupDeleteCall), [*groups get*](api::ProjectGroupGetCall), [*groups list*](api::ProjectGroupListCall), [*groups members list*](api::ProjectGroupMemberListCall), [*groups update*](api::ProjectGroupUpdateCall), [*metric descriptors create*](api::ProjectMetricDescriptorCreateCall), [*metric descriptors delete*](api::ProjectMetricDescriptorDeleteCall), [*metric descriptors get*](api::ProjectMetricDescriptorGetCall), [*metric descriptors list*](api::ProjectMetricDescriptorListCall), [*monitored resource descriptors get*](api::ProjectMonitoredResourceDescriptorGetCall), [*monitored resource descriptors list*](api::ProjectMonitoredResourceDescriptorListCall), [*notification channel descriptors get*](api::ProjectNotificationChannelDescriptorGetCall), [*notification channel descriptors list*](api::ProjectNotificationChannelDescriptorListCall), [*notification channels create*](api::ProjectNotificationChannelCreateCall), [*notification channels delete*](api::ProjectNotificationChannelDeleteCall), [*notification channels get*](api::ProjectNotificationChannelGetCall), [*notification channels get verification code*](api::ProjectNotificationChannelGetVerificationCodeCall), [*notification channels list*](api::ProjectNotificationChannelListCall), [*notification channels patch*](api::ProjectNotificationChannelPatchCall), [*notification channels send verification code*](api::ProjectNotificationChannelSendVerificationCodeCall), [*notification channels verify*](api::ProjectNotificationChannelVerifyCall), [*snoozes create*](api::ProjectSnoozeCreateCall), [*snoozes get*](api::ProjectSnoozeGetCall), [*snoozes list*](api::ProjectSnoozeListCall), [*snoozes patch*](api::ProjectSnoozePatchCall), [*time series create*](api::ProjectTimeSeryCreateCall), [*time series create service*](api::ProjectTimeSeryCreateServiceCall), [*time series list*](api::ProjectTimeSeryListCall), [*time series query*](api::ProjectTimeSeryQueryCall), [*uptime check configs create*](api::ProjectUptimeCheckConfigCreateCall), [*uptime check configs delete*](api::ProjectUptimeCheckConfigDeleteCall), [*uptime check configs get*](api::ProjectUptimeCheckConfigGetCall), [*uptime check configs list*](api::ProjectUptimeCheckConfigListCall) and [*uptime check configs patch*](api::ProjectUptimeCheckConfigPatchCall)
 //! * [services](api::Service)
 //!  * [*create*](api::ServiceCreateCall), [*delete*](api::ServiceDeleteCall), [*get*](api::ServiceGetCall), [*list*](api::ServiceListCall), [*patch*](api::ServicePatchCall), [*service level objectives create*](api::ServiceServiceLevelObjectiveCreateCall), [*service level objectives delete*](api::ServiceServiceLevelObjectiveDeleteCall), [*service level objectives get*](api::ServiceServiceLevelObjectiveGetCall), [*service level objectives list*](api::ServiceServiceLevelObjectiveListCall) and [*service level objectives patch*](api::ServiceServiceLevelObjectivePatchCall)
 //! * [uptime check ips](api::UptimeCheckIp)
@@ -103,9 +103,20 @@
 //! // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about
 //! // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 //! // retrieve them from storage.
-//! let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+//! let connector = hyper_rustls::HttpsConnectorBuilder::new()
+//!     .with_native_roots()
+//!     .unwrap()
+//!     .https_only()
+//!     .enable_http2()
+//!     .build();
+//!
+//! let executor = hyper_util::rt::TokioExecutor::new();
+//! let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 //!     secret,
 //!     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+//!     yup_oauth2::client::CustomHyperClientBuilder::from(
+//!         hyper_util::client::legacy::Client::builder(executor).build(connector),
+//!     ),
 //! ).build().await.unwrap();
 //!
 //! let client = hyper_util::client::legacy::Client::builder(
@@ -116,7 +127,7 @@
 //!         .with_native_roots()
 //!         .unwrap()
 //!         .https_or_http()
-//!         .enable_http1()
+//!         .enable_http2()
 //!         .build()
 //! );
 //! let mut hub = Monitoring::new(client, auth);

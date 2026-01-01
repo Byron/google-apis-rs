@@ -179,6 +179,12 @@
                                 "name"
                             ],
                             "parameters": {
+                                "extraLocationTypes": {
+                                    "description": "Optional. Do not use this field. It is unsupported and is ignored unless explicitly documented otherwise. This is primarily for internal usage.",
+                                    "location": "query",
+                                    "repeated": true,
+                                    "type": "string"
+                                },
                                 "filter": {
                                     "description": "A filter to narrow down results to a preferred subset. The filtering language accepts strings like `\"displayName=tokyo\"`, and is documented in more detail in [AIP-160](https://google.aip.dev/160).",
                                     "location": "query",
@@ -761,13 +767,15 @@
                                                 "DATABASE_ENTITY_VIEW_UNSPECIFIED",
                                                 "DATABASE_ENTITY_VIEW_BASIC",
                                                 "DATABASE_ENTITY_VIEW_FULL",
-                                                "DATABASE_ENTITY_VIEW_ROOT_SUMMARY"
+                                                "DATABASE_ENTITY_VIEW_ROOT_SUMMARY",
+                                                "DATABASE_ENTITY_VIEW_FULL_COMPACT"
                                             ],
                                             "enumDescriptions": [
                                                 "Unspecified view. Defaults to basic view.",
                                                 "Default view. Does not return DDLs or Issues.",
                                                 "Return full entity details including mappings, ddl and issues.",
-                                                "Top-most (Database, Schema) nodes which are returned contains summary details for their decendents such as the number of entities per type and issues rollups. When this view is used, only a single page of result is returned and the page_size property of the request is ignored. The returned page will only include the top-most node types."
+                                                "Top-most (Database, Schema) nodes which are returned contains summary details for their descendants such as the number of entities per type and issues rollups. When this view is used, only a single page of result is returned and the page_size property of the request is ignored. The returned page will only include the top-most node types.",
+                                                "Returns full entity details except for ddls and schema custom features."
                                             ],
                                             "location": "query",
                                             "type": "string"
@@ -1339,6 +1347,31 @@
                                         "https://www.googleapis.com/auth/cloud-platform"
                                     ]
                                 },
+                                "fetchSourceObjects": {
+                                    "description": "Retrieves objects from the source database that can be selected for data migration. This is applicable for the following migrations: 1. PostgreSQL to Cloud SQL for PostgreSQL 2. PostgreSQL to AlloyDB for PostgreSQL.",
+                                    "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/migrationJobs/{migrationJobsId}:fetchSourceObjects",
+                                    "httpMethod": "GET",
+                                    "id": "datamigration.projects.locations.migrationJobs.fetchSourceObjects",
+                                    "parameterOrder": [
+                                        "name"
+                                    ],
+                                    "parameters": {
+                                        "name": {
+                                            "description": "Required. The resource name for the migration job for which source objects should be returned.",
+                                            "location": "path",
+                                            "pattern": "^projects/[^/]+/locations/[^/]+/migrationJobs/[^/]+$",
+                                            "required": true,
+                                            "type": "string"
+                                        }
+                                    },
+                                    "path": "v1/{+name}:fetchSourceObjects",
+                                    "response": {
+                                        "$ref": "Operation"
+                                    },
+                                    "scopes": [
+                                        "https://www.googleapis.com/auth/cloud-platform"
+                                    ]
+                                },
                                 "generateSshScript": {
                                     "description": "Generate a SSH configuration script to configure the reverse SSH connectivity.",
                                     "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/migrationJobs/{migrationJobsId}:generateSshScript",
@@ -1760,12 +1793,194 @@
                                         "https://www.googleapis.com/auth/cloud-platform"
                                     ]
                                 }
+                            },
+                            "resources": {
+                                "objects": {
+                                    "methods": {
+                                        "get": {
+                                            "description": "Use this method to get details about a migration job object.",
+                                            "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/migrationJobs/{migrationJobsId}/objects/{objectsId}",
+                                            "httpMethod": "GET",
+                                            "id": "datamigration.projects.locations.migrationJobs.objects.get",
+                                            "parameterOrder": [
+                                                "name"
+                                            ],
+                                            "parameters": {
+                                                "name": {
+                                                    "description": "Required. The name of the migration job object resource to get.",
+                                                    "location": "path",
+                                                    "pattern": "^projects/[^/]+/locations/[^/]+/migrationJobs/[^/]+/objects/[^/]+$",
+                                                    "required": true,
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "path": "v1/{+name}",
+                                            "response": {
+                                                "$ref": "MigrationJobObject"
+                                            },
+                                            "scopes": [
+                                                "https://www.googleapis.com/auth/cloud-platform"
+                                            ]
+                                        },
+                                        "getIamPolicy": {
+                                            "description": "Gets the access control policy for a resource. Returns an empty policy if the resource exists and does not have a policy set.",
+                                            "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/migrationJobs/{migrationJobsId}/objects/{objectsId}:getIamPolicy",
+                                            "httpMethod": "GET",
+                                            "id": "datamigration.projects.locations.migrationJobs.objects.getIamPolicy",
+                                            "parameterOrder": [
+                                                "resource"
+                                            ],
+                                            "parameters": {
+                                                "options.requestedPolicyVersion": {
+                                                    "description": "Optional. The maximum policy version that will be used to format the policy. Valid values are 0, 1, and 3. Requests specifying an invalid value will be rejected. Requests for policies with any conditional role bindings must specify version 3. Policies with no conditional role bindings may specify any valid value or leave the field unset. The policy in the response might use the policy version that you specified, or it might use a lower policy version. For example, if you specify version 3, but the policy has no conditional role bindings, the response uses version 1. To learn which resources support conditions in their IAM policies, see the [IAM documentation](https://cloud.google.com/iam/help/conditions/resource-policies).",
+                                                    "format": "int32",
+                                                    "location": "query",
+                                                    "type": "integer"
+                                                },
+                                                "resource": {
+                                                    "description": "REQUIRED: The resource for which the policy is being requested. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field.",
+                                                    "location": "path",
+                                                    "pattern": "^projects/[^/]+/locations/[^/]+/migrationJobs/[^/]+/objects/[^/]+$",
+                                                    "required": true,
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "path": "v1/{+resource}:getIamPolicy",
+                                            "response": {
+                                                "$ref": "Policy"
+                                            },
+                                            "scopes": [
+                                                "https://www.googleapis.com/auth/cloud-platform"
+                                            ]
+                                        },
+                                        "list": {
+                                            "description": "Use this method to list the objects of a specific migration job.",
+                                            "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/migrationJobs/{migrationJobsId}/objects",
+                                            "httpMethod": "GET",
+                                            "id": "datamigration.projects.locations.migrationJobs.objects.list",
+                                            "parameterOrder": [
+                                                "parent"
+                                            ],
+                                            "parameters": {
+                                                "pageSize": {
+                                                    "description": "Maximum number of objects to return. Default is 50. The maximum value is 1000; values above 1000 will be coerced to 1000.",
+                                                    "format": "int32",
+                                                    "location": "query",
+                                                    "type": "integer"
+                                                },
+                                                "pageToken": {
+                                                    "description": "Page token received from a previous `ListMigrationJObObjectsRequest` call. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to `ListMigrationJobObjectsRequest` must match the call that provided the page token.",
+                                                    "location": "query",
+                                                    "type": "string"
+                                                },
+                                                "parent": {
+                                                    "description": "Required. The parent migration job that owns the collection of objects.",
+                                                    "location": "path",
+                                                    "pattern": "^projects/[^/]+/locations/[^/]+/migrationJobs/[^/]+$",
+                                                    "required": true,
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "path": "v1/{+parent}/objects",
+                                            "response": {
+                                                "$ref": "ListMigrationJobObjectsResponse"
+                                            },
+                                            "scopes": [
+                                                "https://www.googleapis.com/auth/cloud-platform"
+                                            ]
+                                        },
+                                        "lookup": {
+                                            "description": "Use this method to look up a migration job object by its source object identifier.",
+                                            "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/migrationJobs/{migrationJobsId}/objects:lookup",
+                                            "httpMethod": "POST",
+                                            "id": "datamigration.projects.locations.migrationJobs.objects.lookup",
+                                            "parameterOrder": [
+                                                "parent"
+                                            ],
+                                            "parameters": {
+                                                "parent": {
+                                                    "description": "Required. The parent migration job that owns the collection of objects.",
+                                                    "location": "path",
+                                                    "pattern": "^projects/[^/]+/locations/[^/]+/migrationJobs/[^/]+$",
+                                                    "required": true,
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "path": "v1/{+parent}/objects:lookup",
+                                            "request": {
+                                                "$ref": "LookupMigrationJobObjectRequest"
+                                            },
+                                            "response": {
+                                                "$ref": "MigrationJobObject"
+                                            },
+                                            "scopes": [
+                                                "https://www.googleapis.com/auth/cloud-platform"
+                                            ]
+                                        },
+                                        "setIamPolicy": {
+                                            "description": "Sets the access control policy on the specified resource. Replaces any existing policy. Can return `NOT_FOUND`, `INVALID_ARGUMENT`, and `PERMISSION_DENIED` errors.",
+                                            "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/migrationJobs/{migrationJobsId}/objects/{objectsId}:setIamPolicy",
+                                            "httpMethod": "POST",
+                                            "id": "datamigration.projects.locations.migrationJobs.objects.setIamPolicy",
+                                            "parameterOrder": [
+                                                "resource"
+                                            ],
+                                            "parameters": {
+                                                "resource": {
+                                                    "description": "REQUIRED: The resource for which the policy is being specified. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field.",
+                                                    "location": "path",
+                                                    "pattern": "^projects/[^/]+/locations/[^/]+/migrationJobs/[^/]+/objects/[^/]+$",
+                                                    "required": true,
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "path": "v1/{+resource}:setIamPolicy",
+                                            "request": {
+                                                "$ref": "SetIamPolicyRequest"
+                                            },
+                                            "response": {
+                                                "$ref": "Policy"
+                                            },
+                                            "scopes": [
+                                                "https://www.googleapis.com/auth/cloud-platform"
+                                            ]
+                                        },
+                                        "testIamPermissions": {
+                                            "description": "Returns permissions that a caller has on the specified resource. If the resource does not exist, this will return an empty set of permissions, not a `NOT_FOUND` error. Note: This operation is designed to be used for building permission-aware UIs and command-line tools, not for authorization checking. This operation may \"fail open\" without warning.",
+                                            "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/migrationJobs/{migrationJobsId}/objects/{objectsId}:testIamPermissions",
+                                            "httpMethod": "POST",
+                                            "id": "datamigration.projects.locations.migrationJobs.objects.testIamPermissions",
+                                            "parameterOrder": [
+                                                "resource"
+                                            ],
+                                            "parameters": {
+                                                "resource": {
+                                                    "description": "REQUIRED: The resource for which the policy detail is being requested. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field.",
+                                                    "location": "path",
+                                                    "pattern": "^projects/[^/]+/locations/[^/]+/migrationJobs/[^/]+/objects/[^/]+$",
+                                                    "required": true,
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "path": "v1/{+resource}:testIamPermissions",
+                                            "request": {
+                                                "$ref": "TestIamPermissionsRequest"
+                                            },
+                                            "response": {
+                                                "$ref": "TestIamPermissionsResponse"
+                                            },
+                                            "scopes": [
+                                                "https://www.googleapis.com/auth/cloud-platform"
+                                            ]
+                                        }
+                                    }
+                                }
                             }
                         },
                         "operations": {
                             "methods": {
                                 "cancel": {
-                                    "description": "Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of 1, corresponding to `Code.CANCELLED`.",
+                                    "description": "Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of `1`, corresponding to `Code.CANCELLED`.",
                                     "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/operations/{operationsId}:cancel",
                                     "httpMethod": "POST",
                                     "id": "datamigration.projects.locations.operations.cancel",
@@ -1873,6 +2088,11 @@
                                             "description": "The standard list page token.",
                                             "location": "query",
                                             "type": "string"
+                                        },
+                                        "returnPartialSuccess": {
+                                            "description": "When set to `true`, operations that are reachable are returned as normal, and those that are unreachable are returned in the ListOperationsResponse.unreachable field. This can only be `true` when reading across collections. For example, when `parent` is set to `\"projects/example/locations/-\"`. This field is not supported by default and will result in an `UNIMPLEMENTED` error if set unless explicitly documented otherwise in service or product specific documentation.",
+                                            "location": "query",
+                                            "type": "boolean"
                                         }
                                     },
                                     "path": "v1/{+name}/operations",
@@ -1915,6 +2135,11 @@
                                         },
                                         "skipValidation": {
                                             "description": "Optional. If set to true, will skip validations.",
+                                            "location": "query",
+                                            "type": "boolean"
+                                        },
+                                        "validateOnly": {
+                                            "description": "Optional. For PSC Interface only - get the tenant project before creating the resource.",
                                             "location": "query",
                                             "type": "boolean"
                                         }
@@ -2125,7 +2350,7 @@
             }
         }
     },
-    "revision": "20240621",
+    "revision": "20251210",
     "rootUrl": "https://datamigration.googleapis.com/",
     "schemas": {
         "AlloyDbConnectionProfile": {
@@ -2152,12 +2377,18 @@
                     "enum": [
                         "DATABASE_VERSION_UNSPECIFIED",
                         "POSTGRES_14",
-                        "POSTGRES_15"
+                        "POSTGRES_15",
+                        "POSTGRES_16",
+                        "POSTGRES_17",
+                        "POSTGRES_18"
                     ],
                     "enumDescriptions": [
                         "This is an unknown database version.",
                         "The database version is Postgres 14.",
-                        "The database version is Postgres 15."
+                        "The database version is Postgres 15.",
+                        "The database version is Postgres 16.",
+                        "The database version is Postgres 17.",
+                        "The database version is Postgres 18."
                     ],
                     "type": "string"
                 },
@@ -2177,7 +2408,8 @@
                     "type": "object"
                 },
                 "primaryInstanceSettings": {
-                    "$ref": "PrimaryInstanceSettings"
+                    "$ref": "PrimaryInstanceSettings",
+                    "description": "Settings for the cluster's primary instance"
                 },
                 "vpcNetwork": {
                     "description": "Required. The resource link for the VPC network in which cluster resources are created and from which they are accessible via Private IP. The network must belong to the same project as the cluster. It is specified in the form: \"projects/{project_number}/global/networks/{network_id}\". This is required to create a cluster.",
@@ -2296,6 +2528,17 @@
             },
             "type": "object"
         },
+        "AuthorizedNetwork": {
+            "description": "AuthorizedNetwork contains metadata for an authorized network.",
+            "id": "AuthorizedNetwork",
+            "properties": {
+                "cidrRange": {
+                    "description": "Optional. CIDR range for one authorzied network of the instance.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
         "BackgroundJobLogEntry": {
             "description": "Execution log of a background job.",
             "id": "BackgroundJobLogEntry",
@@ -2376,6 +2619,21 @@
                     "description": "The timestamp when the background job was started.",
                     "format": "google-datetime",
                     "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "BinaryLogParser": {
+            "description": "Configuration to use Binary Log Parser CDC technique.",
+            "id": "BinaryLogParser",
+            "properties": {
+                "logFileDirectories": {
+                    "$ref": "LogFileDirectories",
+                    "description": "Use Oracle directories."
+                },
+                "oracleAsmLogFileAccess": {
+                    "$ref": "OracleAsmLogFileAccess",
+                    "description": "Use Oracle ASM."
                 }
             },
             "type": "object"
@@ -2487,22 +2745,34 @@
                     "$ref": "DataCacheConfig",
                     "description": "Optional. Data cache is an optional feature available for Cloud SQL for MySQL Enterprise Plus edition only. For more information on data cache, see [Data cache overview](https://cloud.google.com/sql/help/mysql-data-cache) in Cloud SQL documentation."
                 },
+                "dataDiskProvisionedIops": {
+                    "description": "Optional. Provisioned number of I/O operations per second for the data disk. This field is only used for hyperdisk-balanced disk types.",
+                    "format": "int64",
+                    "type": "string"
+                },
+                "dataDiskProvisionedThroughput": {
+                    "description": "Optional. Provisioned throughput measured in MiB per second for the data disk. This field is only used for hyperdisk-balanced disk types.",
+                    "format": "int64",
+                    "type": "string"
+                },
                 "dataDiskSizeGb": {
                     "description": "The storage capacity available to the database, in GB. The minimum (and default) size is 10GB.",
                     "format": "int64",
                     "type": "string"
                 },
                 "dataDiskType": {
-                    "description": "The type of storage: `PD_SSD` (default) or `PD_HDD`.",
+                    "description": "The type of storage: `PD_SSD` (default) or `PD_HDD` or `HYPERDISK_BALANCED`.",
                     "enum": [
                         "SQL_DATA_DISK_TYPE_UNSPECIFIED",
                         "PD_SSD",
-                        "PD_HDD"
+                        "PD_HDD",
+                        "HYPERDISK_BALANCED"
                     ],
                     "enumDescriptions": [
                         "Unspecified.",
                         "SSD disk.",
-                        "HDD disk."
+                        "HDD disk.",
+                        "A Hyperdisk Balanced data disk."
                     ],
                     "type": "string"
                 },
@@ -2514,7 +2784,7 @@
                     "type": "object"
                 },
                 "databaseVersion": {
-                    "description": "The database engine type and version.",
+                    "description": "The database engine type and version. Deprecated. Use database_version_name instead.",
                     "enum": [
                         "SQL_DATABASE_VERSION_UNSPECIFIED",
                         "MYSQL_5_6",
@@ -2531,6 +2801,8 @@
                         "MYSQL_8_0_34",
                         "MYSQL_8_0_35",
                         "MYSQL_8_0_36",
+                        "MYSQL_8_0_37",
+                        "MYSQL_8_4",
                         "POSTGRES_9_6",
                         "POSTGRES_11",
                         "POSTGRES_10",
@@ -2556,6 +2828,8 @@
                         "The database major version is MySQL 8.0 and the minor version is 34.",
                         "The database major version is MySQL 8.0 and the minor version is 35.",
                         "The database major version is MySQL 8.0 and the minor version is 36.",
+                        "The database major version is MySQL 8.0 and the minor version is 37.",
+                        "MySQL 8.4.",
                         "PostgreSQL 9.6.",
                         "PostgreSQL 11.",
                         "PostgreSQL 10.",
@@ -2565,6 +2839,10 @@
                         "PostgreSQL 15.",
                         "PostgreSQL 16."
                     ],
+                    "type": "string"
+                },
+                "databaseVersionName": {
+                    "description": "Optional. The database engine type and version name.",
                     "type": "string"
                 },
                 "edition": {
@@ -2653,6 +2931,10 @@
                 "comment": {
                     "description": "Comment associated with the column.",
                     "type": "string"
+                },
+                "computed": {
+                    "description": "Is the column a computed column.",
+                    "type": "boolean"
                 },
                 "customFeatures": {
                     "additionalProperties": {
@@ -2812,16 +3094,42 @@
                         "CLOUDSQL",
                         "RDS",
                         "AURORA",
-                        "ALLOYDB"
+                        "ALLOYDB",
+                        "AZURE_DATABASE"
                     ],
                     "enumDescriptions": [
-                        "Use this value for on-premise source database instances.",
+                        "Use this value for on-premise source database instances and ORACLE.",
                         "Cloud SQL is the source instance provider.",
                         "Amazon RDS is the source instance provider.",
                         "Amazon Aurora is the source instance provider.",
-                        "AlloyDB for PostgreSQL is the source instance provider."
+                        "AlloyDB for PostgreSQL is the source instance provider.",
+                        "Microsoft Azure Database for MySQL/PostgreSQL."
                     ],
                     "type": "string"
+                },
+                "role": {
+                    "description": "Optional. The connection profile role.",
+                    "enum": [
+                        "ROLE_UNSPECIFIED",
+                        "SOURCE",
+                        "DESTINATION"
+                    ],
+                    "enumDescriptions": [
+                        "The role is unspecified.",
+                        "The role is source.",
+                        "The role is destination."
+                    ],
+                    "type": "string"
+                },
+                "satisfiesPzi": {
+                    "description": "Output only. Reserved for future use.",
+                    "readOnly": true,
+                    "type": "boolean"
+                },
+                "satisfiesPzs": {
+                    "description": "Output only. Reserved for future use.",
+                    "readOnly": true,
+                    "type": "boolean"
                 },
                 "sqlserver": {
                     "$ref": "SqlServerConnectionProfile",
@@ -2919,6 +3227,26 @@
                     "$ref": "DatabaseEngineInfo",
                     "description": "Required. The destination engine details."
                 },
+                "destinationProvider": {
+                    "description": "Optional. The provider for the destination database.",
+                    "enum": [
+                        "DATABASE_PROVIDER_UNSPECIFIED",
+                        "CLOUDSQL",
+                        "RDS",
+                        "AURORA",
+                        "ALLOYDB",
+                        "AZURE_DATABASE"
+                    ],
+                    "enumDescriptions": [
+                        "Use this value for on-premise source database instances and ORACLE.",
+                        "Cloud SQL is the source instance provider.",
+                        "Amazon RDS is the source instance provider.",
+                        "Amazon Aurora is the source instance provider.",
+                        "AlloyDB for PostgreSQL is the source instance provider.",
+                        "Microsoft Azure Database for MySQL/PostgreSQL."
+                    ],
+                    "type": "string"
+                },
                 "displayName": {
                     "description": "Optional. The display name for the workspace.",
                     "type": "string"
@@ -2953,6 +3281,26 @@
                 "source": {
                     "$ref": "DatabaseEngineInfo",
                     "description": "Required. The source engine details."
+                },
+                "sourceProvider": {
+                    "description": "Optional. The provider for the source database.",
+                    "enum": [
+                        "DATABASE_PROVIDER_UNSPECIFIED",
+                        "CLOUDSQL",
+                        "RDS",
+                        "AURORA",
+                        "ALLOYDB",
+                        "AZURE_DATABASE"
+                    ],
+                    "enumDescriptions": [
+                        "Use this value for on-premise source database instances and ORACLE.",
+                        "Cloud SQL is the source instance provider.",
+                        "Amazon RDS is the source instance provider.",
+                        "Amazon Aurora is the source instance provider.",
+                        "AlloyDB for PostgreSQL is the source instance provider.",
+                        "Microsoft Azure Database for MySQL/PostgreSQL."
+                    ],
+                    "type": "string"
                 },
                 "updateTime": {
                     "description": "Output only. The timestamp when the workspace resource was last updated.",
@@ -3240,14 +3588,16 @@
                         "CLOUDSQL",
                         "RDS",
                         "AURORA",
-                        "ALLOYDB"
+                        "ALLOYDB",
+                        "AZURE_DATABASE"
                     ],
                     "enumDescriptions": [
-                        "Use this value for on-premise source database instances.",
+                        "Use this value for on-premise source database instances and ORACLE.",
                         "Cloud SQL is the source instance provider.",
                         "Amazon RDS is the source instance provider.",
                         "Amazon Aurora is the source instance provider.",
-                        "AlloyDB for PostgreSQL is the source instance provider."
+                        "AlloyDB for PostgreSQL is the source instance provider.",
+                        "Microsoft Azure Database for MySQL/PostgreSQL."
                     ],
                     "type": "string"
                 }
@@ -3376,8 +3726,44 @@
                     "description": "The actual ddl code.",
                     "type": "string"
                 },
+                "ddlKind": {
+                    "description": "The DDL Kind selected for apply, or UNSPECIFIED if the entity wasn't converted yet.",
+                    "enum": [
+                        "DDL_KIND_UNSPECIFIED",
+                        "SOURCE",
+                        "DETERMINISTIC",
+                        "AI",
+                        "USER_EDIT"
+                    ],
+                    "enumDescriptions": [
+                        "The kind of the DDL is unknown.",
+                        "DDL of the source entity",
+                        "Deterministic converted DDL",
+                        "Gemini AI converted DDL",
+                        "User edited DDL"
+                    ],
+                    "type": "string"
+                },
                 "ddlType": {
                     "description": "Type of DDL (Create, Alter).",
+                    "type": "string"
+                },
+                "editedDdlKind": {
+                    "description": "If ddl_kind is USER_EDIT, this holds the DDL kind of the original content - DETERMINISTIC or AI. Otherwise, this is DDL_KIND_UNSPECIFIED.",
+                    "enum": [
+                        "DDL_KIND_UNSPECIFIED",
+                        "SOURCE",
+                        "DETERMINISTIC",
+                        "AI",
+                        "USER_EDIT"
+                    ],
+                    "enumDescriptions": [
+                        "The kind of the DDL is unknown.",
+                        "DDL of the source entity",
+                        "Deterministic converted DDL",
+                        "Gemini AI converted DDL",
+                        "User edited DDL"
+                    ],
                     "type": "string"
                 },
                 "entity": {
@@ -3842,8 +4228,16 @@
                     "readOnly": true,
                     "type": "string"
                 },
+                "metadata": {
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "description": "Output only. Additional metadata that is returned by the backend for the operation.",
+                    "readOnly": true,
+                    "type": "object"
+                },
                 "requestedCancellation": {
-                    "description": "Output only. Identifies whether the user has requested cancellation of the operation. Operations that have successfully been cancelled have Operation.error value with a google.rpc.Status.code of 1, corresponding to `Code.CANCELLED`.",
+                    "description": "Output only. Identifies whether the user has requested cancellation of the operation. Operations that have successfully been cancelled have google.longrunning.Operation.error value with a google.rpc.Status.code of 1, corresponding to `Code.CANCELLED`.",
                     "readOnly": true,
                     "type": "boolean"
                 },
@@ -3860,6 +4254,18 @@
                 "verb": {
                     "description": "Output only. Name of the verb executed by the operation.",
                     "readOnly": true,
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "HeterogeneousMetadata": {
+            "description": "Metadata for heterogeneous migration jobs objects.",
+            "id": "HeterogeneousMetadata",
+            "properties": {
+                "unsupportedEventsCount": {
+                    "description": "The number of unsupported events.",
+                    "format": "int64",
                     "type": "string"
                 }
             },
@@ -3963,6 +4369,28 @@
                 },
                 "unique": {
                     "description": "Boolean value indicating whether the index is unique.",
+                    "type": "boolean"
+                }
+            },
+            "type": "object"
+        },
+        "InstanceNetworkConfig": {
+            "description": "Metadata related to instance level network configuration.",
+            "id": "InstanceNetworkConfig",
+            "properties": {
+                "authorizedExternalNetworks": {
+                    "description": "Optional. A list of external network authorized to access this instance.",
+                    "items": {
+                        "$ref": "AuthorizedNetwork"
+                    },
+                    "type": "array"
+                },
+                "enableOutboundPublicIp": {
+                    "description": "Optional. Enabling an outbound public IP address to support a database server sending requests out into the internet.",
+                    "type": "boolean"
+                },
+                "enablePublicIp": {
+                    "description": "Optional. Enabling public ip for the instance.",
                     "type": "boolean"
                 }
             },
@@ -4084,6 +4512,24 @@
             },
             "type": "object"
         },
+        "ListMigrationJobObjectsResponse": {
+            "description": "Response containing the objects for a migration job.",
+            "id": "ListMigrationJobObjectsResponse",
+            "properties": {
+                "migrationJobObjects": {
+                    "description": "List of migration job objects.",
+                    "items": {
+                        "$ref": "MigrationJobObject"
+                    },
+                    "type": "array"
+                },
+                "nextPageToken": {
+                    "description": "A token, which can be sent as `page_token` to retrieve the next page.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
         "ListMigrationJobsResponse": {
             "description": "Response message for 'ListMigrationJobs' request.",
             "id": "ListMigrationJobsResponse",
@@ -4121,6 +4567,13 @@
                     "description": "A list of operations that matches the specified filter in the request.",
                     "items": {
                         "$ref": "Operation"
+                    },
+                    "type": "array"
+                },
+                "unreachable": {
+                    "description": "Unordered list. Unreachable resources. Populated when the request sets `ListOperationsRequest.return_partial_success` and reads across collections. For example, when attempting to list all resources across all supported locations.",
+                    "items": {
+                        "type": "string"
                     },
                     "type": "array"
                 }
@@ -4186,6 +4639,38 @@
             },
             "type": "object"
         },
+        "LogFileDirectories": {
+            "description": "Configuration to specify the Oracle directories to access the log files.",
+            "id": "LogFileDirectories",
+            "properties": {
+                "archivedLogDirectory": {
+                    "description": "Required. Oracle directory for archived logs.",
+                    "type": "string"
+                },
+                "onlineLogDirectory": {
+                    "description": "Required. Oracle directory for online logs.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "LogMiner": {
+            "description": "Configuration to use LogMiner CDC method.",
+            "id": "LogMiner",
+            "properties": {},
+            "type": "object"
+        },
+        "LookupMigrationJobObjectRequest": {
+            "description": "Request for looking up a specific migration job object by its source object identifier.",
+            "id": "LookupMigrationJobObjectRequest",
+            "properties": {
+                "sourceObjectIdentifier": {
+                    "$ref": "SourceObjectIdentifier",
+                    "description": "Required. The source object identifier which maps to the migration job object."
+                }
+            },
+            "type": "object"
+        },
         "MachineConfig": {
             "description": "MachineConfig describes the configuration of a machine.",
             "id": "MachineConfig",
@@ -4194,6 +4679,10 @@
                     "description": "The number of CPU's in the VM instance.",
                     "format": "int32",
                     "type": "integer"
+                },
+                "machineType": {
+                    "description": "Optional. Machine type of the VM instance. E.g. \"n2-highmem-4\", \"n2-highmem-8\", \"c4a-highmem-4-lssd\". cpu_count must match the number of vCPUs in the machine type.",
+                    "type": "string"
                 }
             },
             "type": "object"
@@ -4375,6 +4864,13 @@
                     "description": "Custom engine specific features.",
                     "type": "object"
                 },
+                "indices": {
+                    "description": "View indices.",
+                    "items": {
+                        "$ref": "IndexEntity"
+                    },
+                    "type": "array"
+                },
                 "sqlCode": {
                     "description": "The SQL code which creates the view.",
                     "type": "string"
@@ -4466,6 +4962,14 @@
                     "description": "The name (URI) of this migration job resource, in the form of: projects/{project}/locations/{location}/migrationJobs/{migrationJob}.",
                     "type": "string"
                 },
+                "objectsConfig": {
+                    "$ref": "MigrationJobObjectsConfig",
+                    "description": "Optional. The objects that need to be migrated."
+                },
+                "oracleToPostgresConfig": {
+                    "$ref": "OracleToPostgresConfig",
+                    "description": "Configuration for heterogeneous **Oracle to Cloud SQL for PostgreSQL** and **Oracle to AlloyDB for PostgreSQL** migrations."
+                },
                 "performanceConfig": {
                     "$ref": "PerformanceConfig",
                     "description": "Optional. Data dump parallelism settings used by the migration."
@@ -4479,8 +4983,7 @@
                         "PROMOTE_IN_PROGRESS",
                         "WAITING_FOR_SOURCE_WRITES_TO_STOP",
                         "PREPARING_THE_DUMP",
-                        "READY_FOR_PROMOTE",
-                        "DIFF_BACKUP"
+                        "READY_FOR_PROMOTE"
                     ],
                     "enumDescriptions": [
                         "The phase of the migration job is unknown.",
@@ -4489,8 +4992,7 @@
                         "The migration job is running the promote phase.",
                         "Only RDS flow - waiting for source writes to stop",
                         "Only RDS flow - the sources writes stopped, waiting for dump to begin",
-                        "The migration job is ready to be promoted.",
-                        "The migration job is in the differential backup phase."
+                        "The migration job is ready to be promoted."
                     ],
                     "readOnly": true,
                     "type": "string"
@@ -4498,6 +5000,16 @@
                 "reverseSshConnectivity": {
                     "$ref": "ReverseSshConnectivity",
                     "description": "The details needed to communicate to the source over Reverse SSH tunnel connectivity."
+                },
+                "satisfiesPzi": {
+                    "description": "Output only. Reserved for future use.",
+                    "readOnly": true,
+                    "type": "boolean"
+                },
+                "satisfiesPzs": {
+                    "description": "Output only. Reserved for future use.",
+                    "readOnly": true,
+                    "type": "boolean"
                 },
                 "source": {
                     "description": "Required. The resource name (URI) of the source connection profile.",
@@ -4510,6 +5022,10 @@
                 "sqlserverHomogeneousMigrationJobConfig": {
                     "$ref": "SqlServerHomogeneousMigrationJobConfig",
                     "description": "Optional. Configuration for SQL Server homogeneous migration."
+                },
+                "sqlserverToPostgresConfig": {
+                    "$ref": "SqlServerToPostgresConfig",
+                    "description": "Configuration for heterogeneous **SQL Server to Cloud SQL for PostgreSQL** migrations."
                 },
                 "state": {
                     "description": "The current migration job state.",
@@ -4578,6 +5094,105 @@
                 "vpcPeeringConnectivity": {
                     "$ref": "VpcPeeringConnectivity",
                     "description": "The details of the VPC network that the source database is located in."
+                }
+            },
+            "type": "object"
+        },
+        "MigrationJobObject": {
+            "description": "A specific Migration Job Object (e.g. a specifc DB Table)",
+            "id": "MigrationJobObject",
+            "properties": {
+                "createTime": {
+                    "description": "Output only. The creation time of the migration job object.",
+                    "format": "google-datetime",
+                    "readOnly": true,
+                    "type": "string"
+                },
+                "error": {
+                    "$ref": "Status",
+                    "description": "Output only. The error details in case of failure.",
+                    "readOnly": true
+                },
+                "heterogeneousMetadata": {
+                    "$ref": "HeterogeneousMetadata",
+                    "description": "Output only. Metadata for heterogeneous migration jobs objects.",
+                    "readOnly": true
+                },
+                "name": {
+                    "description": "The object's name.",
+                    "type": "string"
+                },
+                "phase": {
+                    "description": "Output only. The phase of the migration job object.",
+                    "enum": [
+                        "PHASE_UNSPECIFIED",
+                        "FULL_DUMP",
+                        "CDC",
+                        "READY_FOR_PROMOTE",
+                        "PROMOTE_IN_PROGRESS",
+                        "PROMOTED",
+                        "DIFF_BACKUP"
+                    ],
+                    "enumDescriptions": [
+                        "The phase of the migration job is unknown.",
+                        "The migration job object is in the full dump phase.",
+                        "The migration job object is in CDC phase.",
+                        "The migration job object is ready to be promoted.",
+                        "The migration job object is in running the promote phase.",
+                        "The migration job is promoted.",
+                        "The migration job object is in the differential backup phase."
+                    ],
+                    "readOnly": true,
+                    "type": "string"
+                },
+                "sourceObject": {
+                    "$ref": "SourceObjectIdentifier",
+                    "description": "The object identifier in the data source."
+                },
+                "state": {
+                    "description": "The state of the migration job object.",
+                    "enum": [
+                        "STATE_UNSPECIFIED",
+                        "NOT_STARTED",
+                        "RUNNING",
+                        "STOPPING",
+                        "STOPPED",
+                        "RESTARTING",
+                        "FAILED",
+                        "REMOVING",
+                        "NOT_SELECTED",
+                        "COMPLETED"
+                    ],
+                    "enumDescriptions": [
+                        "The state of the migration job object is unknown.",
+                        "The migration job object is not started.",
+                        "The migration job object is running.",
+                        "The migration job object is being stopped.",
+                        "The migration job object is currently stopped.",
+                        "The migration job object is restarting.",
+                        "The migration job object failed.",
+                        "The migration job object is deleting.",
+                        "The migration job object is not selected for migration.",
+                        "The migration job object is completed."
+                    ],
+                    "type": "string"
+                },
+                "updateTime": {
+                    "description": "Output only. The last update time of the migration job object.",
+                    "format": "google-datetime",
+                    "readOnly": true,
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "MigrationJobObjectsConfig": {
+            "description": "Configuration for the objects to be migrated.",
+            "id": "MigrationJobObjectsConfig",
+            "properties": {
+                "sourceObjectsConfig": {
+                    "$ref": "SourceObjectsConfig",
+                    "description": "The list of the migration job objects."
                 }
             },
             "type": "object"
@@ -4820,6 +5435,49 @@
             },
             "type": "object"
         },
+        "OracleAsmConfig": {
+            "description": "Configuration for Oracle Automatic Storage Management (ASM) connection.",
+            "id": "OracleAsmConfig",
+            "properties": {
+                "asmService": {
+                    "description": "Required. ASM service name for the Oracle ASM connection.",
+                    "type": "string"
+                },
+                "hostname": {
+                    "description": "Required. Hostname for the Oracle ASM connection.",
+                    "type": "string"
+                },
+                "password": {
+                    "description": "Required. Input only. Password for the Oracle ASM connection.",
+                    "type": "string"
+                },
+                "passwordSet": {
+                    "description": "Output only. Indicates whether a new password is included in the request.",
+                    "readOnly": true,
+                    "type": "boolean"
+                },
+                "port": {
+                    "description": "Required. Port for the Oracle ASM connection.",
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "ssl": {
+                    "$ref": "SslConfig",
+                    "description": "Optional. SSL configuration for the Oracle connection."
+                },
+                "username": {
+                    "description": "Required. Username for the Oracle ASM connection.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "OracleAsmLogFileAccess": {
+            "description": "Configuration to use Oracle ASM to access the log files.",
+            "id": "OracleAsmLogFileAccess",
+            "properties": {},
+            "type": "object"
+        },
         "OracleConnectionProfile": {
             "description": "Specifies connection parameters required specifically for Oracle databases.",
             "id": "OracleConnectionProfile",
@@ -4835,6 +5493,10 @@
                 "host": {
                     "description": "Required. The IP or hostname of the source Oracle database.",
                     "type": "string"
+                },
+                "oracleAsmConfig": {
+                    "$ref": "OracleAsmConfig",
+                    "description": "Optional. Configuration for Oracle ASM connection."
                 },
                 "password": {
                     "description": "Required. Input only. The password for the user that Database Migration Service will be using to connect to the database. This field is not returned on request, and the value is encrypted when stored in Database Migration Service.",
@@ -4865,6 +5527,55 @@
                 "username": {
                     "description": "Required. The username that Database Migration Service will use to connect to the database. The value is encrypted when stored in Database Migration Service.",
                     "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "OracleSourceConfig": {
+            "description": "Configuration for Oracle as a source in a migration.",
+            "id": "OracleSourceConfig",
+            "properties": {
+                "binaryLogParser": {
+                    "$ref": "BinaryLogParser",
+                    "description": "Use Binary Log Parser."
+                },
+                "cdcStartPosition": {
+                    "description": "Optional. The schema change number (SCN) to start CDC data migration from.",
+                    "format": "int64",
+                    "type": "string"
+                },
+                "logMiner": {
+                    "$ref": "LogMiner",
+                    "description": "Use LogMiner."
+                },
+                "maxConcurrentCdcConnections": {
+                    "description": "Optional. Maximum number of connections Database Migration Service will open to the source for CDC phase.",
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "maxConcurrentFullDumpConnections": {
+                    "description": "Optional. Maximum number of connections Database Migration Service will open to the source for full dump phase.",
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "skipFullDump": {
+                    "description": "Optional. Whether to skip full dump or not.",
+                    "type": "boolean"
+                }
+            },
+            "type": "object"
+        },
+        "OracleToPostgresConfig": {
+            "description": "Configuration for heterogeneous **Oracle to Cloud SQL for PostgreSQL** and **Oracle to AlloyDB for PostgreSQL** migrations.",
+            "id": "OracleToPostgresConfig",
+            "properties": {
+                "oracleSourceConfig": {
+                    "$ref": "OracleSourceConfig",
+                    "description": "Optional. Configuration for Oracle source."
+                },
+                "postgresDestinationConfig": {
+                    "$ref": "PostgresDestinationConfig",
+                    "description": "Optional. Configuration for Postgres destination."
                 }
             },
             "type": "object"
@@ -4985,6 +5696,10 @@
                     "description": "If the source is a Cloud SQL database, use this field to provide the Cloud SQL instance ID of the source.",
                     "type": "string"
                 },
+                "database": {
+                    "description": "Optional. The name of the specific database within the host.",
+                    "type": "string"
+                },
                 "host": {
                     "description": "Required. The IP or hostname of the source PostgreSQL database.",
                     "type": "string"
@@ -5037,6 +5752,23 @@
             },
             "type": "object"
         },
+        "PostgresDestinationConfig": {
+            "description": "Configuration for Postgres as a destination in a migration.",
+            "id": "PostgresDestinationConfig",
+            "properties": {
+                "maxConcurrentConnections": {
+                    "description": "Optional. Maximum number of connections Database Migration Service will open to the destination for data migration.",
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "transactionTimeout": {
+                    "description": "Optional. Timeout for data migration transactions.",
+                    "format": "google-duration",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
         "PrimaryInstanceSettings": {
             "description": "Settings for the cluster's primary instance",
             "id": "PrimaryInstanceSettings",
@@ -5052,6 +5784,10 @@
                     "description": "Required. The ID of the AlloyDB primary instance. The ID must satisfy the regex expression \"[a-z0-9-]+\".",
                     "type": "string"
                 },
+                "instanceNetworkConfig": {
+                    "$ref": "InstanceNetworkConfig",
+                    "description": "Optional. Metadata related to instance level network configuration."
+                },
                 "labels": {
                     "additionalProperties": {
                         "type": "string"
@@ -5062,6 +5798,14 @@
                 "machineConfig": {
                     "$ref": "MachineConfig",
                     "description": "Configuration for the machines that host the underlying database engine."
+                },
+                "outboundPublicIpAddresses": {
+                    "description": "Output only. All outbound public IP addresses configured for the instance.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "readOnly": true,
+                    "type": "array"
                 },
                 "privateIp": {
                     "description": "Output only. The private IP address for the Instance. This is the connection endpoint for an end-user application.",
@@ -5100,6 +5844,20 @@
                 "name": {
                     "description": "The name of the resource.",
                     "type": "string"
+                },
+                "pscInterfaceConfig": {
+                    "$ref": "PscInterfaceConfig",
+                    "description": "PSC Interface configuration."
+                },
+                "satisfiesPzi": {
+                    "description": "Output only. Reserved for future use.",
+                    "readOnly": true,
+                    "type": "boolean"
+                },
+                "satisfiesPzs": {
+                    "description": "Output only. Reserved for future use.",
+                    "readOnly": true,
+                    "type": "boolean"
                 },
                 "state": {
                     "description": "Output only. The state of the private connection.",
@@ -5162,13 +5920,37 @@
         "PromoteMigrationJobRequest": {
             "description": "Request message for 'PromoteMigrationJob' request.",
             "id": "PromoteMigrationJobRequest",
-            "properties": {},
+            "properties": {
+                "objectsFilter": {
+                    "$ref": "MigrationJobObjectsConfig",
+                    "description": "Optional. The object filter to apply to the migration job."
+                }
+            },
+            "type": "object"
+        },
+        "PscInterfaceConfig": {
+            "description": "The PSC Interface configuration is used to create PSC Interface between DMS's internal VPC and the consumer's PSC.",
+            "id": "PscInterfaceConfig",
+            "properties": {
+                "networkAttachment": {
+                    "description": "Required. Fully qualified name of the Network Attachment that DMS will connect to. Format: `projects/{{project}}/regions/{{region}}/networkAttachments/{{name}}`",
+                    "type": "string"
+                }
+            },
             "type": "object"
         },
         "RestartMigrationJobRequest": {
             "description": "Request message for 'RestartMigrationJob' request.",
             "id": "RestartMigrationJobRequest",
             "properties": {
+                "objectsFilter": {
+                    "$ref": "MigrationJobObjectsConfig",
+                    "description": "Optional. The object filter to apply to the migration job."
+                },
+                "restartFailedObjects": {
+                    "description": "Optional. If true, only failed objects will be restarted.",
+                    "type": "boolean"
+                },
                 "skipValidation": {
                     "description": "Optional. Restart the migration job without running prior configuration verification. Defaults to `false`.",
                     "type": "boolean"
@@ -5530,6 +6312,80 @@
             },
             "type": "object"
         },
+        "SourceObjectConfig": {
+            "description": "Config for a single migration job object.",
+            "id": "SourceObjectConfig",
+            "properties": {
+                "objectIdentifier": {
+                    "$ref": "SourceObjectIdentifier",
+                    "description": "Optional. The object identifier."
+                }
+            },
+            "type": "object"
+        },
+        "SourceObjectIdentifier": {
+            "description": "An identifier for the Migration Job Object.",
+            "id": "SourceObjectIdentifier",
+            "properties": {
+                "database": {
+                    "description": "Optional. The database name. This will be required only if the object uses a database name as part of its unique identifier.",
+                    "type": "string"
+                },
+                "schema": {
+                    "description": "Optional. The schema name. This will be required only if the object uses a schema name as part of its unique identifier.",
+                    "type": "string"
+                },
+                "table": {
+                    "description": "Optional. The table name. This will be required only if the object is a level below database or schema.",
+                    "type": "string"
+                },
+                "type": {
+                    "description": "Required. The type of the migration job object.",
+                    "enum": [
+                        "MIGRATION_JOB_OBJECT_TYPE_UNSPECIFIED",
+                        "DATABASE",
+                        "SCHEMA",
+                        "TABLE"
+                    ],
+                    "enumDescriptions": [
+                        "The type of the migration job object is unknown.",
+                        "The migration job object is a database.",
+                        "The migration job object is a schema.",
+                        "The migration job object is a table."
+                    ],
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "SourceObjectsConfig": {
+            "description": "List of configurations for the source objects to be migrated.",
+            "id": "SourceObjectsConfig",
+            "properties": {
+                "objectConfigs": {
+                    "description": "Optional. The list of the objects to be migrated.",
+                    "items": {
+                        "$ref": "SourceObjectConfig"
+                    },
+                    "type": "array"
+                },
+                "objectsSelectionType": {
+                    "description": "Optional. The objects selection type of the migration job.",
+                    "enum": [
+                        "OBJECTS_SELECTION_TYPE_UNSPECIFIED",
+                        "ALL_OBJECTS",
+                        "SPECIFIED_OBJECTS"
+                    ],
+                    "enumDescriptions": [
+                        "The type of the objects selection is unknown, indicating that the migration job is at instance level.",
+                        "Migrate all of the objects.",
+                        "Migrate specific objects."
+                    ],
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
         "SourceSqlChange": {
             "description": "Options to configure rule type SourceSqlChange. The rule is used to alter the sql code for database entities. The rule filter field can refer to one entity. The rule scope can be: StoredProcedure, Function, Trigger, View",
             "id": "SourceSqlChange",
@@ -5640,6 +6496,19 @@
                     "description": "If the source is a Cloud SQL database, use this field to provide the Cloud SQL instance ID of the source.",
                     "type": "string"
                 },
+                "cloudSqlProjectId": {
+                    "description": "Optional. The project id of the Cloud SQL instance. If not provided, the project id of the connection profile will be used.",
+                    "type": "string"
+                },
+                "database": {
+                    "description": "Required. The name of the specific database within the host.",
+                    "type": "string"
+                },
+                "dbmPort": {
+                    "description": "Optional. The Database Mirroring (DBM) port of the source SQL Server instance.",
+                    "format": "int32",
+                    "type": "integer"
+                },
                 "forwardSshConnectivity": {
                     "$ref": "ForwardSshTunnelConnectivity",
                     "description": "Forward SSH tunnel connectivity."
@@ -5685,6 +6554,21 @@
             },
             "type": "object"
         },
+        "SqlServerDagConfig": {
+            "description": "Configuration for distributed availability group (DAG) for the SQL Server homogeneous migration.",
+            "id": "SqlServerDagConfig",
+            "properties": {
+                "linkedServer": {
+                    "description": "Required. The name of the linked server that points to the source SQL Server instance. Only used by DAG migrations.",
+                    "type": "string"
+                },
+                "sourceAg": {
+                    "description": "Required. The name of the source availability group. Only used by DAG migrations.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
         "SqlServerDatabaseBackup": {
             "description": "Specifies the backup details for a single database in Cloud Storage for homogeneous migration to Cloud SQL for SQL Server.",
             "id": "SqlServerDatabaseBackup",
@@ -5705,15 +6589,15 @@
             "id": "SqlServerEncryptionOptions",
             "properties": {
                 "certPath": {
-                    "description": "Required. Path to certificate.",
+                    "description": "Required. Path to the Certificate (.cer) in Cloud Storage, in the form `gs://bucketName/fileName`. The instance must have write permissions to the bucket and read access to the file.",
                     "type": "string"
                 },
                 "pvkPassword": {
-                    "description": "Required. Input only. Private key password.",
+                    "description": "Required. Input only. Password that encrypts the private key.",
                     "type": "string"
                 },
                 "pvkPath": {
-                    "description": "Required. Path to certificate private key.",
+                    "description": "Required. Path to the Certificate Private Key (.pvk) in Cloud Storage, in the form `gs://bucketName/fileName`. The instance must have write permissions to the bucket and read access to the file.",
                     "type": "string"
                 }
             },
@@ -5727,6 +6611,10 @@
                     "description": "Required. Pattern that describes the default backup naming strategy. The specified pattern should ensure lexicographical order of backups. The pattern must define one of the following capture group sets: Capture group set #1 yy/yyyy - year, 2 or 4 digits mm - month number, 1-12 dd - day of month, 1-31 hh - hour of day, 00-23 mi - minutes, 00-59 ss - seconds, 00-59 Example: For backup file TestDB_20230802_155400.trn, use pattern: (?.*)_backup_(?\\d{4})(?\\d{2})(?\\d{2})_(?\\d{2})(?\\d{2})(?\\d{2}).trn Capture group set #2 timestamp - unix timestamp Example: For backup file TestDB.1691448254.trn, use pattern: (?.*)\\.(?\\d*).trn or (?.*)\\.(?\\d*).trn",
                     "type": "string"
                 },
+                "dagConfig": {
+                    "$ref": "SqlServerDagConfig",
+                    "description": "Optional. Configuration for distributed availability group (DAG) for the SQL Server homogeneous migration."
+                },
                 "databaseBackups": {
                     "description": "Required. Backup details per database in Cloud Storage.",
                     "items": {
@@ -5734,9 +6622,53 @@
                     },
                     "type": "array"
                 },
+                "promoteWhenReady": {
+                    "description": "Optional. Promote databases when ready.",
+                    "type": "boolean"
+                },
                 "useDiffBackup": {
                     "description": "Optional. Enable differential backups.",
                     "type": "boolean"
+                }
+            },
+            "type": "object"
+        },
+        "SqlServerSourceConfig": {
+            "description": "Configuration for SQL Server as a source in a migration.",
+            "id": "SqlServerSourceConfig",
+            "properties": {
+                "cdcStartPosition": {
+                    "description": "Optional. The log sequence number (LSN) to start CDC data migration from.",
+                    "type": "string"
+                },
+                "maxConcurrentCdcConnections": {
+                    "description": "Optional. Maximum number of connections Database Migration Service will open to the source for CDC phase.",
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "maxConcurrentFullDumpConnections": {
+                    "description": "Optional. Maximum number of connections Database Migration Service will open to the source for full dump phase.",
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "skipFullDump": {
+                    "description": "Optional. Whether to skip full dump or not.",
+                    "type": "boolean"
+                }
+            },
+            "type": "object"
+        },
+        "SqlServerToPostgresConfig": {
+            "description": "Configuration for heterogeneous **SQL Server to Cloud SQL for PostgreSQL** migrations.",
+            "id": "SqlServerToPostgresConfig",
+            "properties": {
+                "postgresDestinationConfig": {
+                    "$ref": "PostgresDestinationConfig",
+                    "description": "Optional. Configuration for Postgres destination."
+                },
+                "sqlserverSourceConfig": {
+                    "$ref": "SqlServerSourceConfig",
+                    "description": "Optional. Configuration for SQL Server source."
                 }
             },
             "type": "object"
@@ -5768,19 +6700,29 @@
                     "description": "Input only. The unencrypted PKCS#1 or PKCS#8 PEM-encoded private key associated with the Client Certificate. If this field is used then the 'client_certificate' field is mandatory.",
                     "type": "string"
                 },
+                "sslFlags": {
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "description": "Optional. SSL flags used for establishing SSL connection to the source database. Only source specific flags are supported. An object containing a list of \"key\": \"value\" pairs. Example: { \"server_certificate_hostname\": \"server.com\"}.",
+                    "type": "object"
+                },
                 "type": {
-                    "description": "Output only. The ssl config type according to 'client_key', 'client_certificate' and 'ca_certificate'.",
+                    "description": "Optional. The ssl config type according to 'client_key', 'client_certificate' and 'ca_certificate'.",
                     "enum": [
                         "SSL_TYPE_UNSPECIFIED",
                         "SERVER_ONLY",
-                        "SERVER_CLIENT"
+                        "SERVER_CLIENT",
+                        "REQUIRED",
+                        "NONE"
                     ],
                     "enumDescriptions": [
                         "Unspecified.",
                         "Only 'ca_certificate' specified.",
-                        "Both server ('ca_certificate'), and client ('client_key', 'client_certificate') specified."
+                        "Both server ('ca_certificate'), and client ('client_key', 'client_certificate') specified.",
+                        "Mandates SSL encryption for all connections. This doesn\u2019t require certificate verification.",
+                        "Connection is not encrypted."
                     ],
-                    "readOnly": true,
                     "type": "string"
                 }
             },

@@ -94,6 +94,20 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "phone-authentication-event.event-time" => Some((
+                    "phoneAuthenticationEvent.eventTime",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "phone-authentication-event.phone-number" => Some((
+                    "phoneAuthenticationEvent.phoneNumber",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "reasons" => Some((
                     "reasons",
                     JsonTypeInfo {
@@ -138,6 +152,8 @@ where
                             "event-time",
                             "event-type",
                             "hashed-account-id",
+                            "phone-authentication-event",
+                            "phone-number",
                             "reason",
                             "reasons",
                             "transaction-event",
@@ -298,6 +314,20 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "assessment-environment.client" => Some((
+                    "assessmentEnvironment.client",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "assessment-environment.version" => Some((
+                    "assessmentEnvironment.version",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "event.expected-action" => Some((
                     "event.expectedAction",
                     JsonTypeInfo {
@@ -342,6 +372,13 @@ where
                 )),
                 "event.ja3" => Some((
                     "event.ja3",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "event.ja4" => Some((
+                    "event.ja4",
                     JsonTypeInfo {
                         jtype: JsonType::String,
                         ctype: ComplexType::Pod,
@@ -746,6 +783,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "risk-analysis.challenge" => Some((
+                    "riskAnalysis.challenge",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "risk-analysis.extended-verdict-reasons" => Some((
                     "riskAnalysis.extendedVerdictReasons",
                     JsonTypeInfo {
@@ -828,6 +872,7 @@ where
                             "address",
                             "administrative-area",
                             "android-package-name",
+                            "assessment-environment",
                             "avs-response-code",
                             "behavioral-trust-verdict",
                             "billing-address",
@@ -836,6 +881,8 @@ where
                             "card-last-four",
                             "card-signals",
                             "card-testing-verdict",
+                            "challenge",
+                            "client",
                             "code",
                             "condition",
                             "create-account-time",
@@ -867,6 +914,7 @@ where
                             "invalid-reason",
                             "ios-bundle-id",
                             "ja3",
+                            "ja4",
                             "labels",
                             "language-code",
                             "latest-verification-result",
@@ -909,6 +957,7 @@ where
                             "username",
                             "valid",
                             "value",
+                            "version",
                             "waf-token-assessment",
                         ],
                     );
@@ -1722,6 +1771,151 @@ where
         }
     }
 
+    async fn _projects_keys_add_ip_override(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut field_cursor = FieldCursor::default();
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "ip-override-data.ip" => Some((
+                    "ipOverrideData.ip",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "ip-override-data.override-type" => Some((
+                    "ipOverrideData.overrideType",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec!["ip", "ip-override-data", "override-type"],
+                    );
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
+            }
+        }
+        let mut request: api::GoogleCloudRecaptchaenterpriseV1AddIpOverrideRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .keys_add_ip_override(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _projects_keys_create(
         &self,
         opt: &ArgMatches<'n>,
@@ -1893,6 +2087,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "web-settings.challenge-settings.default-settings.score-threshold" => Some((
+                    "webSettings.challengeSettings.defaultSettings.scoreThreshold",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "web-settings.integration-type" => Some((
                     "webSettings.integrationType",
                     JsonTypeInfo {
@@ -1914,7 +2115,9 @@ where
                             "android-settings",
                             "apple-developer-id",
                             "challenge-security-preference",
+                            "challenge-settings",
                             "create-time",
+                            "default-settings",
                             "display-name",
                             "integration-type",
                             "ios-settings",
@@ -1922,6 +2125,7 @@ where
                             "labels",
                             "name",
                             "private-key",
+                            "score-threshold",
                             "support-non-google-app-store-distribution",
                             "team-id",
                             "testing-challenge",
@@ -2363,6 +2567,98 @@ where
         }
     }
 
+    async fn _projects_keys_list_ip_overrides(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .keys_list_ip_overrides(opt.value_of("parent").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                }
+                "page-size" => {
+                    call = call.page_size(
+                        value
+                            .map(|v| arg_from_str(v, err, "page-size", "int32"))
+                            .unwrap_or(-0),
+                    );
+                }
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["page-size", "page-token"].iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _projects_keys_migrate(
         &self,
         opt: &ArgMatches<'n>,
@@ -2669,6 +2965,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "web-settings.challenge-settings.default-settings.score-threshold" => Some((
+                    "webSettings.challengeSettings.defaultSettings.scoreThreshold",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "web-settings.integration-type" => Some((
                     "webSettings.integrationType",
                     JsonTypeInfo {
@@ -2690,7 +2993,9 @@ where
                             "android-settings",
                             "apple-developer-id",
                             "challenge-security-preference",
+                            "challenge-settings",
                             "create-time",
+                            "default-settings",
                             "display-name",
                             "integration-type",
                             "ios-settings",
@@ -2698,6 +3003,7 @@ where
                             "labels",
                             "name",
                             "private-key",
+                            "score-threshold",
                             "support-non-google-app-store-distribution",
                             "team-id",
                             "testing-challenge",
@@ -2766,6 +3072,151 @@ where
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
                                 v.extend(["update-mask"].iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_keys_remove_ip_override(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut field_cursor = FieldCursor::default();
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "ip-override-data.ip" => Some((
+                    "ipOverrideData.ip",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "ip-override-data.override-type" => Some((
+                    "ipOverrideData.overrideType",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec!["ip", "ip-override-data", "override-type"],
+                    );
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
+            }
+        }
+        let mut request: api::GoogleCloudRecaptchaenterpriseV1RemoveIpOverrideRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .keys_remove_ip_override(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
                                 v
                             }));
                     }
@@ -3284,6 +3735,11 @@ where
                         ._projects_firewallpolicies_reorder(opt, dry_run, &mut err)
                         .await;
                 }
+                ("keys-add-ip-override", Some(opt)) => {
+                    call_result = self
+                        ._projects_keys_add_ip_override(opt, dry_run, &mut err)
+                        .await;
+                }
                 ("keys-create", Some(opt)) => {
                     call_result = self._projects_keys_create(opt, dry_run, &mut err).await;
                 }
@@ -3301,11 +3757,21 @@ where
                 ("keys-list", Some(opt)) => {
                     call_result = self._projects_keys_list(opt, dry_run, &mut err).await;
                 }
+                ("keys-list-ip-overrides", Some(opt)) => {
+                    call_result = self
+                        ._projects_keys_list_ip_overrides(opt, dry_run, &mut err)
+                        .await;
+                }
                 ("keys-migrate", Some(opt)) => {
                     call_result = self._projects_keys_migrate(opt, dry_run, &mut err).await;
                 }
                 ("keys-patch", Some(opt)) => {
                     call_result = self._projects_keys_patch(opt, dry_run, &mut err).await;
+                }
+                ("keys-remove-ip-override", Some(opt)) => {
+                    call_result = self
+                        ._projects_keys_remove_ip_override(opt, dry_run, &mut err)
+                        .await;
                 }
                 ("keys-retrieve-legacy-secret-key", Some(opt)) => {
                     call_result = self
@@ -3373,7 +3839,9 @@ where
         let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
             secret,
             yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-            hyper_util::client::legacy::Client::builder(executor).build(connector),
+            yup_oauth2::client::CustomHyperClientBuilder::from(
+                hyper_util::client::legacy::Client::builder(executor).build(connector),
+            ),
         )
         .persist_tokens_to_disk(format!("{}/recaptchaenterprise1", config_dir))
         .build()
@@ -3426,7 +3894,7 @@ where
 async fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("projects", "methods: 'assessments-annotate', 'assessments-create', 'firewallpolicies-create', 'firewallpolicies-delete', 'firewallpolicies-get', 'firewallpolicies-list', 'firewallpolicies-patch', 'firewallpolicies-reorder', 'keys-create', 'keys-delete', 'keys-get', 'keys-get-metrics', 'keys-list', 'keys-migrate', 'keys-patch', 'keys-retrieve-legacy-secret-key', 'relatedaccountgroupmemberships-search', 'relatedaccountgroups-list' and 'relatedaccountgroups-memberships-list'", vec![
+        ("projects", "methods: 'assessments-annotate', 'assessments-create', 'firewallpolicies-create', 'firewallpolicies-delete', 'firewallpolicies-get', 'firewallpolicies-list', 'firewallpolicies-patch', 'firewallpolicies-reorder', 'keys-add-ip-override', 'keys-create', 'keys-delete', 'keys-get', 'keys-get-metrics', 'keys-list', 'keys-list-ip-overrides', 'keys-migrate', 'keys-patch', 'keys-remove-ip-override', 'keys-retrieve-legacy-secret-key', 'relatedaccountgroupmemberships-search', 'relatedaccountgroups-list' and 'relatedaccountgroups-memberships-list'", vec![
             ("assessments-annotate",
                     Some(r##"Annotates a previously created Assessment to provide additional information on whether the event turned out to be authentic or fraudulent."##),
                     "Details at http://byron.github.io/google-apis-rs/google_recaptchaenterprise1_cli/projects_assessments-annotate",
@@ -3458,7 +3926,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The name of the project in which the assessment will be created, in the format `projects/{project}`."##),
+                     Some(r##"Required. The name of the project in which the assessment is created, in the format `projects/{project}`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -3483,7 +3951,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The name of the project this policy will apply to, in the format `projects/{project}`."##),
+                     Some(r##"Required. The name of the project this policy applies to, in the format `projects/{project}`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -3612,13 +4080,38 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("keys-add-ip-override",
+                    Some(r##"Adds an IP override to a key. The following restrictions hold: * The maximum number of IP overrides per key is 1000. * For any conflict (such as IP already exists or IP part of an existing IP range), an error is returned."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_recaptchaenterprise1_cli/projects_keys-add-ip-override",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The name of the key to which the IP override is added, in the format `projects/{project}/keys/{key}`."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("keys-create",
                     Some(r##"Creates a new reCAPTCHA Enterprise key."##),
                     "Details at http://byron.github.io/google-apis-rs/google_recaptchaenterprise1_cli/projects_keys-create",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The name of the project in which the key will be created, in the format `projects/{project}`."##),
+                     Some(r##"Required. The name of the project in which the key is created, in the format `projects/{project}`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -3703,7 +4196,27 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The name of the project that contains the keys that will be listed, in the format `projects/{project}`."##),
+                     Some(r##"Required. The name of the project that contains the keys that is listed, in the format `projects/{project}`."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("keys-list-ip-overrides",
+                    Some(r##"Lists all IP overrides for a key."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_recaptchaenterprise1_cli/projects_keys-list-ip-overrides",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. The parent key for which the IP overrides are listed, in the format `projects/{project}/keys/{key}`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -3749,6 +4262,31 @@ async fn main() {
                     (Some(r##"name"##),
                      None,
                      Some(r##"Identifier. The resource name for the Key in the format `projects/{project}/keys/{key}`."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("keys-remove-ip-override",
+                    Some(r##"Removes an IP override from a key. The following restrictions hold: * If the IP isn't found in an existing IP override, a `NOT_FOUND` error is returned. * If the IP is found in an existing IP override, but the override type does not match, a `NOT_FOUND` error is returned."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_recaptchaenterprise1_cli/projects_keys-remove-ip-override",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The name of the key from which the IP override is removed, in the format `projects/{project}/keys/{key}`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -3857,7 +4395,7 @@ async fn main() {
 
     let mut app = App::new("recaptchaenterprise1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("6.0.0+20240623")
+           .version("7.0.0+20251210")
            .about("Help protect your website from fraudulent activity, spam, and abuse without creating friction.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_recaptchaenterprise1_cli")
            .arg(Arg::with_name("url")
@@ -3922,7 +4460,7 @@ async fn main() {
         .with_native_roots()
         .unwrap()
         .https_or_http()
-        .enable_http1()
+        .enable_http2()
         .build();
 
     match Engine::new(matches, connector).await {

@@ -2136,6 +2136,101 @@ where
         }
     }
 
+    async fn _organizations_locations_connections_list(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .organizations()
+            .locations_connections_list(opt.value_of("parent").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                }
+                "page-size" => {
+                    call = call.page_size(
+                        value
+                            .map(|v| arg_from_str(v, err, "page-size", "int32"))
+                            .unwrap_or(-0),
+                    );
+                }
+                "filter" => {
+                    call = call.filter(value.unwrap_or(""));
+                }
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["filter", "page-size", "page-token"].iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _organizations_locations_connections_patch(
         &self,
         opt: &ArgMatches<'n>,
@@ -3093,113 +3188,27 @@ where
                 continue;
             }
 
-            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
-            {
-                "config-id" => Some((
-                    "configId",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "discovery-config.create-time" => Some((
-                    "discoveryConfig.createTime",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "discovery-config.display-name" => Some((
-                    "discoveryConfig.displayName",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "discovery-config.inspect-templates" => Some((
-                    "discoveryConfig.inspectTemplates",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Vec,
-                    },
-                )),
-                "discovery-config.last-run-time" => Some((
-                    "discoveryConfig.lastRunTime",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "discovery-config.name" => Some((
-                    "discoveryConfig.name",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "discovery-config.org-config.location.folder-id" => Some((
-                    "discoveryConfig.orgConfig.location.folderId",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "discovery-config.org-config.location.organization-id" => Some((
-                    "discoveryConfig.orgConfig.location.organizationId",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "discovery-config.org-config.project-id" => Some((
-                    "discoveryConfig.orgConfig.projectId",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "discovery-config.status" => Some((
-                    "discoveryConfig.status",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "discovery-config.update-time" => Some((
-                    "discoveryConfig.updateTime",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(
-                        key,
-                        &vec![
-                            "config-id",
-                            "create-time",
-                            "discovery-config",
-                            "display-name",
-                            "folder-id",
-                            "inspect-templates",
-                            "last-run-time",
-                            "location",
-                            "name",
-                            "org-config",
-                            "organization-id",
-                            "project-id",
-                            "status",
-                            "update-time",
-                        ],
-                    );
-                    err.issues.push(CLIError::Field(FieldError::Unknown(
-                        temp_cursor.to_string(),
-                        suggestion,
-                        value.map(|v| v.to_string()),
-                    )));
-                    None
-                }
-            };
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "config-id" => Some(("configId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "discovery-config.create-time" => Some(("discoveryConfig.createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "discovery-config.display-name" => Some(("discoveryConfig.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "discovery-config.inspect-templates" => Some(("discoveryConfig.inspectTemplates", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "discovery-config.last-run-time" => Some(("discoveryConfig.lastRunTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "discovery-config.name" => Some(("discoveryConfig.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "discovery-config.org-config.location.folder-id" => Some(("discoveryConfig.orgConfig.location.folderId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "discovery-config.org-config.location.organization-id" => Some(("discoveryConfig.orgConfig.location.organizationId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "discovery-config.org-config.project-id" => Some(("discoveryConfig.orgConfig.projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "discovery-config.other-cloud-starting-location.aws-location.account-id" => Some(("discoveryConfig.otherCloudStartingLocation.awsLocation.accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "discovery-config.other-cloud-starting-location.aws-location.all-asset-inventory-assets" => Some(("discoveryConfig.otherCloudStartingLocation.awsLocation.allAssetInventoryAssets", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "discovery-config.status" => Some(("discoveryConfig.status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "discovery-config.update-time" => Some(("discoveryConfig.updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "all-asset-inventory-assets", "aws-location", "config-id", "create-time", "discovery-config", "display-name", "folder-id", "inspect-templates", "last-run-time", "location", "name", "org-config", "organization-id", "other-cloud-starting-location", "project-id", "status", "update-time"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
             if let Some((field_cursor_str, type_info)) = type_info {
                 FieldCursor::from(field_cursor_str).set_json_value(
                     &mut object,
@@ -3575,113 +3584,27 @@ where
                 continue;
             }
 
-            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
-            {
-                "discovery-config.create-time" => Some((
-                    "discoveryConfig.createTime",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "discovery-config.display-name" => Some((
-                    "discoveryConfig.displayName",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "discovery-config.inspect-templates" => Some((
-                    "discoveryConfig.inspectTemplates",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Vec,
-                    },
-                )),
-                "discovery-config.last-run-time" => Some((
-                    "discoveryConfig.lastRunTime",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "discovery-config.name" => Some((
-                    "discoveryConfig.name",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "discovery-config.org-config.location.folder-id" => Some((
-                    "discoveryConfig.orgConfig.location.folderId",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "discovery-config.org-config.location.organization-id" => Some((
-                    "discoveryConfig.orgConfig.location.organizationId",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "discovery-config.org-config.project-id" => Some((
-                    "discoveryConfig.orgConfig.projectId",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "discovery-config.status" => Some((
-                    "discoveryConfig.status",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "discovery-config.update-time" => Some((
-                    "discoveryConfig.updateTime",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "update-mask" => Some((
-                    "updateMask",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(
-                        key,
-                        &vec![
-                            "create-time",
-                            "discovery-config",
-                            "display-name",
-                            "folder-id",
-                            "inspect-templates",
-                            "last-run-time",
-                            "location",
-                            "name",
-                            "org-config",
-                            "organization-id",
-                            "project-id",
-                            "status",
-                            "update-mask",
-                            "update-time",
-                        ],
-                    );
-                    err.issues.push(CLIError::Field(FieldError::Unknown(
-                        temp_cursor.to_string(),
-                        suggestion,
-                        value.map(|v| v.to_string()),
-                    )));
-                    None
-                }
-            };
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "discovery-config.create-time" => Some(("discoveryConfig.createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "discovery-config.display-name" => Some(("discoveryConfig.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "discovery-config.inspect-templates" => Some(("discoveryConfig.inspectTemplates", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "discovery-config.last-run-time" => Some(("discoveryConfig.lastRunTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "discovery-config.name" => Some(("discoveryConfig.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "discovery-config.org-config.location.folder-id" => Some(("discoveryConfig.orgConfig.location.folderId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "discovery-config.org-config.location.organization-id" => Some(("discoveryConfig.orgConfig.location.organizationId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "discovery-config.org-config.project-id" => Some(("discoveryConfig.orgConfig.projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "discovery-config.other-cloud-starting-location.aws-location.account-id" => Some(("discoveryConfig.otherCloudStartingLocation.awsLocation.accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "discovery-config.other-cloud-starting-location.aws-location.all-asset-inventory-assets" => Some(("discoveryConfig.otherCloudStartingLocation.awsLocation.allAssetInventoryAssets", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "discovery-config.status" => Some(("discoveryConfig.status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "discovery-config.update-time" => Some(("discoveryConfig.updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update-mask" => Some(("updateMask", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "all-asset-inventory-assets", "aws-location", "create-time", "discovery-config", "display-name", "folder-id", "inspect-templates", "last-run-time", "location", "name", "org-config", "organization-id", "other-cloud-starting-location", "project-id", "status", "update-mask", "update-time"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
             if let Some((field_cursor_str, type_info)) = type_info {
                 FieldCursor::from(field_cursor_str).set_json_value(
                     &mut object,
@@ -3837,6 +3760,365 @@ where
                                     ]
                                     .iter()
                                     .map(|v| *v),
+                                );
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _organizations_locations_file_store_data_profiles_delete(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .organizations()
+            .locations_file_store_data_profiles_delete(opt.value_of("name").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _organizations_locations_file_store_data_profiles_get(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .organizations()
+            .locations_file_store_data_profiles_get(opt.value_of("name").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _organizations_locations_file_store_data_profiles_list(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .organizations()
+            .locations_file_store_data_profiles_list(opt.value_of("parent").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                }
+                "page-size" => {
+                    call = call.page_size(
+                        value
+                            .map(|v| arg_from_str(v, err, "page-size", "int32"))
+                            .unwrap_or(-0),
+                    );
+                }
+                "order-by" => {
+                    call = call.order_by(value.unwrap_or(""));
+                }
+                "filter" => {
+                    call = call.filter(value.unwrap_or(""));
+                }
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(
+                                    ["filter", "order-by", "page-size", "page-token"]
+                                        .iter()
+                                        .map(|v| *v),
+                                );
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _organizations_locations_info_types_list(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .organizations()
+            .locations_info_types_list(opt.value_of("parent").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "location-id" => {
+                    call = call.location_id(value.unwrap_or(""));
+                }
+                "language-code" => {
+                    call = call.language_code(value.unwrap_or(""));
+                }
+                "filter" => {
+                    call = call.filter(value.unwrap_or(""));
+                }
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(
+                                    ["filter", "language-code", "location-id"]
+                                        .iter()
+                                        .map(|v| *v),
                                 );
                                 v
                             }));
@@ -9138,6 +9420,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "deidentify-template" => Some((
+                    "deidentifyTemplate",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "include-findings" => Some((
                     "includeFindings",
                     JsonTypeInfo {
@@ -9187,6 +9476,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "inspect-template" => Some((
+                    "inspectTemplate",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "location-id" => Some((
                     "locationId",
                     JsonTypeInfo {
@@ -9201,10 +9497,12 @@ where
                             "byte-item",
                             "content-options",
                             "data",
+                            "deidentify-template",
                             "exclude-info-types",
                             "include-findings",
                             "include-quote",
                             "inspect-config",
+                            "inspect-template",
                             "limits",
                             "location-id",
                             "max-findings-per-item",
@@ -13052,113 +13350,27 @@ where
                 continue;
             }
 
-            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
-            {
-                "config-id" => Some((
-                    "configId",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "discovery-config.create-time" => Some((
-                    "discoveryConfig.createTime",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "discovery-config.display-name" => Some((
-                    "discoveryConfig.displayName",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "discovery-config.inspect-templates" => Some((
-                    "discoveryConfig.inspectTemplates",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Vec,
-                    },
-                )),
-                "discovery-config.last-run-time" => Some((
-                    "discoveryConfig.lastRunTime",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "discovery-config.name" => Some((
-                    "discoveryConfig.name",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "discovery-config.org-config.location.folder-id" => Some((
-                    "discoveryConfig.orgConfig.location.folderId",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "discovery-config.org-config.location.organization-id" => Some((
-                    "discoveryConfig.orgConfig.location.organizationId",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "discovery-config.org-config.project-id" => Some((
-                    "discoveryConfig.orgConfig.projectId",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "discovery-config.status" => Some((
-                    "discoveryConfig.status",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "discovery-config.update-time" => Some((
-                    "discoveryConfig.updateTime",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(
-                        key,
-                        &vec![
-                            "config-id",
-                            "create-time",
-                            "discovery-config",
-                            "display-name",
-                            "folder-id",
-                            "inspect-templates",
-                            "last-run-time",
-                            "location",
-                            "name",
-                            "org-config",
-                            "organization-id",
-                            "project-id",
-                            "status",
-                            "update-time",
-                        ],
-                    );
-                    err.issues.push(CLIError::Field(FieldError::Unknown(
-                        temp_cursor.to_string(),
-                        suggestion,
-                        value.map(|v| v.to_string()),
-                    )));
-                    None
-                }
-            };
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "config-id" => Some(("configId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "discovery-config.create-time" => Some(("discoveryConfig.createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "discovery-config.display-name" => Some(("discoveryConfig.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "discovery-config.inspect-templates" => Some(("discoveryConfig.inspectTemplates", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "discovery-config.last-run-time" => Some(("discoveryConfig.lastRunTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "discovery-config.name" => Some(("discoveryConfig.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "discovery-config.org-config.location.folder-id" => Some(("discoveryConfig.orgConfig.location.folderId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "discovery-config.org-config.location.organization-id" => Some(("discoveryConfig.orgConfig.location.organizationId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "discovery-config.org-config.project-id" => Some(("discoveryConfig.orgConfig.projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "discovery-config.other-cloud-starting-location.aws-location.account-id" => Some(("discoveryConfig.otherCloudStartingLocation.awsLocation.accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "discovery-config.other-cloud-starting-location.aws-location.all-asset-inventory-assets" => Some(("discoveryConfig.otherCloudStartingLocation.awsLocation.allAssetInventoryAssets", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "discovery-config.status" => Some(("discoveryConfig.status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "discovery-config.update-time" => Some(("discoveryConfig.updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "all-asset-inventory-assets", "aws-location", "config-id", "create-time", "discovery-config", "display-name", "folder-id", "inspect-templates", "last-run-time", "location", "name", "org-config", "organization-id", "other-cloud-starting-location", "project-id", "status", "update-time"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
             if let Some((field_cursor_str, type_info)) = type_info {
                 FieldCursor::from(field_cursor_str).set_json_value(
                     &mut object,
@@ -13534,113 +13746,27 @@ where
                 continue;
             }
 
-            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
-            {
-                "discovery-config.create-time" => Some((
-                    "discoveryConfig.createTime",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "discovery-config.display-name" => Some((
-                    "discoveryConfig.displayName",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "discovery-config.inspect-templates" => Some((
-                    "discoveryConfig.inspectTemplates",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Vec,
-                    },
-                )),
-                "discovery-config.last-run-time" => Some((
-                    "discoveryConfig.lastRunTime",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "discovery-config.name" => Some((
-                    "discoveryConfig.name",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "discovery-config.org-config.location.folder-id" => Some((
-                    "discoveryConfig.orgConfig.location.folderId",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "discovery-config.org-config.location.organization-id" => Some((
-                    "discoveryConfig.orgConfig.location.organizationId",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "discovery-config.org-config.project-id" => Some((
-                    "discoveryConfig.orgConfig.projectId",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "discovery-config.status" => Some((
-                    "discoveryConfig.status",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "discovery-config.update-time" => Some((
-                    "discoveryConfig.updateTime",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "update-mask" => Some((
-                    "updateMask",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(
-                        key,
-                        &vec![
-                            "create-time",
-                            "discovery-config",
-                            "display-name",
-                            "folder-id",
-                            "inspect-templates",
-                            "last-run-time",
-                            "location",
-                            "name",
-                            "org-config",
-                            "organization-id",
-                            "project-id",
-                            "status",
-                            "update-mask",
-                            "update-time",
-                        ],
-                    );
-                    err.issues.push(CLIError::Field(FieldError::Unknown(
-                        temp_cursor.to_string(),
-                        suggestion,
-                        value.map(|v| v.to_string()),
-                    )));
-                    None
-                }
-            };
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "discovery-config.create-time" => Some(("discoveryConfig.createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "discovery-config.display-name" => Some(("discoveryConfig.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "discovery-config.inspect-templates" => Some(("discoveryConfig.inspectTemplates", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "discovery-config.last-run-time" => Some(("discoveryConfig.lastRunTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "discovery-config.name" => Some(("discoveryConfig.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "discovery-config.org-config.location.folder-id" => Some(("discoveryConfig.orgConfig.location.folderId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "discovery-config.org-config.location.organization-id" => Some(("discoveryConfig.orgConfig.location.organizationId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "discovery-config.org-config.project-id" => Some(("discoveryConfig.orgConfig.projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "discovery-config.other-cloud-starting-location.aws-location.account-id" => Some(("discoveryConfig.otherCloudStartingLocation.awsLocation.accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "discovery-config.other-cloud-starting-location.aws-location.all-asset-inventory-assets" => Some(("discoveryConfig.otherCloudStartingLocation.awsLocation.allAssetInventoryAssets", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "discovery-config.status" => Some(("discoveryConfig.status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "discovery-config.update-time" => Some(("discoveryConfig.updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update-mask" => Some(("updateMask", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "all-asset-inventory-assets", "aws-location", "create-time", "discovery-config", "display-name", "folder-id", "inspect-templates", "last-run-time", "location", "name", "org-config", "organization-id", "other-cloud-starting-location", "project-id", "status", "update-mask", "update-time"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
             if let Some((field_cursor_str, type_info)) = type_info {
                 FieldCursor::from(field_cursor_str).set_json_value(
                     &mut object,
@@ -14668,6 +14794,270 @@ where
         }
     }
 
+    async fn _projects_locations_file_store_data_profiles_delete(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .locations_file_store_data_profiles_delete(opt.value_of("name").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_file_store_data_profiles_get(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .locations_file_store_data_profiles_get(opt.value_of("name").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_file_store_data_profiles_list(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .locations_file_store_data_profiles_list(opt.value_of("parent").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                }
+                "page-size" => {
+                    call = call.page_size(
+                        value
+                            .map(|v| arg_from_str(v, err, "page-size", "int32"))
+                            .unwrap_or(-0),
+                    );
+                }
+                "order-by" => {
+                    call = call.order_by(value.unwrap_or(""));
+                }
+                "filter" => {
+                    call = call.filter(value.unwrap_or(""));
+                }
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(
+                                    ["filter", "order-by", "page-size", "page-token"]
+                                        .iter()
+                                        .map(|v| *v),
+                                );
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _projects_locations_image_redact(
         &self,
         opt: &ArgMatches<'n>,
@@ -14708,6 +15098,13 @@ where
                 )),
                 "byte-item.type" => Some((
                     "byteItem.type",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "deidentify-template" => Some((
+                    "deidentifyTemplate",
                     JsonTypeInfo {
                         jtype: JsonType::String,
                         ctype: ComplexType::Pod,
@@ -14762,6 +15159,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "inspect-template" => Some((
+                    "inspectTemplate",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "location-id" => Some((
                     "locationId",
                     JsonTypeInfo {
@@ -14776,10 +15180,12 @@ where
                             "byte-item",
                             "content-options",
                             "data",
+                            "deidentify-template",
                             "exclude-info-types",
                             "include-findings",
                             "include-quote",
                             "inspect-config",
+                            "inspect-template",
                             "limits",
                             "location-id",
                             "max-findings-per-item",
@@ -14837,6 +15243,101 @@ where
                             .push(CLIError::UnknownParameter(key.to_string(), {
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_info_types_list(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .locations_info_types_list(opt.value_of("parent").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "location-id" => {
+                    call = call.location_id(value.unwrap_or(""));
+                }
+                "language-code" => {
+                    call = call.language_code(value.unwrap_or(""));
+                }
+                "filter" => {
+                    call = call.filter(value.unwrap_or(""));
+                }
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(
+                                    ["filter", "language-code", "location-id"]
+                                        .iter()
+                                        .map(|v| *v),
+                                );
                                 v
                             }));
                     }
@@ -18672,6 +19173,11 @@ where
                         ._organizations_locations_connections_get(opt, dry_run, &mut err)
                         .await;
                 }
+                ("locations-connections-list", Some(opt)) => {
+                    call_result = self
+                        ._organizations_locations_connections_list(opt, dry_run, &mut err)
+                        .await;
+                }
                 ("locations-connections-patch", Some(opt)) => {
                     call_result = self
                         ._organizations_locations_connections_patch(opt, dry_run, &mut err)
@@ -18739,6 +19245,32 @@ where
                 ("locations-dlp-jobs-list", Some(opt)) => {
                     call_result = self
                         ._organizations_locations_dlp_jobs_list(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("locations-file-store-data-profiles-delete", Some(opt)) => {
+                    call_result = self
+                        ._organizations_locations_file_store_data_profiles_delete(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
+                ("locations-file-store-data-profiles-get", Some(opt)) => {
+                    call_result = self
+                        ._organizations_locations_file_store_data_profiles_get(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
+                ("locations-file-store-data-profiles-list", Some(opt)) => {
+                    call_result = self
+                        ._organizations_locations_file_store_data_profiles_list(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
+                ("locations-info-types-list", Some(opt)) => {
+                    call_result = self
+                        ._organizations_locations_info_types_list(opt, dry_run, &mut err)
                         .await;
                 }
                 ("locations-inspect-templates-create", Some(opt)) => {
@@ -19124,9 +19656,29 @@ where
                         ._projects_locations_dlp_jobs_list(opt, dry_run, &mut err)
                         .await;
                 }
+                ("locations-file-store-data-profiles-delete", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_file_store_data_profiles_delete(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("locations-file-store-data-profiles-get", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_file_store_data_profiles_get(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("locations-file-store-data-profiles-list", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_file_store_data_profiles_list(opt, dry_run, &mut err)
+                        .await;
+                }
                 ("locations-image-redact", Some(opt)) => {
                     call_result = self
                         ._projects_locations_image_redact(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("locations-info-types-list", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_info_types_list(opt, dry_run, &mut err)
                         .await;
                 }
                 ("locations-inspect-templates-create", Some(opt)) => {
@@ -19310,7 +19862,9 @@ where
         let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
             secret,
             yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-            hyper_util::client::legacy::Client::builder(executor).build(connector),
+            yup_oauth2::client::CustomHyperClientBuilder::from(
+                hyper_util::client::legacy::Client::builder(executor).build(connector),
+            ),
         )
         .persist_tokens_to_disk(format!("{}/dlp2", config_dir))
         .build()
@@ -19365,7 +19919,7 @@ async fn main() {
     let arg_data = [
         ("info-types", "methods: 'list'", vec![
             ("list",
-                    Some(r##"Returns a list of the sensitive information types that DLP API supports. See https://cloud.google.com/sensitive-data-protection/docs/infotypes-reference to learn more."##),
+                    Some(r##"Returns a list of the sensitive information types that the DLP API supports. See https://cloud.google.com/sensitive-data-protection/docs/infotypes-reference to learn more."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/info-types_list",
                   vec![
                     (Some(r##"v"##),
@@ -19382,12 +19936,12 @@ async fn main() {
             ]),
             ("locations", "methods: 'info-types-list'", vec![
             ("info-types-list",
-                    Some(r##"Returns a list of the sensitive information types that DLP API supports. See https://cloud.google.com/sensitive-data-protection/docs/infotypes-reference to learn more."##),
+                    Some(r##"Returns a list of the sensitive information types that the DLP API supports. See https://cloud.google.com/sensitive-data-protection/docs/infotypes-reference to learn more."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/locations_info-types-list",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"The parent resource name. The format of this value is as follows: locations/ LOCATION_ID"##),
+                     Some(r##"The parent resource name. The format of this value is as follows: `locations/{location_id}`"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -19402,14 +19956,14 @@ async fn main() {
                      Some(false)),
                   ]),
             ]),
-            ("organizations", "methods: 'deidentify-templates-create', 'deidentify-templates-delete', 'deidentify-templates-get', 'deidentify-templates-list', 'deidentify-templates-patch', 'inspect-templates-create', 'inspect-templates-delete', 'inspect-templates-get', 'inspect-templates-list', 'inspect-templates-patch', 'locations-column-data-profiles-get', 'locations-column-data-profiles-list', 'locations-connections-create', 'locations-connections-delete', 'locations-connections-get', 'locations-connections-patch', 'locations-connections-search', 'locations-deidentify-templates-create', 'locations-deidentify-templates-delete', 'locations-deidentify-templates-get', 'locations-deidentify-templates-list', 'locations-deidentify-templates-patch', 'locations-discovery-configs-create', 'locations-discovery-configs-delete', 'locations-discovery-configs-get', 'locations-discovery-configs-list', 'locations-discovery-configs-patch', 'locations-dlp-jobs-list', 'locations-inspect-templates-create', 'locations-inspect-templates-delete', 'locations-inspect-templates-get', 'locations-inspect-templates-list', 'locations-inspect-templates-patch', 'locations-job-triggers-create', 'locations-job-triggers-delete', 'locations-job-triggers-get', 'locations-job-triggers-list', 'locations-job-triggers-patch', 'locations-project-data-profiles-get', 'locations-project-data-profiles-list', 'locations-stored-info-types-create', 'locations-stored-info-types-delete', 'locations-stored-info-types-get', 'locations-stored-info-types-list', 'locations-stored-info-types-patch', 'locations-table-data-profiles-delete', 'locations-table-data-profiles-get', 'locations-table-data-profiles-list', 'stored-info-types-create', 'stored-info-types-delete', 'stored-info-types-get', 'stored-info-types-list' and 'stored-info-types-patch'", vec![
+            ("organizations", "methods: 'deidentify-templates-create', 'deidentify-templates-delete', 'deidentify-templates-get', 'deidentify-templates-list', 'deidentify-templates-patch', 'inspect-templates-create', 'inspect-templates-delete', 'inspect-templates-get', 'inspect-templates-list', 'inspect-templates-patch', 'locations-column-data-profiles-get', 'locations-column-data-profiles-list', 'locations-connections-create', 'locations-connections-delete', 'locations-connections-get', 'locations-connections-list', 'locations-connections-patch', 'locations-connections-search', 'locations-deidentify-templates-create', 'locations-deidentify-templates-delete', 'locations-deidentify-templates-get', 'locations-deidentify-templates-list', 'locations-deidentify-templates-patch', 'locations-discovery-configs-create', 'locations-discovery-configs-delete', 'locations-discovery-configs-get', 'locations-discovery-configs-list', 'locations-discovery-configs-patch', 'locations-dlp-jobs-list', 'locations-file-store-data-profiles-delete', 'locations-file-store-data-profiles-get', 'locations-file-store-data-profiles-list', 'locations-info-types-list', 'locations-inspect-templates-create', 'locations-inspect-templates-delete', 'locations-inspect-templates-get', 'locations-inspect-templates-list', 'locations-inspect-templates-patch', 'locations-job-triggers-create', 'locations-job-triggers-delete', 'locations-job-triggers-get', 'locations-job-triggers-list', 'locations-job-triggers-patch', 'locations-project-data-profiles-get', 'locations-project-data-profiles-list', 'locations-stored-info-types-create', 'locations-stored-info-types-delete', 'locations-stored-info-types-get', 'locations-stored-info-types-list', 'locations-stored-info-types-patch', 'locations-table-data-profiles-delete', 'locations-table-data-profiles-get', 'locations-table-data-profiles-list', 'stored-info-types-create', 'stored-info-types-delete', 'stored-info-types-get', 'stored-info-types-list' and 'stored-info-types-patch'", vec![
             ("deidentify-templates-create",
                     Some(r##"Creates a DeidentifyTemplate for reusing frequently used configuration for de-identifying content, images, and storage. See https://cloud.google.com/sensitive-data-protection/docs/creating-templates-deid to learn more."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/organizations_deidentify-templates-create",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Parent resource name. The format of this value varies depending on the scope of the request (project or organization) and whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/` LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID + Organizations scope, location specified: `organizations/`ORG_ID`/locations/`LOCATION_ID + Organizations scope, no location specified (defaults to global): `organizations/`ORG_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
+                     Some(r##"Required. Parent resource name. The format of this value varies depending on the scope of the request (project or organization) and whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/{project_id}/locations/{location_id}` + Projects scope, no location specified (defaults to global): `projects/{project_id}` + Organizations scope, location specified: `organizations/{org_id}/locations/{location_id}` + Organizations scope, no location specified (defaults to global): `organizations/{org_id}` The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -19474,7 +20028,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Parent resource name. The format of this value varies depending on the scope of the request (project or organization) and whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/` LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID + Organizations scope, location specified: `organizations/`ORG_ID`/locations/`LOCATION_ID + Organizations scope, no location specified (defaults to global): `organizations/`ORG_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
+                     Some(r##"Required. Parent resource name. The format of this value varies depending on the scope of the request (project or organization) and whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/{project_id}/locations/{location_id}` + Projects scope, no location specified (defaults to global): `projects/{project_id}` + Organizations scope, location specified: `organizations/{org_id}/locations/{location_id}` + Organizations scope, no location specified (defaults to global): `organizations/{org_id}` The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -19519,7 +20073,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Parent resource name. The format of this value varies depending on the scope of the request (project or organization) and whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/` LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID + Organizations scope, location specified: `organizations/`ORG_ID`/locations/`LOCATION_ID + Organizations scope, no location specified (defaults to global): `organizations/`ORG_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
+                     Some(r##"Required. Parent resource name. The format of this value varies depending on the scope of the request (project or organization) and whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/{project_id}/locations/{location_id}` + Projects scope, no location specified (defaults to global): `projects/{project_id}` + Organizations scope, location specified: `organizations/{org_id}/locations/{location_id}` + Organizations scope, no location specified (defaults to global): `organizations/{org_id}` The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -19584,7 +20138,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Parent resource name. The format of this value varies depending on the scope of the request (project or organization) and whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/` LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID + Organizations scope, location specified: `organizations/`ORG_ID`/locations/`LOCATION_ID + Organizations scope, no location specified (defaults to global): `organizations/`ORG_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
+                     Some(r##"Required. Parent resource name. The format of this value varies depending on the scope of the request (project or organization) and whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/{project_id}/locations/{location_id}` + Projects scope, no location specified (defaults to global): `projects/{project_id}` + Organizations scope, location specified: `organizations/{org_id}/locations/{location_id}` + Organizations scope, no location specified (defaults to global): `organizations/{org_id}` The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -19669,7 +20223,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Parent resource name. The format of this value varies depending on the scope of the request (project or organization): + Projects scope: `projects/`PROJECT_ID`/locations/`LOCATION_ID + Organizations scope: `organizations/`ORG_ID`/locations/`LOCATION_ID"##),
+                     Some(r##"Required. Parent resource name. The format of this value varies depending on the scope of the request (project or organization): + Projects scope: `projects/{project_id}/locations/{location_id}` + Organizations scope: `organizations/{org_id}/locations/{location_id}`"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -19728,6 +20282,26 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("locations-connections-list",
+                    Some(r##"Lists Connections in a parent. Use SearchConnections to see all connections within an organization."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/organizations_locations-connections-list",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. Resource name of the organization or project, for example, `organizations/433245324/locations/europe` or `projects/project-id/locations/asia`."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("locations-connections-patch",
                     Some(r##"Update a Connection."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/organizations_locations-connections-patch",
@@ -19759,7 +20333,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Parent name, typically an organization, without location. For example: `organizations/12345678`."##),
+                     Some(r##"Required. Resource name of the organization or project with a wildcard location, for example, `organizations/433245324/locations/-` or `projects/project-id/locations/-`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -19779,7 +20353,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Parent resource name. The format of this value varies depending on the scope of the request (project or organization) and whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/` LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID + Organizations scope, location specified: `organizations/`ORG_ID`/locations/`LOCATION_ID + Organizations scope, no location specified (defaults to global): `organizations/`ORG_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
+                     Some(r##"Required. Parent resource name. The format of this value varies depending on the scope of the request (project or organization) and whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/{project_id}/locations/{location_id}` + Projects scope, no location specified (defaults to global): `projects/{project_id}` + Organizations scope, location specified: `organizations/{org_id}/locations/{location_id}` + Organizations scope, no location specified (defaults to global): `organizations/{org_id}` The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -19844,7 +20418,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Parent resource name. The format of this value varies depending on the scope of the request (project or organization) and whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/` LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID + Organizations scope, location specified: `organizations/`ORG_ID`/locations/`LOCATION_ID + Organizations scope, no location specified (defaults to global): `organizations/`ORG_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
+                     Some(r##"Required. Parent resource name. The format of this value varies depending on the scope of the request (project or organization) and whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/{project_id}/locations/{location_id}` + Projects scope, no location specified (defaults to global): `projects/{project_id}` + Organizations scope, location specified: `organizations/{org_id}/locations/{location_id}` + Organizations scope, no location specified (defaults to global): `organizations/{org_id}` The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -19889,7 +20463,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Parent resource name. The format of this value varies depending on the scope of the request (project or organization): + Projects scope: `projects/`PROJECT_ID`/locations/`LOCATION_ID + Organizations scope: `organizations/`ORG_ID`/locations/`LOCATION_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
+                     Some(r##"Required. Parent resource name. The format of this value varies depending on the scope of the request (project or organization): + Projects scope: `projects/{project_id}/locations/{location_id}` + Organizations scope: `organizations/{org_id}/locations/{location_id}` The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -19954,7 +20528,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Parent resource name. The format of this value is as follows: `projects/`PROJECT_ID`/locations/`LOCATION_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
+                     Some(r##"Required. Parent resource name. The format of this value is as follows: `projects/{project_id}/locations/{location_id}` The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -19999,7 +20573,87 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Parent resource name. The format of this value varies depending on whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/` LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
+                     Some(r##"Required. Parent resource name. The format of this value varies depending on whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/{project_id}/locations/{location_id}` + Projects scope, no location specified (defaults to global): `projects/{project_id}` The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-file-store-data-profiles-delete",
+                    Some(r##"Delete a FileStoreDataProfile. Will not prevent the profile from being regenerated if the resource is still included in a discovery configuration."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/organizations_locations-file-store-data-profiles-delete",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. Resource name of the file store data profile."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-file-store-data-profiles-get",
+                    Some(r##"Gets a file store data profile."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/organizations_locations-file-store-data-profiles-get",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. Resource name, for example `organizations/12345/locations/us/fileStoreDataProfiles/53234423`."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-file-store-data-profiles-list",
+                    Some(r##"Lists file store data profiles for an organization."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/organizations_locations-file-store-data-profiles-list",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. Resource name of the organization or project, for example `organizations/433245324/locations/europe` or `projects/project-id/locations/asia`."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-info-types-list",
+                    Some(r##"Returns a list of the sensitive information types that the DLP API supports. See https://cloud.google.com/sensitive-data-protection/docs/infotypes-reference to learn more."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/organizations_locations-info-types-list",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"The parent resource name. The format of this value is as follows: `locations/{location_id}`"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -20019,7 +20673,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Parent resource name. The format of this value varies depending on the scope of the request (project or organization) and whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/` LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID + Organizations scope, location specified: `organizations/`ORG_ID`/locations/`LOCATION_ID + Organizations scope, no location specified (defaults to global): `organizations/`ORG_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
+                     Some(r##"Required. Parent resource name. The format of this value varies depending on the scope of the request (project or organization) and whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/{project_id}/locations/{location_id}` + Projects scope, no location specified (defaults to global): `projects/{project_id}` + Organizations scope, location specified: `organizations/{org_id}/locations/{location_id}` + Organizations scope, no location specified (defaults to global): `organizations/{org_id}` The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -20084,7 +20738,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Parent resource name. The format of this value varies depending on the scope of the request (project or organization) and whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/` LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID + Organizations scope, location specified: `organizations/`ORG_ID`/locations/`LOCATION_ID + Organizations scope, no location specified (defaults to global): `organizations/`ORG_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
+                     Some(r##"Required. Parent resource name. The format of this value varies depending on the scope of the request (project or organization) and whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/{project_id}/locations/{location_id}` + Projects scope, no location specified (defaults to global): `projects/{project_id}` + Organizations scope, location specified: `organizations/{org_id}/locations/{location_id}` + Organizations scope, no location specified (defaults to global): `organizations/{org_id}` The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -20129,7 +20783,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Parent resource name. The format of this value varies depending on whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/` LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
+                     Some(r##"Required. Parent resource name. The format of this value varies depending on whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/{project_id}/locations/{location_id}` + Projects scope, no location specified (defaults to global): `projects/{project_id}` The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -20194,7 +20848,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Parent resource name. The format of this value varies depending on whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/` LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
+                     Some(r##"Required. Parent resource name. The format of this value varies depending on whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/{project_id}/locations/{location_id}` + Projects scope, no location specified (defaults to global): `projects/{project_id}` The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -20279,7 +20933,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Parent resource name. The format of this value varies depending on the scope of the request (project or organization) and whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/` LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID + Organizations scope, location specified: `organizations/`ORG_ID`/locations/`LOCATION_ID + Organizations scope, no location specified (defaults to global): `organizations/`ORG_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
+                     Some(r##"Required. Parent resource name. The format of this value varies depending on the scope of the request (project or organization) and whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/{project_id}/locations/{location_id}` + Projects scope, no location specified (defaults to global): `projects/{project_id}` + Organizations scope, location specified: `organizations/{org_id}/locations/{location_id}` + Organizations scope, no location specified (defaults to global): `organizations/{org_id}` The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -20344,7 +20998,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Parent resource name. The format of this value varies depending on the scope of the request (project or organization) and whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/` LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
+                     Some(r##"Required. Parent resource name. The format of this value varies depending on the scope of the request (project or organization) and whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/{project_id}/locations/{location_id}` + Projects scope, no location specified (defaults to global): `projects/{project_id}` The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -20449,7 +21103,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Parent resource name. The format of this value varies depending on the scope of the request (project or organization) and whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/` LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID + Organizations scope, location specified: `organizations/`ORG_ID`/locations/`LOCATION_ID + Organizations scope, no location specified (defaults to global): `organizations/`ORG_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
+                     Some(r##"Required. Parent resource name. The format of this value varies depending on the scope of the request (project or organization) and whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/{project_id}/locations/{location_id}` + Projects scope, no location specified (defaults to global): `projects/{project_id}` + Organizations scope, location specified: `organizations/{org_id}/locations/{location_id}` + Organizations scope, no location specified (defaults to global): `organizations/{org_id}` The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -20514,7 +21168,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Parent resource name. The format of this value varies depending on the scope of the request (project or organization) and whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/` LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
+                     Some(r##"Required. Parent resource name. The format of this value varies depending on the scope of the request (project or organization) and whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/{project_id}/locations/{location_id}` + Projects scope, no location specified (defaults to global): `projects/{project_id}` The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -20554,14 +21208,14 @@ async fn main() {
                      Some(false)),
                   ]),
             ]),
-            ("projects", "methods: 'content-deidentify', 'content-inspect', 'content-reidentify', 'deidentify-templates-create', 'deidentify-templates-delete', 'deidentify-templates-get', 'deidentify-templates-list', 'deidentify-templates-patch', 'dlp-jobs-cancel', 'dlp-jobs-create', 'dlp-jobs-delete', 'dlp-jobs-get', 'dlp-jobs-list', 'image-redact', 'inspect-templates-create', 'inspect-templates-delete', 'inspect-templates-get', 'inspect-templates-list', 'inspect-templates-patch', 'job-triggers-activate', 'job-triggers-create', 'job-triggers-delete', 'job-triggers-get', 'job-triggers-list', 'job-triggers-patch', 'locations-column-data-profiles-get', 'locations-column-data-profiles-list', 'locations-connections-create', 'locations-connections-delete', 'locations-connections-get', 'locations-connections-list', 'locations-connections-patch', 'locations-connections-search', 'locations-content-deidentify', 'locations-content-inspect', 'locations-content-reidentify', 'locations-deidentify-templates-create', 'locations-deidentify-templates-delete', 'locations-deidentify-templates-get', 'locations-deidentify-templates-list', 'locations-deidentify-templates-patch', 'locations-discovery-configs-create', 'locations-discovery-configs-delete', 'locations-discovery-configs-get', 'locations-discovery-configs-list', 'locations-discovery-configs-patch', 'locations-dlp-jobs-cancel', 'locations-dlp-jobs-create', 'locations-dlp-jobs-delete', 'locations-dlp-jobs-finish', 'locations-dlp-jobs-get', 'locations-dlp-jobs-hybrid-inspect', 'locations-dlp-jobs-list', 'locations-image-redact', 'locations-inspect-templates-create', 'locations-inspect-templates-delete', 'locations-inspect-templates-get', 'locations-inspect-templates-list', 'locations-inspect-templates-patch', 'locations-job-triggers-activate', 'locations-job-triggers-create', 'locations-job-triggers-delete', 'locations-job-triggers-get', 'locations-job-triggers-hybrid-inspect', 'locations-job-triggers-list', 'locations-job-triggers-patch', 'locations-project-data-profiles-get', 'locations-project-data-profiles-list', 'locations-stored-info-types-create', 'locations-stored-info-types-delete', 'locations-stored-info-types-get', 'locations-stored-info-types-list', 'locations-stored-info-types-patch', 'locations-table-data-profiles-delete', 'locations-table-data-profiles-get', 'locations-table-data-profiles-list', 'stored-info-types-create', 'stored-info-types-delete', 'stored-info-types-get', 'stored-info-types-list' and 'stored-info-types-patch'", vec![
+            ("projects", "methods: 'content-deidentify', 'content-inspect', 'content-reidentify', 'deidentify-templates-create', 'deidentify-templates-delete', 'deidentify-templates-get', 'deidentify-templates-list', 'deidentify-templates-patch', 'dlp-jobs-cancel', 'dlp-jobs-create', 'dlp-jobs-delete', 'dlp-jobs-get', 'dlp-jobs-list', 'image-redact', 'inspect-templates-create', 'inspect-templates-delete', 'inspect-templates-get', 'inspect-templates-list', 'inspect-templates-patch', 'job-triggers-activate', 'job-triggers-create', 'job-triggers-delete', 'job-triggers-get', 'job-triggers-list', 'job-triggers-patch', 'locations-column-data-profiles-get', 'locations-column-data-profiles-list', 'locations-connections-create', 'locations-connections-delete', 'locations-connections-get', 'locations-connections-list', 'locations-connections-patch', 'locations-connections-search', 'locations-content-deidentify', 'locations-content-inspect', 'locations-content-reidentify', 'locations-deidentify-templates-create', 'locations-deidentify-templates-delete', 'locations-deidentify-templates-get', 'locations-deidentify-templates-list', 'locations-deidentify-templates-patch', 'locations-discovery-configs-create', 'locations-discovery-configs-delete', 'locations-discovery-configs-get', 'locations-discovery-configs-list', 'locations-discovery-configs-patch', 'locations-dlp-jobs-cancel', 'locations-dlp-jobs-create', 'locations-dlp-jobs-delete', 'locations-dlp-jobs-finish', 'locations-dlp-jobs-get', 'locations-dlp-jobs-hybrid-inspect', 'locations-dlp-jobs-list', 'locations-file-store-data-profiles-delete', 'locations-file-store-data-profiles-get', 'locations-file-store-data-profiles-list', 'locations-image-redact', 'locations-info-types-list', 'locations-inspect-templates-create', 'locations-inspect-templates-delete', 'locations-inspect-templates-get', 'locations-inspect-templates-list', 'locations-inspect-templates-patch', 'locations-job-triggers-activate', 'locations-job-triggers-create', 'locations-job-triggers-delete', 'locations-job-triggers-get', 'locations-job-triggers-hybrid-inspect', 'locations-job-triggers-list', 'locations-job-triggers-patch', 'locations-project-data-profiles-get', 'locations-project-data-profiles-list', 'locations-stored-info-types-create', 'locations-stored-info-types-delete', 'locations-stored-info-types-get', 'locations-stored-info-types-list', 'locations-stored-info-types-patch', 'locations-table-data-profiles-delete', 'locations-table-data-profiles-get', 'locations-table-data-profiles-list', 'stored-info-types-create', 'stored-info-types-delete', 'stored-info-types-get', 'stored-info-types-list' and 'stored-info-types-patch'", vec![
             ("content-deidentify",
                     Some(r##"De-identifies potentially sensitive info from a ContentItem. This method has limits on input size and output size. See https://cloud.google.com/sensitive-data-protection/docs/deidentify-sensitive-data to learn more. When no InfoTypes or CustomInfoTypes are specified in this request, the system will automatically choose what detectors to run. By default this may be all types, but may change over time as detectors are updated."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/projects_content-deidentify",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Parent resource name. The format of this value varies depending on whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/` LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
+                     Some(r##"Parent resource name. The format of this value varies depending on whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/{project_id}/locations/{location_id}` + Projects scope, no location specified (defaults to global): `projects/{project_id}` The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -20586,7 +21240,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Parent resource name. The format of this value varies depending on whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/` LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
+                     Some(r##"Parent resource name. The format of this value varies depending on whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/{project_id}/locations/{location_id}` + Projects scope, no location specified (defaults to global): `projects/{project_id}` The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -20611,7 +21265,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Parent resource name. The format of this value varies depending on whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/` LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
+                     Some(r##"Required. Parent resource name. The format of this value varies depending on whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/{project_id}/locations/{location_id}` + Projects scope, no location specified (defaults to global): `projects/{project_id}` The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -20636,7 +21290,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Parent resource name. The format of this value varies depending on the scope of the request (project or organization) and whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/` LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID + Organizations scope, location specified: `organizations/`ORG_ID`/locations/`LOCATION_ID + Organizations scope, no location specified (defaults to global): `organizations/`ORG_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
+                     Some(r##"Required. Parent resource name. The format of this value varies depending on the scope of the request (project or organization) and whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/{project_id}/locations/{location_id}` + Projects scope, no location specified (defaults to global): `projects/{project_id}` + Organizations scope, location specified: `organizations/{org_id}/locations/{location_id}` + Organizations scope, no location specified (defaults to global): `organizations/{org_id}` The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -20701,7 +21355,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Parent resource name. The format of this value varies depending on the scope of the request (project or organization) and whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/` LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID + Organizations scope, location specified: `organizations/`ORG_ID`/locations/`LOCATION_ID + Organizations scope, no location specified (defaults to global): `organizations/`ORG_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
+                     Some(r##"Required. Parent resource name. The format of this value varies depending on the scope of the request (project or organization) and whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/{project_id}/locations/{location_id}` + Projects scope, no location specified (defaults to global): `projects/{project_id}` + Organizations scope, location specified: `organizations/{org_id}/locations/{location_id}` + Organizations scope, no location specified (defaults to global): `organizations/{org_id}` The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -20771,7 +21425,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Parent resource name. The format of this value varies depending on whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/` LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
+                     Some(r##"Required. Parent resource name. The format of this value varies depending on whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/{project_id}/locations/{location_id}` + Projects scope, no location specified (defaults to global): `projects/{project_id}` The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -20836,7 +21490,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Parent resource name. The format of this value varies depending on whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/` LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
+                     Some(r##"Required. Parent resource name. The format of this value varies depending on whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/{project_id}/locations/{location_id}` + Projects scope, no location specified (defaults to global): `projects/{project_id}` The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -20851,12 +21505,12 @@ async fn main() {
                      Some(false)),
                   ]),
             ("image-redact",
-                    Some(r##"Redacts potentially sensitive info from an image. This method has limits on input size, processing time, and output size. See https://cloud.google.com/sensitive-data-protection/docs/redacting-sensitive-data-images to learn more. When no InfoTypes or CustomInfoTypes are specified in this request, the system will automatically choose what detectors to run. By default this may be all types, but may change over time as detectors are updated."##),
+                    Some(r##"Redacts potentially sensitive info from an image. This method has limits on input size, processing time, and output size. See https://cloud.google.com/sensitive-data-protection/docs/redacting-sensitive-data-images to learn more. When no InfoTypes or CustomInfoTypes are specified in this request, the system will automatically choose what detectors to run. By default this may be all types, but may change over time as detectors are updated. Only the first frame of each multiframe image is redacted. Metadata and other frames are omitted in the response."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/projects_image-redact",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Parent resource name. The format of this value varies depending on whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/` LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
+                     Some(r##"Parent resource name. The format of this value varies depending on whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/{project_id}/locations/{location_id}` + Projects scope, no location specified (defaults to global): `projects/{project_id}` The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -20881,7 +21535,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Parent resource name. The format of this value varies depending on the scope of the request (project or organization) and whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/` LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID + Organizations scope, location specified: `organizations/`ORG_ID`/locations/`LOCATION_ID + Organizations scope, no location specified (defaults to global): `organizations/`ORG_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
+                     Some(r##"Required. Parent resource name. The format of this value varies depending on the scope of the request (project or organization) and whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/{project_id}/locations/{location_id}` + Projects scope, no location specified (defaults to global): `projects/{project_id}` + Organizations scope, location specified: `organizations/{org_id}/locations/{location_id}` + Organizations scope, no location specified (defaults to global): `organizations/{org_id}` The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -20946,7 +21600,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Parent resource name. The format of this value varies depending on the scope of the request (project or organization) and whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/` LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID + Organizations scope, location specified: `organizations/`ORG_ID`/locations/`LOCATION_ID + Organizations scope, no location specified (defaults to global): `organizations/`ORG_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
+                     Some(r##"Required. Parent resource name. The format of this value varies depending on the scope of the request (project or organization) and whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/{project_id}/locations/{location_id}` + Projects scope, no location specified (defaults to global): `projects/{project_id}` + Organizations scope, location specified: `organizations/{org_id}/locations/{location_id}` + Organizations scope, no location specified (defaults to global): `organizations/{org_id}` The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -21016,7 +21670,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Parent resource name. The format of this value varies depending on whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/` LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
+                     Some(r##"Required. Parent resource name. The format of this value varies depending on whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/{project_id}/locations/{location_id}` + Projects scope, no location specified (defaults to global): `projects/{project_id}` The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -21081,7 +21735,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Parent resource name. The format of this value varies depending on whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/` LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
+                     Some(r##"Required. Parent resource name. The format of this value varies depending on whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/{project_id}/locations/{location_id}` + Projects scope, no location specified (defaults to global): `projects/{project_id}` The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -21166,7 +21820,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Parent resource name. The format of this value varies depending on the scope of the request (project or organization): + Projects scope: `projects/`PROJECT_ID`/locations/`LOCATION_ID + Organizations scope: `organizations/`ORG_ID`/locations/`LOCATION_ID"##),
+                     Some(r##"Required. Parent resource name. The format of this value varies depending on the scope of the request (project or organization): + Projects scope: `projects/{project_id}/locations/{location_id}` + Organizations scope: `organizations/{org_id}/locations/{location_id}`"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -21226,12 +21880,12 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-connections-list",
-                    Some(r##"Lists Connections in a parent."##),
+                    Some(r##"Lists Connections in a parent. Use SearchConnections to see all connections within an organization."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/projects_locations-connections-list",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Parent name, for example: `projects/project-id/locations/global`."##),
+                     Some(r##"Required. Resource name of the organization or project, for example, `organizations/433245324/locations/europe` or `projects/project-id/locations/asia`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -21276,7 +21930,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Parent name, typically an organization, without location. For example: `organizations/12345678`."##),
+                     Some(r##"Required. Resource name of the organization or project with a wildcard location, for example, `organizations/433245324/locations/-` or `projects/project-id/locations/-`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -21296,7 +21950,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Parent resource name. The format of this value varies depending on whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/` LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
+                     Some(r##"Parent resource name. The format of this value varies depending on whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/{project_id}/locations/{location_id}` + Projects scope, no location specified (defaults to global): `projects/{project_id}` The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -21321,7 +21975,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Parent resource name. The format of this value varies depending on whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/` LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
+                     Some(r##"Parent resource name. The format of this value varies depending on whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/{project_id}/locations/{location_id}` + Projects scope, no location specified (defaults to global): `projects/{project_id}` The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -21346,7 +22000,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Parent resource name. The format of this value varies depending on whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/` LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
+                     Some(r##"Required. Parent resource name. The format of this value varies depending on whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/{project_id}/locations/{location_id}` + Projects scope, no location specified (defaults to global): `projects/{project_id}` The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -21371,7 +22025,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Parent resource name. The format of this value varies depending on the scope of the request (project or organization) and whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/` LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID + Organizations scope, location specified: `organizations/`ORG_ID`/locations/`LOCATION_ID + Organizations scope, no location specified (defaults to global): `organizations/`ORG_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
+                     Some(r##"Required. Parent resource name. The format of this value varies depending on the scope of the request (project or organization) and whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/{project_id}/locations/{location_id}` + Projects scope, no location specified (defaults to global): `projects/{project_id}` + Organizations scope, location specified: `organizations/{org_id}/locations/{location_id}` + Organizations scope, no location specified (defaults to global): `organizations/{org_id}` The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -21436,7 +22090,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Parent resource name. The format of this value varies depending on the scope of the request (project or organization) and whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/` LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID + Organizations scope, location specified: `organizations/`ORG_ID`/locations/`LOCATION_ID + Organizations scope, no location specified (defaults to global): `organizations/`ORG_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
+                     Some(r##"Required. Parent resource name. The format of this value varies depending on the scope of the request (project or organization) and whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/{project_id}/locations/{location_id}` + Projects scope, no location specified (defaults to global): `projects/{project_id}` + Organizations scope, location specified: `organizations/{org_id}/locations/{location_id}` + Organizations scope, no location specified (defaults to global): `organizations/{org_id}` The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -21481,7 +22135,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Parent resource name. The format of this value varies depending on the scope of the request (project or organization): + Projects scope: `projects/`PROJECT_ID`/locations/`LOCATION_ID + Organizations scope: `organizations/`ORG_ID`/locations/`LOCATION_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
+                     Some(r##"Required. Parent resource name. The format of this value varies depending on the scope of the request (project or organization): + Projects scope: `projects/{project_id}/locations/{location_id}` + Organizations scope: `organizations/{org_id}/locations/{location_id}` The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -21546,7 +22200,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Parent resource name. The format of this value is as follows: `projects/`PROJECT_ID`/locations/`LOCATION_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
+                     Some(r##"Required. Parent resource name. The format of this value is as follows: `projects/{project_id}/locations/{location_id}` The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -21616,7 +22270,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Parent resource name. The format of this value varies depending on whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/` LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
+                     Some(r##"Required. Parent resource name. The format of this value varies depending on whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/{project_id}/locations/{location_id}` + Projects scope, no location specified (defaults to global): `projects/{project_id}` The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -21731,7 +22385,67 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Parent resource name. The format of this value varies depending on whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/` LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
+                     Some(r##"Required. Parent resource name. The format of this value varies depending on whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/{project_id}/locations/{location_id}` + Projects scope, no location specified (defaults to global): `projects/{project_id}` The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-file-store-data-profiles-delete",
+                    Some(r##"Delete a FileStoreDataProfile. Will not prevent the profile from being regenerated if the resource is still included in a discovery configuration."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/projects_locations-file-store-data-profiles-delete",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. Resource name of the file store data profile."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-file-store-data-profiles-get",
+                    Some(r##"Gets a file store data profile."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/projects_locations-file-store-data-profiles-get",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. Resource name, for example `organizations/12345/locations/us/fileStoreDataProfiles/53234423`."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-file-store-data-profiles-list",
+                    Some(r##"Lists file store data profiles for an organization."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/projects_locations-file-store-data-profiles-list",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. Resource name of the organization or project, for example `organizations/433245324/locations/europe` or `projects/project-id/locations/asia`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -21746,12 +22460,12 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-image-redact",
-                    Some(r##"Redacts potentially sensitive info from an image. This method has limits on input size, processing time, and output size. See https://cloud.google.com/sensitive-data-protection/docs/redacting-sensitive-data-images to learn more. When no InfoTypes or CustomInfoTypes are specified in this request, the system will automatically choose what detectors to run. By default this may be all types, but may change over time as detectors are updated."##),
+                    Some(r##"Redacts potentially sensitive info from an image. This method has limits on input size, processing time, and output size. See https://cloud.google.com/sensitive-data-protection/docs/redacting-sensitive-data-images to learn more. When no InfoTypes or CustomInfoTypes are specified in this request, the system will automatically choose what detectors to run. By default this may be all types, but may change over time as detectors are updated. Only the first frame of each multiframe image is redacted. Metadata and other frames are omitted in the response."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/projects_locations-image-redact",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Parent resource name. The format of this value varies depending on whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/` LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
+                     Some(r##"Parent resource name. The format of this value varies depending on whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/{project_id}/locations/{location_id}` + Projects scope, no location specified (defaults to global): `projects/{project_id}` The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -21770,13 +22484,33 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("locations-info-types-list",
+                    Some(r##"Returns a list of the sensitive information types that the DLP API supports. See https://cloud.google.com/sensitive-data-protection/docs/infotypes-reference to learn more."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/projects_locations-info-types-list",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"The parent resource name. The format of this value is as follows: `locations/{location_id}`"##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("locations-inspect-templates-create",
                     Some(r##"Creates an InspectTemplate for reusing frequently used configuration for inspecting content, images, and storage. See https://cloud.google.com/sensitive-data-protection/docs/creating-templates to learn more."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/projects_locations-inspect-templates-create",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Parent resource name. The format of this value varies depending on the scope of the request (project or organization) and whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/` LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID + Organizations scope, location specified: `organizations/`ORG_ID`/locations/`LOCATION_ID + Organizations scope, no location specified (defaults to global): `organizations/`ORG_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
+                     Some(r##"Required. Parent resource name. The format of this value varies depending on the scope of the request (project or organization) and whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/{project_id}/locations/{location_id}` + Projects scope, no location specified (defaults to global): `projects/{project_id}` + Organizations scope, location specified: `organizations/{org_id}/locations/{location_id}` + Organizations scope, no location specified (defaults to global): `organizations/{org_id}` The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -21841,7 +22575,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Parent resource name. The format of this value varies depending on the scope of the request (project or organization) and whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/` LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID + Organizations scope, location specified: `organizations/`ORG_ID`/locations/`LOCATION_ID + Organizations scope, no location specified (defaults to global): `organizations/`ORG_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
+                     Some(r##"Required. Parent resource name. The format of this value varies depending on the scope of the request (project or organization) and whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/{project_id}/locations/{location_id}` + Projects scope, no location specified (defaults to global): `projects/{project_id}` + Organizations scope, location specified: `organizations/{org_id}/locations/{location_id}` + Organizations scope, no location specified (defaults to global): `organizations/{org_id}` The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -21911,7 +22645,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Parent resource name. The format of this value varies depending on whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/` LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
+                     Some(r##"Required. Parent resource name. The format of this value varies depending on whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/{project_id}/locations/{location_id}` + Projects scope, no location specified (defaults to global): `projects/{project_id}` The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -22001,7 +22735,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Parent resource name. The format of this value varies depending on whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/` LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
+                     Some(r##"Required. Parent resource name. The format of this value varies depending on whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/{project_id}/locations/{location_id}` + Projects scope, no location specified (defaults to global): `projects/{project_id}` The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -22086,7 +22820,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Parent resource name. The format of this value varies depending on the scope of the request (project or organization) and whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/` LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID + Organizations scope, location specified: `organizations/`ORG_ID`/locations/`LOCATION_ID + Organizations scope, no location specified (defaults to global): `organizations/`ORG_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
+                     Some(r##"Required. Parent resource name. The format of this value varies depending on the scope of the request (project or organization) and whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/{project_id}/locations/{location_id}` + Projects scope, no location specified (defaults to global): `projects/{project_id}` + Organizations scope, location specified: `organizations/{org_id}/locations/{location_id}` + Organizations scope, no location specified (defaults to global): `organizations/{org_id}` The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -22151,7 +22885,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Parent resource name. The format of this value varies depending on the scope of the request (project or organization) and whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/` LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
+                     Some(r##"Required. Parent resource name. The format of this value varies depending on the scope of the request (project or organization) and whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/{project_id}/locations/{location_id}` + Projects scope, no location specified (defaults to global): `projects/{project_id}` The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -22256,7 +22990,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Parent resource name. The format of this value varies depending on the scope of the request (project or organization) and whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/` LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID + Organizations scope, location specified: `organizations/`ORG_ID`/locations/`LOCATION_ID + Organizations scope, no location specified (defaults to global): `organizations/`ORG_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
+                     Some(r##"Required. Parent resource name. The format of this value varies depending on the scope of the request (project or organization) and whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/{project_id}/locations/{location_id}` + Projects scope, no location specified (defaults to global): `projects/{project_id}` + Organizations scope, location specified: `organizations/{org_id}/locations/{location_id}` + Organizations scope, no location specified (defaults to global): `organizations/{org_id}` The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -22321,7 +23055,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Parent resource name. The format of this value varies depending on the scope of the request (project or organization) and whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/`PROJECT_ID`/locations/` LOCATION_ID + Projects scope, no location specified (defaults to global): `projects/`PROJECT_ID The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
+                     Some(r##"Required. Parent resource name. The format of this value varies depending on the scope of the request (project or organization) and whether you have [specified a processing location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location): + Projects scope, location specified: `projects/{project_id}/locations/{location_id}` + Projects scope, no location specified (defaults to global): `projects/{project_id}` The following example `parent` string specifies a parent project with the identifier `example-project`, and specifies the `europe-west3` location for processing data: parent=projects/example-project/locations/europe-west3"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -22365,7 +23099,7 @@ async fn main() {
 
     let mut app = App::new("dlp2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("6.0.0+20240616")
+           .version("7.0.0+20251213")
            .about("Discover and protect your sensitive data. A fully managed service designed to help you discover, classify, and protect your valuable data assets with ease.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_dlp2_cli")
            .arg(Arg::with_name("url")
@@ -22430,7 +23164,7 @@ async fn main() {
         .with_native_roots()
         .unwrap()
         .https_or_http()
-        .enable_http1()
+        .enable_http2()
         .build();
 
     match Engine::new(matches, connector).await {

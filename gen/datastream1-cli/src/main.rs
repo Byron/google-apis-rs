@@ -71,340 +71,102 @@ where
                 continue;
             }
 
-            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
-            {
-                "create-time" => Some((
-                    "createTime",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "display-name" => Some((
-                    "displayName",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "forward-ssh-connectivity.hostname" => Some((
-                    "forwardSshConnectivity.hostname",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "forward-ssh-connectivity.password" => Some((
-                    "forwardSshConnectivity.password",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "forward-ssh-connectivity.port" => Some((
-                    "forwardSshConnectivity.port",
-                    JsonTypeInfo {
-                        jtype: JsonType::Int,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "forward-ssh-connectivity.private-key" => Some((
-                    "forwardSshConnectivity.privateKey",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "forward-ssh-connectivity.username" => Some((
-                    "forwardSshConnectivity.username",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "gcs-profile.bucket" => Some((
-                    "gcsProfile.bucket",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "gcs-profile.root-path" => Some((
-                    "gcsProfile.rootPath",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "labels" => Some((
-                    "labels",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Map,
-                    },
-                )),
-                "mysql-profile.hostname" => Some((
-                    "mysqlProfile.hostname",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "mysql-profile.password" => Some((
-                    "mysqlProfile.password",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "mysql-profile.port" => Some((
-                    "mysqlProfile.port",
-                    JsonTypeInfo {
-                        jtype: JsonType::Int,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "mysql-profile.ssl-config.ca-certificate" => Some((
-                    "mysqlProfile.sslConfig.caCertificate",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "mysql-profile.ssl-config.ca-certificate-set" => Some((
-                    "mysqlProfile.sslConfig.caCertificateSet",
-                    JsonTypeInfo {
-                        jtype: JsonType::Boolean,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "mysql-profile.ssl-config.client-certificate" => Some((
-                    "mysqlProfile.sslConfig.clientCertificate",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "mysql-profile.ssl-config.client-certificate-set" => Some((
-                    "mysqlProfile.sslConfig.clientCertificateSet",
-                    JsonTypeInfo {
-                        jtype: JsonType::Boolean,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "mysql-profile.ssl-config.client-key" => Some((
-                    "mysqlProfile.sslConfig.clientKey",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "mysql-profile.ssl-config.client-key-set" => Some((
-                    "mysqlProfile.sslConfig.clientKeySet",
-                    JsonTypeInfo {
-                        jtype: JsonType::Boolean,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "mysql-profile.username" => Some((
-                    "mysqlProfile.username",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "name" => Some((
-                    "name",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "oracle-profile.connection-attributes" => Some((
-                    "oracleProfile.connectionAttributes",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Map,
-                    },
-                )),
-                "oracle-profile.database-service" => Some((
-                    "oracleProfile.databaseService",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "oracle-profile.hostname" => Some((
-                    "oracleProfile.hostname",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "oracle-profile.oracle-ssl-config.ca-certificate" => Some((
-                    "oracleProfile.oracleSslConfig.caCertificate",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "oracle-profile.oracle-ssl-config.ca-certificate-set" => Some((
-                    "oracleProfile.oracleSslConfig.caCertificateSet",
-                    JsonTypeInfo {
-                        jtype: JsonType::Boolean,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "oracle-profile.password" => Some((
-                    "oracleProfile.password",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "oracle-profile.port" => Some((
-                    "oracleProfile.port",
-                    JsonTypeInfo {
-                        jtype: JsonType::Int,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "oracle-profile.username" => Some((
-                    "oracleProfile.username",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "postgresql-profile.database" => Some((
-                    "postgresqlProfile.database",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "postgresql-profile.hostname" => Some((
-                    "postgresqlProfile.hostname",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "postgresql-profile.password" => Some((
-                    "postgresqlProfile.password",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "postgresql-profile.port" => Some((
-                    "postgresqlProfile.port",
-                    JsonTypeInfo {
-                        jtype: JsonType::Int,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "postgresql-profile.username" => Some((
-                    "postgresqlProfile.username",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "private-connectivity.private-connection" => Some((
-                    "privateConnectivity.privateConnection",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "sql-server-profile.database" => Some((
-                    "sqlServerProfile.database",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "sql-server-profile.hostname" => Some((
-                    "sqlServerProfile.hostname",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "sql-server-profile.password" => Some((
-                    "sqlServerProfile.password",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "sql-server-profile.port" => Some((
-                    "sqlServerProfile.port",
-                    JsonTypeInfo {
-                        jtype: JsonType::Int,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "sql-server-profile.username" => Some((
-                    "sqlServerProfile.username",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "update-time" => Some((
-                    "updateTime",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(
-                        key,
-                        &vec![
-                            "bucket",
-                            "ca-certificate",
-                            "ca-certificate-set",
-                            "client-certificate",
-                            "client-certificate-set",
-                            "client-key",
-                            "client-key-set",
-                            "connection-attributes",
-                            "create-time",
-                            "database",
-                            "database-service",
-                            "display-name",
-                            "forward-ssh-connectivity",
-                            "gcs-profile",
-                            "hostname",
-                            "labels",
-                            "mysql-profile",
-                            "name",
-                            "oracle-profile",
-                            "oracle-ssl-config",
-                            "password",
-                            "port",
-                            "postgresql-profile",
-                            "private-connection",
-                            "private-connectivity",
-                            "private-key",
-                            "root-path",
-                            "sql-server-profile",
-                            "ssl-config",
-                            "update-time",
-                            "username",
-                        ],
-                    );
-                    err.issues.push(CLIError::Field(FieldError::Unknown(
-                        temp_cursor.to_string(),
-                        suggestion,
-                        value.map(|v| v.to_string()),
-                    )));
-                    None
-                }
-            };
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "forward-ssh-connectivity.hostname" => Some(("forwardSshConnectivity.hostname", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "forward-ssh-connectivity.password" => Some(("forwardSshConnectivity.password", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "forward-ssh-connectivity.port" => Some(("forwardSshConnectivity.port", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "forward-ssh-connectivity.private-key" => Some(("forwardSshConnectivity.privateKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "forward-ssh-connectivity.username" => Some(("forwardSshConnectivity.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "gcs-profile.bucket" => Some(("gcsProfile.bucket", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "gcs-profile.root-path" => Some(("gcsProfile.rootPath", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "mongodb-profile.additional-options" => Some(("mongodbProfile.additionalOptions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "mongodb-profile.password" => Some(("mongodbProfile.password", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "mongodb-profile.replica-set" => Some(("mongodbProfile.replicaSet", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "mongodb-profile.secret-manager-stored-password" => Some(("mongodbProfile.secretManagerStoredPassword", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "mongodb-profile.ssl-config.ca-certificate" => Some(("mongodbProfile.sslConfig.caCertificate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "mongodb-profile.ssl-config.ca-certificate-set" => Some(("mongodbProfile.sslConfig.caCertificateSet", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "mongodb-profile.ssl-config.client-certificate" => Some(("mongodbProfile.sslConfig.clientCertificate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "mongodb-profile.ssl-config.client-certificate-set" => Some(("mongodbProfile.sslConfig.clientCertificateSet", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "mongodb-profile.ssl-config.client-key" => Some(("mongodbProfile.sslConfig.clientKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "mongodb-profile.ssl-config.client-key-set" => Some(("mongodbProfile.sslConfig.clientKeySet", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "mongodb-profile.ssl-config.secret-manager-stored-client-key" => Some(("mongodbProfile.sslConfig.secretManagerStoredClientKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "mongodb-profile.standard-connection-format.direct-connection" => Some(("mongodbProfile.standardConnectionFormat.directConnection", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "mongodb-profile.username" => Some(("mongodbProfile.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "mysql-profile.hostname" => Some(("mysqlProfile.hostname", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "mysql-profile.password" => Some(("mysqlProfile.password", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "mysql-profile.port" => Some(("mysqlProfile.port", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "mysql-profile.secret-manager-stored-password" => Some(("mysqlProfile.secretManagerStoredPassword", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "mysql-profile.ssl-config.ca-certificate" => Some(("mysqlProfile.sslConfig.caCertificate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "mysql-profile.ssl-config.ca-certificate-set" => Some(("mysqlProfile.sslConfig.caCertificateSet", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "mysql-profile.ssl-config.client-certificate" => Some(("mysqlProfile.sslConfig.clientCertificate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "mysql-profile.ssl-config.client-certificate-set" => Some(("mysqlProfile.sslConfig.clientCertificateSet", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "mysql-profile.ssl-config.client-key" => Some(("mysqlProfile.sslConfig.clientKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "mysql-profile.ssl-config.client-key-set" => Some(("mysqlProfile.sslConfig.clientKeySet", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "mysql-profile.username" => Some(("mysqlProfile.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "oracle-profile.connection-attributes" => Some(("oracleProfile.connectionAttributes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "oracle-profile.database-service" => Some(("oracleProfile.databaseService", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "oracle-profile.hostname" => Some(("oracleProfile.hostname", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "oracle-profile.oracle-asm-config.asm-service" => Some(("oracleProfile.oracleAsmConfig.asmService", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "oracle-profile.oracle-asm-config.connection-attributes" => Some(("oracleProfile.oracleAsmConfig.connectionAttributes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "oracle-profile.oracle-asm-config.hostname" => Some(("oracleProfile.oracleAsmConfig.hostname", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "oracle-profile.oracle-asm-config.oracle-ssl-config.ca-certificate" => Some(("oracleProfile.oracleAsmConfig.oracleSslConfig.caCertificate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "oracle-profile.oracle-asm-config.oracle-ssl-config.ca-certificate-set" => Some(("oracleProfile.oracleAsmConfig.oracleSslConfig.caCertificateSet", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "oracle-profile.oracle-asm-config.oracle-ssl-config.server-certificate-distinguished-name" => Some(("oracleProfile.oracleAsmConfig.oracleSslConfig.serverCertificateDistinguishedName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "oracle-profile.oracle-asm-config.password" => Some(("oracleProfile.oracleAsmConfig.password", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "oracle-profile.oracle-asm-config.port" => Some(("oracleProfile.oracleAsmConfig.port", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "oracle-profile.oracle-asm-config.secret-manager-stored-password" => Some(("oracleProfile.oracleAsmConfig.secretManagerStoredPassword", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "oracle-profile.oracle-asm-config.username" => Some(("oracleProfile.oracleAsmConfig.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "oracle-profile.oracle-ssl-config.ca-certificate" => Some(("oracleProfile.oracleSslConfig.caCertificate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "oracle-profile.oracle-ssl-config.ca-certificate-set" => Some(("oracleProfile.oracleSslConfig.caCertificateSet", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "oracle-profile.oracle-ssl-config.server-certificate-distinguished-name" => Some(("oracleProfile.oracleSslConfig.serverCertificateDistinguishedName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "oracle-profile.password" => Some(("oracleProfile.password", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "oracle-profile.port" => Some(("oracleProfile.port", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "oracle-profile.secret-manager-stored-password" => Some(("oracleProfile.secretManagerStoredPassword", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "oracle-profile.username" => Some(("oracleProfile.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "postgresql-profile.database" => Some(("postgresqlProfile.database", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "postgresql-profile.hostname" => Some(("postgresqlProfile.hostname", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "postgresql-profile.password" => Some(("postgresqlProfile.password", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "postgresql-profile.port" => Some(("postgresqlProfile.port", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "postgresql-profile.secret-manager-stored-password" => Some(("postgresqlProfile.secretManagerStoredPassword", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "postgresql-profile.ssl-config.server-and-client-verification.ca-certificate" => Some(("postgresqlProfile.sslConfig.serverAndClientVerification.caCertificate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "postgresql-profile.ssl-config.server-and-client-verification.client-certificate" => Some(("postgresqlProfile.sslConfig.serverAndClientVerification.clientCertificate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "postgresql-profile.ssl-config.server-and-client-verification.client-key" => Some(("postgresqlProfile.sslConfig.serverAndClientVerification.clientKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "postgresql-profile.ssl-config.server-and-client-verification.server-certificate-hostname" => Some(("postgresqlProfile.sslConfig.serverAndClientVerification.serverCertificateHostname", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "postgresql-profile.ssl-config.server-verification.ca-certificate" => Some(("postgresqlProfile.sslConfig.serverVerification.caCertificate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "postgresql-profile.ssl-config.server-verification.server-certificate-hostname" => Some(("postgresqlProfile.sslConfig.serverVerification.serverCertificateHostname", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "postgresql-profile.username" => Some(("postgresqlProfile.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "private-connectivity.private-connection" => Some(("privateConnectivity.privateConnection", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "salesforce-profile.domain" => Some(("salesforceProfile.domain", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "salesforce-profile.oauth2-client-credentials.client-id" => Some(("salesforceProfile.oauth2ClientCredentials.clientId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "salesforce-profile.oauth2-client-credentials.client-secret" => Some(("salesforceProfile.oauth2ClientCredentials.clientSecret", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "salesforce-profile.oauth2-client-credentials.secret-manager-stored-client-secret" => Some(("salesforceProfile.oauth2ClientCredentials.secretManagerStoredClientSecret", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "salesforce-profile.user-credentials.password" => Some(("salesforceProfile.userCredentials.password", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "salesforce-profile.user-credentials.secret-manager-stored-password" => Some(("salesforceProfile.userCredentials.secretManagerStoredPassword", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "salesforce-profile.user-credentials.secret-manager-stored-security-token" => Some(("salesforceProfile.userCredentials.secretManagerStoredSecurityToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "salesforce-profile.user-credentials.security-token" => Some(("salesforceProfile.userCredentials.securityToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "salesforce-profile.user-credentials.username" => Some(("salesforceProfile.userCredentials.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "satisfies-pzi" => Some(("satisfiesPzi", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "satisfies-pzs" => Some(("satisfiesPzs", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "sql-server-profile.database" => Some(("sqlServerProfile.database", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sql-server-profile.hostname" => Some(("sqlServerProfile.hostname", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sql-server-profile.password" => Some(("sqlServerProfile.password", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sql-server-profile.port" => Some(("sqlServerProfile.port", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "sql-server-profile.secret-manager-stored-password" => Some(("sqlServerProfile.secretManagerStoredPassword", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sql-server-profile.ssl-config.encryption-and-server-validation.ca-certificate" => Some(("sqlServerProfile.sslConfig.encryptionAndServerValidation.caCertificate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sql-server-profile.ssl-config.encryption-and-server-validation.server-certificate-hostname" => Some(("sqlServerProfile.sslConfig.encryptionAndServerValidation.serverCertificateHostname", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sql-server-profile.username" => Some(("sqlServerProfile.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["additional-options", "asm-service", "bucket", "ca-certificate", "ca-certificate-set", "client-certificate", "client-certificate-set", "client-id", "client-key", "client-key-set", "client-secret", "connection-attributes", "create-time", "database", "database-service", "direct-connection", "display-name", "domain", "encryption-and-server-validation", "forward-ssh-connectivity", "gcs-profile", "hostname", "labels", "mongodb-profile", "mysql-profile", "name", "oauth2-client-credentials", "oracle-asm-config", "oracle-profile", "oracle-ssl-config", "password", "port", "postgresql-profile", "private-connection", "private-connectivity", "private-key", "replica-set", "root-path", "salesforce-profile", "satisfies-pzi", "satisfies-pzs", "secret-manager-stored-client-key", "secret-manager-stored-client-secret", "secret-manager-stored-password", "secret-manager-stored-security-token", "security-token", "server-and-client-verification", "server-certificate-distinguished-name", "server-certificate-hostname", "server-verification", "sql-server-profile", "ssl-config", "standard-connection-format", "update-time", "user-credentials", "username"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
             if let Some((field_cursor_str, type_info)) = type_info {
                 FieldCursor::from(field_cursor_str).set_json_value(
                     &mut object,
@@ -635,365 +397,105 @@ where
                 continue;
             }
 
-            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
-            {
-                "connection-profile.create-time" => Some((
-                    "connectionProfile.createTime",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "connection-profile.display-name" => Some((
-                    "connectionProfile.displayName",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "connection-profile.forward-ssh-connectivity.hostname" => Some((
-                    "connectionProfile.forwardSshConnectivity.hostname",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "connection-profile.forward-ssh-connectivity.password" => Some((
-                    "connectionProfile.forwardSshConnectivity.password",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "connection-profile.forward-ssh-connectivity.port" => Some((
-                    "connectionProfile.forwardSshConnectivity.port",
-                    JsonTypeInfo {
-                        jtype: JsonType::Int,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "connection-profile.forward-ssh-connectivity.private-key" => Some((
-                    "connectionProfile.forwardSshConnectivity.privateKey",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "connection-profile.forward-ssh-connectivity.username" => Some((
-                    "connectionProfile.forwardSshConnectivity.username",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "connection-profile.gcs-profile.bucket" => Some((
-                    "connectionProfile.gcsProfile.bucket",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "connection-profile.gcs-profile.root-path" => Some((
-                    "connectionProfile.gcsProfile.rootPath",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "connection-profile.labels" => Some((
-                    "connectionProfile.labels",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Map,
-                    },
-                )),
-                "connection-profile.mysql-profile.hostname" => Some((
-                    "connectionProfile.mysqlProfile.hostname",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "connection-profile.mysql-profile.password" => Some((
-                    "connectionProfile.mysqlProfile.password",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "connection-profile.mysql-profile.port" => Some((
-                    "connectionProfile.mysqlProfile.port",
-                    JsonTypeInfo {
-                        jtype: JsonType::Int,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "connection-profile.mysql-profile.ssl-config.ca-certificate" => Some((
-                    "connectionProfile.mysqlProfile.sslConfig.caCertificate",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "connection-profile.mysql-profile.ssl-config.ca-certificate-set" => Some((
-                    "connectionProfile.mysqlProfile.sslConfig.caCertificateSet",
-                    JsonTypeInfo {
-                        jtype: JsonType::Boolean,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "connection-profile.mysql-profile.ssl-config.client-certificate" => Some((
-                    "connectionProfile.mysqlProfile.sslConfig.clientCertificate",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "connection-profile.mysql-profile.ssl-config.client-certificate-set" => Some((
-                    "connectionProfile.mysqlProfile.sslConfig.clientCertificateSet",
-                    JsonTypeInfo {
-                        jtype: JsonType::Boolean,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "connection-profile.mysql-profile.ssl-config.client-key" => Some((
-                    "connectionProfile.mysqlProfile.sslConfig.clientKey",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "connection-profile.mysql-profile.ssl-config.client-key-set" => Some((
-                    "connectionProfile.mysqlProfile.sslConfig.clientKeySet",
-                    JsonTypeInfo {
-                        jtype: JsonType::Boolean,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "connection-profile.mysql-profile.username" => Some((
-                    "connectionProfile.mysqlProfile.username",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "connection-profile.name" => Some((
-                    "connectionProfile.name",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "connection-profile.oracle-profile.connection-attributes" => Some((
-                    "connectionProfile.oracleProfile.connectionAttributes",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Map,
-                    },
-                )),
-                "connection-profile.oracle-profile.database-service" => Some((
-                    "connectionProfile.oracleProfile.databaseService",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "connection-profile.oracle-profile.hostname" => Some((
-                    "connectionProfile.oracleProfile.hostname",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "connection-profile.oracle-profile.oracle-ssl-config.ca-certificate" => Some((
-                    "connectionProfile.oracleProfile.oracleSslConfig.caCertificate",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "connection-profile.oracle-profile.oracle-ssl-config.ca-certificate-set" => Some((
-                    "connectionProfile.oracleProfile.oracleSslConfig.caCertificateSet",
-                    JsonTypeInfo {
-                        jtype: JsonType::Boolean,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "connection-profile.oracle-profile.password" => Some((
-                    "connectionProfile.oracleProfile.password",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "connection-profile.oracle-profile.port" => Some((
-                    "connectionProfile.oracleProfile.port",
-                    JsonTypeInfo {
-                        jtype: JsonType::Int,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "connection-profile.oracle-profile.username" => Some((
-                    "connectionProfile.oracleProfile.username",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "connection-profile.postgresql-profile.database" => Some((
-                    "connectionProfile.postgresqlProfile.database",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "connection-profile.postgresql-profile.hostname" => Some((
-                    "connectionProfile.postgresqlProfile.hostname",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "connection-profile.postgresql-profile.password" => Some((
-                    "connectionProfile.postgresqlProfile.password",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "connection-profile.postgresql-profile.port" => Some((
-                    "connectionProfile.postgresqlProfile.port",
-                    JsonTypeInfo {
-                        jtype: JsonType::Int,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "connection-profile.postgresql-profile.username" => Some((
-                    "connectionProfile.postgresqlProfile.username",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "connection-profile.private-connectivity.private-connection" => Some((
-                    "connectionProfile.privateConnectivity.privateConnection",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "connection-profile.sql-server-profile.database" => Some((
-                    "connectionProfile.sqlServerProfile.database",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "connection-profile.sql-server-profile.hostname" => Some((
-                    "connectionProfile.sqlServerProfile.hostname",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "connection-profile.sql-server-profile.password" => Some((
-                    "connectionProfile.sqlServerProfile.password",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "connection-profile.sql-server-profile.port" => Some((
-                    "connectionProfile.sqlServerProfile.port",
-                    JsonTypeInfo {
-                        jtype: JsonType::Int,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "connection-profile.sql-server-profile.username" => Some((
-                    "connectionProfile.sqlServerProfile.username",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "connection-profile.update-time" => Some((
-                    "connectionProfile.updateTime",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "connection-profile-name" => Some((
-                    "connectionProfileName",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "full-hierarchy" => Some((
-                    "fullHierarchy",
-                    JsonTypeInfo {
-                        jtype: JsonType::Boolean,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "hierarchy-depth" => Some((
-                    "hierarchyDepth",
-                    JsonTypeInfo {
-                        jtype: JsonType::Int,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(
-                        key,
-                        &vec![
-                            "bucket",
-                            "ca-certificate",
-                            "ca-certificate-set",
-                            "client-certificate",
-                            "client-certificate-set",
-                            "client-key",
-                            "client-key-set",
-                            "connection-attributes",
-                            "connection-profile",
-                            "connection-profile-name",
-                            "create-time",
-                            "database",
-                            "database-service",
-                            "display-name",
-                            "forward-ssh-connectivity",
-                            "full-hierarchy",
-                            "gcs-profile",
-                            "hierarchy-depth",
-                            "hostname",
-                            "labels",
-                            "mysql-profile",
-                            "name",
-                            "oracle-profile",
-                            "oracle-ssl-config",
-                            "password",
-                            "port",
-                            "postgresql-profile",
-                            "private-connection",
-                            "private-connectivity",
-                            "private-key",
-                            "root-path",
-                            "sql-server-profile",
-                            "ssl-config",
-                            "update-time",
-                            "username",
-                        ],
-                    );
-                    err.issues.push(CLIError::Field(FieldError::Unknown(
-                        temp_cursor.to_string(),
-                        suggestion,
-                        value.map(|v| v.to_string()),
-                    )));
-                    None
-                }
-            };
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "connection-profile.create-time" => Some(("connectionProfile.createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "connection-profile.display-name" => Some(("connectionProfile.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "connection-profile.forward-ssh-connectivity.hostname" => Some(("connectionProfile.forwardSshConnectivity.hostname", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "connection-profile.forward-ssh-connectivity.password" => Some(("connectionProfile.forwardSshConnectivity.password", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "connection-profile.forward-ssh-connectivity.port" => Some(("connectionProfile.forwardSshConnectivity.port", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "connection-profile.forward-ssh-connectivity.private-key" => Some(("connectionProfile.forwardSshConnectivity.privateKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "connection-profile.forward-ssh-connectivity.username" => Some(("connectionProfile.forwardSshConnectivity.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "connection-profile.gcs-profile.bucket" => Some(("connectionProfile.gcsProfile.bucket", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "connection-profile.gcs-profile.root-path" => Some(("connectionProfile.gcsProfile.rootPath", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "connection-profile.labels" => Some(("connectionProfile.labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "connection-profile.mongodb-profile.additional-options" => Some(("connectionProfile.mongodbProfile.additionalOptions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "connection-profile.mongodb-profile.password" => Some(("connectionProfile.mongodbProfile.password", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "connection-profile.mongodb-profile.replica-set" => Some(("connectionProfile.mongodbProfile.replicaSet", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "connection-profile.mongodb-profile.secret-manager-stored-password" => Some(("connectionProfile.mongodbProfile.secretManagerStoredPassword", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "connection-profile.mongodb-profile.ssl-config.ca-certificate" => Some(("connectionProfile.mongodbProfile.sslConfig.caCertificate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "connection-profile.mongodb-profile.ssl-config.ca-certificate-set" => Some(("connectionProfile.mongodbProfile.sslConfig.caCertificateSet", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "connection-profile.mongodb-profile.ssl-config.client-certificate" => Some(("connectionProfile.mongodbProfile.sslConfig.clientCertificate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "connection-profile.mongodb-profile.ssl-config.client-certificate-set" => Some(("connectionProfile.mongodbProfile.sslConfig.clientCertificateSet", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "connection-profile.mongodb-profile.ssl-config.client-key" => Some(("connectionProfile.mongodbProfile.sslConfig.clientKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "connection-profile.mongodb-profile.ssl-config.client-key-set" => Some(("connectionProfile.mongodbProfile.sslConfig.clientKeySet", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "connection-profile.mongodb-profile.ssl-config.secret-manager-stored-client-key" => Some(("connectionProfile.mongodbProfile.sslConfig.secretManagerStoredClientKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "connection-profile.mongodb-profile.standard-connection-format.direct-connection" => Some(("connectionProfile.mongodbProfile.standardConnectionFormat.directConnection", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "connection-profile.mongodb-profile.username" => Some(("connectionProfile.mongodbProfile.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "connection-profile.mysql-profile.hostname" => Some(("connectionProfile.mysqlProfile.hostname", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "connection-profile.mysql-profile.password" => Some(("connectionProfile.mysqlProfile.password", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "connection-profile.mysql-profile.port" => Some(("connectionProfile.mysqlProfile.port", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "connection-profile.mysql-profile.secret-manager-stored-password" => Some(("connectionProfile.mysqlProfile.secretManagerStoredPassword", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "connection-profile.mysql-profile.ssl-config.ca-certificate" => Some(("connectionProfile.mysqlProfile.sslConfig.caCertificate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "connection-profile.mysql-profile.ssl-config.ca-certificate-set" => Some(("connectionProfile.mysqlProfile.sslConfig.caCertificateSet", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "connection-profile.mysql-profile.ssl-config.client-certificate" => Some(("connectionProfile.mysqlProfile.sslConfig.clientCertificate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "connection-profile.mysql-profile.ssl-config.client-certificate-set" => Some(("connectionProfile.mysqlProfile.sslConfig.clientCertificateSet", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "connection-profile.mysql-profile.ssl-config.client-key" => Some(("connectionProfile.mysqlProfile.sslConfig.clientKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "connection-profile.mysql-profile.ssl-config.client-key-set" => Some(("connectionProfile.mysqlProfile.sslConfig.clientKeySet", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "connection-profile.mysql-profile.username" => Some(("connectionProfile.mysqlProfile.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "connection-profile.name" => Some(("connectionProfile.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "connection-profile.oracle-profile.connection-attributes" => Some(("connectionProfile.oracleProfile.connectionAttributes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "connection-profile.oracle-profile.database-service" => Some(("connectionProfile.oracleProfile.databaseService", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "connection-profile.oracle-profile.hostname" => Some(("connectionProfile.oracleProfile.hostname", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "connection-profile.oracle-profile.oracle-asm-config.asm-service" => Some(("connectionProfile.oracleProfile.oracleAsmConfig.asmService", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "connection-profile.oracle-profile.oracle-asm-config.connection-attributes" => Some(("connectionProfile.oracleProfile.oracleAsmConfig.connectionAttributes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "connection-profile.oracle-profile.oracle-asm-config.hostname" => Some(("connectionProfile.oracleProfile.oracleAsmConfig.hostname", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "connection-profile.oracle-profile.oracle-asm-config.oracle-ssl-config.ca-certificate" => Some(("connectionProfile.oracleProfile.oracleAsmConfig.oracleSslConfig.caCertificate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "connection-profile.oracle-profile.oracle-asm-config.oracle-ssl-config.ca-certificate-set" => Some(("connectionProfile.oracleProfile.oracleAsmConfig.oracleSslConfig.caCertificateSet", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "connection-profile.oracle-profile.oracle-asm-config.oracle-ssl-config.server-certificate-distinguished-name" => Some(("connectionProfile.oracleProfile.oracleAsmConfig.oracleSslConfig.serverCertificateDistinguishedName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "connection-profile.oracle-profile.oracle-asm-config.password" => Some(("connectionProfile.oracleProfile.oracleAsmConfig.password", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "connection-profile.oracle-profile.oracle-asm-config.port" => Some(("connectionProfile.oracleProfile.oracleAsmConfig.port", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "connection-profile.oracle-profile.oracle-asm-config.secret-manager-stored-password" => Some(("connectionProfile.oracleProfile.oracleAsmConfig.secretManagerStoredPassword", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "connection-profile.oracle-profile.oracle-asm-config.username" => Some(("connectionProfile.oracleProfile.oracleAsmConfig.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "connection-profile.oracle-profile.oracle-ssl-config.ca-certificate" => Some(("connectionProfile.oracleProfile.oracleSslConfig.caCertificate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "connection-profile.oracle-profile.oracle-ssl-config.ca-certificate-set" => Some(("connectionProfile.oracleProfile.oracleSslConfig.caCertificateSet", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "connection-profile.oracle-profile.oracle-ssl-config.server-certificate-distinguished-name" => Some(("connectionProfile.oracleProfile.oracleSslConfig.serverCertificateDistinguishedName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "connection-profile.oracle-profile.password" => Some(("connectionProfile.oracleProfile.password", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "connection-profile.oracle-profile.port" => Some(("connectionProfile.oracleProfile.port", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "connection-profile.oracle-profile.secret-manager-stored-password" => Some(("connectionProfile.oracleProfile.secretManagerStoredPassword", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "connection-profile.oracle-profile.username" => Some(("connectionProfile.oracleProfile.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "connection-profile.postgresql-profile.database" => Some(("connectionProfile.postgresqlProfile.database", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "connection-profile.postgresql-profile.hostname" => Some(("connectionProfile.postgresqlProfile.hostname", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "connection-profile.postgresql-profile.password" => Some(("connectionProfile.postgresqlProfile.password", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "connection-profile.postgresql-profile.port" => Some(("connectionProfile.postgresqlProfile.port", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "connection-profile.postgresql-profile.secret-manager-stored-password" => Some(("connectionProfile.postgresqlProfile.secretManagerStoredPassword", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "connection-profile.postgresql-profile.ssl-config.server-and-client-verification.ca-certificate" => Some(("connectionProfile.postgresqlProfile.sslConfig.serverAndClientVerification.caCertificate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "connection-profile.postgresql-profile.ssl-config.server-and-client-verification.client-certificate" => Some(("connectionProfile.postgresqlProfile.sslConfig.serverAndClientVerification.clientCertificate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "connection-profile.postgresql-profile.ssl-config.server-and-client-verification.client-key" => Some(("connectionProfile.postgresqlProfile.sslConfig.serverAndClientVerification.clientKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "connection-profile.postgresql-profile.ssl-config.server-and-client-verification.server-certificate-hostname" => Some(("connectionProfile.postgresqlProfile.sslConfig.serverAndClientVerification.serverCertificateHostname", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "connection-profile.postgresql-profile.ssl-config.server-verification.ca-certificate" => Some(("connectionProfile.postgresqlProfile.sslConfig.serverVerification.caCertificate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "connection-profile.postgresql-profile.ssl-config.server-verification.server-certificate-hostname" => Some(("connectionProfile.postgresqlProfile.sslConfig.serverVerification.serverCertificateHostname", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "connection-profile.postgresql-profile.username" => Some(("connectionProfile.postgresqlProfile.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "connection-profile.private-connectivity.private-connection" => Some(("connectionProfile.privateConnectivity.privateConnection", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "connection-profile.salesforce-profile.domain" => Some(("connectionProfile.salesforceProfile.domain", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "connection-profile.salesforce-profile.oauth2-client-credentials.client-id" => Some(("connectionProfile.salesforceProfile.oauth2ClientCredentials.clientId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "connection-profile.salesforce-profile.oauth2-client-credentials.client-secret" => Some(("connectionProfile.salesforceProfile.oauth2ClientCredentials.clientSecret", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "connection-profile.salesforce-profile.oauth2-client-credentials.secret-manager-stored-client-secret" => Some(("connectionProfile.salesforceProfile.oauth2ClientCredentials.secretManagerStoredClientSecret", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "connection-profile.salesforce-profile.user-credentials.password" => Some(("connectionProfile.salesforceProfile.userCredentials.password", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "connection-profile.salesforce-profile.user-credentials.secret-manager-stored-password" => Some(("connectionProfile.salesforceProfile.userCredentials.secretManagerStoredPassword", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "connection-profile.salesforce-profile.user-credentials.secret-manager-stored-security-token" => Some(("connectionProfile.salesforceProfile.userCredentials.secretManagerStoredSecurityToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "connection-profile.salesforce-profile.user-credentials.security-token" => Some(("connectionProfile.salesforceProfile.userCredentials.securityToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "connection-profile.salesforce-profile.user-credentials.username" => Some(("connectionProfile.salesforceProfile.userCredentials.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "connection-profile.satisfies-pzi" => Some(("connectionProfile.satisfiesPzi", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "connection-profile.satisfies-pzs" => Some(("connectionProfile.satisfiesPzs", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "connection-profile.sql-server-profile.database" => Some(("connectionProfile.sqlServerProfile.database", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "connection-profile.sql-server-profile.hostname" => Some(("connectionProfile.sqlServerProfile.hostname", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "connection-profile.sql-server-profile.password" => Some(("connectionProfile.sqlServerProfile.password", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "connection-profile.sql-server-profile.port" => Some(("connectionProfile.sqlServerProfile.port", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "connection-profile.sql-server-profile.secret-manager-stored-password" => Some(("connectionProfile.sqlServerProfile.secretManagerStoredPassword", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "connection-profile.sql-server-profile.ssl-config.encryption-and-server-validation.ca-certificate" => Some(("connectionProfile.sqlServerProfile.sslConfig.encryptionAndServerValidation.caCertificate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "connection-profile.sql-server-profile.ssl-config.encryption-and-server-validation.server-certificate-hostname" => Some(("connectionProfile.sqlServerProfile.sslConfig.encryptionAndServerValidation.serverCertificateHostname", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "connection-profile.sql-server-profile.username" => Some(("connectionProfile.sqlServerProfile.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "connection-profile.update-time" => Some(("connectionProfile.updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "connection-profile-name" => Some(("connectionProfileName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "full-hierarchy" => Some(("fullHierarchy", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "hierarchy-depth" => Some(("hierarchyDepth", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["additional-options", "asm-service", "bucket", "ca-certificate", "ca-certificate-set", "client-certificate", "client-certificate-set", "client-id", "client-key", "client-key-set", "client-secret", "connection-attributes", "connection-profile", "connection-profile-name", "create-time", "database", "database-service", "direct-connection", "display-name", "domain", "encryption-and-server-validation", "forward-ssh-connectivity", "full-hierarchy", "gcs-profile", "hierarchy-depth", "hostname", "labels", "mongodb-profile", "mysql-profile", "name", "oauth2-client-credentials", "oracle-asm-config", "oracle-profile", "oracle-ssl-config", "password", "port", "postgresql-profile", "private-connection", "private-connectivity", "private-key", "replica-set", "root-path", "salesforce-profile", "satisfies-pzi", "satisfies-pzs", "secret-manager-stored-client-key", "secret-manager-stored-client-secret", "secret-manager-stored-password", "secret-manager-stored-security-token", "security-token", "server-and-client-verification", "server-certificate-distinguished-name", "server-certificate-hostname", "server-verification", "sql-server-profile", "ssl-config", "standard-connection-format", "update-time", "user-credentials", "username"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
             if let Some((field_cursor_str, type_info)) = type_info {
                 FieldCursor::from(field_cursor_str).set_json_value(
                     &mut object,
@@ -1293,340 +795,102 @@ where
                 continue;
             }
 
-            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
-            {
-                "create-time" => Some((
-                    "createTime",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "display-name" => Some((
-                    "displayName",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "forward-ssh-connectivity.hostname" => Some((
-                    "forwardSshConnectivity.hostname",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "forward-ssh-connectivity.password" => Some((
-                    "forwardSshConnectivity.password",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "forward-ssh-connectivity.port" => Some((
-                    "forwardSshConnectivity.port",
-                    JsonTypeInfo {
-                        jtype: JsonType::Int,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "forward-ssh-connectivity.private-key" => Some((
-                    "forwardSshConnectivity.privateKey",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "forward-ssh-connectivity.username" => Some((
-                    "forwardSshConnectivity.username",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "gcs-profile.bucket" => Some((
-                    "gcsProfile.bucket",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "gcs-profile.root-path" => Some((
-                    "gcsProfile.rootPath",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "labels" => Some((
-                    "labels",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Map,
-                    },
-                )),
-                "mysql-profile.hostname" => Some((
-                    "mysqlProfile.hostname",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "mysql-profile.password" => Some((
-                    "mysqlProfile.password",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "mysql-profile.port" => Some((
-                    "mysqlProfile.port",
-                    JsonTypeInfo {
-                        jtype: JsonType::Int,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "mysql-profile.ssl-config.ca-certificate" => Some((
-                    "mysqlProfile.sslConfig.caCertificate",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "mysql-profile.ssl-config.ca-certificate-set" => Some((
-                    "mysqlProfile.sslConfig.caCertificateSet",
-                    JsonTypeInfo {
-                        jtype: JsonType::Boolean,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "mysql-profile.ssl-config.client-certificate" => Some((
-                    "mysqlProfile.sslConfig.clientCertificate",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "mysql-profile.ssl-config.client-certificate-set" => Some((
-                    "mysqlProfile.sslConfig.clientCertificateSet",
-                    JsonTypeInfo {
-                        jtype: JsonType::Boolean,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "mysql-profile.ssl-config.client-key" => Some((
-                    "mysqlProfile.sslConfig.clientKey",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "mysql-profile.ssl-config.client-key-set" => Some((
-                    "mysqlProfile.sslConfig.clientKeySet",
-                    JsonTypeInfo {
-                        jtype: JsonType::Boolean,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "mysql-profile.username" => Some((
-                    "mysqlProfile.username",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "name" => Some((
-                    "name",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "oracle-profile.connection-attributes" => Some((
-                    "oracleProfile.connectionAttributes",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Map,
-                    },
-                )),
-                "oracle-profile.database-service" => Some((
-                    "oracleProfile.databaseService",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "oracle-profile.hostname" => Some((
-                    "oracleProfile.hostname",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "oracle-profile.oracle-ssl-config.ca-certificate" => Some((
-                    "oracleProfile.oracleSslConfig.caCertificate",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "oracle-profile.oracle-ssl-config.ca-certificate-set" => Some((
-                    "oracleProfile.oracleSslConfig.caCertificateSet",
-                    JsonTypeInfo {
-                        jtype: JsonType::Boolean,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "oracle-profile.password" => Some((
-                    "oracleProfile.password",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "oracle-profile.port" => Some((
-                    "oracleProfile.port",
-                    JsonTypeInfo {
-                        jtype: JsonType::Int,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "oracle-profile.username" => Some((
-                    "oracleProfile.username",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "postgresql-profile.database" => Some((
-                    "postgresqlProfile.database",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "postgresql-profile.hostname" => Some((
-                    "postgresqlProfile.hostname",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "postgresql-profile.password" => Some((
-                    "postgresqlProfile.password",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "postgresql-profile.port" => Some((
-                    "postgresqlProfile.port",
-                    JsonTypeInfo {
-                        jtype: JsonType::Int,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "postgresql-profile.username" => Some((
-                    "postgresqlProfile.username",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "private-connectivity.private-connection" => Some((
-                    "privateConnectivity.privateConnection",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "sql-server-profile.database" => Some((
-                    "sqlServerProfile.database",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "sql-server-profile.hostname" => Some((
-                    "sqlServerProfile.hostname",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "sql-server-profile.password" => Some((
-                    "sqlServerProfile.password",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "sql-server-profile.port" => Some((
-                    "sqlServerProfile.port",
-                    JsonTypeInfo {
-                        jtype: JsonType::Int,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "sql-server-profile.username" => Some((
-                    "sqlServerProfile.username",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "update-time" => Some((
-                    "updateTime",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(
-                        key,
-                        &vec![
-                            "bucket",
-                            "ca-certificate",
-                            "ca-certificate-set",
-                            "client-certificate",
-                            "client-certificate-set",
-                            "client-key",
-                            "client-key-set",
-                            "connection-attributes",
-                            "create-time",
-                            "database",
-                            "database-service",
-                            "display-name",
-                            "forward-ssh-connectivity",
-                            "gcs-profile",
-                            "hostname",
-                            "labels",
-                            "mysql-profile",
-                            "name",
-                            "oracle-profile",
-                            "oracle-ssl-config",
-                            "password",
-                            "port",
-                            "postgresql-profile",
-                            "private-connection",
-                            "private-connectivity",
-                            "private-key",
-                            "root-path",
-                            "sql-server-profile",
-                            "ssl-config",
-                            "update-time",
-                            "username",
-                        ],
-                    );
-                    err.issues.push(CLIError::Field(FieldError::Unknown(
-                        temp_cursor.to_string(),
-                        suggestion,
-                        value.map(|v| v.to_string()),
-                    )));
-                    None
-                }
-            };
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "forward-ssh-connectivity.hostname" => Some(("forwardSshConnectivity.hostname", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "forward-ssh-connectivity.password" => Some(("forwardSshConnectivity.password", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "forward-ssh-connectivity.port" => Some(("forwardSshConnectivity.port", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "forward-ssh-connectivity.private-key" => Some(("forwardSshConnectivity.privateKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "forward-ssh-connectivity.username" => Some(("forwardSshConnectivity.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "gcs-profile.bucket" => Some(("gcsProfile.bucket", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "gcs-profile.root-path" => Some(("gcsProfile.rootPath", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "mongodb-profile.additional-options" => Some(("mongodbProfile.additionalOptions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "mongodb-profile.password" => Some(("mongodbProfile.password", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "mongodb-profile.replica-set" => Some(("mongodbProfile.replicaSet", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "mongodb-profile.secret-manager-stored-password" => Some(("mongodbProfile.secretManagerStoredPassword", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "mongodb-profile.ssl-config.ca-certificate" => Some(("mongodbProfile.sslConfig.caCertificate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "mongodb-profile.ssl-config.ca-certificate-set" => Some(("mongodbProfile.sslConfig.caCertificateSet", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "mongodb-profile.ssl-config.client-certificate" => Some(("mongodbProfile.sslConfig.clientCertificate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "mongodb-profile.ssl-config.client-certificate-set" => Some(("mongodbProfile.sslConfig.clientCertificateSet", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "mongodb-profile.ssl-config.client-key" => Some(("mongodbProfile.sslConfig.clientKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "mongodb-profile.ssl-config.client-key-set" => Some(("mongodbProfile.sslConfig.clientKeySet", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "mongodb-profile.ssl-config.secret-manager-stored-client-key" => Some(("mongodbProfile.sslConfig.secretManagerStoredClientKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "mongodb-profile.standard-connection-format.direct-connection" => Some(("mongodbProfile.standardConnectionFormat.directConnection", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "mongodb-profile.username" => Some(("mongodbProfile.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "mysql-profile.hostname" => Some(("mysqlProfile.hostname", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "mysql-profile.password" => Some(("mysqlProfile.password", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "mysql-profile.port" => Some(("mysqlProfile.port", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "mysql-profile.secret-manager-stored-password" => Some(("mysqlProfile.secretManagerStoredPassword", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "mysql-profile.ssl-config.ca-certificate" => Some(("mysqlProfile.sslConfig.caCertificate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "mysql-profile.ssl-config.ca-certificate-set" => Some(("mysqlProfile.sslConfig.caCertificateSet", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "mysql-profile.ssl-config.client-certificate" => Some(("mysqlProfile.sslConfig.clientCertificate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "mysql-profile.ssl-config.client-certificate-set" => Some(("mysqlProfile.sslConfig.clientCertificateSet", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "mysql-profile.ssl-config.client-key" => Some(("mysqlProfile.sslConfig.clientKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "mysql-profile.ssl-config.client-key-set" => Some(("mysqlProfile.sslConfig.clientKeySet", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "mysql-profile.username" => Some(("mysqlProfile.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "oracle-profile.connection-attributes" => Some(("oracleProfile.connectionAttributes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "oracle-profile.database-service" => Some(("oracleProfile.databaseService", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "oracle-profile.hostname" => Some(("oracleProfile.hostname", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "oracle-profile.oracle-asm-config.asm-service" => Some(("oracleProfile.oracleAsmConfig.asmService", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "oracle-profile.oracle-asm-config.connection-attributes" => Some(("oracleProfile.oracleAsmConfig.connectionAttributes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "oracle-profile.oracle-asm-config.hostname" => Some(("oracleProfile.oracleAsmConfig.hostname", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "oracle-profile.oracle-asm-config.oracle-ssl-config.ca-certificate" => Some(("oracleProfile.oracleAsmConfig.oracleSslConfig.caCertificate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "oracle-profile.oracle-asm-config.oracle-ssl-config.ca-certificate-set" => Some(("oracleProfile.oracleAsmConfig.oracleSslConfig.caCertificateSet", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "oracle-profile.oracle-asm-config.oracle-ssl-config.server-certificate-distinguished-name" => Some(("oracleProfile.oracleAsmConfig.oracleSslConfig.serverCertificateDistinguishedName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "oracle-profile.oracle-asm-config.password" => Some(("oracleProfile.oracleAsmConfig.password", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "oracle-profile.oracle-asm-config.port" => Some(("oracleProfile.oracleAsmConfig.port", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "oracle-profile.oracle-asm-config.secret-manager-stored-password" => Some(("oracleProfile.oracleAsmConfig.secretManagerStoredPassword", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "oracle-profile.oracle-asm-config.username" => Some(("oracleProfile.oracleAsmConfig.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "oracle-profile.oracle-ssl-config.ca-certificate" => Some(("oracleProfile.oracleSslConfig.caCertificate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "oracle-profile.oracle-ssl-config.ca-certificate-set" => Some(("oracleProfile.oracleSslConfig.caCertificateSet", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "oracle-profile.oracle-ssl-config.server-certificate-distinguished-name" => Some(("oracleProfile.oracleSslConfig.serverCertificateDistinguishedName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "oracle-profile.password" => Some(("oracleProfile.password", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "oracle-profile.port" => Some(("oracleProfile.port", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "oracle-profile.secret-manager-stored-password" => Some(("oracleProfile.secretManagerStoredPassword", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "oracle-profile.username" => Some(("oracleProfile.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "postgresql-profile.database" => Some(("postgresqlProfile.database", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "postgresql-profile.hostname" => Some(("postgresqlProfile.hostname", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "postgresql-profile.password" => Some(("postgresqlProfile.password", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "postgresql-profile.port" => Some(("postgresqlProfile.port", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "postgresql-profile.secret-manager-stored-password" => Some(("postgresqlProfile.secretManagerStoredPassword", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "postgresql-profile.ssl-config.server-and-client-verification.ca-certificate" => Some(("postgresqlProfile.sslConfig.serverAndClientVerification.caCertificate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "postgresql-profile.ssl-config.server-and-client-verification.client-certificate" => Some(("postgresqlProfile.sslConfig.serverAndClientVerification.clientCertificate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "postgresql-profile.ssl-config.server-and-client-verification.client-key" => Some(("postgresqlProfile.sslConfig.serverAndClientVerification.clientKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "postgresql-profile.ssl-config.server-and-client-verification.server-certificate-hostname" => Some(("postgresqlProfile.sslConfig.serverAndClientVerification.serverCertificateHostname", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "postgresql-profile.ssl-config.server-verification.ca-certificate" => Some(("postgresqlProfile.sslConfig.serverVerification.caCertificate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "postgresql-profile.ssl-config.server-verification.server-certificate-hostname" => Some(("postgresqlProfile.sslConfig.serverVerification.serverCertificateHostname", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "postgresql-profile.username" => Some(("postgresqlProfile.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "private-connectivity.private-connection" => Some(("privateConnectivity.privateConnection", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "salesforce-profile.domain" => Some(("salesforceProfile.domain", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "salesforce-profile.oauth2-client-credentials.client-id" => Some(("salesforceProfile.oauth2ClientCredentials.clientId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "salesforce-profile.oauth2-client-credentials.client-secret" => Some(("salesforceProfile.oauth2ClientCredentials.clientSecret", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "salesforce-profile.oauth2-client-credentials.secret-manager-stored-client-secret" => Some(("salesforceProfile.oauth2ClientCredentials.secretManagerStoredClientSecret", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "salesforce-profile.user-credentials.password" => Some(("salesforceProfile.userCredentials.password", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "salesforce-profile.user-credentials.secret-manager-stored-password" => Some(("salesforceProfile.userCredentials.secretManagerStoredPassword", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "salesforce-profile.user-credentials.secret-manager-stored-security-token" => Some(("salesforceProfile.userCredentials.secretManagerStoredSecurityToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "salesforce-profile.user-credentials.security-token" => Some(("salesforceProfile.userCredentials.securityToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "salesforce-profile.user-credentials.username" => Some(("salesforceProfile.userCredentials.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "satisfies-pzi" => Some(("satisfiesPzi", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "satisfies-pzs" => Some(("satisfiesPzs", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "sql-server-profile.database" => Some(("sqlServerProfile.database", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sql-server-profile.hostname" => Some(("sqlServerProfile.hostname", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sql-server-profile.password" => Some(("sqlServerProfile.password", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sql-server-profile.port" => Some(("sqlServerProfile.port", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "sql-server-profile.secret-manager-stored-password" => Some(("sqlServerProfile.secretManagerStoredPassword", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sql-server-profile.ssl-config.encryption-and-server-validation.ca-certificate" => Some(("sqlServerProfile.sslConfig.encryptionAndServerValidation.caCertificate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sql-server-profile.ssl-config.encryption-and-server-validation.server-certificate-hostname" => Some(("sqlServerProfile.sslConfig.encryptionAndServerValidation.serverCertificateHostname", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sql-server-profile.username" => Some(("sqlServerProfile.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["additional-options", "asm-service", "bucket", "ca-certificate", "ca-certificate-set", "client-certificate", "client-certificate-set", "client-id", "client-key", "client-key-set", "client-secret", "connection-attributes", "create-time", "database", "database-service", "direct-connection", "display-name", "domain", "encryption-and-server-validation", "forward-ssh-connectivity", "gcs-profile", "hostname", "labels", "mongodb-profile", "mysql-profile", "name", "oauth2-client-credentials", "oracle-asm-config", "oracle-profile", "oracle-ssl-config", "password", "port", "postgresql-profile", "private-connection", "private-connectivity", "private-key", "replica-set", "root-path", "salesforce-profile", "satisfies-pzi", "satisfies-pzs", "secret-manager-stored-client-key", "secret-manager-stored-client-secret", "secret-manager-stored-password", "secret-manager-stored-security-token", "security-token", "server-and-client-verification", "server-certificate-distinguished-name", "server-certificate-hostname", "server-verification", "sql-server-profile", "ssl-config", "standard-connection-format", "update-time", "user-credentials", "username"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
             if let Some((field_cursor_str, type_info)) = type_info {
                 FieldCursor::from(field_cursor_str).set_json_value(
                     &mut object,
@@ -1946,6 +1210,9 @@ where
                 "filter" => {
                     call = call.filter(value.unwrap_or(""));
                 }
+                "extra-location-types" => {
+                    call = call.add_extra_location_types(value.unwrap_or(""));
+                }
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -1963,7 +1230,11 @@ where
                             .push(CLIError::UnknownParameter(key.to_string(), {
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
-                                v.extend(["filter", "page-size", "page-token"].iter().map(|v| *v));
+                                v.extend(
+                                    ["extra-location-types", "filter", "page-size", "page-token"]
+                                        .iter()
+                                        .map(|v| *v),
+                                );
                                 v
                             }));
                     }
@@ -2318,6 +1589,13 @@ where
         {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "return-partial-success" => {
+                    call = call.return_partial_success(
+                        value
+                            .map(|v| arg_from_str(v, err, "return-partial-success", "boolean"))
+                            .unwrap_or(false),
+                    );
+                }
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
                 }
@@ -2348,7 +1626,16 @@ where
                             .push(CLIError::UnknownParameter(key.to_string(), {
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
-                                v.extend(["filter", "page-size", "page-token"].iter().map(|v| *v));
+                                v.extend(
+                                    [
+                                        "filter",
+                                        "page-size",
+                                        "page-token",
+                                        "return-partial-success",
+                                    ]
+                                    .iter()
+                                    .map(|v| *v),
+                                );
                                 v
                             }));
                     }
@@ -2489,6 +1776,27 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "psc-interface-config.network-attachment" => Some((
+                    "pscInterfaceConfig.networkAttachment",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "satisfies-pzi" => Some((
+                    "satisfiesPzi",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "satisfies-pzs" => Some((
+                    "satisfiesPzs",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "state" => Some((
                     "state",
                     JsonTypeInfo {
@@ -2530,7 +1838,11 @@ where
                             "labels",
                             "message",
                             "name",
+                            "network-attachment",
+                            "psc-interface-config",
                             "reason",
+                            "satisfies-pzi",
+                            "satisfies-pzs",
                             "state",
                             "subnet",
                             "update-time",
@@ -2569,6 +1881,13 @@ where
         {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "validate-only" => {
+                    call = call.validate_only(
+                        value
+                            .map(|v| arg_from_str(v, err, "validate-only", "boolean"))
+                            .unwrap_or(false),
+                    );
+                }
                 "request-id" => {
                     call = call.request_id(value.unwrap_or(""));
                 }
@@ -2600,9 +1919,14 @@ where
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
                                 v.extend(
-                                    ["force", "private-connection-id", "request-id"]
-                                        .iter()
-                                        .map(|v| *v),
+                                    [
+                                        "force",
+                                        "private-connection-id",
+                                        "request-id",
+                                        "validate-only",
+                                    ]
+                                    .iter()
+                                    .map(|v| *v),
                                 );
                                 v
                             }));
@@ -3423,11 +2747,17 @@ where
                 match &temp_cursor.to_string()[..] {
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "customer-managed-encryption-key" => Some(("customerManagedEncryptionKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "destination-config.bigquery-destination-config.blmt-config.bucket" => Some(("destinationConfig.bigqueryDestinationConfig.blmtConfig.bucket", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "destination-config.bigquery-destination-config.blmt-config.connection-name" => Some(("destinationConfig.bigqueryDestinationConfig.blmtConfig.connectionName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "destination-config.bigquery-destination-config.blmt-config.file-format" => Some(("destinationConfig.bigqueryDestinationConfig.blmtConfig.fileFormat", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "destination-config.bigquery-destination-config.blmt-config.root-path" => Some(("destinationConfig.bigqueryDestinationConfig.blmtConfig.rootPath", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "destination-config.bigquery-destination-config.blmt-config.table-format" => Some(("destinationConfig.bigqueryDestinationConfig.blmtConfig.tableFormat", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "destination-config.bigquery-destination-config.data-freshness" => Some(("destinationConfig.bigqueryDestinationConfig.dataFreshness", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "destination-config.bigquery-destination-config.single-target-dataset.dataset-id" => Some(("destinationConfig.bigqueryDestinationConfig.singleTargetDataset.datasetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "destination-config.bigquery-destination-config.source-hierarchy-datasets.dataset-template.dataset-id-prefix" => Some(("destinationConfig.bigqueryDestinationConfig.sourceHierarchyDatasets.datasetTemplate.datasetIdPrefix", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "destination-config.bigquery-destination-config.source-hierarchy-datasets.dataset-template.kms-key-name" => Some(("destinationConfig.bigqueryDestinationConfig.sourceHierarchyDatasets.datasetTemplate.kmsKeyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "destination-config.bigquery-destination-config.source-hierarchy-datasets.dataset-template.location" => Some(("destinationConfig.bigqueryDestinationConfig.sourceHierarchyDatasets.datasetTemplate.location", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "destination-config.bigquery-destination-config.source-hierarchy-datasets.project-id" => Some(("destinationConfig.bigqueryDestinationConfig.sourceHierarchyDatasets.projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "destination-config.destination-connection-profile" => Some(("destinationConfig.destinationConnectionProfile", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "destination-config.gcs-destination-config.file-rotation-interval" => Some(("destinationConfig.gcsDestinationConfig.fileRotationInterval", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "destination-config.gcs-destination-config.file-rotation-mb" => Some(("destinationConfig.gcsDestinationConfig.fileRotationMb", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
@@ -3438,20 +2768,27 @@ where
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "last-recovery-time" => Some(("lastRecoveryTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "satisfies-pzi" => Some(("satisfiesPzi", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "satisfies-pzs" => Some(("satisfiesPzs", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "source-config.mongodb-source-config.json-mode" => Some(("sourceConfig.mongodbSourceConfig.jsonMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "source-config.mongodb-source-config.max-concurrent-backfill-tasks" => Some(("sourceConfig.mongodbSourceConfig.maxConcurrentBackfillTasks", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "source-config.mysql-source-config.max-concurrent-backfill-tasks" => Some(("sourceConfig.mysqlSourceConfig.maxConcurrentBackfillTasks", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "source-config.mysql-source-config.max-concurrent-cdc-tasks" => Some(("sourceConfig.mysqlSourceConfig.maxConcurrentCdcTasks", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "source-config.oracle-source-config.binary-log-parser.log-file-directories.archived-log-directory" => Some(("sourceConfig.oracleSourceConfig.binaryLogParser.logFileDirectories.archivedLogDirectory", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "source-config.oracle-source-config.binary-log-parser.log-file-directories.online-log-directory" => Some(("sourceConfig.oracleSourceConfig.binaryLogParser.logFileDirectories.onlineLogDirectory", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "source-config.oracle-source-config.max-concurrent-backfill-tasks" => Some(("sourceConfig.oracleSourceConfig.maxConcurrentBackfillTasks", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "source-config.oracle-source-config.max-concurrent-cdc-tasks" => Some(("sourceConfig.oracleSourceConfig.maxConcurrentCdcTasks", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "source-config.postgresql-source-config.max-concurrent-backfill-tasks" => Some(("sourceConfig.postgresqlSourceConfig.maxConcurrentBackfillTasks", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "source-config.postgresql-source-config.publication" => Some(("sourceConfig.postgresqlSourceConfig.publication", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "source-config.postgresql-source-config.replication-slot" => Some(("sourceConfig.postgresqlSourceConfig.replicationSlot", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "source-config.salesforce-source-config.polling-interval" => Some(("sourceConfig.salesforceSourceConfig.pollingInterval", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "source-config.source-connection-profile" => Some(("sourceConfig.sourceConnectionProfile", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "source-config.sql-server-source-config.max-concurrent-backfill-tasks" => Some(("sourceConfig.sqlServerSourceConfig.maxConcurrentBackfillTasks", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "source-config.sql-server-source-config.max-concurrent-cdc-tasks" => Some(("sourceConfig.sqlServerSourceConfig.maxConcurrentCdcTasks", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["bigquery-destination-config", "compression", "create-time", "customer-managed-encryption-key", "data-freshness", "dataset-id", "dataset-id-prefix", "dataset-template", "destination-config", "destination-connection-profile", "display-name", "file-rotation-interval", "file-rotation-mb", "gcs-destination-config", "json-file-format", "kms-key-name", "labels", "last-recovery-time", "location", "max-concurrent-backfill-tasks", "max-concurrent-cdc-tasks", "mysql-source-config", "name", "oracle-source-config", "path", "postgresql-source-config", "publication", "replication-slot", "schema-file-format", "single-target-dataset", "source-config", "source-connection-profile", "source-hierarchy-datasets", "sql-server-source-config", "state", "update-time"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["archived-log-directory", "bigquery-destination-config", "binary-log-parser", "blmt-config", "bucket", "compression", "connection-name", "create-time", "customer-managed-encryption-key", "data-freshness", "dataset-id", "dataset-id-prefix", "dataset-template", "destination-config", "destination-connection-profile", "display-name", "file-format", "file-rotation-interval", "file-rotation-mb", "gcs-destination-config", "json-file-format", "json-mode", "kms-key-name", "labels", "last-recovery-time", "location", "log-file-directories", "max-concurrent-backfill-tasks", "max-concurrent-cdc-tasks", "mongodb-source-config", "mysql-source-config", "name", "online-log-directory", "oracle-source-config", "path", "polling-interval", "postgresql-source-config", "project-id", "publication", "replication-slot", "root-path", "salesforce-source-config", "satisfies-pzi", "satisfies-pzs", "schema-file-format", "single-target-dataset", "source-config", "source-connection-profile", "source-hierarchy-datasets", "sql-server-source-config", "state", "table-format", "update-time"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -4039,6 +3376,20 @@ where
 
             let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
             {
+                "source-object-identifier.mongodb-identifier.collection" => Some((
+                    "sourceObjectIdentifier.mongodbIdentifier.collection",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "source-object-identifier.mongodb-identifier.database" => Some((
+                    "sourceObjectIdentifier.mongodbIdentifier.database",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "source-object-identifier.mysql-identifier.database" => Some((
                     "sourceObjectIdentifier.mysqlIdentifier.database",
                     JsonTypeInfo {
@@ -4081,6 +3432,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "source-object-identifier.salesforce-identifier.object-name" => Some((
+                    "sourceObjectIdentifier.salesforceIdentifier.objectName",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "source-object-identifier.sql-server-identifier.schema" => Some((
                     "sourceObjectIdentifier.sqlServerIdentifier.schema",
                     JsonTypeInfo {
@@ -4099,10 +3457,14 @@ where
                     let suggestion = FieldCursor::did_you_mean(
                         key,
                         &vec![
+                            "collection",
                             "database",
+                            "mongodb-identifier",
                             "mysql-identifier",
+                            "object-name",
                             "oracle-identifier",
                             "postgresql-identifier",
+                            "salesforce-identifier",
                             "schema",
                             "source-object-identifier",
                             "sql-server-identifier",
@@ -4235,8 +3597,16 @@ where
 
             let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
             {
+                "event-filter.sql-where-clause" => Some((
+                    "eventFilter.sqlWhereClause",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                    let suggestion =
+                        FieldCursor::did_you_mean(key, &vec!["event-filter", "sql-where-clause"]);
                     err.issues.push(CLIError::Field(FieldError::Unknown(
                         temp_cursor.to_string(),
                         suggestion,
@@ -4499,11 +3869,17 @@ where
                 match &temp_cursor.to_string()[..] {
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "customer-managed-encryption-key" => Some(("customerManagedEncryptionKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "destination-config.bigquery-destination-config.blmt-config.bucket" => Some(("destinationConfig.bigqueryDestinationConfig.blmtConfig.bucket", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "destination-config.bigquery-destination-config.blmt-config.connection-name" => Some(("destinationConfig.bigqueryDestinationConfig.blmtConfig.connectionName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "destination-config.bigquery-destination-config.blmt-config.file-format" => Some(("destinationConfig.bigqueryDestinationConfig.blmtConfig.fileFormat", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "destination-config.bigquery-destination-config.blmt-config.root-path" => Some(("destinationConfig.bigqueryDestinationConfig.blmtConfig.rootPath", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "destination-config.bigquery-destination-config.blmt-config.table-format" => Some(("destinationConfig.bigqueryDestinationConfig.blmtConfig.tableFormat", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "destination-config.bigquery-destination-config.data-freshness" => Some(("destinationConfig.bigqueryDestinationConfig.dataFreshness", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "destination-config.bigquery-destination-config.single-target-dataset.dataset-id" => Some(("destinationConfig.bigqueryDestinationConfig.singleTargetDataset.datasetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "destination-config.bigquery-destination-config.source-hierarchy-datasets.dataset-template.dataset-id-prefix" => Some(("destinationConfig.bigqueryDestinationConfig.sourceHierarchyDatasets.datasetTemplate.datasetIdPrefix", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "destination-config.bigquery-destination-config.source-hierarchy-datasets.dataset-template.kms-key-name" => Some(("destinationConfig.bigqueryDestinationConfig.sourceHierarchyDatasets.datasetTemplate.kmsKeyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "destination-config.bigquery-destination-config.source-hierarchy-datasets.dataset-template.location" => Some(("destinationConfig.bigqueryDestinationConfig.sourceHierarchyDatasets.datasetTemplate.location", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "destination-config.bigquery-destination-config.source-hierarchy-datasets.project-id" => Some(("destinationConfig.bigqueryDestinationConfig.sourceHierarchyDatasets.projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "destination-config.destination-connection-profile" => Some(("destinationConfig.destinationConnectionProfile", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "destination-config.gcs-destination-config.file-rotation-interval" => Some(("destinationConfig.gcsDestinationConfig.fileRotationInterval", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "destination-config.gcs-destination-config.file-rotation-mb" => Some(("destinationConfig.gcsDestinationConfig.fileRotationMb", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
@@ -4514,20 +3890,27 @@ where
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "last-recovery-time" => Some(("lastRecoveryTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "satisfies-pzi" => Some(("satisfiesPzi", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "satisfies-pzs" => Some(("satisfiesPzs", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "source-config.mongodb-source-config.json-mode" => Some(("sourceConfig.mongodbSourceConfig.jsonMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "source-config.mongodb-source-config.max-concurrent-backfill-tasks" => Some(("sourceConfig.mongodbSourceConfig.maxConcurrentBackfillTasks", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "source-config.mysql-source-config.max-concurrent-backfill-tasks" => Some(("sourceConfig.mysqlSourceConfig.maxConcurrentBackfillTasks", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "source-config.mysql-source-config.max-concurrent-cdc-tasks" => Some(("sourceConfig.mysqlSourceConfig.maxConcurrentCdcTasks", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "source-config.oracle-source-config.binary-log-parser.log-file-directories.archived-log-directory" => Some(("sourceConfig.oracleSourceConfig.binaryLogParser.logFileDirectories.archivedLogDirectory", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "source-config.oracle-source-config.binary-log-parser.log-file-directories.online-log-directory" => Some(("sourceConfig.oracleSourceConfig.binaryLogParser.logFileDirectories.onlineLogDirectory", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "source-config.oracle-source-config.max-concurrent-backfill-tasks" => Some(("sourceConfig.oracleSourceConfig.maxConcurrentBackfillTasks", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "source-config.oracle-source-config.max-concurrent-cdc-tasks" => Some(("sourceConfig.oracleSourceConfig.maxConcurrentCdcTasks", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "source-config.postgresql-source-config.max-concurrent-backfill-tasks" => Some(("sourceConfig.postgresqlSourceConfig.maxConcurrentBackfillTasks", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "source-config.postgresql-source-config.publication" => Some(("sourceConfig.postgresqlSourceConfig.publication", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "source-config.postgresql-source-config.replication-slot" => Some(("sourceConfig.postgresqlSourceConfig.replicationSlot", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "source-config.salesforce-source-config.polling-interval" => Some(("sourceConfig.salesforceSourceConfig.pollingInterval", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "source-config.source-connection-profile" => Some(("sourceConfig.sourceConnectionProfile", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "source-config.sql-server-source-config.max-concurrent-backfill-tasks" => Some(("sourceConfig.sqlServerSourceConfig.maxConcurrentBackfillTasks", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "source-config.sql-server-source-config.max-concurrent-cdc-tasks" => Some(("sourceConfig.sqlServerSourceConfig.maxConcurrentCdcTasks", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["bigquery-destination-config", "compression", "create-time", "customer-managed-encryption-key", "data-freshness", "dataset-id", "dataset-id-prefix", "dataset-template", "destination-config", "destination-connection-profile", "display-name", "file-rotation-interval", "file-rotation-mb", "gcs-destination-config", "json-file-format", "kms-key-name", "labels", "last-recovery-time", "location", "max-concurrent-backfill-tasks", "max-concurrent-cdc-tasks", "mysql-source-config", "name", "oracle-source-config", "path", "postgresql-source-config", "publication", "replication-slot", "schema-file-format", "single-target-dataset", "source-config", "source-connection-profile", "source-hierarchy-datasets", "sql-server-source-config", "state", "update-time"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["archived-log-directory", "bigquery-destination-config", "binary-log-parser", "blmt-config", "bucket", "compression", "connection-name", "create-time", "customer-managed-encryption-key", "data-freshness", "dataset-id", "dataset-id-prefix", "dataset-template", "destination-config", "destination-connection-profile", "display-name", "file-format", "file-rotation-interval", "file-rotation-mb", "gcs-destination-config", "json-file-format", "json-mode", "kms-key-name", "labels", "last-recovery-time", "location", "log-file-directories", "max-concurrent-backfill-tasks", "max-concurrent-cdc-tasks", "mongodb-source-config", "mysql-source-config", "name", "online-log-directory", "oracle-source-config", "path", "polling-interval", "postgresql-source-config", "project-id", "publication", "replication-slot", "root-path", "salesforce-source-config", "satisfies-pzi", "satisfies-pzs", "schema-file-format", "single-target-dataset", "source-config", "source-connection-profile", "source-hierarchy-datasets", "sql-server-source-config", "state", "table-format", "update-time"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -4676,50 +4059,21 @@ where
                 continue;
             }
 
-            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
-            {
-                "cdc-strategy.specific-start-position.mysql-log-position.log-file" => Some((
-                    "cdcStrategy.specificStartPosition.mysqlLogPosition.logFile",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "cdc-strategy.specific-start-position.mysql-log-position.log-position" => Some((
-                    "cdcStrategy.specificStartPosition.mysqlLogPosition.logPosition",
-                    JsonTypeInfo {
-                        jtype: JsonType::Int,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "cdc-strategy.specific-start-position.oracle-scn-position.scn" => Some((
-                    "cdcStrategy.specificStartPosition.oracleScnPosition.scn",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(
-                        key,
-                        &vec![
-                            "cdc-strategy",
-                            "log-file",
-                            "log-position",
-                            "mysql-log-position",
-                            "oracle-scn-position",
-                            "scn",
-                            "specific-start-position",
-                        ],
-                    );
-                    err.issues.push(CLIError::Field(FieldError::Unknown(
-                        temp_cursor.to_string(),
-                        suggestion,
-                        value.map(|v| v.to_string()),
-                    )));
-                    None
-                }
-            };
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "cdc-strategy.specific-start-position.mongodb-change-stream-position.start-time" => Some(("cdcStrategy.specificStartPosition.mongodbChangeStreamPosition.startTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cdc-strategy.specific-start-position.mysql-gtid-position.gtid-set" => Some(("cdcStrategy.specificStartPosition.mysqlGtidPosition.gtidSet", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cdc-strategy.specific-start-position.mysql-log-position.log-file" => Some(("cdcStrategy.specificStartPosition.mysqlLogPosition.logFile", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cdc-strategy.specific-start-position.mysql-log-position.log-position" => Some(("cdcStrategy.specificStartPosition.mysqlLogPosition.logPosition", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "cdc-strategy.specific-start-position.oracle-scn-position.scn" => Some(("cdcStrategy.specificStartPosition.oracleScnPosition.scn", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cdc-strategy.specific-start-position.sql-server-lsn-position.lsn" => Some(("cdcStrategy.specificStartPosition.sqlServerLsnPosition.lsn", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "force" => Some(("force", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["cdc-strategy", "force", "gtid-set", "log-file", "log-position", "lsn", "mongodb-change-stream-position", "mysql-gtid-position", "mysql-log-position", "oracle-scn-position", "scn", "specific-start-position", "sql-server-lsn-position", "start-time"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
             if let Some((field_cursor_str, type_info)) = type_info {
                 FieldCursor::from(field_cursor_str).set_json_value(
                     &mut object,
@@ -5025,7 +4379,9 @@ where
         let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
             secret,
             yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-            hyper_util::client::legacy::Client::builder(executor).build(connector),
+            yup_oauth2::client::CustomHyperClientBuilder::from(
+                hyper_util::client::legacy::Client::builder(executor).build(connector),
+            ),
         )
         .persist_tokens_to_disk(format!("{}/datastream1", config_dir))
         .build()
@@ -5195,7 +4551,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Output only. The resource's name."##),
+                     Some(r##"Output only. Identifier. The resource's name."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -5275,7 +4631,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-operations-cancel",
-                    Some(r##"Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of 1, corresponding to `Code.CANCELLED`."##),
+                    Some(r##"Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of `1`, corresponding to `Code.CANCELLED`."##),
                     "Details at http://byron.github.io/google-apis-rs/google_datastream1_cli/projects_locations-operations-cancel",
                   vec![
                     (Some(r##"name"##),
@@ -5735,7 +5091,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Output only. The stream's name."##),
+                     Some(r##"Output only. Identifier. The stream's name."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -5755,7 +5111,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-streams-run",
-                    Some(r##"Use this method to start, resume or recover a stream with a non default CDC strategy. NOTE: This feature is currently experimental."##),
+                    Some(r##"Use this method to start, resume or recover a stream with a non default CDC strategy."##),
                     "Details at http://byron.github.io/google-apis-rs/google_datastream1_cli/projects_locations-streams-run",
                   vec![
                     (Some(r##"name"##),
@@ -5784,7 +5140,7 @@ async fn main() {
 
     let mut app = App::new("datastream1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("6.0.0+20240612")
+           .version("7.0.0+20251210")
            .about("")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_datastream1_cli")
            .arg(Arg::with_name("url")
@@ -5849,7 +5205,7 @@ async fn main() {
         .with_native_roots()
         .unwrap()
         .https_or_http()
-        .enable_http1()
+        .enable_http2()
         .build();
 
     match Engine::new(matches, connector).await {

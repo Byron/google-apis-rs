@@ -414,10 +414,13 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self
-            .hub
-            .queries()
-            .deletequery(opt.value_of("query-id").unwrap_or(""));
+        let query_id: i64 = arg_from_str(
+            &opt.value_of("query-id").unwrap_or(""),
+            err,
+            "<query-id>",
+            "int64",
+        );
+        let mut call = self.hub.queries().deletequery(query_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -479,10 +482,13 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self
-            .hub
-            .queries()
-            .getquery(opt.value_of("query-id").unwrap_or(""));
+        let query_id: i64 = arg_from_str(
+            &opt.value_of("query-id").unwrap_or(""),
+            err,
+            "<query-id>",
+            "int64",
+        );
+        let mut call = self.hub.queries().getquery(query_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -731,10 +737,13 @@ where
             }
         }
         let mut request: api::RunQueryRequest = serde_json::value::from_value(object).unwrap();
-        let mut call = self
-            .hub
-            .queries()
-            .runquery(request, opt.value_of("query-id").unwrap_or(""));
+        let query_id: i64 = arg_from_str(
+            &opt.value_of("query-id").unwrap_or(""),
+            err,
+            "<query-id>",
+            "int64",
+        );
+        let mut call = self.hub.queries().runquery(request, query_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -804,10 +813,13 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self
-            .hub
-            .reports()
-            .listreports(opt.value_of("query-id").unwrap_or(""));
+        let query_id: i64 = arg_from_str(
+            &opt.value_of("query-id").unwrap_or(""),
+            err,
+            "<query-id>",
+            "int64",
+        );
+        let mut call = self.hub.reports().listreports(query_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -970,7 +982,9 @@ where
         let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
             secret,
             yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-            hyper_util::client::legacy::Client::builder(executor).build(connector),
+            yup_oauth2::client::CustomHyperClientBuilder::from(
+                hyper_util::client::legacy::Client::builder(executor).build(connector),
+            ),
         )
         .persist_tokens_to_disk(format!("{}/doubleclickbidmanager1d1", config_dir))
         .build()
@@ -1141,7 +1155,7 @@ async fn main() {
 
     let mut app = App::new("doubleclickbidmanager1d1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("6.0.0+20230117")
+           .version("7.0.0+20230117")
            .about("DoubleClick Bid Manager API allows users to manage and create campaigns and reports.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_doubleclickbidmanager1d1_cli")
            .arg(Arg::with_name("url")
@@ -1206,7 +1220,7 @@ async fn main() {
         .with_native_roots()
         .unwrap()
         .https_or_http()
-        .enable_http1()
+        .enable_http2()
         .build();
 
     match Engine::new(matches, connector).await {

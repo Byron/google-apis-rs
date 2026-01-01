@@ -1,4 +1,4 @@
-site_name: networkconnectivity v6.0.0+20240618
+site_name: networkconnectivity v7.0.0+20251209
 site_url: http://byron.github.io/google-apis-rs/google-networkconnectivity1-cli
 site_description: A complete library to interact with networkconnectivity (protocol v1)
 
@@ -10,8 +10,10 @@ site_dir: build_html
 nav:
 - Home: 'index.md'
 - 'Projects':
+    - 'Locations Check Consumer Config': 'projects_locations-check-consumer-config.md'
     - 'Locations Get': 'projects_locations-get.md'
     - 'Locations Global Hubs Accept Spoke': 'projects_locations-global-hubs-accept-spoke.md'
+    - 'Locations Global Hubs Accept Spoke Update': 'projects_locations-global-hubs-accept-spoke-update.md'
     - 'Locations Global Hubs Create': 'projects_locations-global-hubs-create.md'
     - 'Locations Global Hubs Delete': 'projects_locations-global-hubs-delete.md'
     - 'Locations Global Hubs Get': 'projects_locations-global-hubs-get.md'
@@ -25,7 +27,9 @@ nav:
     - 'Locations Global Hubs List': 'projects_locations-global-hubs-list.md'
     - 'Locations Global Hubs List Spokes': 'projects_locations-global-hubs-list-spokes.md'
     - 'Locations Global Hubs Patch': 'projects_locations-global-hubs-patch.md'
+    - 'Locations Global Hubs Query Status': 'projects_locations-global-hubs-query-status.md'
     - 'Locations Global Hubs Reject Spoke': 'projects_locations-global-hubs-reject-spoke.md'
+    - 'Locations Global Hubs Reject Spoke Update': 'projects_locations-global-hubs-reject-spoke-update.md'
     - 'Locations Global Hubs Route Tables Get': 'projects_locations-global-hubs-route-tables-get.md'
     - 'Locations Global Hubs Route Tables List': 'projects_locations-global-hubs-route-tables-list.md'
     - 'Locations Global Hubs Route Tables Routes Get': 'projects_locations-global-hubs-route-tables-routes-get.md'
@@ -42,9 +46,24 @@ nav:
     - 'Locations Internal Ranges Create': 'projects_locations-internal-ranges-create.md'
     - 'Locations Internal Ranges Delete': 'projects_locations-internal-ranges-delete.md'
     - 'Locations Internal Ranges Get': 'projects_locations-internal-ranges-get.md'
+    - 'Locations Internal Ranges Get Iam Policy': 'projects_locations-internal-ranges-get-iam-policy.md'
     - 'Locations Internal Ranges List': 'projects_locations-internal-ranges-list.md'
     - 'Locations Internal Ranges Patch': 'projects_locations-internal-ranges-patch.md'
+    - 'Locations Internal Ranges Set Iam Policy': 'projects_locations-internal-ranges-set-iam-policy.md'
+    - 'Locations Internal Ranges Test Iam Permissions': 'projects_locations-internal-ranges-test-iam-permissions.md'
     - 'Locations List': 'projects_locations-list.md'
+    - 'Locations Multicloud Data Transfer Configs Create': 'projects_locations-multicloud-data-transfer-configs-create.md'
+    - 'Locations Multicloud Data Transfer Configs Delete': 'projects_locations-multicloud-data-transfer-configs-delete.md'
+    - 'Locations Multicloud Data Transfer Configs Destinations Create': 'projects_locations-multicloud-data-transfer-configs-destinations-create.md'
+    - 'Locations Multicloud Data Transfer Configs Destinations Delete': 'projects_locations-multicloud-data-transfer-configs-destinations-delete.md'
+    - 'Locations Multicloud Data Transfer Configs Destinations Get': 'projects_locations-multicloud-data-transfer-configs-destinations-get.md'
+    - 'Locations Multicloud Data Transfer Configs Destinations List': 'projects_locations-multicloud-data-transfer-configs-destinations-list.md'
+    - 'Locations Multicloud Data Transfer Configs Destinations Patch': 'projects_locations-multicloud-data-transfer-configs-destinations-patch.md'
+    - 'Locations Multicloud Data Transfer Configs Get': 'projects_locations-multicloud-data-transfer-configs-get.md'
+    - 'Locations Multicloud Data Transfer Configs List': 'projects_locations-multicloud-data-transfer-configs-list.md'
+    - 'Locations Multicloud Data Transfer Configs Patch': 'projects_locations-multicloud-data-transfer-configs-patch.md'
+    - 'Locations Multicloud Data Transfer Supported Services Get': 'projects_locations-multicloud-data-transfer-supported-services-get.md'
+    - 'Locations Multicloud Data Transfer Supported Services List': 'projects_locations-multicloud-data-transfer-supported-services-list.md'
     - 'Locations Operations Cancel': 'projects_locations-operations-cancel.md'
     - 'Locations Operations Delete': 'projects_locations-operations-delete.md'
     - 'Locations Operations Get': 'projects_locations-operations-get.md'

@@ -1,4 +1,4 @@
-site_name: Recaptcha Enterprise v6.0.0+20240623
+site_name: Recaptcha Enterprise v7.0.0+20251210
 site_url: http://byron.github.io/google-apis-rs/google-recaptchaenterprise1-cli
 site_description: A complete library to interact with Recaptcha Enterprise (protocol v1)
 
@@ -18,13 +18,16 @@ nav:
     - 'Firewallpolicies List': 'projects_firewallpolicies-list.md'
     - 'Firewallpolicies Patch': 'projects_firewallpolicies-patch.md'
     - 'Firewallpolicies Reorder': 'projects_firewallpolicies-reorder.md'
+    - 'Keys Add Ip Override': 'projects_keys-add-ip-override.md'
     - 'Keys Create': 'projects_keys-create.md'
     - 'Keys Delete': 'projects_keys-delete.md'
     - 'Keys Get': 'projects_keys-get.md'
     - 'Keys Get Metrics': 'projects_keys-get-metrics.md'
     - 'Keys List': 'projects_keys-list.md'
+    - 'Keys List Ip Overrides': 'projects_keys-list-ip-overrides.md'
     - 'Keys Migrate': 'projects_keys-migrate.md'
     - 'Keys Patch': 'projects_keys-patch.md'
+    - 'Keys Remove Ip Override': 'projects_keys-remove-ip-override.md'
     - 'Keys Retrieve Legacy Secret Key': 'projects_keys-retrieve-legacy-secret-key.md'
     - 'Relatedaccountgroupmemberships Search': 'projects_relatedaccountgroupmemberships-search.md'
     - 'Relatedaccountgroups List': 'projects_relatedaccountgroups-list.md'

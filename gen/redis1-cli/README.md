@@ -25,17 +25,25 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Cloud Redis* API at revision *20240613*. The CLI is at version *6.0.0*.
+This documentation was generated from the *Cloud Redis* API at revision *20251104*. The CLI is at version *7.0.0*.
 
 ```bash
 redis1 [options]
         projects
+                locations-backup-collections-backups-delete <name> [-p <v>]... [-o <out>]
+                locations-backup-collections-backups-export <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-backup-collections-backups-get <name> [-p <v>]... [-o <out>]
+                locations-backup-collections-backups-list <parent> [-p <v>]... [-o <out>]
+                locations-backup-collections-get <name> [-p <v>]... [-o <out>]
+                locations-backup-collections-list <parent> [-p <v>]... [-o <out>]
+                locations-clusters-backup <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-clusters-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-clusters-delete <name> [-p <v>]... [-o <out>]
                 locations-clusters-get <name> [-p <v>]... [-o <out>]
                 locations-clusters-get-certificate-authority <name> [-p <v>]... [-o <out>]
                 locations-clusters-list <parent> [-p <v>]... [-o <out>]
                 locations-clusters-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-clusters-reschedule-cluster-maintenance <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-get <name> [-p <v>]... [-o <out>]
                 locations-instances-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-instances-delete <name> [-p <v>]... [-o <out>]

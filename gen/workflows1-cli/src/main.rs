@@ -154,6 +154,9 @@ where
                 "filter" => {
                     call = call.filter(value.unwrap_or(""));
                 }
+                "extra-location-types" => {
+                    call = call.add_extra_location_types(value.unwrap_or(""));
+                }
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -171,7 +174,11 @@ where
                             .push(CLIError::UnknownParameter(key.to_string(), {
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
-                                v.extend(["filter", "page-size", "page-token"].iter().map(|v| *v));
+                                v.extend(
+                                    ["extra-location-types", "filter", "page-size", "page-token"]
+                                        .iter()
+                                        .map(|v| *v),
+                                );
                                 v
                             }));
                     }
@@ -398,6 +405,13 @@ where
         {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "return-partial-success" => {
+                    call = call.return_partial_success(
+                        value
+                            .map(|v| arg_from_str(v, err, "return-partial-success", "boolean"))
+                            .unwrap_or(false),
+                    );
+                }
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
                 }
@@ -428,7 +442,16 @@ where
                             .push(CLIError::UnknownParameter(key.to_string(), {
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
-                                v.extend(["filter", "page-size", "page-token"].iter().map(|v| *v));
+                                v.extend(
+                                    [
+                                        "filter",
+                                        "page-size",
+                                        "page-token",
+                                        "return-partial-success",
+                                    ]
+                                    .iter()
+                                    .map(|v| *v),
+                                );
                                 v
                             }));
                     }
@@ -555,6 +578,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "execution-history-level" => Some((
+                    "executionHistoryLevel",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "labels" => Some((
                     "labels",
                     JsonTypeInfo {
@@ -618,6 +648,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "tags" => Some((
+                    "tags",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Map,
+                    },
+                )),
                 "update-time" => Some((
                     "updateTime",
                     JsonTypeInfo {
@@ -644,6 +681,7 @@ where
                             "crypto-key-version",
                             "description",
                             "details",
+                            "execution-history-level",
                             "labels",
                             "name",
                             "revision-create-time",
@@ -652,6 +690,7 @@ where
                             "source-contents",
                             "state",
                             "state-error",
+                            "tags",
                             "type",
                             "update-time",
                             "user-env-vars",
@@ -1195,6 +1234,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "execution-history-level" => Some((
+                    "executionHistoryLevel",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "labels" => Some((
                     "labels",
                     JsonTypeInfo {
@@ -1258,6 +1304,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "tags" => Some((
+                    "tags",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Map,
+                    },
+                )),
                 "update-time" => Some((
                     "updateTime",
                     JsonTypeInfo {
@@ -1284,6 +1337,7 @@ where
                             "crypto-key-version",
                             "description",
                             "details",
+                            "execution-history-level",
                             "labels",
                             "name",
                             "revision-create-time",
@@ -1292,6 +1346,7 @@ where
                             "source-contents",
                             "state",
                             "state-error",
+                            "tags",
                             "type",
                             "update-time",
                             "user-env-vars",
@@ -1505,7 +1560,9 @@ where
         let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
             secret,
             yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-            hyper_util::client::legacy::Client::builder(executor).build(connector),
+            yup_oauth2::client::CustomHyperClientBuilder::from(
+                hyper_util::client::legacy::Client::builder(executor).build(connector),
+            ),
         )
         .persist_tokens_to_disk(format!("{}/workflows1", config_dir))
         .build()
@@ -1794,7 +1851,7 @@ async fn main() {
 
     let mut app = App::new("workflows1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("6.0.0+20240612")
+           .version("7.0.0+20251203")
            .about("Manage workflow definitions. To execute workflows and manage executions, see the Workflows Executions API.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_workflows1_cli")
            .arg(Arg::with_name("url")
@@ -1859,7 +1916,7 @@ async fn main() {
         .with_native_roots()
         .unwrap()
         .https_or_http()
-        .enable_http1()
+        .enable_http2()
         .build();
 
     match Engine::new(matches, connector).await {

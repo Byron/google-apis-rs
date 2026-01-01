@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Cloud Run* API at revision *20240621*. The CLI is at version *6.0.0*.
+This documentation was generated from the *Cloud Run* API at revision *20251212*. The CLI is at version *7.0.0*.
 
 ```bash
 run1 [options]
@@ -59,6 +59,11 @@ run1 [options]
                 services-replace-service <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 tasks-get <name> [-p <v>]... [-o <out>]
                 tasks-list <parent> [-p <v>]... [-o <out>]
+                workerpools-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                workerpools-delete <name> [-p <v>]... [-o <out>]
+                workerpools-get <name> [-p <v>]... [-o <out>]
+                workerpools-list <parent> [-p <v>]... [-o <out>]
+                workerpools-replace-worker-pool <name> (-r <kv>)... [-p <v>]... [-o <out>]
         projects
                 authorizeddomains-list <parent> [-p <v>]... [-o <out>]
                 locations-authorizeddomains-list <parent> [-p <v>]... [-o <out>]
@@ -89,6 +94,9 @@ run1 [options]
                 locations-services-replace-service <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-services-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-services-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-workerpools-get-iam-policy <resource> [-p <v>]... [-o <out>]
+                locations-workerpools-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-workerpools-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
   run1 --help
 
 Configuration:

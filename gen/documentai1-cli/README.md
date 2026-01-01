@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Document* API at revision *20240619*. The CLI is at version *6.0.0*.
+This documentation was generated from the *Document* API at revision *20251213*. The CLI is at version *7.0.0*.
 
 ```bash
 documentai1 [options]
@@ -61,6 +61,17 @@ documentai1 [options]
                 locations-processors-processor-versions-train <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-processors-processor-versions-undeploy <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-processors-set-default-processor-version <processor> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-schemas-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-schemas-delete <name> [-p <v>]... [-o <out>]
+                locations-schemas-get <name> [-p <v>]... [-o <out>]
+                locations-schemas-list <parent> [-p <v>]... [-o <out>]
+                locations-schemas-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-schemas-schema-versions-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-schemas-schema-versions-delete <name> [-p <v>]... [-o <out>]
+                locations-schemas-schema-versions-generate <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-schemas-schema-versions-get <name> [-p <v>]... [-o <out>]
+                locations-schemas-schema-versions-list <parent> [-p <v>]... [-o <out>]
+                locations-schemas-schema-versions-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 operations-get <name> [-p <v>]... [-o <out>]
   documentai1 --help
 

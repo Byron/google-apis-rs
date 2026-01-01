@@ -25,13 +25,15 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Cloud Resource Manager* API at revision *20240617*. The CLI is at version *6.0.0*.
+This documentation was generated from the *Cloud Resource Manager* API at revision *20251103*. The CLI is at version *7.0.0*.
 
 ```bash
 cloudresourcemanager3 [options]
         effective-tags
                 list [-p <v>]... [-o <out>]
         folders
+                capabilities-get <name> [-p <v>]... [-o <out>]
+                capabilities-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 create (-r <kv>)... [-p <v>]... [-o <out>]
                 delete <name> [-p <v>]... [-o <out>]
                 get <name> [-p <v>]... [-o <out>]
@@ -48,6 +50,10 @@ cloudresourcemanager3 [options]
                 delete <name> [-p <v>]... [-o <out>]
                 get <name> [-p <v>]... [-o <out>]
                 list [-p <v>]... [-o <out>]
+        locations
+                effective-tag-binding-collections-get <name> [-p <v>]... [-o <out>]
+                tag-binding-collections-get <name> [-p <v>]... [-o <out>]
+                tag-binding-collections-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
         operations
                 get <name> [-p <v>]... [-o <out>]
         organizations

@@ -147,7 +147,7 @@
                             ],
                             "parameters": {
                                 "parent": {
-                                    "description": "Required. The name of the project in which the assessment will be created, in the format `projects/{project}`.",
+                                    "description": "Required. The name of the project in which the assessment is created, in the format `projects/{project}`.",
                                     "location": "path",
                                     "pattern": "^projects/[^/]+$",
                                     "required": true,
@@ -179,7 +179,7 @@
                             ],
                             "parameters": {
                                 "parent": {
-                                    "description": "Required. The name of the project this policy will apply to, in the format `projects/{project}`.",
+                                    "description": "Required. The name of the project this policy applies to, in the format `projects/{project}`.",
                                     "location": "path",
                                     "pattern": "^projects/[^/]+$",
                                     "required": true,
@@ -300,7 +300,7 @@
                                     "type": "string"
                                 },
                                 "updateMask": {
-                                    "description": "Optional. The mask to control which fields of the policy get updated. If the mask is not present, all fields will be updated.",
+                                    "description": "Optional. The mask to control which fields of the policy get updated. If the mask is not present, all fields are updated.",
                                     "format": "google-fieldmask",
                                     "location": "query",
                                     "type": "string"
@@ -349,6 +349,34 @@
                 },
                 "keys": {
                     "methods": {
+                        "addIpOverride": {
+                            "description": "Adds an IP override to a key. The following restrictions hold: * The maximum number of IP overrides per key is 1000. * For any conflict (such as IP already exists or IP part of an existing IP range), an error is returned.",
+                            "flatPath": "v1/projects/{projectsId}/keys/{keysId}:addIpOverride",
+                            "httpMethod": "POST",
+                            "id": "recaptchaenterprise.projects.keys.addIpOverride",
+                            "parameterOrder": [
+                                "name"
+                            ],
+                            "parameters": {
+                                "name": {
+                                    "description": "Required. The name of the key to which the IP override is added, in the format `projects/{project}/keys/{key}`.",
+                                    "location": "path",
+                                    "pattern": "^projects/[^/]+/keys/[^/]+$",
+                                    "required": true,
+                                    "type": "string"
+                                }
+                            },
+                            "path": "v1/{+name}:addIpOverride",
+                            "request": {
+                                "$ref": "GoogleCloudRecaptchaenterpriseV1AddIpOverrideRequest"
+                            },
+                            "response": {
+                                "$ref": "GoogleCloudRecaptchaenterpriseV1AddIpOverrideResponse"
+                            },
+                            "scopes": [
+                                "https://www.googleapis.com/auth/cloud-platform"
+                            ]
+                        },
                         "create": {
                             "description": "Creates a new reCAPTCHA Enterprise key.",
                             "flatPath": "v1/projects/{projectsId}/keys",
@@ -359,7 +387,7 @@
                             ],
                             "parameters": {
                                 "parent": {
-                                    "description": "Required. The name of the project in which the key will be created, in the format `projects/{project}`.",
+                                    "description": "Required. The name of the project in which the key is created, in the format `projects/{project}`.",
                                     "location": "path",
                                     "pattern": "^projects/[^/]+$",
                                     "required": true,
@@ -473,7 +501,7 @@
                                     "type": "string"
                                 },
                                 "parent": {
-                                    "description": "Required. The name of the project that contains the keys that will be listed, in the format `projects/{project}`.",
+                                    "description": "Required. The name of the project that contains the keys that is listed, in the format `projects/{project}`.",
                                     "location": "path",
                                     "pattern": "^projects/[^/]+$",
                                     "required": true,
@@ -483,6 +511,42 @@
                             "path": "v1/{+parent}/keys",
                             "response": {
                                 "$ref": "GoogleCloudRecaptchaenterpriseV1ListKeysResponse"
+                            },
+                            "scopes": [
+                                "https://www.googleapis.com/auth/cloud-platform"
+                            ]
+                        },
+                        "listIpOverrides": {
+                            "description": "Lists all IP overrides for a key.",
+                            "flatPath": "v1/projects/{projectsId}/keys/{keysId}:listIpOverrides",
+                            "httpMethod": "GET",
+                            "id": "recaptchaenterprise.projects.keys.listIpOverrides",
+                            "parameterOrder": [
+                                "parent"
+                            ],
+                            "parameters": {
+                                "pageSize": {
+                                    "description": "Optional. The maximum number of overrides to return. Default is 10. Max limit is 100. If the number of overrides is less than the page_size, all overrides are returned. If the page size is more than 100, it is coerced to 100.",
+                                    "format": "int32",
+                                    "location": "query",
+                                    "type": "integer"
+                                },
+                                "pageToken": {
+                                    "description": "Optional. The next_page_token value returned from a previous ListIpOverridesRequest, if any.",
+                                    "location": "query",
+                                    "type": "string"
+                                },
+                                "parent": {
+                                    "description": "Required. The parent key for which the IP overrides are listed, in the format `projects/{project}/keys/{key}`.",
+                                    "location": "path",
+                                    "pattern": "^projects/[^/]+/keys/[^/]+$",
+                                    "required": true,
+                                    "type": "string"
+                                }
+                            },
+                            "path": "v1/{+parent}:listIpOverrides",
+                            "response": {
+                                "$ref": "GoogleCloudRecaptchaenterpriseV1ListIpOverridesResponse"
                             },
                             "scopes": [
                                 "https://www.googleapis.com/auth/cloud-platform"
@@ -533,7 +597,7 @@
                                     "type": "string"
                                 },
                                 "updateMask": {
-                                    "description": "Optional. The mask to control which fields of the key get updated. If the mask is not present, all fields will be updated.",
+                                    "description": "Optional. The mask to control which fields of the key get updated. If the mask is not present, all fields are updated.",
                                     "format": "google-fieldmask",
                                     "location": "query",
                                     "type": "string"
@@ -545,6 +609,34 @@
                             },
                             "response": {
                                 "$ref": "GoogleCloudRecaptchaenterpriseV1Key"
+                            },
+                            "scopes": [
+                                "https://www.googleapis.com/auth/cloud-platform"
+                            ]
+                        },
+                        "removeIpOverride": {
+                            "description": "Removes an IP override from a key. The following restrictions hold: * If the IP isn't found in an existing IP override, a `NOT_FOUND` error is returned. * If the IP is found in an existing IP override, but the override type does not match, a `NOT_FOUND` error is returned.",
+                            "flatPath": "v1/projects/{projectsId}/keys/{keysId}:removeIpOverride",
+                            "httpMethod": "POST",
+                            "id": "recaptchaenterprise.projects.keys.removeIpOverride",
+                            "parameterOrder": [
+                                "name"
+                            ],
+                            "parameters": {
+                                "name": {
+                                    "description": "Required. The name of the key from which the IP override is removed, in the format `projects/{project}/keys/{key}`.",
+                                    "location": "path",
+                                    "pattern": "^projects/[^/]+/keys/[^/]+$",
+                                    "required": true,
+                                    "type": "string"
+                                }
+                            },
+                            "path": "v1/{+name}:removeIpOverride",
+                            "request": {
+                                "$ref": "GoogleCloudRecaptchaenterpriseV1RemoveIpOverrideRequest"
+                            },
+                            "response": {
+                                "$ref": "GoogleCloudRecaptchaenterpriseV1RemoveIpOverrideResponse"
                             },
                             "scopes": [
                                 "https://www.googleapis.com/auth/cloud-platform"
@@ -694,7 +786,7 @@
             }
         }
     },
-    "revision": "20240623",
+    "revision": "20251210",
     "rootUrl": "https://recaptchaenterprise.googleapis.com/",
     "schemas": {
         "GoogleCloudRecaptchaenterpriseV1AccountDefenderAssessment": {
@@ -778,6 +870,23 @@
             },
             "type": "object"
         },
+        "GoogleCloudRecaptchaenterpriseV1AddIpOverrideRequest": {
+            "description": "The AddIpOverride request message.",
+            "id": "GoogleCloudRecaptchaenterpriseV1AddIpOverrideRequest",
+            "properties": {
+                "ipOverrideData": {
+                    "$ref": "GoogleCloudRecaptchaenterpriseV1IpOverrideData",
+                    "description": "Required. IP override added to the key."
+                }
+            },
+            "type": "object"
+        },
+        "GoogleCloudRecaptchaenterpriseV1AddIpOverrideResponse": {
+            "description": "Response for AddIpOverride.",
+            "id": "GoogleCloudRecaptchaenterpriseV1AddIpOverrideResponse",
+            "properties": {},
+            "type": "object"
+        },
         "GoogleCloudRecaptchaenterpriseV1AndroidKeySettings": {
             "description": "Settings specific to keys that can be used by Android apps.",
             "id": "GoogleCloudRecaptchaenterpriseV1AndroidKeySettings",
@@ -787,7 +896,7 @@
                     "type": "boolean"
                 },
                 "allowedPackageNames": {
-                    "description": "Optional. Android package names of apps allowed to use the key. Example: 'com.companyname.appname'",
+                    "description": "Optional. Android package names of apps allowed to use the key. Example: 'com.companyname.appname' Each key supports a maximum of 250 package names. To use a key on more apps, set `allow_all_package_names` to true. When this is set, you are responsible for validating the package name by checking the `token_properties.android_package_name` field in each assessment response against your list of allowed package names.",
                     "items": {
                         "type": "string"
                     },
@@ -809,7 +918,7 @@
                     "type": "string"
                 },
                 "annotation": {
-                    "description": "Optional. The annotation that will be assigned to the Event. This field can be left empty to provide reasons that apply to an event without concluding whether the event is legitimate or fraudulent.",
+                    "description": "Optional. The annotation that is assigned to the Event. This field can be left empty to provide reasons that apply to an event without concluding whether the event is legitimate or fraudulent.",
                     "enum": [
                         "ANNOTATION_UNSPECIFIED",
                         "LEGITIMATE",
@@ -838,6 +947,10 @@
                     "format": "byte",
                     "type": "string"
                 },
+                "phoneAuthenticationEvent": {
+                    "$ref": "GoogleCloudRecaptchaenterpriseV1PhoneAuthenticationEvent",
+                    "description": "Optional. If using an external multi-factor authentication provider, provide phone authentication details for fraud detection purposes."
+                },
                 "reasons": {
                     "description": "Optional. Reasons for the annotation that are assigned to the event.",
                     "items": {
@@ -859,7 +972,7 @@
                             "SOCIAL_SPAM"
                         ],
                         "enumDescriptions": [
-                            "Default unspecified reason.",
+                            "Unspecified reason. Do not use.",
                             "Indicates that the transaction had a chargeback issued with no other details. When possible, specify the type by using CHARGEBACK_FRAUD or CHARGEBACK_DISPUTE instead.",
                             "Indicates that the transaction had a chargeback issued related to an alleged unauthorized transaction from the cardholder's perspective (for example, the card number was stolen).",
                             "Indicates that the transaction had a chargeback issued related to the cardholder having provided their card details but allegedly not being satisfied with the purchase (for example, misrepresentation, attempted cancellation).",
@@ -924,6 +1037,10 @@
                     "$ref": "GoogleCloudRecaptchaenterpriseV1AccountVerificationInfo",
                     "description": "Optional. Account verification information for identity verification. The assessment event must include a token and site key to use this feature."
                 },
+                "assessmentEnvironment": {
+                    "$ref": "GoogleCloudRecaptchaenterpriseV1AssessmentEnvironment",
+                    "description": "Optional. The environment creating the assessment. This describes your environment (the system invoking CreateAssessment), NOT the environment of your user."
+                },
                 "event": {
                     "$ref": "GoogleCloudRecaptchaenterpriseV1Event",
                     "description": "Optional. The event being assessed."
@@ -966,6 +1083,48 @@
                     "$ref": "GoogleCloudRecaptchaenterpriseV1TokenProperties",
                     "description": "Output only. Properties of the provided event token.",
                     "readOnly": true
+                }
+            },
+            "type": "object"
+        },
+        "GoogleCloudRecaptchaenterpriseV1AssessmentEnvironment": {
+            "description": "The environment creating the assessment. This describes your environment (the system invoking CreateAssessment), NOT the environment of your user.",
+            "id": "GoogleCloudRecaptchaenterpriseV1AssessmentEnvironment",
+            "properties": {
+                "client": {
+                    "description": "Optional. Identifies the client module initiating the CreateAssessment request. This can be the link to the client module's project. Examples include: - \"github.com/GoogleCloudPlatform/recaptcha-enterprise-google-tag-manager\" - \"wordpress.org/plugins/recaptcha-something\"",
+                    "type": "string"
+                },
+                "version": {
+                    "description": "Optional. The version of the client module. For example, \"1.0.0\".",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "GoogleCloudRecaptchaenterpriseV1Bot": {
+            "description": "Bot information and metadata.",
+            "id": "GoogleCloudRecaptchaenterpriseV1Bot",
+            "properties": {
+                "botType": {
+                    "description": "Optional. Enumerated field representing the type of bot.",
+                    "enum": [
+                        "BOT_TYPE_UNSPECIFIED",
+                        "AI_AGENT",
+                        "CONTENT_SCRAPER",
+                        "SEARCH_INDEXER"
+                    ],
+                    "enumDescriptions": [
+                        "Default unspecified type.",
+                        "Software program that interacts with a site and performs tasks autonomously.",
+                        "Software that extracts specific data from sites for use.",
+                        "Software that crawls sites and stores content for the purpose of efficient retrieval, likely as part of a search engine."
+                    ],
+                    "type": "string"
+                },
+                "name": {
+                    "description": "Optional. Enumerated string value that indicates the identity of the bot, formatted in kebab-case.",
+                    "type": "string"
                 }
             },
             "type": "object"
@@ -1032,11 +1191,11 @@
                     "type": "string"
                 },
                 "express": {
-                    "description": "Optional. Flag for a reCAPTCHA express request for an assessment without a token. If enabled, `site_key` must reference a SCORE key with WAF feature set to EXPRESS.",
+                    "description": "Optional. Flag for a reCAPTCHA express request for an assessment without a token. If enabled, `site_key` must reference an Express site key.",
                     "type": "boolean"
                 },
                 "firewallPolicyEvaluation": {
-                    "description": "Optional. Flag for enabling firewall policy config assessment. If this flag is enabled, the firewall policy will be evaluated and a suggested firewall action will be returned in the response.",
+                    "description": "Optional. Flag for enabling firewall policy config assessment. If this flag is enabled, the firewall policy is evaluated and a suggested firewall action is returned in the response.",
                     "type": "boolean"
                 },
                 "fraudPrevention": {
@@ -1047,9 +1206,9 @@
                         "DISABLED"
                     ],
                     "enumDescriptions": [
-                        "Default, unspecified setting. If opted in for automatic detection, `fraud_prevention_assessment` is returned based on the request. Otherwise, `fraud_prevention_assessment` is returned if `transaction_data` is present in the `Event` and Fraud Prevention is enabled in the Google Cloud console.",
+                        "Default, unspecified setting. `fraud_prevention_assessment` is returned if `transaction_data` is present in `Event` and Fraud Prevention is enabled in the Google Cloud console.",
                         "Enable Fraud Prevention for this assessment, if Fraud Prevention is enabled in the Google Cloud console.",
-                        "Disable Fraud Prevention for this assessment, regardless of opt-in status or Google Cloud console settings."
+                        "Disable Fraud Prevention for this assessment, regardless of the Google Cloud console settings."
                     ],
                     "type": "string"
                 },
@@ -1067,7 +1226,11 @@
                     "type": "array"
                 },
                 "ja3": {
-                    "description": "Optional. JA3 fingerprint for SSL clients.",
+                    "description": "Optional. JA3 fingerprint for SSL clients. To learn how to compute this fingerprint, please refer to https://github.com/salesforce/ja3.",
+                    "type": "string"
+                },
+                "ja4": {
+                    "description": "Optional. JA4 fingerprint for SSL clients. To learn how to compute this fingerprint, please refer to https://github.com/FoxIO-LLC/ja4.",
                     "type": "string"
                 },
                 "requestedUri": {
@@ -1099,10 +1262,16 @@
                     "type": "string"
                 },
                 "wafTokenAssessment": {
-                    "description": "Optional. Flag for running WAF token assessment. If enabled, the token must be specified, and have been created by a WAF-enabled key.",
+                    "description": "Optional. Flag for running Web Application Firewall (WAF) token assessment. If enabled, the token must be specified, and have been created by a WAF-enabled key.",
                     "type": "boolean"
                 }
             },
+            "type": "object"
+        },
+        "GoogleCloudRecaptchaenterpriseV1ExpressKeySettings": {
+            "description": "Settings specific to keys that can be used for reCAPTCHA Express.",
+            "id": "GoogleCloudRecaptchaenterpriseV1ExpressKeySettings",
+            "properties": {},
             "type": "object"
         },
         "GoogleCloudRecaptchaenterpriseV1FirewallAction": {
@@ -1115,23 +1284,23 @@
                 },
                 "block": {
                     "$ref": "GoogleCloudRecaptchaenterpriseV1FirewallActionBlockAction",
-                    "description": "This action will deny access to a given page. The user will get an HTTP error code."
+                    "description": "This action denies access to a given page. The user gets an HTTP error code."
                 },
                 "includeRecaptchaScript": {
                     "$ref": "GoogleCloudRecaptchaenterpriseV1FirewallActionIncludeRecaptchaScriptAction",
-                    "description": "This action will inject reCAPTCHA JavaScript code into the HTML page returned by the site backend."
+                    "description": "This action injects reCAPTCHA JavaScript code into the HTML page returned by the site backend."
                 },
                 "redirect": {
                     "$ref": "GoogleCloudRecaptchaenterpriseV1FirewallActionRedirectAction",
-                    "description": "This action will redirect the request to a ReCaptcha interstitial to attach a token."
+                    "description": "This action redirects the request to a reCAPTCHA interstitial to attach a token."
                 },
                 "setHeader": {
                     "$ref": "GoogleCloudRecaptchaenterpriseV1FirewallActionSetHeaderAction",
-                    "description": "This action will set a custom header but allow the request to continue to the customer backend."
+                    "description": "This action sets a custom header but allow the request to continue to the customer backend."
                 },
                 "substitute": {
                     "$ref": "GoogleCloudRecaptchaenterpriseV1FirewallActionSubstituteAction",
-                    "description": "This action will transparently serve a different page to an offending user."
+                    "description": "This action transparently serves a different page to an offending user."
                 }
             },
             "type": "object"
@@ -1155,7 +1324,7 @@
             "type": "object"
         },
         "GoogleCloudRecaptchaenterpriseV1FirewallActionRedirectAction": {
-            "description": "A redirect action returns a 307 (temporary redirect) response, pointing the user to a ReCaptcha interstitial page to attach a token.",
+            "description": "A redirect action returns a 307 (temporary redirect) response, pointing the user to a reCAPTCHA interstitial page to attach a token.",
             "id": "GoogleCloudRecaptchaenterpriseV1FirewallActionRedirectAction",
             "properties": {},
             "type": "object"
@@ -1222,12 +1391,12 @@
             "properties": {
                 "error": {
                     "$ref": "GoogleRpcStatus",
-                    "description": "Output only. If the processing of a policy config fails, an error will be populated and the firewall_policy will be left empty.",
+                    "description": "Output only. If the processing of a policy config fails, an error is populated and the firewall_policy is left empty.",
                     "readOnly": true
                 },
                 "firewallPolicy": {
                     "$ref": "GoogleCloudRecaptchaenterpriseV1FirewallPolicy",
-                    "description": "Output only. The policy that matched the request. If more than one policy may match, this is the first match. If no policy matches the incoming request, the policy field will be left empty.",
+                    "description": "Output only. The policy that matched the request. If more than one policy may match, this is the first match. If no policy matches the incoming request, the policy field is left empty.",
                     "readOnly": true
                 }
             },
@@ -1246,6 +1415,14 @@
                     "$ref": "GoogleCloudRecaptchaenterpriseV1FraudPreventionAssessmentCardTestingVerdict",
                     "description": "Output only. Assessment of this transaction for risk of being part of a card testing attack.",
                     "readOnly": true
+                },
+                "riskReasons": {
+                    "description": "Output only. Reasons why the transaction is probably fraudulent and received a high transaction risk score.",
+                    "items": {
+                        "$ref": "GoogleCloudRecaptchaenterpriseV1FraudPreventionAssessmentRiskReason"
+                    },
+                    "readOnly": true,
+                    "type": "array"
                 },
                 "stolenInstrumentVerdict": {
                     "$ref": "GoogleCloudRecaptchaenterpriseV1FraudPreventionAssessmentStolenInstrumentVerdict",
@@ -1283,6 +1460,34 @@
                     "format": "float",
                     "readOnly": true,
                     "type": "number"
+                }
+            },
+            "type": "object"
+        },
+        "GoogleCloudRecaptchaenterpriseV1FraudPreventionAssessmentRiskReason": {
+            "description": "Risk reasons applicable to the Fraud Prevention assessment.",
+            "id": "GoogleCloudRecaptchaenterpriseV1FraudPreventionAssessmentRiskReason",
+            "properties": {
+                "reason": {
+                    "description": "Output only. Risk reasons applicable to the Fraud Prevention assessment.",
+                    "enum": [
+                        "REASON_UNSPECIFIED",
+                        "HIGH_TRANSACTION_VELOCITY",
+                        "EXCESSIVE_ENUMERATION_PATTERN",
+                        "SHORT_IDENTITY_HISTORY",
+                        "GEOLOCATION_DISCREPANCY",
+                        "ASSOCIATED_WITH_FRAUD_CLUSTER"
+                    ],
+                    "enumDescriptions": [
+                        "Default unspecified type.",
+                        "A suspiciously high number of recent transactions have used identifiers present in this transaction.",
+                        "User is cycling through a suspiciously large number of identifiers, suggesting enumeration or validation attacks within a potential fraud network.",
+                        "User has a short history or no history in the reCAPTCHA network, suggesting the possibility of synthetic identity generation.",
+                        "Identifiers used in this transaction originate from an unusual or conflicting set of geolocations.",
+                        "This transaction is linked to a cluster of known fraudulent activity."
+                    ],
+                    "readOnly": true,
+                    "type": "string"
                 }
             },
             "type": "object"
@@ -1372,7 +1577,7 @@
                     "type": "boolean"
                 },
                 "allowedBundleIds": {
-                    "description": "Optional. iOS bundle ids of apps allowed to use the key. Example: 'com.companyname.productname.appname'",
+                    "description": "Optional. iOS bundle IDs of apps allowed to use the key. Example: 'com.companyname.productname.appname' Each key supports a maximum of 250 bundle IDs. To use a key on more apps, set `allow_all_bundle_ids` to true. When this is set, you are responsible for validating the bundle id by checking the `token_properties.ios_bundle_id` field in each assessment response against your list of allowed bundle IDs.",
                     "items": {
                         "type": "string"
                     },
@@ -1380,7 +1585,30 @@
                 },
                 "appleDeveloperId": {
                     "$ref": "GoogleCloudRecaptchaenterpriseV1AppleDeveloperId",
-                    "description": "Optional. Apple Developer account details for the app that is protected by the reCAPTCHA Key. reCAPTCHA Enterprise leverages platform-specific checks like Apple App Attest and Apple DeviceCheck to protect your app from abuse. Providing these fields allows reCAPTCHA Enterprise to get a better assessment of the integrity of your app."
+                    "description": "Optional. Apple Developer account details for the app that is protected by the reCAPTCHA Key. reCAPTCHA leverages platform-specific checks like Apple App Attest and Apple DeviceCheck to protect your app from abuse. Providing these fields allows reCAPTCHA to get a better assessment of the integrity of your app."
+                }
+            },
+            "type": "object"
+        },
+        "GoogleCloudRecaptchaenterpriseV1IpOverrideData": {
+            "description": "Information about the IP or IP range override.",
+            "id": "GoogleCloudRecaptchaenterpriseV1IpOverrideData",
+            "properties": {
+                "ip": {
+                    "description": "Required. The IP address to override (can be IPv4, IPv6 or CIDR). The IP override must be a valid IPv4 or IPv6 address, or a CIDR range. The IP override must be a public IP address. Example of IPv4: 168.192.5.6 Example of IPv6: 2001:0000:130F:0000:0000:09C0:876A:130B Example of IPv4 with CIDR: 168.192.5.0/24 Example of IPv6 with CIDR: 2001:0DB8:1234::/48",
+                    "type": "string"
+                },
+                "overrideType": {
+                    "description": "Required. Describes the type of IP override.",
+                    "enum": [
+                        "OVERRIDE_TYPE_UNSPECIFIED",
+                        "ALLOW"
+                    ],
+                    "enumDescriptions": [
+                        "Default override type that indicates this enum hasn't been specified.",
+                        "Allowlist the IP address; i.e. give a `risk_analysis.score` of 0.9 for all valid assessments."
+                    ],
+                    "type": "string"
                 }
             },
             "type": "object"
@@ -1403,6 +1631,10 @@
                     "description": "Required. Human-readable display name of this key. Modifiable by user.",
                     "type": "string"
                 },
+                "expressSettings": {
+                    "$ref": "GoogleCloudRecaptchaenterpriseV1ExpressKeySettings",
+                    "description": "Settings for keys that can be used by reCAPTCHA Express."
+                },
                 "iosSettings": {
                     "$ref": "GoogleCloudRecaptchaenterpriseV1IOSKeySettings",
                     "description": "Settings for keys that can be used by iOS apps."
@@ -1411,7 +1643,7 @@
                     "additionalProperties": {
                         "type": "string"
                     },
-                    "description": "Optional. See [Creating and managing labels] (https://cloud.google.com/recaptcha-enterprise/docs/labels).",
+                    "description": "Optional. See [Creating and managing labels] (https://cloud.google.com/recaptcha/docs/labels).",
                     "type": "object"
                 },
                 "name": {
@@ -1424,7 +1656,7 @@
                 },
                 "wafSettings": {
                     "$ref": "GoogleCloudRecaptchaenterpriseV1WafSettings",
-                    "description": "Optional. Settings for WAF"
+                    "description": "Optional. Settings for Web Application Firewall (WAF)."
                 },
                 "webSettings": {
                     "$ref": "GoogleCloudRecaptchaenterpriseV1WebKeySettings",
@@ -1446,6 +1678,24 @@
                 },
                 "nextPageToken": {
                     "description": "Token to retrieve the next page of results. It is set to empty if no policies remain in results.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "GoogleCloudRecaptchaenterpriseV1ListIpOverridesResponse": {
+            "description": "Response for ListIpOverrides.",
+            "id": "GoogleCloudRecaptchaenterpriseV1ListIpOverridesResponse",
+            "properties": {
+                "ipOverrides": {
+                    "description": "IP Overrides details.",
+                    "items": {
+                        "$ref": "GoogleCloudRecaptchaenterpriseV1IpOverrideData"
+                    },
+                    "type": "array"
+                },
+                "nextPageToken": {
+                    "description": "Token to retrieve the next page of results. If this field is empty, no keys remain in the results.",
                     "type": "string"
                 }
             },
@@ -1510,7 +1760,7 @@
             "id": "GoogleCloudRecaptchaenterpriseV1Metrics",
             "properties": {
                 "challengeMetrics": {
-                    "description": "Metrics will be continuous and in order by dates, and in the granularity of day. Only challenge-based keys (CHECKBOX, INVISIBLE), will have challenge-based data.",
+                    "description": "Metrics are continuous and in order by dates, and in the granularity of day. Only challenge-based keys (CHECKBOX, INVISIBLE) have challenge-based data.",
                     "items": {
                         "$ref": "GoogleCloudRecaptchaenterpriseV1ChallengeMetrics"
                     },
@@ -1522,14 +1772,14 @@
                     "type": "string"
                 },
                 "scoreMetrics": {
-                    "description": "Metrics will be continuous and in order by dates, and in the granularity of day. All Key types should have score-based data.",
+                    "description": "Metrics are continuous and in order by dates, and in the granularity of day. All Key types should have score-based data.",
                     "items": {
                         "$ref": "GoogleCloudRecaptchaenterpriseV1ScoreMetrics"
                     },
                     "type": "array"
                 },
                 "startTime": {
-                    "description": "Inclusive start time aligned to a day (UTC).",
+                    "description": "Inclusive start time aligned to a day in the America/Los_Angeles (Pacific) timezone.",
                     "format": "google-datetime",
                     "type": "string"
                 }
@@ -1541,8 +1791,24 @@
             "id": "GoogleCloudRecaptchaenterpriseV1MigrateKeyRequest",
             "properties": {
                 "skipBillingCheck": {
-                    "description": "Optional. If true, skips the billing check. A reCAPTCHA Enterprise key or migrated key behaves differently than a reCAPTCHA (non-Enterprise version) key when you reach a quota limit (see https://cloud.google.com/recaptcha-enterprise/quotas#quota_limit). To avoid any disruption of your usage, we check that a billing account is present. If your usage of reCAPTCHA is under the free quota, you can safely skip the billing check and proceed with the migration. See https://cloud.google.com/recaptcha-enterprise/docs/billing-information.",
+                    "description": "Optional. If true, skips the billing check. A reCAPTCHA Enterprise key or migrated key behaves differently than a reCAPTCHA (non-Enterprise version) key when you reach a quota limit (see https://docs.cloud.google.com/recaptcha/quotas#quota_limit). To avoid any disruption of your usage, we check that a billing account is present. If your usage of reCAPTCHA is under the free quota, you can safely skip the billing check and proceed with the migration. See https://cloud.google.com/recaptcha/docs/billing-information.",
                     "type": "boolean"
+                }
+            },
+            "type": "object"
+        },
+        "GoogleCloudRecaptchaenterpriseV1PhoneAuthenticationEvent": {
+            "description": "Details on a phone authentication event",
+            "id": "GoogleCloudRecaptchaenterpriseV1PhoneAuthenticationEvent",
+            "properties": {
+                "eventTime": {
+                    "description": "Optional. The time at which the multi-factor authentication event (challenge or verification) occurred.",
+                    "format": "google-datetime",
+                    "type": "string"
+                },
+                "phoneNumber": {
+                    "description": "Required. Phone number in E.164 format for which a multi-factor authentication challenge was initiated, succeeded, or failed.",
+                    "type": "string"
                 }
             },
             "type": "object"
@@ -1623,6 +1889,23 @@
             },
             "type": "object"
         },
+        "GoogleCloudRecaptchaenterpriseV1RemoveIpOverrideRequest": {
+            "description": "The RemoveIpOverride request message.",
+            "id": "GoogleCloudRecaptchaenterpriseV1RemoveIpOverrideRequest",
+            "properties": {
+                "ipOverrideData": {
+                    "$ref": "GoogleCloudRecaptchaenterpriseV1IpOverrideData",
+                    "description": "Required. IP override to be removed from the key."
+                }
+            },
+            "type": "object"
+        },
+        "GoogleCloudRecaptchaenterpriseV1RemoveIpOverrideResponse": {
+            "description": "Response for RemoveIpOverride.",
+            "id": "GoogleCloudRecaptchaenterpriseV1RemoveIpOverrideResponse",
+            "properties": {},
+            "type": "object"
+        },
         "GoogleCloudRecaptchaenterpriseV1ReorderFirewallPoliciesRequest": {
             "description": "The reorder firewall policies request message.",
             "id": "GoogleCloudRecaptchaenterpriseV1ReorderFirewallPoliciesRequest",
@@ -1658,6 +1941,23 @@
             "description": "Risk analysis result for an event.",
             "id": "GoogleCloudRecaptchaenterpriseV1RiskAnalysis",
             "properties": {
+                "challenge": {
+                    "description": "Output only. Challenge information for POLICY_BASED_CHALLENGE and INVISIBLE keys.",
+                    "enum": [
+                        "CHALLENGE_UNSPECIFIED",
+                        "NOCAPTCHA",
+                        "PASSED",
+                        "FAILED"
+                    ],
+                    "enumDescriptions": [
+                        "Default unspecified type.",
+                        "No challenge was presented for solving.",
+                        "A solution was submitted that was correct.",
+                        "A solution was submitted that was incorrect or otherwise deemed suspicious."
+                    ],
+                    "readOnly": true,
+                    "type": "string"
+                },
                 "extendedVerdictReasons": {
                     "description": "Output only. Extended verdict reasons to be used for experimentation only. The set of possible reasons is subject to change.",
                     "items": {
@@ -1699,6 +1999,14 @@
                     "format": "float",
                     "readOnly": true,
                     "type": "number"
+                },
+                "verifiedBots": {
+                    "description": "Output only. Bots with identities that have been verified by reCAPTCHA and detected in the event.",
+                    "items": {
+                        "$ref": "GoogleCloudRecaptchaenterpriseV1Bot"
+                    },
+                    "readOnly": true,
+                    "type": "array"
                 }
             },
             "type": "object"
@@ -1814,7 +2122,7 @@
             "id": "GoogleCloudRecaptchaenterpriseV1TestingOptions",
             "properties": {
                 "testingChallenge": {
-                    "description": "Optional. For challenge-based keys only (CHECKBOX, INVISIBLE), all challenge requests for this site will return nocaptcha if NOCAPTCHA, or an unsolvable challenge if CHALLENGE.",
+                    "description": "Optional. For challenge-based keys only (CHECKBOX, INVISIBLE), all challenge requests for this site return nocaptcha if NOCAPTCHA, or an unsolvable challenge if CHALLENGE.",
                     "enum": [
                         "TESTING_CHALLENGE_UNSPECIFIED",
                         "NOCAPTCHA",
@@ -1828,7 +2136,7 @@
                     "type": "string"
                 },
                 "testingScore": {
-                    "description": "Optional. All assessments for this Key will return this score. Must be between 0 (likely not legitimate) and 1 (likely legitimate) inclusive.",
+                    "description": "Optional. All assessments for this Key return this score. Must be between 0 (likely not legitimate) and 1 (likely legitimate) inclusive.",
                     "format": "float",
                     "type": "number"
                 }
@@ -1869,7 +2177,8 @@
                         "EXPIRED",
                         "DUPE",
                         "MISSING",
-                        "BROWSER_ERROR"
+                        "BROWSER_ERROR",
+                        "UNEXPECTED_ACTION"
                     ],
                     "enumDescriptions": [
                         "Default unspecified type.",
@@ -1878,7 +2187,8 @@
                         "The user verification token had expired.",
                         "The user verification had already been seen.",
                         "The user verification token was not present.",
-                        "A retriable error (such as network failure) occurred on the browser. Could easily be simulated by an attacker."
+                        "A retriable error (such as network failure) occurred on the browser. Could easily be simulated by an attacker.",
+                        "The action provided at token generation was different than the `expected_action` in the assessment request. The comparison is case-insensitive. This reason can only be returned if all of the following are true: - your `site_key` has the POLICY_BASED_CHALLENGE integration type - you set an action score threshold higher than 0.0 - you provided a non-empty `expected_action`"
                     ],
                     "readOnly": true,
                     "type": "string"
@@ -2191,7 +2501,7 @@
             "id": "GoogleCloudRecaptchaenterpriseV1WafSettings",
             "properties": {
                 "wafFeature": {
-                    "description": "Required. The WAF feature for which this key is enabled.",
+                    "description": "Required. The Web Application Firewall (WAF) feature for which this key is enabled.",
                     "enum": [
                         "WAF_FEATURE_UNSPECIFIED",
                         "CHALLENGE_PAGE",
@@ -2199,28 +2509,37 @@
                         "ACTION_TOKEN",
                         "EXPRESS"
                     ],
+                    "enumDeprecated": [
+                        false,
+                        false,
+                        false,
+                        false,
+                        true
+                    ],
                     "enumDescriptions": [
                         "Undefined feature.",
                         "Redirects suspicious traffic to reCAPTCHA.",
                         "Use reCAPTCHA session-tokens to protect the whole user session on the site's domain.",
                         "Use reCAPTCHA action-tokens to protect user actions.",
-                        "Use reCAPTCHA WAF express protection to protect any content other than web pages, like APIs and IoT devices."
+                        "Deprecated: Use `express_settings` instead."
                     ],
                     "type": "string"
                 },
                 "wafService": {
-                    "description": "Required. The WAF service that uses this key.",
+                    "description": "Required. The Web Application Firewall (WAF) service that uses this key.",
                     "enum": [
                         "WAF_SERVICE_UNSPECIFIED",
                         "CA",
                         "FASTLY",
-                        "CLOUDFLARE"
+                        "CLOUDFLARE",
+                        "AKAMAI"
                     ],
                     "enumDescriptions": [
                         "Undefined WAF",
                         "Cloud Armor",
                         "Fastly",
-                        "Cloudflare"
+                        "Cloudflare",
+                        "Akamai"
                     ],
                     "type": "string"
                 }
@@ -2232,7 +2551,7 @@
             "id": "GoogleCloudRecaptchaenterpriseV1WebKeySettings",
             "properties": {
                 "allowAllDomains": {
-                    "description": "Optional. If set to true, it means allowed_domains will not be enforced.",
+                    "description": "Optional. If set to true, it means allowed_domains are not enforced.",
                     "type": "boolean"
                 },
                 "allowAmpTraffic": {
@@ -2240,14 +2559,14 @@
                     "type": "boolean"
                 },
                 "allowedDomains": {
-                    "description": "Optional. Domains or subdomains of websites allowed to use the key. All subdomains of an allowed domain are automatically allowed. A valid domain requires a host and must not include any path, port, query or fragment. Examples: 'example.com' or 'subdomain.example.com'",
+                    "description": "Optional. Domains or subdomains of websites allowed to use the key. All subdomains of an allowed domain are automatically allowed. A valid domain requires a host and must not include any path, port, query or fragment. Examples: 'example.com' or 'subdomain.example.com' Each key supports a maximum of 250 domains. To use a key on more domains, set `allow_all_domains` to true. When this is set, you are responsible for validating the hostname by checking the `token_properties.hostname` field in each assessment response against your list of allowed domains.",
                     "items": {
                         "type": "string"
                     },
                     "type": "array"
                 },
                 "challengeSecurityPreference": {
-                    "description": "Optional. Settings for the frequency and difficulty at which this key triggers captcha challenges. This should only be specified for IntegrationTypes CHECKBOX and INVISIBLE.",
+                    "description": "Optional. Settings for the frequency and difficulty at which this key triggers captcha challenges. This should only be specified for `IntegrationType` CHECKBOX, INVISIBLE or POLICY_BASED_CHALLENGE.",
                     "enum": [
                         "CHALLENGE_SECURITY_PREFERENCE_UNSPECIFIED",
                         "USABILITY",
@@ -2262,21 +2581,57 @@
                     ],
                     "type": "string"
                 },
+                "challengeSettings": {
+                    "$ref": "GoogleCloudRecaptchaenterpriseV1WebKeySettingsChallengeSettings",
+                    "description": "Optional. Challenge settings."
+                },
                 "integrationType": {
                     "description": "Required. Describes how this key is integrated with the website.",
                     "enum": [
                         "INTEGRATION_TYPE_UNSPECIFIED",
                         "SCORE",
                         "CHECKBOX",
-                        "INVISIBLE"
+                        "INVISIBLE",
+                        "POLICY_BASED_CHALLENGE"
                     ],
                     "enumDescriptions": [
                         "Default type that indicates this enum hasn't been specified. This is not a valid IntegrationType, one of the other types must be specified instead.",
                         "Only used to produce scores. It doesn't display the \"I'm not a robot\" checkbox and never shows captcha challenges.",
                         "Displays the \"I'm not a robot\" checkbox and may show captcha challenges after it is checked.",
-                        "Doesn't display the \"I'm not a robot\" checkbox, but may show captcha challenges after risk analysis."
+                        "Doesn't display the \"I'm not a robot\" checkbox, but may show captcha challenges after risk analysis.",
+                        "Displays a visual challenge or not depending on the user risk analysis score."
                     ],
                     "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "GoogleCloudRecaptchaenterpriseV1WebKeySettingsActionSettings": {
+            "description": "Per-action challenge settings.",
+            "id": "GoogleCloudRecaptchaenterpriseV1WebKeySettingsActionSettings",
+            "properties": {
+                "scoreThreshold": {
+                    "description": "Required. A challenge is triggered if the end-user score is below that threshold. Value must be between 0 and 1 (inclusive).",
+                    "format": "float",
+                    "type": "number"
+                }
+            },
+            "type": "object"
+        },
+        "GoogleCloudRecaptchaenterpriseV1WebKeySettingsChallengeSettings": {
+            "description": "Settings for POLICY_BASED_CHALLENGE keys to control when a challenge is triggered.",
+            "id": "GoogleCloudRecaptchaenterpriseV1WebKeySettingsChallengeSettings",
+            "properties": {
+                "actionSettings": {
+                    "additionalProperties": {
+                        "$ref": "GoogleCloudRecaptchaenterpriseV1WebKeySettingsActionSettings"
+                    },
+                    "description": "Optional. The action to score threshold map. The action name should be the same as the action name passed in the `data-action` attribute (see https://cloud.google.com/recaptcha/docs/actions-website). Action names are case-insensitive. There is a maximum of 100 action settings. An action name has a maximum length of 100.",
+                    "type": "object"
+                },
+                "defaultSettings": {
+                    "$ref": "GoogleCloudRecaptchaenterpriseV1WebKeySettingsActionSettings",
+                    "description": "Required. Defines when a challenge is triggered (unless the default threshold is overridden for the given action, see `action_settings`)."
                 }
             },
             "type": "object"

@@ -1132,27 +1132,6 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
-                "git-config.http.proxy-ssl-ca-info.bucket" => Some((
-                    "gitConfig.http.proxySslCaInfo.bucket",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "git-config.http.proxy-ssl-ca-info.generation" => Some((
-                    "gitConfig.http.proxySslCaInfo.generation",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "git-config.http.proxy-ssl-ca-info.object" => Some((
-                    "gitConfig.http.proxySslCaInfo.object",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
                 "id" => Some((
                     "id",
                     JsonTypeInfo {
@@ -1216,6 +1195,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "options.enable-structured-logging" => Some((
+                    "options.enableStructuredLogging",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "options.env" => Some((
                     "options.env",
                     JsonTypeInfo {
@@ -1246,6 +1232,13 @@ where
                 )),
                 "options.pool.name" => Some((
                     "options.pool.name",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "options.pubsub-topic" => Some((
+                    "options.pubsubTopic",
                     JsonTypeInfo {
                         jtype: JsonType::String,
                         ctype: ComplexType::Pod,
@@ -1735,6 +1728,7 @@ where
                             "dir",
                             "disk-size-gb",
                             "dynamic-substitutions",
+                            "enable-structured-logging",
                             "end-time",
                             "env",
                             "failure-info",
@@ -1762,7 +1756,7 @@ where
                             "pool",
                             "project-id",
                             "proxy-secret-version-name",
-                            "proxy-ssl-ca-info",
+                            "pubsub-topic",
                             "queue-ttl",
                             "repo-name",
                             "repo-source",
@@ -4620,27 +4614,6 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
-                "git-config.http.proxy-ssl-ca-info.bucket" => Some((
-                    "gitConfig.http.proxySslCaInfo.bucket",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "git-config.http.proxy-ssl-ca-info.generation" => Some((
-                    "gitConfig.http.proxySslCaInfo.generation",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "git-config.http.proxy-ssl-ca-info.object" => Some((
-                    "gitConfig.http.proxySslCaInfo.object",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
                 "id" => Some((
                     "id",
                     JsonTypeInfo {
@@ -4704,6 +4677,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "options.enable-structured-logging" => Some((
+                    "options.enableStructuredLogging",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "options.env" => Some((
                     "options.env",
                     JsonTypeInfo {
@@ -4734,6 +4714,13 @@ where
                 )),
                 "options.pool.name" => Some((
                     "options.pool.name",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "options.pubsub-topic" => Some((
+                    "options.pubsubTopic",
                     JsonTypeInfo {
                         jtype: JsonType::String,
                         ctype: ComplexType::Pod,
@@ -5223,6 +5210,7 @@ where
                             "dir",
                             "disk-size-gb",
                             "dynamic-substitutions",
+                            "enable-structured-logging",
                             "end-time",
                             "env",
                             "failure-info",
@@ -5250,7 +5238,7 @@ where
                             "pool",
                             "project-id",
                             "proxy-secret-version-name",
-                            "proxy-ssl-ca-info",
+                            "pubsub-topic",
                             "queue-ttl",
                             "repo-name",
                             "repo-source",
@@ -7968,9 +7956,6 @@ where
                     "build.failure-info.type" => Some(("build.failureInfo.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "build.finish-time" => Some(("build.finishTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "build.git-config.http.proxy-secret-version-name" => Some(("build.gitConfig.http.proxySecretVersionName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "build.git-config.http.proxy-ssl-ca-info.bucket" => Some(("build.gitConfig.http.proxySslCaInfo.bucket", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "build.git-config.http.proxy-ssl-ca-info.generation" => Some(("build.gitConfig.http.proxySslCaInfo.generation", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "build.git-config.http.proxy-ssl-ca-info.object" => Some(("build.gitConfig.http.proxySslCaInfo.object", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "build.id" => Some(("build.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "build.images" => Some(("build.images", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "build.log-url" => Some(("build.logUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -7980,11 +7965,13 @@ where
                     "build.options.default-logs-bucket-behavior" => Some(("build.options.defaultLogsBucketBehavior", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "build.options.disk-size-gb" => Some(("build.options.diskSizeGb", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "build.options.dynamic-substitutions" => Some(("build.options.dynamicSubstitutions", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "build.options.enable-structured-logging" => Some(("build.options.enableStructuredLogging", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "build.options.env" => Some(("build.options.env", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "build.options.log-streaming-option" => Some(("build.options.logStreamingOption", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "build.options.logging" => Some(("build.options.logging", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "build.options.machine-type" => Some(("build.options.machineType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "build.options.pool.name" => Some(("build.options.pool.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "build.options.pubsub-topic" => Some(("build.options.pubsubTopic", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "build.options.requested-verify-option" => Some(("build.options.requestedVerifyOption", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "build.options.secret-env" => Some(("build.options.secretEnv", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "build.options.source-provenance-hash" => Some(("build.options.sourceProvenanceHash", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
@@ -8052,6 +8039,14 @@ where
                     "build.timeout" => Some(("build.timeout", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "developer-connect-event-config.git-repository-link" => Some(("developerConnectEventConfig.gitRepositoryLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "developer-connect-event-config.git-repository-link-type" => Some(("developerConnectEventConfig.gitRepositoryLinkType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "developer-connect-event-config.pull-request.branch" => Some(("developerConnectEventConfig.pullRequest.branch", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "developer-connect-event-config.pull-request.comment-control" => Some(("developerConnectEventConfig.pullRequest.commentControl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "developer-connect-event-config.pull-request.invert-regex" => Some(("developerConnectEventConfig.pullRequest.invertRegex", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "developer-connect-event-config.push.branch" => Some(("developerConnectEventConfig.push.branch", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "developer-connect-event-config.push.invert-regex" => Some(("developerConnectEventConfig.push.invertRegex", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "developer-connect-event-config.push.tag" => Some(("developerConnectEventConfig.push.tag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "disabled" => Some(("disabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "event-type" => Some(("eventType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "filename" => Some(("filename", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -8130,7 +8125,7 @@ where
                     "webhook-config.secret" => Some(("webhookConfig.secret", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "webhook-config.state" => Some(("webhookConfig.state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["admin-access-token-version-name", "api-access-token-version", "api-key", "api-key-version", "approval", "approval-config", "approval-required", "approval-time", "approver-account", "artifact-manifest", "artifact-timing", "artifacts", "autodetect", "automap-substitutions", "bitbucket-server-config", "bitbucket-server-config-resource", "bitbucket-server-trigger-config", "branch", "branch-name", "bucket", "build", "build-step-images", "build-step-outputs", "build-trigger-id", "comment", "comment-control", "commit-sha", "config", "connected-repository", "create-time", "decision", "default-logs-bucket-behavior", "description", "detail", "developer-connect-config", "dir", "disabled", "disk-size-gb", "dynamic-substitutions", "end-time", "enterprise-config", "enterprise-config-resource-name", "env", "event-type", "failure-info", "filename", "filter", "finish-time", "generation", "git-config", "git-file-source", "git-repository-link", "git-source", "github", "github-enterprise-config", "gitlab-config", "gitlab-config-resource", "gitlab-enterprise-events-config", "host-uri", "http", "id", "ignored-files", "images", "include-build-logs", "included-files", "installation-id", "invert-regex", "location", "log-streaming-option", "log-url", "logging", "logs-bucket", "machine-type", "name", "num-artifacts", "object", "objects", "options", "owner", "path", "paths", "peered-network", "peered-network-ip-range", "pool", "project-id", "project-key", "project-namespace", "proxy-secret-version-name", "proxy-ssl-ca-info", "pubsub-config", "pull-request", "push", "queue-ttl", "read-access-token-version", "read-access-token-version-name", "ref", "repo-name", "repo-slug", "repo-source", "repo-type", "repository", "repository-event-config", "repository-type", "requested-verify-option", "resolved-connected-repository", "resolved-git-source", "resolved-repo-source", "resolved-storage-source", "resolved-storage-source-manifest", "resource-name", "result", "results", "revision", "secret", "secret-env", "secrets", "service", "service-account", "service-account-email", "service-directory-config", "source", "source-fetcher", "source-provenance", "source-provenance-hash", "source-to-build", "ssl-ca", "start-time", "state", "status", "status-detail", "storage-source", "storage-source-manifest", "subscription", "substitution-option", "substitutions", "tag", "tag-name", "tags", "timeout", "timing", "topic", "trigger-template", "type", "uri", "url", "username", "webhook-config", "webhook-key", "webhook-secret-version", "webhook-secret-version-name", "worker-pool"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["admin-access-token-version-name", "api-access-token-version", "api-key", "api-key-version", "approval", "approval-config", "approval-required", "approval-time", "approver-account", "artifact-manifest", "artifact-timing", "artifacts", "autodetect", "automap-substitutions", "bitbucket-server-config", "bitbucket-server-config-resource", "bitbucket-server-trigger-config", "branch", "branch-name", "bucket", "build", "build-step-images", "build-step-outputs", "build-trigger-id", "comment", "comment-control", "commit-sha", "config", "connected-repository", "create-time", "decision", "default-logs-bucket-behavior", "description", "detail", "developer-connect-config", "developer-connect-event-config", "dir", "disabled", "disk-size-gb", "dynamic-substitutions", "enable-structured-logging", "end-time", "enterprise-config", "enterprise-config-resource-name", "env", "event-type", "failure-info", "filename", "filter", "finish-time", "generation", "git-config", "git-file-source", "git-repository-link", "git-repository-link-type", "git-source", "github", "github-enterprise-config", "gitlab-config", "gitlab-config-resource", "gitlab-enterprise-events-config", "host-uri", "http", "id", "ignored-files", "images", "include-build-logs", "included-files", "installation-id", "invert-regex", "location", "log-streaming-option", "log-url", "logging", "logs-bucket", "machine-type", "name", "num-artifacts", "object", "objects", "options", "owner", "path", "paths", "peered-network", "peered-network-ip-range", "pool", "project-id", "project-key", "project-namespace", "proxy-secret-version-name", "pubsub-config", "pubsub-topic", "pull-request", "push", "queue-ttl", "read-access-token-version", "read-access-token-version-name", "ref", "repo-name", "repo-slug", "repo-source", "repo-type", "repository", "repository-event-config", "repository-type", "requested-verify-option", "resolved-connected-repository", "resolved-git-source", "resolved-repo-source", "resolved-storage-source", "resolved-storage-source-manifest", "resource-name", "result", "results", "revision", "secret", "secret-env", "secrets", "service", "service-account", "service-account-email", "service-directory-config", "source", "source-fetcher", "source-provenance", "source-provenance-hash", "source-to-build", "ssl-ca", "start-time", "state", "status", "status-detail", "storage-source", "storage-source-manifest", "subscription", "substitution-option", "substitutions", "tag", "tag-name", "tags", "timeout", "timing", "topic", "trigger-template", "type", "uri", "url", "username", "webhook-config", "webhook-key", "webhook-secret-version", "webhook-secret-version-name", "worker-pool"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -8570,9 +8565,6 @@ where
                     "build.failure-info.type" => Some(("build.failureInfo.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "build.finish-time" => Some(("build.finishTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "build.git-config.http.proxy-secret-version-name" => Some(("build.gitConfig.http.proxySecretVersionName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "build.git-config.http.proxy-ssl-ca-info.bucket" => Some(("build.gitConfig.http.proxySslCaInfo.bucket", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "build.git-config.http.proxy-ssl-ca-info.generation" => Some(("build.gitConfig.http.proxySslCaInfo.generation", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "build.git-config.http.proxy-ssl-ca-info.object" => Some(("build.gitConfig.http.proxySslCaInfo.object", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "build.id" => Some(("build.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "build.images" => Some(("build.images", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "build.log-url" => Some(("build.logUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -8582,11 +8574,13 @@ where
                     "build.options.default-logs-bucket-behavior" => Some(("build.options.defaultLogsBucketBehavior", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "build.options.disk-size-gb" => Some(("build.options.diskSizeGb", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "build.options.dynamic-substitutions" => Some(("build.options.dynamicSubstitutions", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "build.options.enable-structured-logging" => Some(("build.options.enableStructuredLogging", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "build.options.env" => Some(("build.options.env", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "build.options.log-streaming-option" => Some(("build.options.logStreamingOption", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "build.options.logging" => Some(("build.options.logging", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "build.options.machine-type" => Some(("build.options.machineType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "build.options.pool.name" => Some(("build.options.pool.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "build.options.pubsub-topic" => Some(("build.options.pubsubTopic", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "build.options.requested-verify-option" => Some(("build.options.requestedVerifyOption", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "build.options.secret-env" => Some(("build.options.secretEnv", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "build.options.source-provenance-hash" => Some(("build.options.sourceProvenanceHash", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
@@ -8654,6 +8648,14 @@ where
                     "build.timeout" => Some(("build.timeout", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "developer-connect-event-config.git-repository-link" => Some(("developerConnectEventConfig.gitRepositoryLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "developer-connect-event-config.git-repository-link-type" => Some(("developerConnectEventConfig.gitRepositoryLinkType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "developer-connect-event-config.pull-request.branch" => Some(("developerConnectEventConfig.pullRequest.branch", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "developer-connect-event-config.pull-request.comment-control" => Some(("developerConnectEventConfig.pullRequest.commentControl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "developer-connect-event-config.pull-request.invert-regex" => Some(("developerConnectEventConfig.pullRequest.invertRegex", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "developer-connect-event-config.push.branch" => Some(("developerConnectEventConfig.push.branch", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "developer-connect-event-config.push.invert-regex" => Some(("developerConnectEventConfig.push.invertRegex", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "developer-connect-event-config.push.tag" => Some(("developerConnectEventConfig.push.tag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "disabled" => Some(("disabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "event-type" => Some(("eventType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "filename" => Some(("filename", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -8732,7 +8734,7 @@ where
                     "webhook-config.secret" => Some(("webhookConfig.secret", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "webhook-config.state" => Some(("webhookConfig.state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["admin-access-token-version-name", "api-access-token-version", "api-key", "api-key-version", "approval", "approval-config", "approval-required", "approval-time", "approver-account", "artifact-manifest", "artifact-timing", "artifacts", "autodetect", "automap-substitutions", "bitbucket-server-config", "bitbucket-server-config-resource", "bitbucket-server-trigger-config", "branch", "branch-name", "bucket", "build", "build-step-images", "build-step-outputs", "build-trigger-id", "comment", "comment-control", "commit-sha", "config", "connected-repository", "create-time", "decision", "default-logs-bucket-behavior", "description", "detail", "developer-connect-config", "dir", "disabled", "disk-size-gb", "dynamic-substitutions", "end-time", "enterprise-config", "enterprise-config-resource-name", "env", "event-type", "failure-info", "filename", "filter", "finish-time", "generation", "git-config", "git-file-source", "git-repository-link", "git-source", "github", "github-enterprise-config", "gitlab-config", "gitlab-config-resource", "gitlab-enterprise-events-config", "host-uri", "http", "id", "ignored-files", "images", "include-build-logs", "included-files", "installation-id", "invert-regex", "location", "log-streaming-option", "log-url", "logging", "logs-bucket", "machine-type", "name", "num-artifacts", "object", "objects", "options", "owner", "path", "paths", "peered-network", "peered-network-ip-range", "pool", "project-id", "project-key", "project-namespace", "proxy-secret-version-name", "proxy-ssl-ca-info", "pubsub-config", "pull-request", "push", "queue-ttl", "read-access-token-version", "read-access-token-version-name", "ref", "repo-name", "repo-slug", "repo-source", "repo-type", "repository", "repository-event-config", "repository-type", "requested-verify-option", "resolved-connected-repository", "resolved-git-source", "resolved-repo-source", "resolved-storage-source", "resolved-storage-source-manifest", "resource-name", "result", "results", "revision", "secret", "secret-env", "secrets", "service", "service-account", "service-account-email", "service-directory-config", "source", "source-fetcher", "source-provenance", "source-provenance-hash", "source-to-build", "ssl-ca", "start-time", "state", "status", "status-detail", "storage-source", "storage-source-manifest", "subscription", "substitution-option", "substitutions", "tag", "tag-name", "tags", "timeout", "timing", "topic", "trigger-template", "type", "uri", "url", "username", "webhook-config", "webhook-key", "webhook-secret-version", "webhook-secret-version-name", "worker-pool"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["admin-access-token-version-name", "api-access-token-version", "api-key", "api-key-version", "approval", "approval-config", "approval-required", "approval-time", "approver-account", "artifact-manifest", "artifact-timing", "artifacts", "autodetect", "automap-substitutions", "bitbucket-server-config", "bitbucket-server-config-resource", "bitbucket-server-trigger-config", "branch", "branch-name", "bucket", "build", "build-step-images", "build-step-outputs", "build-trigger-id", "comment", "comment-control", "commit-sha", "config", "connected-repository", "create-time", "decision", "default-logs-bucket-behavior", "description", "detail", "developer-connect-config", "developer-connect-event-config", "dir", "disabled", "disk-size-gb", "dynamic-substitutions", "enable-structured-logging", "end-time", "enterprise-config", "enterprise-config-resource-name", "env", "event-type", "failure-info", "filename", "filter", "finish-time", "generation", "git-config", "git-file-source", "git-repository-link", "git-repository-link-type", "git-source", "github", "github-enterprise-config", "gitlab-config", "gitlab-config-resource", "gitlab-enterprise-events-config", "host-uri", "http", "id", "ignored-files", "images", "include-build-logs", "included-files", "installation-id", "invert-regex", "location", "log-streaming-option", "log-url", "logging", "logs-bucket", "machine-type", "name", "num-artifacts", "object", "objects", "options", "owner", "path", "paths", "peered-network", "peered-network-ip-range", "pool", "project-id", "project-key", "project-namespace", "proxy-secret-version-name", "pubsub-config", "pubsub-topic", "pull-request", "push", "queue-ttl", "read-access-token-version", "read-access-token-version-name", "ref", "repo-name", "repo-slug", "repo-source", "repo-type", "repository", "repository-event-config", "repository-type", "requested-verify-option", "resolved-connected-repository", "resolved-git-source", "resolved-repo-source", "resolved-storage-source", "resolved-storage-source-manifest", "resource-name", "result", "results", "revision", "secret", "secret-env", "secrets", "service", "service-account", "service-account-email", "service-directory-config", "source", "source-fetcher", "source-provenance", "source-provenance-hash", "source-to-build", "ssl-ca", "start-time", "state", "status", "status-detail", "storage-source", "storage-source-manifest", "subscription", "substitution-option", "substitutions", "tag", "tag-name", "tags", "timeout", "timing", "topic", "trigger-template", "type", "uri", "url", "username", "webhook-config", "webhook-key", "webhook-secret-version", "webhook-secret-version-name", "worker-pool"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -9289,10 +9291,40 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "private-pool-v1-config.private-service-connect.network-attachment" => Some((
+                    "privatePoolV1Config.privateServiceConnect.networkAttachment",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "private-pool-v1-config.private-service-connect.public-ip-address-disabled" => {
+                    Some((
+                        "privatePoolV1Config.privateServiceConnect.publicIpAddressDisabled",
+                        JsonTypeInfo {
+                            jtype: JsonType::Boolean,
+                            ctype: ComplexType::Pod,
+                        },
+                    ))
+                }
+                "private-pool-v1-config.private-service-connect.route-all-traffic" => Some((
+                    "privatePoolV1Config.privateServiceConnect.routeAllTraffic",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "private-pool-v1-config.worker-config.disk-size-gb" => Some((
                     "privatePoolV1Config.workerConfig.diskSizeGb",
                     JsonTypeInfo {
                         jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "private-pool-v1-config.worker-config.enable-nested-virtualization" => Some((
+                    "privatePoolV1Config.workerConfig.enableNestedVirtualization",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
                         ctype: ComplexType::Pod,
                     },
                 )),
@@ -9334,13 +9366,18 @@ where
                             "disk-size-gb",
                             "display-name",
                             "egress-option",
+                            "enable-nested-virtualization",
                             "etag",
                             "machine-type",
                             "name",
+                            "network-attachment",
                             "network-config",
                             "peered-network",
                             "peered-network-ip-range",
                             "private-pool-v1-config",
+                            "private-service-connect",
+                            "public-ip-address-disabled",
+                            "route-all-traffic",
                             "state",
                             "uid",
                             "update-time",
@@ -9822,10 +9859,40 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "private-pool-v1-config.private-service-connect.network-attachment" => Some((
+                    "privatePoolV1Config.privateServiceConnect.networkAttachment",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "private-pool-v1-config.private-service-connect.public-ip-address-disabled" => {
+                    Some((
+                        "privatePoolV1Config.privateServiceConnect.publicIpAddressDisabled",
+                        JsonTypeInfo {
+                            jtype: JsonType::Boolean,
+                            ctype: ComplexType::Pod,
+                        },
+                    ))
+                }
+                "private-pool-v1-config.private-service-connect.route-all-traffic" => Some((
+                    "privatePoolV1Config.privateServiceConnect.routeAllTraffic",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "private-pool-v1-config.worker-config.disk-size-gb" => Some((
                     "privatePoolV1Config.workerConfig.diskSizeGb",
                     JsonTypeInfo {
                         jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "private-pool-v1-config.worker-config.enable-nested-virtualization" => Some((
+                    "privatePoolV1Config.workerConfig.enableNestedVirtualization",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
                         ctype: ComplexType::Pod,
                     },
                 )),
@@ -9867,13 +9934,18 @@ where
                             "disk-size-gb",
                             "display-name",
                             "egress-option",
+                            "enable-nested-virtualization",
                             "etag",
                             "machine-type",
                             "name",
+                            "network-attachment",
                             "network-config",
                             "peered-network",
                             "peered-network-ip-range",
                             "private-pool-v1-config",
+                            "private-service-connect",
+                            "public-ip-address-disabled",
+                            "route-all-traffic",
                             "state",
                             "uid",
                             "update-time",
@@ -10061,9 +10133,6 @@ where
                     "build.failure-info.type" => Some(("build.failureInfo.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "build.finish-time" => Some(("build.finishTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "build.git-config.http.proxy-secret-version-name" => Some(("build.gitConfig.http.proxySecretVersionName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "build.git-config.http.proxy-ssl-ca-info.bucket" => Some(("build.gitConfig.http.proxySslCaInfo.bucket", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "build.git-config.http.proxy-ssl-ca-info.generation" => Some(("build.gitConfig.http.proxySslCaInfo.generation", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "build.git-config.http.proxy-ssl-ca-info.object" => Some(("build.gitConfig.http.proxySslCaInfo.object", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "build.id" => Some(("build.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "build.images" => Some(("build.images", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "build.log-url" => Some(("build.logUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -10073,11 +10142,13 @@ where
                     "build.options.default-logs-bucket-behavior" => Some(("build.options.defaultLogsBucketBehavior", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "build.options.disk-size-gb" => Some(("build.options.diskSizeGb", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "build.options.dynamic-substitutions" => Some(("build.options.dynamicSubstitutions", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "build.options.enable-structured-logging" => Some(("build.options.enableStructuredLogging", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "build.options.env" => Some(("build.options.env", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "build.options.log-streaming-option" => Some(("build.options.logStreamingOption", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "build.options.logging" => Some(("build.options.logging", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "build.options.machine-type" => Some(("build.options.machineType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "build.options.pool.name" => Some(("build.options.pool.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "build.options.pubsub-topic" => Some(("build.options.pubsubTopic", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "build.options.requested-verify-option" => Some(("build.options.requestedVerifyOption", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "build.options.secret-env" => Some(("build.options.secretEnv", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "build.options.source-provenance-hash" => Some(("build.options.sourceProvenanceHash", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
@@ -10145,6 +10216,14 @@ where
                     "build.timeout" => Some(("build.timeout", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "developer-connect-event-config.git-repository-link" => Some(("developerConnectEventConfig.gitRepositoryLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "developer-connect-event-config.git-repository-link-type" => Some(("developerConnectEventConfig.gitRepositoryLinkType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "developer-connect-event-config.pull-request.branch" => Some(("developerConnectEventConfig.pullRequest.branch", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "developer-connect-event-config.pull-request.comment-control" => Some(("developerConnectEventConfig.pullRequest.commentControl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "developer-connect-event-config.pull-request.invert-regex" => Some(("developerConnectEventConfig.pullRequest.invertRegex", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "developer-connect-event-config.push.branch" => Some(("developerConnectEventConfig.push.branch", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "developer-connect-event-config.push.invert-regex" => Some(("developerConnectEventConfig.push.invertRegex", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "developer-connect-event-config.push.tag" => Some(("developerConnectEventConfig.push.tag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "disabled" => Some(("disabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "event-type" => Some(("eventType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "filename" => Some(("filename", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -10223,7 +10302,7 @@ where
                     "webhook-config.secret" => Some(("webhookConfig.secret", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "webhook-config.state" => Some(("webhookConfig.state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["admin-access-token-version-name", "api-access-token-version", "api-key", "api-key-version", "approval", "approval-config", "approval-required", "approval-time", "approver-account", "artifact-manifest", "artifact-timing", "artifacts", "autodetect", "automap-substitutions", "bitbucket-server-config", "bitbucket-server-config-resource", "bitbucket-server-trigger-config", "branch", "branch-name", "bucket", "build", "build-step-images", "build-step-outputs", "build-trigger-id", "comment", "comment-control", "commit-sha", "config", "connected-repository", "create-time", "decision", "default-logs-bucket-behavior", "description", "detail", "developer-connect-config", "dir", "disabled", "disk-size-gb", "dynamic-substitutions", "end-time", "enterprise-config", "enterprise-config-resource-name", "env", "event-type", "failure-info", "filename", "filter", "finish-time", "generation", "git-config", "git-file-source", "git-repository-link", "git-source", "github", "github-enterprise-config", "gitlab-config", "gitlab-config-resource", "gitlab-enterprise-events-config", "host-uri", "http", "id", "ignored-files", "images", "include-build-logs", "included-files", "installation-id", "invert-regex", "location", "log-streaming-option", "log-url", "logging", "logs-bucket", "machine-type", "name", "num-artifacts", "object", "objects", "options", "owner", "path", "paths", "peered-network", "peered-network-ip-range", "pool", "project-id", "project-key", "project-namespace", "proxy-secret-version-name", "proxy-ssl-ca-info", "pubsub-config", "pull-request", "push", "queue-ttl", "read-access-token-version", "read-access-token-version-name", "ref", "repo-name", "repo-slug", "repo-source", "repo-type", "repository", "repository-event-config", "repository-type", "requested-verify-option", "resolved-connected-repository", "resolved-git-source", "resolved-repo-source", "resolved-storage-source", "resolved-storage-source-manifest", "resource-name", "result", "results", "revision", "secret", "secret-env", "secrets", "service", "service-account", "service-account-email", "service-directory-config", "source", "source-fetcher", "source-provenance", "source-provenance-hash", "source-to-build", "ssl-ca", "start-time", "state", "status", "status-detail", "storage-source", "storage-source-manifest", "subscription", "substitution-option", "substitutions", "tag", "tag-name", "tags", "timeout", "timing", "topic", "trigger-template", "type", "uri", "url", "username", "webhook-config", "webhook-key", "webhook-secret-version", "webhook-secret-version-name", "worker-pool"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["admin-access-token-version-name", "api-access-token-version", "api-key", "api-key-version", "approval", "approval-config", "approval-required", "approval-time", "approver-account", "artifact-manifest", "artifact-timing", "artifacts", "autodetect", "automap-substitutions", "bitbucket-server-config", "bitbucket-server-config-resource", "bitbucket-server-trigger-config", "branch", "branch-name", "bucket", "build", "build-step-images", "build-step-outputs", "build-trigger-id", "comment", "comment-control", "commit-sha", "config", "connected-repository", "create-time", "decision", "default-logs-bucket-behavior", "description", "detail", "developer-connect-config", "developer-connect-event-config", "dir", "disabled", "disk-size-gb", "dynamic-substitutions", "enable-structured-logging", "end-time", "enterprise-config", "enterprise-config-resource-name", "env", "event-type", "failure-info", "filename", "filter", "finish-time", "generation", "git-config", "git-file-source", "git-repository-link", "git-repository-link-type", "git-source", "github", "github-enterprise-config", "gitlab-config", "gitlab-config-resource", "gitlab-enterprise-events-config", "host-uri", "http", "id", "ignored-files", "images", "include-build-logs", "included-files", "installation-id", "invert-regex", "location", "log-streaming-option", "log-url", "logging", "logs-bucket", "machine-type", "name", "num-artifacts", "object", "objects", "options", "owner", "path", "paths", "peered-network", "peered-network-ip-range", "pool", "project-id", "project-key", "project-namespace", "proxy-secret-version-name", "pubsub-config", "pubsub-topic", "pull-request", "push", "queue-ttl", "read-access-token-version", "read-access-token-version-name", "ref", "repo-name", "repo-slug", "repo-source", "repo-type", "repository", "repository-event-config", "repository-type", "requested-verify-option", "resolved-connected-repository", "resolved-git-source", "resolved-repo-source", "resolved-storage-source", "resolved-storage-source-manifest", "resource-name", "result", "results", "revision", "secret", "secret-env", "secrets", "service", "service-account", "service-account-email", "service-directory-config", "source", "source-fetcher", "source-provenance", "source-provenance-hash", "source-to-build", "ssl-ca", "start-time", "state", "status", "status-detail", "storage-source", "storage-source-manifest", "subscription", "substitution-option", "substitutions", "tag", "tag-name", "tags", "timeout", "timing", "topic", "trigger-template", "type", "uri", "url", "username", "webhook-config", "webhook-key", "webhook-secret-version", "webhook-secret-version-name", "worker-pool"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -10655,9 +10734,6 @@ where
                     "build.failure-info.type" => Some(("build.failureInfo.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "build.finish-time" => Some(("build.finishTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "build.git-config.http.proxy-secret-version-name" => Some(("build.gitConfig.http.proxySecretVersionName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "build.git-config.http.proxy-ssl-ca-info.bucket" => Some(("build.gitConfig.http.proxySslCaInfo.bucket", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "build.git-config.http.proxy-ssl-ca-info.generation" => Some(("build.gitConfig.http.proxySslCaInfo.generation", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "build.git-config.http.proxy-ssl-ca-info.object" => Some(("build.gitConfig.http.proxySslCaInfo.object", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "build.id" => Some(("build.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "build.images" => Some(("build.images", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "build.log-url" => Some(("build.logUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -10667,11 +10743,13 @@ where
                     "build.options.default-logs-bucket-behavior" => Some(("build.options.defaultLogsBucketBehavior", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "build.options.disk-size-gb" => Some(("build.options.diskSizeGb", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "build.options.dynamic-substitutions" => Some(("build.options.dynamicSubstitutions", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "build.options.enable-structured-logging" => Some(("build.options.enableStructuredLogging", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "build.options.env" => Some(("build.options.env", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "build.options.log-streaming-option" => Some(("build.options.logStreamingOption", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "build.options.logging" => Some(("build.options.logging", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "build.options.machine-type" => Some(("build.options.machineType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "build.options.pool.name" => Some(("build.options.pool.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "build.options.pubsub-topic" => Some(("build.options.pubsubTopic", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "build.options.requested-verify-option" => Some(("build.options.requestedVerifyOption", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "build.options.secret-env" => Some(("build.options.secretEnv", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "build.options.source-provenance-hash" => Some(("build.options.sourceProvenanceHash", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
@@ -10739,6 +10817,14 @@ where
                     "build.timeout" => Some(("build.timeout", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "developer-connect-event-config.git-repository-link" => Some(("developerConnectEventConfig.gitRepositoryLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "developer-connect-event-config.git-repository-link-type" => Some(("developerConnectEventConfig.gitRepositoryLinkType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "developer-connect-event-config.pull-request.branch" => Some(("developerConnectEventConfig.pullRequest.branch", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "developer-connect-event-config.pull-request.comment-control" => Some(("developerConnectEventConfig.pullRequest.commentControl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "developer-connect-event-config.pull-request.invert-regex" => Some(("developerConnectEventConfig.pullRequest.invertRegex", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "developer-connect-event-config.push.branch" => Some(("developerConnectEventConfig.push.branch", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "developer-connect-event-config.push.invert-regex" => Some(("developerConnectEventConfig.push.invertRegex", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "developer-connect-event-config.push.tag" => Some(("developerConnectEventConfig.push.tag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "disabled" => Some(("disabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "event-type" => Some(("eventType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "filename" => Some(("filename", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -10817,7 +10903,7 @@ where
                     "webhook-config.secret" => Some(("webhookConfig.secret", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "webhook-config.state" => Some(("webhookConfig.state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["admin-access-token-version-name", "api-access-token-version", "api-key", "api-key-version", "approval", "approval-config", "approval-required", "approval-time", "approver-account", "artifact-manifest", "artifact-timing", "artifacts", "autodetect", "automap-substitutions", "bitbucket-server-config", "bitbucket-server-config-resource", "bitbucket-server-trigger-config", "branch", "branch-name", "bucket", "build", "build-step-images", "build-step-outputs", "build-trigger-id", "comment", "comment-control", "commit-sha", "config", "connected-repository", "create-time", "decision", "default-logs-bucket-behavior", "description", "detail", "developer-connect-config", "dir", "disabled", "disk-size-gb", "dynamic-substitutions", "end-time", "enterprise-config", "enterprise-config-resource-name", "env", "event-type", "failure-info", "filename", "filter", "finish-time", "generation", "git-config", "git-file-source", "git-repository-link", "git-source", "github", "github-enterprise-config", "gitlab-config", "gitlab-config-resource", "gitlab-enterprise-events-config", "host-uri", "http", "id", "ignored-files", "images", "include-build-logs", "included-files", "installation-id", "invert-regex", "location", "log-streaming-option", "log-url", "logging", "logs-bucket", "machine-type", "name", "num-artifacts", "object", "objects", "options", "owner", "path", "paths", "peered-network", "peered-network-ip-range", "pool", "project-id", "project-key", "project-namespace", "proxy-secret-version-name", "proxy-ssl-ca-info", "pubsub-config", "pull-request", "push", "queue-ttl", "read-access-token-version", "read-access-token-version-name", "ref", "repo-name", "repo-slug", "repo-source", "repo-type", "repository", "repository-event-config", "repository-type", "requested-verify-option", "resolved-connected-repository", "resolved-git-source", "resolved-repo-source", "resolved-storage-source", "resolved-storage-source-manifest", "resource-name", "result", "results", "revision", "secret", "secret-env", "secrets", "service", "service-account", "service-account-email", "service-directory-config", "source", "source-fetcher", "source-provenance", "source-provenance-hash", "source-to-build", "ssl-ca", "start-time", "state", "status", "status-detail", "storage-source", "storage-source-manifest", "subscription", "substitution-option", "substitutions", "tag", "tag-name", "tags", "timeout", "timing", "topic", "trigger-template", "type", "uri", "url", "username", "webhook-config", "webhook-key", "webhook-secret-version", "webhook-secret-version-name", "worker-pool"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["admin-access-token-version-name", "api-access-token-version", "api-key", "api-key-version", "approval", "approval-config", "approval-required", "approval-time", "approver-account", "artifact-manifest", "artifact-timing", "artifacts", "autodetect", "automap-substitutions", "bitbucket-server-config", "bitbucket-server-config-resource", "bitbucket-server-trigger-config", "branch", "branch-name", "bucket", "build", "build-step-images", "build-step-outputs", "build-trigger-id", "comment", "comment-control", "commit-sha", "config", "connected-repository", "create-time", "decision", "default-logs-bucket-behavior", "description", "detail", "developer-connect-config", "developer-connect-event-config", "dir", "disabled", "disk-size-gb", "dynamic-substitutions", "enable-structured-logging", "end-time", "enterprise-config", "enterprise-config-resource-name", "env", "event-type", "failure-info", "filename", "filter", "finish-time", "generation", "git-config", "git-file-source", "git-repository-link", "git-repository-link-type", "git-source", "github", "github-enterprise-config", "gitlab-config", "gitlab-config-resource", "gitlab-enterprise-events-config", "host-uri", "http", "id", "ignored-files", "images", "include-build-logs", "included-files", "installation-id", "invert-regex", "location", "log-streaming-option", "log-url", "logging", "logs-bucket", "machine-type", "name", "num-artifacts", "object", "objects", "options", "owner", "path", "paths", "peered-network", "peered-network-ip-range", "pool", "project-id", "project-key", "project-namespace", "proxy-secret-version-name", "pubsub-config", "pubsub-topic", "pull-request", "push", "queue-ttl", "read-access-token-version", "read-access-token-version-name", "ref", "repo-name", "repo-slug", "repo-source", "repo-type", "repository", "repository-event-config", "repository-type", "requested-verify-option", "resolved-connected-repository", "resolved-git-source", "resolved-repo-source", "resolved-storage-source", "resolved-storage-source-manifest", "resource-name", "result", "results", "revision", "secret", "secret-env", "secrets", "service", "service-account", "service-account-email", "service-directory-config", "source", "source-fetcher", "source-provenance", "source-provenance-hash", "source-to-build", "ssl-ca", "start-time", "state", "status", "status-detail", "storage-source", "storage-source-manifest", "subscription", "substitution-option", "substitutions", "tag", "tag-name", "tags", "timeout", "timing", "topic", "trigger-template", "type", "uri", "url", "username", "webhook-config", "webhook-key", "webhook-secret-version", "webhook-secret-version-name", "worker-pool"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -11540,7 +11626,9 @@ where
         let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
             secret,
             yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-            hyper_util::client::legacy::Client::builder(executor).build(connector),
+            yup_oauth2::client::CustomHyperClientBuilder::from(
+                hyper_util::client::legacy::Client::builder(executor).build(connector),
+            ),
         )
         .persist_tokens_to_disk(format!("{}/cloudbuild1", config_dir))
         .build()
@@ -11666,7 +11754,7 @@ async fn main() {
             ]),
             ("operations", "methods: 'cancel' and 'get'", vec![
             ("cancel",
-                    Some(r##"Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of 1, corresponding to `Code.CANCELLED`."##),
+                    Some(r##"Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of `1`, corresponding to `Code.CANCELLED`."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudbuild1_cli/operations_cancel",
                   vec![
                     (Some(r##"name"##),
@@ -11713,7 +11801,7 @@ async fn main() {
             ]),
             ("projects", "methods: 'builds-approve', 'builds-cancel', 'builds-create', 'builds-get', 'builds-list', 'builds-retry', 'github-enterprise-configs-create', 'github-enterprise-configs-delete', 'github-enterprise-configs-get', 'github-enterprise-configs-list', 'github-enterprise-configs-patch', 'locations-bitbucket-server-configs-connected-repositories-batch-create', 'locations-bitbucket-server-configs-create', 'locations-bitbucket-server-configs-delete', 'locations-bitbucket-server-configs-get', 'locations-bitbucket-server-configs-list', 'locations-bitbucket-server-configs-patch', 'locations-bitbucket-server-configs-remove-bitbucket-server-connected-repository', 'locations-bitbucket-server-configs-repos-list', 'locations-builds-approve', 'locations-builds-cancel', 'locations-builds-create', 'locations-builds-get', 'locations-builds-list', 'locations-builds-retry', 'locations-get-default-service-account', 'locations-git-lab-configs-connected-repositories-batch-create', 'locations-git-lab-configs-create', 'locations-git-lab-configs-delete', 'locations-git-lab-configs-get', 'locations-git-lab-configs-list', 'locations-git-lab-configs-patch', 'locations-git-lab-configs-remove-git-lab-connected-repository', 'locations-git-lab-configs-repos-list', 'locations-github-enterprise-configs-create', 'locations-github-enterprise-configs-delete', 'locations-github-enterprise-configs-get', 'locations-github-enterprise-configs-list', 'locations-github-enterprise-configs-patch', 'locations-operations-cancel', 'locations-operations-get', 'locations-triggers-create', 'locations-triggers-delete', 'locations-triggers-get', 'locations-triggers-list', 'locations-triggers-patch', 'locations-triggers-run', 'locations-triggers-webhook', 'locations-worker-pools-create', 'locations-worker-pools-delete', 'locations-worker-pools-get', 'locations-worker-pools-list', 'locations-worker-pools-patch', 'triggers-create', 'triggers-delete', 'triggers-get', 'triggers-list', 'triggers-patch', 'triggers-run' and 'triggers-webhook'", vec![
             ("builds-approve",
-                    Some(r##"Approves or rejects a pending build. If approved, the returned LRO will be analogous to the LRO returned from a CreateBuild call. If rejected, the returned LRO will be immediately done."##),
+                    Some(r##"Approves or rejects a pending build. If approved, the returned long-running operation (LRO) will be analogous to the LRO returned from a CreateBuild call. If rejected, the returned LRO will be immediately done."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudbuild1_cli/projects_builds-approve",
                   vec![
                     (Some(r##"name"##),
@@ -11873,7 +11961,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Name of the parent project. For example: projects/{$project_number} or projects/{$project_id}"##),
+                     Some(r##"Name of the parent project. For example: projects/{$project_number} or projects/{$project_id}"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -12158,7 +12246,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-builds-approve",
-                    Some(r##"Approves or rejects a pending build. If approved, the returned LRO will be analogous to the LRO returned from a CreateBuild call. If rejected, the returned LRO will be immediately done."##),
+                    Some(r##"Approves or rejects a pending build. If approved, the returned long-running operation (LRO) will be analogous to the LRO returned from a CreateBuild call. If rejected, the returned LRO will be immediately done."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudbuild1_cli/projects_locations-builds-approve",
                   vec![
                     (Some(r##"name"##),
@@ -12503,7 +12591,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Name of the parent project. For example: projects/{$project_number} or projects/{$project_id}"##),
+                     Some(r##"Name of the parent project. For example: projects/{$project_number} or projects/{$project_id}"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -12608,7 +12696,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-operations-cancel",
-                    Some(r##"Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of 1, corresponding to `Code.CANCELLED`."##),
+                    Some(r##"Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of `1`, corresponding to `Code.CANCELLED`."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudbuild1_cli/projects_locations-operations-cancel",
                   vec![
                     (Some(r##"name"##),
@@ -13112,7 +13200,7 @@ async fn main() {
 
     let mut app = App::new("cloudbuild1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("6.0.0+20240618")
+           .version("7.0.0+20251209")
            .about("Creates and manages builds on Google Cloud Platform.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_cloudbuild1_cli")
            .arg(Arg::with_name("url")
@@ -13177,7 +13265,7 @@ async fn main() {
         .with_native_roots()
         .unwrap()
         .https_or_http()
-        .enable_http1()
+        .enable_http2()
         .build();
 
     match Engine::new(matches, connector).await {

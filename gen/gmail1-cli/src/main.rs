@@ -10258,7 +10258,9 @@ where
         let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
             secret,
             yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-            hyper_util::client::legacy::Client::builder(executor).build(connector),
+            yup_oauth2::client::CustomHyperClientBuilder::from(
+                hyper_util::client::legacy::Client::builder(executor).build(connector),
+            ),
         )
         .persist_tokens_to_disk(format!("{}/gmail1", config_dir))
         .build()
@@ -10779,7 +10781,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("messages-import",
-                    Some(r##"Imports a message into only this user's mailbox, with standard email delivery scanning and classification similar to receiving via SMTP. This method doesn't perform SPF checks, so it might not work for some spam messages, such as those attempting to perform domain spoofing. This method does not send a message."##),
+                    Some(r##"Imports a message into only this user's mailbox, with standard email delivery scanning and classification similar to receiving via SMTP. This method doesn't perform SPF checks, so it might not work for some spam messages, such as those attempting to perform domain spoofing. This method does not send a message. Note that the maximum size of the message is 150MB."##),
                     "Details at http://byron.github.io/google-apis-rs/google_gmail1_cli/users_messages-import",
                   vec![
                     (Some(r##"user-id"##),
@@ -10839,7 +10841,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("messages-list",
-                    Some(r##"Lists the messages in the user's mailbox."##),
+                    Some(r##"Lists the messages in the user's mailbox. For example usage, see [List Gmail messages](https://developers.google.com/workspace/gmail/api/guides/list-messages)."##),
                     "Details at http://byron.github.io/google-apis-rs/google_gmail1_cli/users_messages-list",
                   vec![
                     (Some(r##"user-id"##),
@@ -10889,7 +10891,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("messages-send",
-                    Some(r##"Sends the specified message to the recipients in the `To`, `Cc`, and `Bcc` headers. For example usage, see [Sending email](https://developers.google.com/gmail/api/guides/sending)."##),
+                    Some(r##"Sends the specified message to the recipients in the `To`, `Cc`, and `Bcc` headers. For example usage, see [Sending email](https://developers.google.com/workspace/gmail/api/guides/sending)."##),
                     "Details at http://byron.github.io/google-apis-rs/google_gmail1_cli/users_messages-send",
                   vec![
                     (Some(r##"user-id"##),
@@ -10969,7 +10971,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("settings-cse-identities-create",
-                    Some(r##"Creates and configures a client-side encryption identity that's authorized to send mail from the user account. Google publishes the S/MIME certificate to a shared domain-wide directory so that people within a Google Workspace organization can encrypt and send mail to the identity."##),
+                    Some(r##"Creates and configures a client-side encryption identity that's authorized to send mail from the user account. Google publishes the S/MIME certificate to a shared domain-wide directory so that people within a Google Workspace organization can encrypt and send mail to the identity. For administrators managing identities and keypairs for users in their organization, requests require authorization with a [service account](https://developers.google.com/identity/protocols/OAuth2ServiceAccount) that has [domain-wide delegation authority](https://developers.google.com/identity/protocols/OAuth2ServiceAccount#delegatingauthority) to impersonate users with the `https://www.googleapis.com/auth/gmail.settings.basic` scope. For users managing their own identities and keypairs, requests require [hardware key encryption](https://support.google.com/a/answer/14153163) turned on and configured."##),
                     "Details at http://byron.github.io/google-apis-rs/google_gmail1_cli/users_settings-cse-identities-create",
                   vec![
                     (Some(r##"user-id"##),
@@ -10994,7 +10996,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("settings-cse-identities-delete",
-                    Some(r##"Deletes a client-side encryption identity. The authenticated user can no longer use the identity to send encrypted messages. You cannot restore the identity after you delete it. Instead, use the CreateCseIdentity method to create another identity with the same configuration."##),
+                    Some(r##"Deletes a client-side encryption identity. The authenticated user can no longer use the identity to send encrypted messages. You cannot restore the identity after you delete it. Instead, use the CreateCseIdentity method to create another identity with the same configuration. For administrators managing identities and keypairs for users in their organization, requests require authorization with a [service account](https://developers.google.com/identity/protocols/OAuth2ServiceAccount) that has [domain-wide delegation authority](https://developers.google.com/identity/protocols/OAuth2ServiceAccount#delegatingauthority) to impersonate users with the `https://www.googleapis.com/auth/gmail.settings.basic` scope. For users managing their own identities and keypairs, requests require [hardware key encryption](https://support.google.com/a/answer/14153163) turned on and configured."##),
                     "Details at http://byron.github.io/google-apis-rs/google_gmail1_cli/users_settings-cse-identities-delete",
                   vec![
                     (Some(r##"user-id"##),
@@ -11014,7 +11016,7 @@ async fn main() {
                      Some(true)),
                   ]),
             ("settings-cse-identities-get",
-                    Some(r##"Retrieves a client-side encryption identity configuration."##),
+                    Some(r##"Retrieves a client-side encryption identity configuration. For administrators managing identities and keypairs for users in their organization, requests require authorization with a [service account](https://developers.google.com/identity/protocols/OAuth2ServiceAccount) that has [domain-wide delegation authority](https://developers.google.com/identity/protocols/OAuth2ServiceAccount#delegatingauthority) to impersonate users with the `https://www.googleapis.com/auth/gmail.settings.basic` scope. For users managing their own identities and keypairs, requests require [hardware key encryption](https://support.google.com/a/answer/14153163) turned on and configured."##),
                     "Details at http://byron.github.io/google-apis-rs/google_gmail1_cli/users_settings-cse-identities-get",
                   vec![
                     (Some(r##"user-id"##),
@@ -11039,7 +11041,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("settings-cse-identities-list",
-                    Some(r##"Lists the client-side encrypted identities for an authenticated user."##),
+                    Some(r##"Lists the client-side encrypted identities for an authenticated user. For administrators managing identities and keypairs for users in their organization, requests require authorization with a [service account](https://developers.google.com/identity/protocols/OAuth2ServiceAccount) that has [domain-wide delegation authority](https://developers.google.com/identity/protocols/OAuth2ServiceAccount#delegatingauthority) to impersonate users with the `https://www.googleapis.com/auth/gmail.settings.basic` scope. For users managing their own identities and keypairs, requests require [hardware key encryption](https://support.google.com/a/answer/14153163) turned on and configured."##),
                     "Details at http://byron.github.io/google-apis-rs/google_gmail1_cli/users_settings-cse-identities-list",
                   vec![
                     (Some(r##"user-id"##),
@@ -11059,7 +11061,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("settings-cse-identities-patch",
-                    Some(r##"Associates a different key pair with an existing client-side encryption identity. The updated key pair must validate against Google's [S/MIME certificate profiles](https://support.google.com/a/answer/7300887)."##),
+                    Some(r##"Associates a different key pair with an existing client-side encryption identity. The updated key pair must validate against Google's [S/MIME certificate profiles](https://support.google.com/a/answer/7300887). For administrators managing identities and keypairs for users in their organization, requests require authorization with a [service account](https://developers.google.com/identity/protocols/OAuth2ServiceAccount) that has [domain-wide delegation authority](https://developers.google.com/identity/protocols/OAuth2ServiceAccount#delegatingauthority) to impersonate users with the `https://www.googleapis.com/auth/gmail.settings.basic` scope. For users managing their own identities and keypairs, requests require [hardware key encryption](https://support.google.com/a/answer/14153163) turned on and configured."##),
                     "Details at http://byron.github.io/google-apis-rs/google_gmail1_cli/users_settings-cse-identities-patch",
                   vec![
                     (Some(r##"user-id"##),
@@ -11089,7 +11091,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("settings-cse-keypairs-create",
-                    Some(r##"Creates and uploads a client-side encryption S/MIME public key certificate chain and private key metadata for the authenticated user."##),
+                    Some(r##"Creates and uploads a client-side encryption S/MIME public key certificate chain and private key metadata for the authenticated user. For administrators managing identities and keypairs for users in their organization, requests require authorization with a [service account](https://developers.google.com/identity/protocols/OAuth2ServiceAccount) that has [domain-wide delegation authority](https://developers.google.com/identity/protocols/OAuth2ServiceAccount#delegatingauthority) to impersonate users with the `https://www.googleapis.com/auth/gmail.settings.basic` scope. For users managing their own identities and keypairs, requests require [hardware key encryption](https://support.google.com/a/answer/14153163) turned on and configured."##),
                     "Details at http://byron.github.io/google-apis-rs/google_gmail1_cli/users_settings-cse-keypairs-create",
                   vec![
                     (Some(r##"user-id"##),
@@ -11114,7 +11116,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("settings-cse-keypairs-disable",
-                    Some(r##"Turns off a client-side encryption key pair. The authenticated user can no longer use the key pair to decrypt incoming CSE message texts or sign outgoing CSE mail. To regain access, use the EnableCseKeyPair to turn on the key pair. After 30 days, you can permanently delete the key pair by using the ObliterateCseKeyPair method."##),
+                    Some(r##"Turns off a client-side encryption key pair. The authenticated user can no longer use the key pair to decrypt incoming CSE message texts or sign outgoing CSE mail. To regain access, use the EnableCseKeyPair to turn on the key pair. After 30 days, you can permanently delete the key pair by using the ObliterateCseKeyPair method. For administrators managing identities and keypairs for users in their organization, requests require authorization with a [service account](https://developers.google.com/identity/protocols/OAuth2ServiceAccount) that has [domain-wide delegation authority](https://developers.google.com/identity/protocols/OAuth2ServiceAccount#delegatingauthority) to impersonate users with the `https://www.googleapis.com/auth/gmail.settings.basic` scope. For users managing their own identities and keypairs, requests require [hardware key encryption](https://support.google.com/a/answer/14153163) turned on and configured."##),
                     "Details at http://byron.github.io/google-apis-rs/google_gmail1_cli/users_settings-cse-keypairs-disable",
                   vec![
                     (Some(r##"user-id"##),
@@ -11144,7 +11146,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("settings-cse-keypairs-enable",
-                    Some(r##"Turns on a client-side encryption key pair that was turned off. The key pair becomes active again for any associated client-side encryption identities."##),
+                    Some(r##"Turns on a client-side encryption key pair that was turned off. The key pair becomes active again for any associated client-side encryption identities. For administrators managing identities and keypairs for users in their organization, requests require authorization with a [service account](https://developers.google.com/identity/protocols/OAuth2ServiceAccount) that has [domain-wide delegation authority](https://developers.google.com/identity/protocols/OAuth2ServiceAccount#delegatingauthority) to impersonate users with the `https://www.googleapis.com/auth/gmail.settings.basic` scope. For users managing their own identities and keypairs, requests require [hardware key encryption](https://support.google.com/a/answer/14153163) turned on and configured."##),
                     "Details at http://byron.github.io/google-apis-rs/google_gmail1_cli/users_settings-cse-keypairs-enable",
                   vec![
                     (Some(r##"user-id"##),
@@ -11174,7 +11176,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("settings-cse-keypairs-get",
-                    Some(r##"Retrieves an existing client-side encryption key pair."##),
+                    Some(r##"Retrieves an existing client-side encryption key pair. For administrators managing identities and keypairs for users in their organization, requests require authorization with a [service account](https://developers.google.com/identity/protocols/OAuth2ServiceAccount) that has [domain-wide delegation authority](https://developers.google.com/identity/protocols/OAuth2ServiceAccount#delegatingauthority) to impersonate users with the `https://www.googleapis.com/auth/gmail.settings.basic` scope. For users managing their own identities and keypairs, requests require [hardware key encryption](https://support.google.com/a/answer/14153163) turned on and configured."##),
                     "Details at http://byron.github.io/google-apis-rs/google_gmail1_cli/users_settings-cse-keypairs-get",
                   vec![
                     (Some(r##"user-id"##),
@@ -11199,7 +11201,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("settings-cse-keypairs-list",
-                    Some(r##"Lists client-side encryption key pairs for an authenticated user."##),
+                    Some(r##"Lists client-side encryption key pairs for an authenticated user. For administrators managing identities and keypairs for users in their organization, requests require authorization with a [service account](https://developers.google.com/identity/protocols/OAuth2ServiceAccount) that has [domain-wide delegation authority](https://developers.google.com/identity/protocols/OAuth2ServiceAccount#delegatingauthority) to impersonate users with the `https://www.googleapis.com/auth/gmail.settings.basic` scope. For users managing their own identities and keypairs, requests require [hardware key encryption](https://support.google.com/a/answer/14153163) turned on and configured."##),
                     "Details at http://byron.github.io/google-apis-rs/google_gmail1_cli/users_settings-cse-keypairs-list",
                   vec![
                     (Some(r##"user-id"##),
@@ -11219,7 +11221,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("settings-cse-keypairs-obliterate",
-                    Some(r##"Deletes a client-side encryption key pair permanently and immediately. You can only permanently delete key pairs that have been turned off for more than 30 days. To turn off a key pair, use the DisableCseKeyPair method. Gmail can't restore or decrypt any messages that were encrypted by an obliterated key. Authenticated users and Google Workspace administrators lose access to reading the encrypted messages."##),
+                    Some(r##"Deletes a client-side encryption key pair permanently and immediately. You can only permanently delete key pairs that have been turned off for more than 30 days. To turn off a key pair, use the DisableCseKeyPair method. Gmail can't restore or decrypt any messages that were encrypted by an obliterated key. Authenticated users and Google Workspace administrators lose access to reading the encrypted messages. For administrators managing identities and keypairs for users in their organization, requests require authorization with a [service account](https://developers.google.com/identity/protocols/OAuth2ServiceAccount) that has [domain-wide delegation authority](https://developers.google.com/identity/protocols/OAuth2ServiceAccount#delegatingauthority) to impersonate users with the `https://www.googleapis.com/auth/gmail.settings.basic` scope. For users managing their own identities and keypairs, requests require [hardware key encryption](https://support.google.com/a/answer/14153163) turned on and configured."##),
                     "Details at http://byron.github.io/google-apis-rs/google_gmail1_cli/users_settings-cse-keypairs-obliterate",
                   vec![
                     (Some(r##"user-id"##),
@@ -12233,7 +12235,7 @@ async fn main() {
 
     let mut app = App::new("gmail1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("6.0.0+20240624")
+           .version("7.0.0+20251215")
            .about("The Gmail API lets you view and manage Gmail mailbox data like threads, messages, and labels.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_gmail1_cli")
            .arg(Arg::with_name("url")
@@ -12311,7 +12313,7 @@ async fn main() {
         .with_native_roots()
         .unwrap()
         .https_or_http()
-        .enable_http1()
+        .enable_http2()
         .build();
 
     match Engine::new(matches, connector).await {

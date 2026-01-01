@@ -2,10 +2,10 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Gmail* crate version *7.0.0+20240624*, where *20240624* is the exact revision of the *gmail:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v7.0.0*.
+//! This documentation was generated from *Gmail* crate version *7.0.0+20251215*, where *20251215* is the exact revision of the *gmail:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v7.0.0*.
 //!
 //! Everything else about the *Gmail* *v1* API can be found at the
-//! [official documentation site](https://developers.google.com/gmail/api/).
+//! [official documentation site](https://developers.google.com/workspace/gmail/api/).
 //! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/main/gen/gmail1).
 //! # Features
 //!

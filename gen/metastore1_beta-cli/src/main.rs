@@ -115,6 +115,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "tags" => Some((
+                    "tags",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Map,
+                    },
+                )),
                 "uid" => Some((
                     "uid",
                     JsonTypeInfo {
@@ -146,6 +153,7 @@ where
                             "name",
                             "state",
                             "state-message",
+                            "tags",
                             "uid",
                             "update-time",
                             "version",
@@ -684,6 +692,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "tags" => Some((
+                    "tags",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Map,
+                    },
+                )),
                 "uid" => Some((
                     "uid",
                     JsonTypeInfo {
@@ -715,6 +730,7 @@ where
                             "name",
                             "state",
                             "state-message",
+                            "tags",
                             "uid",
                             "update-time",
                             "version",
@@ -1226,6 +1242,9 @@ where
                 "filter" => {
                     call = call.filter(value.unwrap_or(""));
                 }
+                "extra-location-types" => {
+                    call = call.add_extra_location_types(value.unwrap_or(""));
+                }
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -1243,7 +1262,11 @@ where
                             .push(CLIError::UnknownParameter(key.to_string(), {
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
-                                v.extend(["filter", "page-size", "page-token"].iter().map(|v| *v));
+                                v.extend(
+                                    ["extra-location-types", "filter", "page-size", "page-token"]
+                                        .iter()
+                                        .map(|v| *v),
+                                );
                                 v
                             }));
                     }
@@ -1598,6 +1621,13 @@ where
         {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "return-partial-success" => {
+                    call = call.return_partial_success(
+                        value
+                            .map(|v| arg_from_str(v, err, "return-partial-success", "boolean"))
+                            .unwrap_or(false),
+                    );
+                }
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
                 }
@@ -1628,7 +1658,16 @@ where
                             .push(CLIError::UnknownParameter(key.to_string(), {
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
-                                v.extend(["filter", "page-size", "page-token"].iter().map(|v| *v));
+                                v.extend(
+                                    [
+                                        "filter",
+                                        "page-size",
+                                        "page-token",
+                                        "return-partial-success",
+                                    ]
+                                    .iter()
+                                    .map(|v| *v),
+                                );
                                 v
                             }));
                     }
@@ -2014,6 +2053,7 @@ where
                     "service-revision.database-type" => Some(("serviceRevision.databaseType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "service-revision.deletion-protection" => Some(("serviceRevision.deletionProtection", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "service-revision.encryption-config.kms-key" => Some(("serviceRevision.encryptionConfig.kmsKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "service-revision.encryption-config.kms-keys" => Some(("serviceRevision.encryptionConfig.kmsKeys", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "service-revision.endpoint-uri" => Some(("serviceRevision.endpointUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "service-revision.hive-metastore-config.config-overrides" => Some(("serviceRevision.hiveMetastoreConfig.configOverrides", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "service-revision.hive-metastore-config.endpoint-protocol" => Some(("serviceRevision.hiveMetastoreConfig.endpointProtocol", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2025,6 +2065,8 @@ where
                     "service-revision.maintenance-window.day-of-week" => Some(("serviceRevision.maintenanceWindow.dayOfWeek", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "service-revision.maintenance-window.hour-of-day" => Some(("serviceRevision.maintenanceWindow.hourOfDay", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "service-revision.metadata-integration.data-catalog-config.enabled" => Some(("serviceRevision.metadataIntegration.dataCatalogConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "service-revision.multi-region-config.custom-region-config.read-only-regions" => Some(("serviceRevision.multiRegionConfig.customRegionConfig.readOnlyRegions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "service-revision.multi-region-config.custom-region-config.read-write-regions" => Some(("serviceRevision.multiRegionConfig.customRegionConfig.readWriteRegions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "service-revision.name" => Some(("serviceRevision.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "service-revision.network" => Some(("serviceRevision.network", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "service-revision.network-config.custom-routes-enabled" => Some(("serviceRevision.networkConfig.customRoutesEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -2047,13 +2089,14 @@ where
                     "service-revision.scheduled-backup.time-zone" => Some(("serviceRevision.scheduledBackup.timeZone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "service-revision.state" => Some(("serviceRevision.state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "service-revision.state-message" => Some(("serviceRevision.stateMessage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "service-revision.tags" => Some(("serviceRevision.tags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "service-revision.telemetry-config.log-format" => Some(("serviceRevision.telemetryConfig.logFormat", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "service-revision.tier" => Some(("serviceRevision.tier", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "service-revision.uid" => Some(("serviceRevision.uid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "service-revision.update-time" => Some(("serviceRevision.updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["artifact-gcs-uri", "autoscaling-config", "autoscaling-enabled", "autoscaling-factor", "backup-id", "backup-location", "cloud-secret", "config-overrides", "create-time", "cron-schedule", "custom-routes-enabled", "data-catalog-config", "database-type", "day-of-week", "deletion-protection", "description", "duration", "enabled", "encryption-config", "end-time", "endpoint-protocol", "endpoint-uri", "hive-metastore-config", "hour-of-day", "instance-size", "kerberos-config", "keytab", "kms-key", "krb5-config-gcs-uri", "labels", "latest-backup", "limit-config", "log-format", "maintenance-window", "max-scaling-factor", "metadata-integration", "min-scaling-factor", "name", "network", "network-config", "next-scheduled-time", "port", "principal", "release-channel", "restoring-services", "scaling-config", "scaling-factor", "scheduled-backup", "service-revision", "start-time", "state", "state-message", "telemetry-config", "tier", "time-zone", "uid", "update-time", "version"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["artifact-gcs-uri", "autoscaling-config", "autoscaling-enabled", "autoscaling-factor", "backup-id", "backup-location", "cloud-secret", "config-overrides", "create-time", "cron-schedule", "custom-region-config", "custom-routes-enabled", "data-catalog-config", "database-type", "day-of-week", "deletion-protection", "description", "duration", "enabled", "encryption-config", "end-time", "endpoint-protocol", "endpoint-uri", "hive-metastore-config", "hour-of-day", "instance-size", "kerberos-config", "keytab", "kms-key", "kms-keys", "krb5-config-gcs-uri", "labels", "latest-backup", "limit-config", "log-format", "maintenance-window", "max-scaling-factor", "metadata-integration", "min-scaling-factor", "multi-region-config", "name", "network", "network-config", "next-scheduled-time", "port", "principal", "read-only-regions", "read-write-regions", "release-channel", "restoring-services", "scaling-config", "scaling-factor", "scheduled-backup", "service-revision", "start-time", "state", "state-message", "tags", "telemetry-config", "tier", "time-zone", "uid", "update-time", "version"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3124,6 +3167,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "encryption-config.kms-keys" => Some((
+                    "encryptionConfig.kmsKeys",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
                 "endpoint-uri" => Some((
                     "endpointUri",
                     JsonTypeInfo {
@@ -3199,6 +3249,20 @@ where
                     JsonTypeInfo {
                         jtype: JsonType::Boolean,
                         ctype: ComplexType::Pod,
+                    },
+                )),
+                "multi-region-config.custom-region-config.read-only-regions" => Some((
+                    "multiRegionConfig.customRegionConfig.readOnlyRegions",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "multi-region-config.custom-region-config.read-write-regions" => Some((
+                    "multiRegionConfig.customRegionConfig.readWriteRegions",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
                     },
                 )),
                 "name" => Some((
@@ -3355,6 +3419,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "tags" => Some((
+                    "tags",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Map,
+                    },
+                )),
                 "telemetry-config.log-format" => Some((
                     "telemetryConfig.logFormat",
                     JsonTypeInfo {
@@ -3397,6 +3468,7 @@ where
                             "config-overrides",
                             "create-time",
                             "cron-schedule",
+                            "custom-region-config",
                             "custom-routes-enabled",
                             "data-catalog-config",
                             "database-type",
@@ -3413,6 +3485,7 @@ where
                             "kerberos-config",
                             "keytab",
                             "kms-key",
+                            "kms-keys",
                             "krb5-config-gcs-uri",
                             "labels",
                             "latest-backup",
@@ -3422,12 +3495,15 @@ where
                             "max-scaling-factor",
                             "metadata-integration",
                             "min-scaling-factor",
+                            "multi-region-config",
                             "name",
                             "network",
                             "network-config",
                             "next-scheduled-time",
                             "port",
                             "principal",
+                            "read-only-regions",
+                            "read-write-regions",
                             "release-channel",
                             "scaling-config",
                             "scaling-factor",
@@ -3435,6 +3511,7 @@ where
                             "start-time",
                             "state",
                             "state-message",
+                            "tags",
                             "telemetry-config",
                             "tier",
                             "time-zone",
@@ -5940,6 +6017,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "encryption-config.kms-keys" => Some((
+                    "encryptionConfig.kmsKeys",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
                 "endpoint-uri" => Some((
                     "endpointUri",
                     JsonTypeInfo {
@@ -6015,6 +6099,20 @@ where
                     JsonTypeInfo {
                         jtype: JsonType::Boolean,
                         ctype: ComplexType::Pod,
+                    },
+                )),
+                "multi-region-config.custom-region-config.read-only-regions" => Some((
+                    "multiRegionConfig.customRegionConfig.readOnlyRegions",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "multi-region-config.custom-region-config.read-write-regions" => Some((
+                    "multiRegionConfig.customRegionConfig.readWriteRegions",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
                     },
                 )),
                 "name" => Some((
@@ -6171,6 +6269,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "tags" => Some((
+                    "tags",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Map,
+                    },
+                )),
                 "telemetry-config.log-format" => Some((
                     "telemetryConfig.logFormat",
                     JsonTypeInfo {
@@ -6213,6 +6318,7 @@ where
                             "config-overrides",
                             "create-time",
                             "cron-schedule",
+                            "custom-region-config",
                             "custom-routes-enabled",
                             "data-catalog-config",
                             "database-type",
@@ -6229,6 +6335,7 @@ where
                             "kerberos-config",
                             "keytab",
                             "kms-key",
+                            "kms-keys",
                             "krb5-config-gcs-uri",
                             "labels",
                             "latest-backup",
@@ -6238,12 +6345,15 @@ where
                             "max-scaling-factor",
                             "metadata-integration",
                             "min-scaling-factor",
+                            "multi-region-config",
                             "name",
                             "network",
                             "network-config",
                             "next-scheduled-time",
                             "port",
                             "principal",
+                            "read-only-regions",
+                            "read-write-regions",
                             "release-channel",
                             "scaling-config",
                             "scaling-factor",
@@ -6251,6 +6361,7 @@ where
                             "start-time",
                             "state",
                             "state-message",
+                            "tags",
                             "telemetry-config",
                             "tier",
                             "time-zone",
@@ -7559,7 +7670,9 @@ where
         let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
             secret,
             yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-            hyper_util::client::legacy::Client::builder(executor).build(connector),
+            yup_oauth2::client::CustomHyperClientBuilder::from(
+                hyper_util::client::legacy::Client::builder(executor).build(connector),
+            ),
         )
         .persist_tokens_to_disk(format!("{}/metastore1-beta", config_dir))
         .build()
@@ -8514,7 +8627,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Immutable. The relative resource name of the metadata import, of the form:projects/{project_number}/locations/{location_id}/services/{service_id}/metadataImports/{metadata_import_id}."##),
+                     Some(r##"Immutable. Identifier. The relative resource name of the metadata import, of the form:projects/{project_number}/locations/{location_id}/services/{service_id}/metadataImports/{metadata_import_id}."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -8624,7 +8737,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Immutable. The relative resource name of the metastore service, in the following format:projects/{project_number}/locations/{location_id}/services/{service_id}."##),
+                     Some(r##"Immutable. Identifier. The relative resource name of the metastore service, in the following format:projects/{project_number}/locations/{location_id}/services/{service_id}."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -8798,7 +8911,7 @@ async fn main() {
 
     let mut app = App::new("metastore1-beta")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("6.0.0+20240613")
+           .version("7.0.0+20251216")
            .about("The Dataproc Metastore API is used to manage the lifecycle and configuration of metastore services.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_metastore1_beta_cli")
            .arg(Arg::with_name("url")
@@ -8863,7 +8976,7 @@ async fn main() {
         .with_native_roots()
         .unwrap()
         .https_or_http()
-        .enable_http1()
+        .enable_http2()
         .build();
 
     match Engine::new(matches, connector).await {

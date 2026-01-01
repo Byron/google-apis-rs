@@ -1,4 +1,4 @@
-site_name: drive v6.0.0+20240618
+site_name: drive v7.0.0+20251218
 site_url: http://byron.github.io/google-apis-rs/google-drive3-cli
 site_description: A complete library to interact with drive (protocol v3)
 
@@ -11,6 +11,13 @@ nav:
 - Home: 'index.md'
 - 'About':
     - 'Get': 'about_get.md'
+- 'Accessproposals':
+    - 'Get': 'accessproposals_get.md'
+    - 'List': 'accessproposals_list.md'
+    - 'Resolve': 'accessproposals_resolve.md'
+- 'Approvals':
+    - 'Get': 'approvals_get.md'
+    - 'List': 'approvals_list.md'
 - 'Apps':
     - 'Get': 'apps_get.md'
     - 'List': 'apps_list.md'
@@ -38,6 +45,7 @@ nav:
     - 'Copy': 'files_copy.md'
     - 'Create': 'files_create.md'
     - 'Delete': 'files_delete.md'
+    - 'Download': 'files_download.md'
     - 'Empty Trash': 'files_empty-trash.md'
     - 'Export': 'files_export.md'
     - 'Generate Ids': 'files_generate-ids.md'
@@ -47,6 +55,8 @@ nav:
     - 'Modify Labels': 'files_modify-labels.md'
     - 'Update': 'files_update.md'
     - 'Watch': 'files_watch.md'
+- 'Operations':
+    - 'Get': 'operations_get.md'
 - 'Permissions':
     - 'Create': 'permissions_create.md'
     - 'Delete': 'permissions_delete.md'

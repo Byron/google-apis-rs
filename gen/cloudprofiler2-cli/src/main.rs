@@ -781,7 +781,9 @@ where
         let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
             secret,
             yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-            hyper_util::client::legacy::Client::builder(executor).build(connector),
+            yup_oauth2::client::CustomHyperClientBuilder::from(
+                hyper_util::client::legacy::Client::builder(executor).build(connector),
+            ),
         )
         .persist_tokens_to_disk(format!("{}/cloudprofiler2", config_dir))
         .build()
@@ -935,7 +937,7 @@ async fn main() {
 
     let mut app = App::new("cloudprofiler2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("6.0.0+20240624")
+           .version("7.0.0+20251006")
            .about("Manages continuous profiling information.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_cloudprofiler2_cli")
            .arg(Arg::with_name("url")
@@ -1000,7 +1002,7 @@ async fn main() {
         .with_native_roots()
         .unwrap()
         .https_or_http()
-        .enable_http1()
+        .enable_http2()
         .build();
 
     match Engine::new(matches, connector).await {

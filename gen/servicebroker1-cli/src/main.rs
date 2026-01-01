@@ -467,7 +467,9 @@ where
         let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
             secret,
             yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-            hyper_util::client::legacy::Client::builder(executor).build(connector),
+            yup_oauth2::client::CustomHyperClientBuilder::from(
+                hyper_util::client::legacy::Client::builder(executor).build(connector),
+            ),
         )
         .persist_tokens_to_disk(format!("{}/servicebroker1", config_dir))
         .build()
@@ -608,7 +610,7 @@ async fn main() {
 
     let mut app = App::new("servicebroker1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("6.0.0+20190624")
+           .version("7.0.0+20190624")
            .about("The Google Cloud Platform Service Broker API provides Google hosted
            implementation of the Open Service Broker API
            (https://www.openservicebrokerapi.org/).
@@ -676,7 +678,7 @@ async fn main() {
         .with_native_roots()
         .unwrap()
         .https_or_http()
-        .enable_http1()
+        .enable_http2()
         .build();
 
     match Engine::new(matches, connector).await {

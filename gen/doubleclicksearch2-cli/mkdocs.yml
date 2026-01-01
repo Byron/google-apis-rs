@@ -1,4 +1,4 @@
-site_name: Doubleclicksearch v6.0.0+20240618
+site_name: Doubleclicksearch v7.0.0+20251210
 site_url: http://byron.github.io/google-apis-rs/google-doubleclicksearch2-cli
 site_description: A complete library to interact with Doubleclicksearch (protocol v2)
 

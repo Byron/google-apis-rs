@@ -1,4 +1,4 @@
-site_name: Walletobjects v6.0.0+20240626
+site_name: Walletobjects v7.0.0+20251211
 site_url: http://byron.github.io/google-apis-rs/google-walletobjects1-cli
 site_description: A complete library to interact with Walletobjects (protocol v1)
 
@@ -125,6 +125,8 @@ nav:
     - 'List': 'transitobject_list.md'
     - 'Patch': 'transitobject_patch.md'
     - 'Update': 'transitobject_update.md'
+- 'Walletobjects':
+    - 'V1 Private Content Set Pass Update Notice': 'walletobjects_v1-private-content-set-pass-update-notice.md'
 
 theme: readthedocs
 

@@ -2480,6 +2480,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "etag" => Some((
+                    "etag",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "name" => Some((
                     "name",
                     JsonTypeInfo {
@@ -2586,6 +2593,7 @@ where
                             "allowed-services",
                             "description",
                             "enable-restriction",
+                            "etag",
                             "name",
                             "perimeter-type",
                             "resources",
@@ -2983,6 +2991,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "etag" => Some((
+                    "etag",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "name" => Some((
                     "name",
                     JsonTypeInfo {
@@ -3089,6 +3104,7 @@ where
                             "allowed-services",
                             "description",
                             "enable-restriction",
+                            "etag",
                             "name",
                             "perimeter-type",
                             "resources",
@@ -4069,6 +4085,13 @@ where
         {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "return-partial-success" => {
+                    call = call.return_partial_success(
+                        value
+                            .map(|v| arg_from_str(v, err, "return-partial-success", "boolean"))
+                            .unwrap_or(false),
+                    );
+                }
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
                 }
@@ -4099,7 +4122,16 @@ where
                             .push(CLIError::UnknownParameter(key.to_string(), {
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
-                                v.extend(["filter", "page-size", "page-token"].iter().map(|v| *v));
+                                v.extend(
+                                    [
+                                        "filter",
+                                        "page-size",
+                                        "page-token",
+                                        "return-partial-success",
+                                    ]
+                                    .iter()
+                                    .map(|v| *v),
+                                );
                                 v
                             }));
                     }
@@ -4205,6 +4237,41 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "session-settings.max-inactivity" => Some((
+                    "sessionSettings.maxInactivity",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "session-settings.session-length" => Some((
+                    "sessionSettings.sessionLength",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "session-settings.session-length-enabled" => Some((
+                    "sessionSettings.sessionLengthEnabled",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "session-settings.session-reauth-method" => Some((
+                    "sessionSettings.sessionReauthMethod",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "session-settings.use-oidc-max-age" => Some((
+                    "sessionSettings.useOidcMaxAge",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 _ => {
                     let suggestion = FieldCursor::did_you_mean(
                         key,
@@ -4212,7 +4279,13 @@ where
                             "access-levels",
                             "dry-run-access-levels",
                             "group-key",
+                            "max-inactivity",
                             "name",
+                            "session-length",
+                            "session-length-enabled",
+                            "session-reauth-method",
+                            "session-settings",
+                            "use-oidc-max-age",
                         ],
                     );
                     err.issues.push(CLIError::Field(FieldError::Unknown(
@@ -4622,6 +4695,41 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "session-settings.max-inactivity" => Some((
+                    "sessionSettings.maxInactivity",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "session-settings.session-length" => Some((
+                    "sessionSettings.sessionLength",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "session-settings.session-length-enabled" => Some((
+                    "sessionSettings.sessionLengthEnabled",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "session-settings.session-reauth-method" => Some((
+                    "sessionSettings.sessionReauthMethod",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "session-settings.use-oidc-max-age" => Some((
+                    "sessionSettings.useOidcMaxAge",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 _ => {
                     let suggestion = FieldCursor::did_you_mean(
                         key,
@@ -4629,7 +4737,13 @@ where
                             "access-levels",
                             "dry-run-access-levels",
                             "group-key",
+                            "max-inactivity",
                             "name",
+                            "session-length",
+                            "session-length-enabled",
+                            "session-reauth-method",
+                            "session-settings",
+                            "use-oidc-max-age",
                         ],
                     );
                     err.issues.push(CLIError::Field(FieldError::Unknown(
@@ -4670,6 +4784,13 @@ where
                             .unwrap_or(apis_common::FieldMask::default()),
                     );
                 }
+                "append" => {
+                    call = call.append(
+                        value
+                            .map(|v| arg_from_str(v, err, "append", "boolean"))
+                            .unwrap_or(false),
+                    );
+                }
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -4687,7 +4808,7 @@ where
                             .push(CLIError::UnknownParameter(key.to_string(), {
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
-                                v.extend(["update-mask"].iter().map(|v| *v));
+                                v.extend(["append", "update-mask"].iter().map(|v| *v));
                                 v
                             }));
                     }
@@ -5152,7 +5273,9 @@ where
         let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
             secret,
             yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-            hyper_util::client::legacy::Client::builder(executor).build(connector),
+            yup_oauth2::client::CustomHyperClientBuilder::from(
+                hyper_util::client::legacy::Client::builder(executor).build(connector),
+            ),
         )
         .persist_tokens_to_disk(format!("{}/accesscontextmanager1", config_dir))
         .build()
@@ -5839,7 +5962,7 @@ async fn main() {
             ]),
             ("operations", "methods: 'cancel', 'delete', 'get' and 'list'", vec![
             ("cancel",
-                    Some(r##"Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of 1, corresponding to `Code.CANCELLED`."##),
+                    Some(r##"Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of `1`, corresponding to `Code.CANCELLED`."##),
                     "Details at http://byron.github.io/google-apis-rs/google_accesscontextmanager1_cli/operations_cancel",
                   vec![
                     (Some(r##"name"##),
@@ -6077,7 +6200,7 @@ async fn main() {
 
     let mut app = App::new("accesscontextmanager1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("6.0.0+20240623")
+           .version("7.0.0+20251211")
            .about("An API for setting attribute based access control to requests to Google Cloud services. *Warning:* Do not mix *v1alpha* and *v1* API usage in the same access policy. The v1alpha API supports new Access Context Manager features, which may have different attributes or behaviors that are not supported by v1. The practice of mixed API usage within a policy may result in the inability to update that policy, including any access levels or service perimeters belonging to it. It is not recommended to use both v1 and v1alpha for modifying policies with critical service perimeters. Modifications using v1alpha should be limited to policies with non-production/non-critical service perimeters.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_accesscontextmanager1_cli")
            .arg(Arg::with_name("url")
@@ -6142,7 +6265,7 @@ async fn main() {
         .with_native_roots()
         .unwrap()
         .https_or_http()
-        .enable_http1()
+        .enable_http2()
         .build();
 
     match Engine::new(matches, connector).await {

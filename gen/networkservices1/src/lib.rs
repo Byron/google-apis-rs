@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *NetworkServices* crate version *6.0.0+20240620*, where *20240620* is the exact revision of the *networkservices:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v6.0.0*.
+//! This documentation was generated from *NetworkServices* crate version *7.0.0+20251203*, where *20251203* is the exact revision of the *networkservices:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v7.0.0*.
 //!
 //! Everything else about the *NetworkServices* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/networking).
@@ -12,7 +12,7 @@
 //! Handle the following *Resources* with ease from the central [hub](NetworkServices) ...
 //!
 //! * projects
-//!  * [*locations edge cache keysets get iam policy*](api::ProjectLocationEdgeCacheKeysetGetIamPolicyCall), [*locations edge cache keysets set iam policy*](api::ProjectLocationEdgeCacheKeysetSetIamPolicyCall), [*locations edge cache keysets test iam permissions*](api::ProjectLocationEdgeCacheKeysetTestIamPermissionCall), [*locations edge cache origins get iam policy*](api::ProjectLocationEdgeCacheOriginGetIamPolicyCall), [*locations edge cache origins set iam policy*](api::ProjectLocationEdgeCacheOriginSetIamPolicyCall), [*locations edge cache origins test iam permissions*](api::ProjectLocationEdgeCacheOriginTestIamPermissionCall), [*locations edge cache services get iam policy*](api::ProjectLocationEdgeCacheServiceGetIamPolicyCall), [*locations edge cache services set iam policy*](api::ProjectLocationEdgeCacheServiceSetIamPolicyCall), [*locations edge cache services test iam permissions*](api::ProjectLocationEdgeCacheServiceTestIamPermissionCall), [*locations endpoint policies create*](api::ProjectLocationEndpointPolicyCreateCall), [*locations endpoint policies delete*](api::ProjectLocationEndpointPolicyDeleteCall), [*locations endpoint policies get*](api::ProjectLocationEndpointPolicyGetCall), [*locations endpoint policies get iam policy*](api::ProjectLocationEndpointPolicyGetIamPolicyCall), [*locations endpoint policies list*](api::ProjectLocationEndpointPolicyListCall), [*locations endpoint policies patch*](api::ProjectLocationEndpointPolicyPatchCall), [*locations endpoint policies set iam policy*](api::ProjectLocationEndpointPolicySetIamPolicyCall), [*locations endpoint policies test iam permissions*](api::ProjectLocationEndpointPolicyTestIamPermissionCall), [*locations gateways create*](api::ProjectLocationGatewayCreateCall), [*locations gateways delete*](api::ProjectLocationGatewayDeleteCall), [*locations gateways get*](api::ProjectLocationGatewayGetCall), [*locations gateways get iam policy*](api::ProjectLocationGatewayGetIamPolicyCall), [*locations gateways list*](api::ProjectLocationGatewayListCall), [*locations gateways patch*](api::ProjectLocationGatewayPatchCall), [*locations gateways set iam policy*](api::ProjectLocationGatewaySetIamPolicyCall), [*locations gateways test iam permissions*](api::ProjectLocationGatewayTestIamPermissionCall), [*locations get*](api::ProjectLocationGetCall), [*locations grpc routes create*](api::ProjectLocationGrpcRouteCreateCall), [*locations grpc routes delete*](api::ProjectLocationGrpcRouteDeleteCall), [*locations grpc routes get*](api::ProjectLocationGrpcRouteGetCall), [*locations grpc routes list*](api::ProjectLocationGrpcRouteListCall), [*locations grpc routes patch*](api::ProjectLocationGrpcRoutePatchCall), [*locations http routes create*](api::ProjectLocationHttpRouteCreateCall), [*locations http routes delete*](api::ProjectLocationHttpRouteDeleteCall), [*locations http routes get*](api::ProjectLocationHttpRouteGetCall), [*locations http routes list*](api::ProjectLocationHttpRouteListCall), [*locations http routes patch*](api::ProjectLocationHttpRoutePatchCall), [*locations lb route extensions create*](api::ProjectLocationLbRouteExtensionCreateCall), [*locations lb route extensions delete*](api::ProjectLocationLbRouteExtensionDeleteCall), [*locations lb route extensions get*](api::ProjectLocationLbRouteExtensionGetCall), [*locations lb route extensions list*](api::ProjectLocationLbRouteExtensionListCall), [*locations lb route extensions patch*](api::ProjectLocationLbRouteExtensionPatchCall), [*locations lb traffic extensions create*](api::ProjectLocationLbTrafficExtensionCreateCall), [*locations lb traffic extensions delete*](api::ProjectLocationLbTrafficExtensionDeleteCall), [*locations lb traffic extensions get*](api::ProjectLocationLbTrafficExtensionGetCall), [*locations lb traffic extensions list*](api::ProjectLocationLbTrafficExtensionListCall), [*locations lb traffic extensions patch*](api::ProjectLocationLbTrafficExtensionPatchCall), [*locations list*](api::ProjectLocationListCall), [*locations meshes create*](api::ProjectLocationMeshCreateCall), [*locations meshes delete*](api::ProjectLocationMeshDeleteCall), [*locations meshes get*](api::ProjectLocationMeshGetCall), [*locations meshes get iam policy*](api::ProjectLocationMeshGetIamPolicyCall), [*locations meshes list*](api::ProjectLocationMeshListCall), [*locations meshes patch*](api::ProjectLocationMeshPatchCall), [*locations meshes set iam policy*](api::ProjectLocationMeshSetIamPolicyCall), [*locations meshes test iam permissions*](api::ProjectLocationMeshTestIamPermissionCall), [*locations operations cancel*](api::ProjectLocationOperationCancelCall), [*locations operations delete*](api::ProjectLocationOperationDeleteCall), [*locations operations get*](api::ProjectLocationOperationGetCall), [*locations operations list*](api::ProjectLocationOperationListCall), [*locations service bindings create*](api::ProjectLocationServiceBindingCreateCall), [*locations service bindings delete*](api::ProjectLocationServiceBindingDeleteCall), [*locations service bindings get*](api::ProjectLocationServiceBindingGetCall), [*locations service bindings get iam policy*](api::ProjectLocationServiceBindingGetIamPolicyCall), [*locations service bindings list*](api::ProjectLocationServiceBindingListCall), [*locations service bindings set iam policy*](api::ProjectLocationServiceBindingSetIamPolicyCall), [*locations service bindings test iam permissions*](api::ProjectLocationServiceBindingTestIamPermissionCall), [*locations service lb policies create*](api::ProjectLocationServiceLbPolicyCreateCall), [*locations service lb policies delete*](api::ProjectLocationServiceLbPolicyDeleteCall), [*locations service lb policies get*](api::ProjectLocationServiceLbPolicyGetCall), [*locations service lb policies get iam policy*](api::ProjectLocationServiceLbPolicyGetIamPolicyCall), [*locations service lb policies list*](api::ProjectLocationServiceLbPolicyListCall), [*locations service lb policies patch*](api::ProjectLocationServiceLbPolicyPatchCall), [*locations service lb policies set iam policy*](api::ProjectLocationServiceLbPolicySetIamPolicyCall), [*locations service lb policies test iam permissions*](api::ProjectLocationServiceLbPolicyTestIamPermissionCall), [*locations tcp routes create*](api::ProjectLocationTcpRouteCreateCall), [*locations tcp routes delete*](api::ProjectLocationTcpRouteDeleteCall), [*locations tcp routes get*](api::ProjectLocationTcpRouteGetCall), [*locations tcp routes list*](api::ProjectLocationTcpRouteListCall), [*locations tcp routes patch*](api::ProjectLocationTcpRoutePatchCall), [*locations tls routes create*](api::ProjectLocationTlsRouteCreateCall), [*locations tls routes delete*](api::ProjectLocationTlsRouteDeleteCall), [*locations tls routes get*](api::ProjectLocationTlsRouteGetCall), [*locations tls routes list*](api::ProjectLocationTlsRouteListCall) and [*locations tls routes patch*](api::ProjectLocationTlsRoutePatchCall)
+//!  * [*locations authz extensions create*](api::ProjectLocationAuthzExtensionCreateCall), [*locations authz extensions delete*](api::ProjectLocationAuthzExtensionDeleteCall), [*locations authz extensions get*](api::ProjectLocationAuthzExtensionGetCall), [*locations authz extensions list*](api::ProjectLocationAuthzExtensionListCall), [*locations authz extensions patch*](api::ProjectLocationAuthzExtensionPatchCall), [*locations edge cache keysets get iam policy*](api::ProjectLocationEdgeCacheKeysetGetIamPolicyCall), [*locations edge cache keysets set iam policy*](api::ProjectLocationEdgeCacheKeysetSetIamPolicyCall), [*locations edge cache keysets test iam permissions*](api::ProjectLocationEdgeCacheKeysetTestIamPermissionCall), [*locations edge cache origins get iam policy*](api::ProjectLocationEdgeCacheOriginGetIamPolicyCall), [*locations edge cache origins set iam policy*](api::ProjectLocationEdgeCacheOriginSetIamPolicyCall), [*locations edge cache origins test iam permissions*](api::ProjectLocationEdgeCacheOriginTestIamPermissionCall), [*locations edge cache services get iam policy*](api::ProjectLocationEdgeCacheServiceGetIamPolicyCall), [*locations edge cache services set iam policy*](api::ProjectLocationEdgeCacheServiceSetIamPolicyCall), [*locations edge cache services test iam permissions*](api::ProjectLocationEdgeCacheServiceTestIamPermissionCall), [*locations endpoint policies create*](api::ProjectLocationEndpointPolicyCreateCall), [*locations endpoint policies delete*](api::ProjectLocationEndpointPolicyDeleteCall), [*locations endpoint policies get*](api::ProjectLocationEndpointPolicyGetCall), [*locations endpoint policies list*](api::ProjectLocationEndpointPolicyListCall), [*locations endpoint policies patch*](api::ProjectLocationEndpointPolicyPatchCall), [*locations gateways create*](api::ProjectLocationGatewayCreateCall), [*locations gateways delete*](api::ProjectLocationGatewayDeleteCall), [*locations gateways get*](api::ProjectLocationGatewayGetCall), [*locations gateways list*](api::ProjectLocationGatewayListCall), [*locations gateways patch*](api::ProjectLocationGatewayPatchCall), [*locations gateways route views get*](api::ProjectLocationGatewayRouteViewGetCall), [*locations gateways route views list*](api::ProjectLocationGatewayRouteViewListCall), [*locations get*](api::ProjectLocationGetCall), [*locations grpc routes create*](api::ProjectLocationGrpcRouteCreateCall), [*locations grpc routes delete*](api::ProjectLocationGrpcRouteDeleteCall), [*locations grpc routes get*](api::ProjectLocationGrpcRouteGetCall), [*locations grpc routes list*](api::ProjectLocationGrpcRouteListCall), [*locations grpc routes patch*](api::ProjectLocationGrpcRoutePatchCall), [*locations http routes create*](api::ProjectLocationHttpRouteCreateCall), [*locations http routes delete*](api::ProjectLocationHttpRouteDeleteCall), [*locations http routes get*](api::ProjectLocationHttpRouteGetCall), [*locations http routes list*](api::ProjectLocationHttpRouteListCall), [*locations http routes patch*](api::ProjectLocationHttpRoutePatchCall), [*locations lb edge extensions create*](api::ProjectLocationLbEdgeExtensionCreateCall), [*locations lb edge extensions delete*](api::ProjectLocationLbEdgeExtensionDeleteCall), [*locations lb edge extensions get*](api::ProjectLocationLbEdgeExtensionGetCall), [*locations lb edge extensions list*](api::ProjectLocationLbEdgeExtensionListCall), [*locations lb edge extensions patch*](api::ProjectLocationLbEdgeExtensionPatchCall), [*locations lb route extensions create*](api::ProjectLocationLbRouteExtensionCreateCall), [*locations lb route extensions delete*](api::ProjectLocationLbRouteExtensionDeleteCall), [*locations lb route extensions get*](api::ProjectLocationLbRouteExtensionGetCall), [*locations lb route extensions list*](api::ProjectLocationLbRouteExtensionListCall), [*locations lb route extensions patch*](api::ProjectLocationLbRouteExtensionPatchCall), [*locations lb traffic extensions create*](api::ProjectLocationLbTrafficExtensionCreateCall), [*locations lb traffic extensions delete*](api::ProjectLocationLbTrafficExtensionDeleteCall), [*locations lb traffic extensions get*](api::ProjectLocationLbTrafficExtensionGetCall), [*locations lb traffic extensions list*](api::ProjectLocationLbTrafficExtensionListCall), [*locations lb traffic extensions patch*](api::ProjectLocationLbTrafficExtensionPatchCall), [*locations list*](api::ProjectLocationListCall), [*locations meshes create*](api::ProjectLocationMeshCreateCall), [*locations meshes delete*](api::ProjectLocationMeshDeleteCall), [*locations meshes get*](api::ProjectLocationMeshGetCall), [*locations meshes list*](api::ProjectLocationMeshListCall), [*locations meshes patch*](api::ProjectLocationMeshPatchCall), [*locations meshes route views get*](api::ProjectLocationMeshRouteViewGetCall), [*locations meshes route views list*](api::ProjectLocationMeshRouteViewListCall), [*locations operations cancel*](api::ProjectLocationOperationCancelCall), [*locations operations delete*](api::ProjectLocationOperationDeleteCall), [*locations operations get*](api::ProjectLocationOperationGetCall), [*locations operations list*](api::ProjectLocationOperationListCall), [*locations service bindings create*](api::ProjectLocationServiceBindingCreateCall), [*locations service bindings delete*](api::ProjectLocationServiceBindingDeleteCall), [*locations service bindings get*](api::ProjectLocationServiceBindingGetCall), [*locations service bindings list*](api::ProjectLocationServiceBindingListCall), [*locations service bindings patch*](api::ProjectLocationServiceBindingPatchCall), [*locations service lb policies create*](api::ProjectLocationServiceLbPolicyCreateCall), [*locations service lb policies delete*](api::ProjectLocationServiceLbPolicyDeleteCall), [*locations service lb policies get*](api::ProjectLocationServiceLbPolicyGetCall), [*locations service lb policies list*](api::ProjectLocationServiceLbPolicyListCall), [*locations service lb policies patch*](api::ProjectLocationServiceLbPolicyPatchCall), [*locations tcp routes create*](api::ProjectLocationTcpRouteCreateCall), [*locations tcp routes delete*](api::ProjectLocationTcpRouteDeleteCall), [*locations tcp routes get*](api::ProjectLocationTcpRouteGetCall), [*locations tcp routes list*](api::ProjectLocationTcpRouteListCall), [*locations tcp routes patch*](api::ProjectLocationTcpRoutePatchCall), [*locations tls routes create*](api::ProjectLocationTlsRouteCreateCall), [*locations tls routes delete*](api::ProjectLocationTlsRouteDeleteCall), [*locations tls routes get*](api::ProjectLocationTlsRouteGetCall), [*locations tls routes list*](api::ProjectLocationTlsRouteListCall), [*locations tls routes patch*](api::ProjectLocationTlsRoutePatchCall), [*locations wasm plugins create*](api::ProjectLocationWasmPluginCreateCall), [*locations wasm plugins delete*](api::ProjectLocationWasmPluginDeleteCall), [*locations wasm plugins get*](api::ProjectLocationWasmPluginGetCall), [*locations wasm plugins list*](api::ProjectLocationWasmPluginListCall), [*locations wasm plugins patch*](api::ProjectLocationWasmPluginPatchCall), [*locations wasm plugins versions create*](api::ProjectLocationWasmPluginVersionCreateCall), [*locations wasm plugins versions delete*](api::ProjectLocationWasmPluginVersionDeleteCall), [*locations wasm plugins versions get*](api::ProjectLocationWasmPluginVersionGetCall) and [*locations wasm plugins versions list*](api::ProjectLocationWasmPluginVersionListCall)
 //!
 //!
 //!
@@ -47,6 +47,9 @@
 //! Or specifically ...
 //!
 //! ```ignore
+//! let r = hub.projects().locations_authz_extensions_create(...).doit().await
+//! let r = hub.projects().locations_authz_extensions_delete(...).doit().await
+//! let r = hub.projects().locations_authz_extensions_patch(...).doit().await
 //! let r = hub.projects().locations_endpoint_policies_create(...).doit().await
 //! let r = hub.projects().locations_endpoint_policies_delete(...).doit().await
 //! let r = hub.projects().locations_endpoint_policies_patch(...).doit().await
@@ -59,6 +62,9 @@
 //! let r = hub.projects().locations_http_routes_create(...).doit().await
 //! let r = hub.projects().locations_http_routes_delete(...).doit().await
 //! let r = hub.projects().locations_http_routes_patch(...).doit().await
+//! let r = hub.projects().locations_lb_edge_extensions_create(...).doit().await
+//! let r = hub.projects().locations_lb_edge_extensions_delete(...).doit().await
+//! let r = hub.projects().locations_lb_edge_extensions_patch(...).doit().await
 //! let r = hub.projects().locations_lb_route_extensions_create(...).doit().await
 //! let r = hub.projects().locations_lb_route_extensions_delete(...).doit().await
 //! let r = hub.projects().locations_lb_route_extensions_patch(...).doit().await
@@ -71,6 +77,7 @@
 //! let r = hub.projects().locations_operations_get(...).doit().await
 //! let r = hub.projects().locations_service_bindings_create(...).doit().await
 //! let r = hub.projects().locations_service_bindings_delete(...).doit().await
+//! let r = hub.projects().locations_service_bindings_patch(...).doit().await
 //! let r = hub.projects().locations_service_lb_policies_create(...).doit().await
 //! let r = hub.projects().locations_service_lb_policies_delete(...).doit().await
 //! let r = hub.projects().locations_service_lb_policies_patch(...).doit().await
@@ -80,6 +87,11 @@
 //! let r = hub.projects().locations_tls_routes_create(...).doit().await
 //! let r = hub.projects().locations_tls_routes_delete(...).doit().await
 //! let r = hub.projects().locations_tls_routes_patch(...).doit().await
+//! let r = hub.projects().locations_wasm_plugins_versions_create(...).doit().await
+//! let r = hub.projects().locations_wasm_plugins_versions_delete(...).doit().await
+//! let r = hub.projects().locations_wasm_plugins_create(...).doit().await
+//! let r = hub.projects().locations_wasm_plugins_delete(...).doit().await
+//! let r = hub.projects().locations_wasm_plugins_patch(...).doit().await
 //! ```
 //!
 //! The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities`
@@ -106,7 +118,7 @@
 //! extern crate hyper;
 //! extern crate hyper_rustls;
 //! extern crate google_networkservices1 as networkservices1;
-//! use networkservices1::api::LbRouteExtension;
+//! use networkservices1::api::AuthzExtension;
 //! use networkservices1::{Result, Error};
 //! # async fn dox() {
 //! use networkservices1::{NetworkServices, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
@@ -119,9 +131,20 @@
 //! // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about
 //! // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 //! // retrieve them from storage.
-//! let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+//! let connector = hyper_rustls::HttpsConnectorBuilder::new()
+//!     .with_native_roots()
+//!     .unwrap()
+//!     .https_only()
+//!     .enable_http2()
+//!     .build();
+//!
+//! let executor = hyper_util::rt::TokioExecutor::new();
+//! let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 //!     secret,
 //!     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+//!     yup_oauth2::client::CustomHyperClientBuilder::from(
+//!         hyper_util::client::legacy::Client::builder(executor).build(connector),
+//!     ),
 //! ).build().await.unwrap();
 //!
 //! let client = hyper_util::client::legacy::Client::builder(
@@ -132,21 +155,21 @@
 //!         .with_native_roots()
 //!         .unwrap()
 //!         .https_or_http()
-//!         .enable_http1()
+//!         .enable_http2()
 //!         .build()
 //! );
 //! let mut hub = NetworkServices::new(client, auth);
 //! // As the method needs a request, you would usually fill it with the desired information
 //! // into the respective structure. Some of the parts shown here might not be applicable !
 //! // Values shown here are possibly random and not representative !
-//! let mut req = LbRouteExtension::default();
+//! let mut req = AuthzExtension::default();
 //!
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
-//! let result = hub.projects().locations_lb_route_extensions_create(req, "parent")
+//! let result = hub.projects().locations_authz_extensions_create(req, "parent")
 //!              .request_id("voluptua.")
-//!              .lb_route_extension_id("At")
+//!              .authz_extension_id("At")
 //!              .doit().await;
 //!
 //! match result {

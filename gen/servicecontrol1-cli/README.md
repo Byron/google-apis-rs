@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Service Control* API at revision *20240607*. The CLI is at version *6.0.0*.
+This documentation was generated from the *Service Control* API at revision *20251125*. The CLI is at version *7.0.0*.
 
 ```bash
 servicecontrol1 [options]

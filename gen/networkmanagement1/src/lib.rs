@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Network Management* crate version *6.0.0+20240619*, where *20240619* is the exact revision of the *networkmanagement:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v6.0.0*.
+//! This documentation was generated from *Network Management* crate version *7.0.0+20251203*, where *20251203* is the exact revision of the *networkmanagement:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v7.0.0*.
 //!
 //! Everything else about the *Network Management* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/).
@@ -11,8 +11,10 @@
 //!
 //! Handle the following *Resources* with ease from the central [hub](NetworkManagement) ...
 //!
+//! * organizations
+//!  * [*locations get*](api::OrganizationLocationGetCall), [*locations list*](api::OrganizationLocationListCall), [*locations operations cancel*](api::OrganizationLocationOperationCancelCall), [*locations operations delete*](api::OrganizationLocationOperationDeleteCall), [*locations operations get*](api::OrganizationLocationOperationGetCall), [*locations operations list*](api::OrganizationLocationOperationListCall), [*locations vpc flow logs configs create*](api::OrganizationLocationVpcFlowLogsConfigCreateCall), [*locations vpc flow logs configs delete*](api::OrganizationLocationVpcFlowLogsConfigDeleteCall), [*locations vpc flow logs configs get*](api::OrganizationLocationVpcFlowLogsConfigGetCall), [*locations vpc flow logs configs list*](api::OrganizationLocationVpcFlowLogsConfigListCall) and [*locations vpc flow logs configs patch*](api::OrganizationLocationVpcFlowLogsConfigPatchCall)
 //! * projects
-//!  * [*locations get*](api::ProjectLocationGetCall), [*locations global connectivity tests create*](api::ProjectLocationGlobalConnectivityTestCreateCall), [*locations global connectivity tests delete*](api::ProjectLocationGlobalConnectivityTestDeleteCall), [*locations global connectivity tests get*](api::ProjectLocationGlobalConnectivityTestGetCall), [*locations global connectivity tests get iam policy*](api::ProjectLocationGlobalConnectivityTestGetIamPolicyCall), [*locations global connectivity tests list*](api::ProjectLocationGlobalConnectivityTestListCall), [*locations global connectivity tests patch*](api::ProjectLocationGlobalConnectivityTestPatchCall), [*locations global connectivity tests rerun*](api::ProjectLocationGlobalConnectivityTestRerunCall), [*locations global connectivity tests set iam policy*](api::ProjectLocationGlobalConnectivityTestSetIamPolicyCall), [*locations global connectivity tests test iam permissions*](api::ProjectLocationGlobalConnectivityTestTestIamPermissionCall), [*locations global operations cancel*](api::ProjectLocationGlobalOperationCancelCall), [*locations global operations delete*](api::ProjectLocationGlobalOperationDeleteCall), [*locations global operations get*](api::ProjectLocationGlobalOperationGetCall), [*locations global operations list*](api::ProjectLocationGlobalOperationListCall) and [*locations list*](api::ProjectLocationListCall)
+//!  * [*locations get*](api::ProjectLocationGetCall), [*locations global connectivity tests create*](api::ProjectLocationGlobalConnectivityTestCreateCall), [*locations global connectivity tests delete*](api::ProjectLocationGlobalConnectivityTestDeleteCall), [*locations global connectivity tests get*](api::ProjectLocationGlobalConnectivityTestGetCall), [*locations global connectivity tests get iam policy*](api::ProjectLocationGlobalConnectivityTestGetIamPolicyCall), [*locations global connectivity tests list*](api::ProjectLocationGlobalConnectivityTestListCall), [*locations global connectivity tests patch*](api::ProjectLocationGlobalConnectivityTestPatchCall), [*locations global connectivity tests rerun*](api::ProjectLocationGlobalConnectivityTestRerunCall), [*locations global connectivity tests set iam policy*](api::ProjectLocationGlobalConnectivityTestSetIamPolicyCall), [*locations global connectivity tests test iam permissions*](api::ProjectLocationGlobalConnectivityTestTestIamPermissionCall), [*locations global operations cancel*](api::ProjectLocationGlobalOperationCancelCall), [*locations global operations delete*](api::ProjectLocationGlobalOperationDeleteCall), [*locations global operations get*](api::ProjectLocationGlobalOperationGetCall), [*locations global operations list*](api::ProjectLocationGlobalOperationListCall), [*locations list*](api::ProjectLocationListCall), [*locations vpc flow logs configs create*](api::ProjectLocationVpcFlowLogsConfigCreateCall), [*locations vpc flow logs configs delete*](api::ProjectLocationVpcFlowLogsConfigDeleteCall), [*locations vpc flow logs configs get*](api::ProjectLocationVpcFlowLogsConfigGetCall), [*locations vpc flow logs configs list*](api::ProjectLocationVpcFlowLogsConfigListCall), [*locations vpc flow logs configs patch*](api::ProjectLocationVpcFlowLogsConfigPatchCall), [*locations vpc flow logs configs query org vpc flow logs configs*](api::ProjectLocationVpcFlowLogsConfigQueryOrgVpcFlowLogsConfigCall) and [*locations vpc flow logs configs show effective flow logs configs*](api::ProjectLocationVpcFlowLogsConfigShowEffectiveFlowLogsConfigCall)
 //!
 //!
 //!
@@ -47,11 +49,18 @@
 //! Or specifically ...
 //!
 //! ```ignore
+//! let r = hub.organizations().locations_operations_get(...).doit().await
+//! let r = hub.organizations().locations_vpc_flow_logs_configs_create(...).doit().await
+//! let r = hub.organizations().locations_vpc_flow_logs_configs_delete(...).doit().await
+//! let r = hub.organizations().locations_vpc_flow_logs_configs_patch(...).doit().await
 //! let r = hub.projects().locations_global_connectivity_tests_create(...).doit().await
 //! let r = hub.projects().locations_global_connectivity_tests_delete(...).doit().await
 //! let r = hub.projects().locations_global_connectivity_tests_patch(...).doit().await
 //! let r = hub.projects().locations_global_connectivity_tests_rerun(...).doit().await
 //! let r = hub.projects().locations_global_operations_get(...).doit().await
+//! let r = hub.projects().locations_vpc_flow_logs_configs_create(...).doit().await
+//! let r = hub.projects().locations_vpc_flow_logs_configs_delete(...).doit().await
+//! let r = hub.projects().locations_vpc_flow_logs_configs_patch(...).doit().await
 //! ```
 //!
 //! The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities`
@@ -78,7 +87,7 @@
 //! extern crate hyper;
 //! extern crate hyper_rustls;
 //! extern crate google_networkmanagement1 as networkmanagement1;
-//! use networkmanagement1::api::ConnectivityTest;
+//! use networkmanagement1::api::VpcFlowLogsConfig;
 //! use networkmanagement1::{Result, Error};
 //! # async fn dox() {
 //! use networkmanagement1::{NetworkManagement, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
@@ -91,9 +100,20 @@
 //! // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about
 //! // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 //! // retrieve them from storage.
-//! let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+//! let connector = hyper_rustls::HttpsConnectorBuilder::new()
+//!     .with_native_roots()
+//!     .unwrap()
+//!     .https_only()
+//!     .enable_http2()
+//!     .build();
+//!
+//! let executor = hyper_util::rt::TokioExecutor::new();
+//! let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 //!     secret,
 //!     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+//!     yup_oauth2::client::CustomHyperClientBuilder::from(
+//!         hyper_util::client::legacy::Client::builder(executor).build(connector),
+//!     ),
 //! ).build().await.unwrap();
 //!
 //! let client = hyper_util::client::legacy::Client::builder(
@@ -104,20 +124,20 @@
 //!         .with_native_roots()
 //!         .unwrap()
 //!         .https_or_http()
-//!         .enable_http1()
+//!         .enable_http2()
 //!         .build()
 //! );
 //! let mut hub = NetworkManagement::new(client, auth);
 //! // As the method needs a request, you would usually fill it with the desired information
 //! // into the respective structure. Some of the parts shown here might not be applicable !
 //! // Values shown here are possibly random and not representative !
-//! let mut req = ConnectivityTest::default();
+//! let mut req = VpcFlowLogsConfig::default();
 //!
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
-//! let result = hub.projects().locations_global_connectivity_tests_create(req, "parent")
-//!              .test_id("ipsum")
+//! let result = hub.organizations().locations_vpc_flow_logs_configs_create(req, "parent")
+//!              .vpc_flow_logs_config_id("ipsum")
 //!              .doit().await;
 //!
 //! match result {

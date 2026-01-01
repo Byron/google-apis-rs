@@ -46,7 +46,6 @@ impl Default for Scope {
 /// extern crate hyper;
 /// extern crate hyper_rustls;
 /// extern crate google_androidmanagement1 as androidmanagement1;
-/// use androidmanagement1::api::Enterprise;
 /// use androidmanagement1::{Result, Error};
 /// # async fn dox() {
 /// use androidmanagement1::{AndroidManagement, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
@@ -59,9 +58,20 @@ impl Default for Scope {
 /// // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about
 /// // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 /// // retrieve them from storage.
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let connector = hyper_rustls::HttpsConnectorBuilder::new()
+///     .with_native_roots()
+///     .unwrap()
+///     .https_only()
+///     .enable_http2()
+///     .build();
+///
+/// let executor = hyper_util::rt::TokioExecutor::new();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 ///     secret,
 ///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///     yup_oauth2::client::CustomHyperClientBuilder::from(
+///         hyper_util::client::legacy::Client::builder(executor).build(connector),
+///     ),
 /// ).build().await.unwrap();
 ///
 /// let client = hyper_util::client::legacy::Client::builder(
@@ -72,23 +82,18 @@ impl Default for Scope {
 ///         .with_native_roots()
 ///         .unwrap()
 ///         .https_or_http()
-///         .enable_http1()
+///         .enable_http2()
 ///         .build()
 /// );
 /// let mut hub = AndroidManagement::new(client, auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = Enterprise::default();
-///
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.enterprises().create(req)
-///              .signup_url_name("amet.")
-///              .project_id("takimata")
-///              .enterprise_token("amet.")
-///              .agreement_accepted(true)
+/// let result = hub.enterprises().devices_operations_list("name")
+///              .return_partial_success(true)
+///              .page_token("gubergren")
+///              .page_size(-75)
+///              .filter("dolor")
 ///              .doit().await;
 ///
 /// match result {
@@ -129,7 +134,7 @@ impl<'a, C> AndroidManagement<C> {
         AndroidManagement {
             client,
             auth: Box::new(auth),
-            _user_agent: "google-api-rust-client/6.0.0".to_string(),
+            _user_agent: "google-api-rust-client/7.0.0".to_string(),
             _base_url: "https://androidmanagement.googleapis.com/".to_string(),
             _root_url: "https://androidmanagement.googleapis.com/".to_string(),
         }
@@ -146,7 +151,7 @@ impl<'a, C> AndroidManagement<C> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/6.0.0`.
+    /// It defaults to `google-api-rust-client/7.0.0`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -173,6 +178,24 @@ impl<'a, C> AndroidManagement<C> {
 // ############
 // SCHEMAS ###
 // ##########
+/// Parameters associated with the ADD_ESIM command to add an eSIM profile to the device.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct AddEsimParams {
+    /// Required. The activation code for the eSIM profile.
+    #[serde(rename = "activationCode")]
+    pub activation_code: Option<String>,
+    /// Required. The activation state of the eSIM profile once it is downloaded.
+    #[serde(rename = "activationState")]
+    pub activation_state: Option<String>,
+}
+
+impl common::Part for AddEsimParams {}
+
 /// Advanced security settings. In most cases, setting these is not needed.
 ///
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -181,16 +204,19 @@ impl<'a, C> AndroidManagement<C> {
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct AdvancedSecurityOverrides {
-    /// Controls Common Criteria Mode—security standards defined in the Common Criteria for Information Technology Security Evaluation (https://www.commoncriteriaportal.org/) (CC). Enabling Common Criteria Mode increases certain security components on a device, including AES-GCM encryption of Bluetooth Long Term Keys, and Wi-Fi configuration stores.Warning: Common Criteria Mode enforces a strict security model typically only required for IT products used in national security systems and other highly sensitive organizations. Standard device use may be affected. Only enabled if required.
+    /// Controls Common Criteria Mode—security standards defined in the Common Criteria for Information Technology Security Evaluation (https://www.commoncriteriaportal.org/) (CC). Enabling Common Criteria Mode increases certain security components on a device, see CommonCriteriaMode for details.Warning: Common Criteria Mode enforces a strict security model typically only required for IT products used in national security systems and other highly sensitive organizations. Standard device use may be affected. Only enabled if required. If Common Criteria Mode is turned off after being enabled previously, all user-configured Wi-Fi networks may be lost and any enterprise-configured Wi-Fi networks that require user input may need to be reconfigured.
     #[serde(rename = "commonCriteriaMode")]
     pub common_criteria_mode: Option<String>,
-    /// Controls access to developer settings: developer options and safe boot. Replaces safeBootDisabled (deprecated) and debuggingFeaturesAllowed (deprecated).
+    /// Optional. Controls whether content protection, which scans for deceptive apps, is enabled. This is supported on Android 15 and above.
+    #[serde(rename = "contentProtectionPolicy")]
+    pub content_protection_policy: Option<String>,
+    /// Controls access to developer settings: developer options and safe boot. Replaces safeBootDisabled (deprecated) and debuggingFeaturesAllowed (deprecated). On personally-owned devices with a work profile, setting this policy will not disable safe boot. In this case, a NonComplianceDetail with MANAGEMENT_MODE is reported.
     #[serde(rename = "developerSettings")]
     pub developer_settings: Option<String>,
     /// Whether Google Play Protect verification (https://support.google.com/accounts/answer/2812853) is enforced. Replaces ensureVerifyAppsEnabled (deprecated).
     #[serde(rename = "googlePlayProtectVerifyApps")]
     pub google_play_protect_verify_apps: Option<String>,
-    /// Optional. Controls Memory Tagging Extension (MTE) (https://source.android.com/docs/security/test/memory-safety/arm-mte) on the device. The device needs to be rebooted to apply changes to the MTE policy.
+    /// Optional. Controls Memory Tagging Extension (MTE) (https://source.android.com/docs/security/test/memory-safety/arm-mte) on the device. The device needs to be rebooted to apply changes to the MTE policy. On Android 15 and above, a NonComplianceDetail with PENDING is reported if the policy change is pending a device reboot.
     #[serde(rename = "mtePolicy")]
     pub mte_policy: Option<String>,
     /// Personal apps that can read work profile notifications using a NotificationListenerService (https://developer.android.com/reference/android/service/notification/NotificationListenerService). By default, no personal apps (aside from system apps) can read work notifications. Each value in the list must be a package name.
@@ -235,6 +261,91 @@ pub struct ApiLevelCondition {
 }
 
 impl common::Part for ApiLevelCondition {}
+
+/// Access Point Name (APN) policy. Configuration for Access Point Names (APNs) which may override any other APNs on the device. See OVERRIDE_APNS_ENABLED and overrideApns for details.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct ApnPolicy {
+    /// Optional. APN settings for override APNs. There must not be any conflict between any of APN settings provided, otherwise the policy will be rejected. Two ApnSettings are considered to conflict when all of the following fields match on both: numericOperatorId, apn, proxyAddress, proxyPort, mmsProxyAddress, mmsProxyPort, mmsc, mvnoType, protocol, roamingProtocol. If some of the APN settings result in non-compliance of INVALID_VALUE , they will be ignored. This can be set on fully managed devices on Android 10 and above. This can also be set on work profiles on Android 13 and above and only with ApnSetting's with ENTERPRISE APN type. A NonComplianceDetail with API_LEVEL is reported if the Android version is less than 10. A NonComplianceDetail with MANAGEMENT_MODE is reported for work profiles on Android versions less than 13.
+    #[serde(rename = "apnSettings")]
+    pub apn_settings: Option<Vec<ApnSetting>>,
+    /// Optional. Whether override APNs are disabled or enabled. See DevicePolicyManager.setOverrideApnsEnabled (https://developer.android.com/reference/android/app/admin/DevicePolicyManager#setOverrideApnsEnabled) for more details.
+    #[serde(rename = "overrideApns")]
+    pub override_apns: Option<String>,
+}
+
+impl common::Part for ApnPolicy {}
+
+/// An Access Point Name (APN) configuration for a carrier data connection. The APN provides configuration to connect a cellular network device to an IP data network. A carrier uses this setting to decide which IP address to assign, any security methods to apply, and how the device might be connected to private networks.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct ApnSetting {
+    /// Optional. Whether User Plane resources have to be activated during every transition from CM-IDLE mode to CM-CONNECTED state for this APN. See 3GPP TS 23.501 section 5.6.13.
+    #[serde(rename = "alwaysOnSetting")]
+    pub always_on_setting: Option<String>,
+    /// Required. Name of the APN. Policy will be rejected if this field is empty.
+    pub apn: Option<String>,
+    /// Required. Usage categories for the APN. Policy will be rejected if this field is empty or contains APN_TYPE_UNSPECIFIED or duplicates. Multiple APN types can be set on fully managed devices. ENTERPRISE is the only allowed APN type on work profiles. A NonComplianceDetail with MANAGEMENT_MODE is reported for any other value on work profiles. APN types that are not supported on the device or management mode will be ignored. If this results in the empty list, the APN setting will be ignored, because apnTypes is a required field. A NonComplianceDetail with INVALID_VALUE is reported if none of the APN types are supported on the device or management mode.
+    #[serde(rename = "apnTypes")]
+    pub apn_types: Option<Vec<String>>,
+    /// Optional. Authentication type of the APN.
+    #[serde(rename = "authType")]
+    pub auth_type: Option<String>,
+    /// Optional. Carrier ID for the APN. A value of 0 (default) means not set and negative values are rejected.
+    #[serde(rename = "carrierId")]
+    pub carrier_id: Option<i32>,
+    /// Required. Human-readable name that describes the APN. Policy will be rejected if this field is empty.
+    #[serde(rename = "displayName")]
+    pub display_name: Option<String>,
+    /// Optional. MMS (Multimedia Messaging Service) proxy address of the APN which can be an IP address or hostname (not a URL).
+    #[serde(rename = "mmsProxyAddress")]
+    pub mms_proxy_address: Option<String>,
+    /// Optional. MMS (Multimedia Messaging Service) proxy port of the APN. A value of 0 (default) means not set and negative values are rejected.
+    #[serde(rename = "mmsProxyPort")]
+    pub mms_proxy_port: Option<i32>,
+    /// Optional. MMSC (Multimedia Messaging Service Center) URI of the APN.
+    pub mmsc: Option<String>,
+    /// Optional. The default MTU (Maximum Transmission Unit) size in bytes of the IPv4 routes brought up by this APN setting. A value of 0 (default) means not set and negative values are rejected. Supported on Android 13 and above. A NonComplianceDetail with API_LEVEL is reported if the Android version is less than 13.
+    #[serde(rename = "mtuV4")]
+    pub mtu_v4: Option<i32>,
+    /// Optional. The MTU (Maximum Transmission Unit) size of the IPv6 mobile interface to which the APN connected. A value of 0 (default) means not set and negative values are rejected. Supported on Android 13 and above. A NonComplianceDetail with API_LEVEL is reported if the Android version is less than 13.
+    #[serde(rename = "mtuV6")]
+    pub mtu_v6: Option<i32>,
+    /// Optional. MVNO match type for the APN.
+    #[serde(rename = "mvnoType")]
+    pub mvno_type: Option<String>,
+    /// Optional. Radio technologies (network types) the APN may use. Policy will be rejected if this field contains NETWORK_TYPE_UNSPECIFIED or duplicates.
+    #[serde(rename = "networkTypes")]
+    pub network_types: Option<Vec<String>>,
+    /// Optional. The numeric operator ID of the APN. Numeric operator ID is defined as MCC (Mobile Country Code) + MNC (Mobile Network Code).
+    #[serde(rename = "numericOperatorId")]
+    pub numeric_operator_id: Option<String>,
+    /// Optional. APN password of the APN.
+    pub password: Option<String>,
+    /// Optional. The protocol to use to connect to this APN.
+    pub protocol: Option<String>,
+    /// Optional. The proxy address of the APN.
+    #[serde(rename = "proxyAddress")]
+    pub proxy_address: Option<String>,
+    /// Optional. The proxy port of the APN. A value of 0 (default) means not set and negative values are rejected.
+    #[serde(rename = "proxyPort")]
+    pub proxy_port: Option<i32>,
+    /// Optional. The protocol to use to connect to this APN while the device is roaming.
+    #[serde(rename = "roamingProtocol")]
+    pub roaming_protocol: Option<String>,
+    /// Optional. APN username of the APN.
+    pub username: Option<String>,
+}
+
+impl common::Part for ApnSetting {}
 
 /// Id to name association of a app track.
 ///
@@ -412,6 +523,9 @@ pub struct ApplicationPolicy {
     /// Optional. Whether the app is allowed to act as a credential provider on Android 14 and above.
     #[serde(rename = "credentialProviderPolicy")]
     pub credential_provider_policy: Option<String>,
+    /// Optional. Configuration for this custom app.install_type must be set to CUSTOM for this to be set.
+    #[serde(rename = "customAppConfig")]
+    pub custom_app_config: Option<CustomAppConfig>,
     /// The default policy for all permissions requested by the app. If specified, this overrides the policy-level default_permission_policy which applies to all apps. It does not override the permission_grants which applies to all apps.
     #[serde(rename = "defaultPermissionPolicy")]
     pub default_permission_policy: Option<String>,
@@ -420,7 +534,7 @@ pub struct ApplicationPolicy {
     pub delegated_scopes: Option<Vec<String>>,
     /// Whether the app is disabled. When disabled, the app data is still preserved.
     pub disabled: Option<bool>,
-    /// Configuration to enable this app as an extension app, with the capability of interacting with Android Device Policy offline.This field can be set for at most one app.
+    /// Configuration to enable this app as an extension app, with the capability of interacting with Android Device Policy offline.This field can be set for at most one app. If there is any app with COMPANION_APP role, this field cannot be set.The signing key certificate fingerprint of the app on the device must match one of the entries in ApplicationPolicy.signingKeyCerts or ExtensionConfig.signingKeyFingerprintsSha256 (deprecated) or the signing key certificate fingerprints obtained from Play Store for the app to be able to communicate with Android Device Policy. If the app is not on Play Store and if ApplicationPolicy.signingKeyCerts and ExtensionConfig.signingKeyFingerprintsSha256 (deprecated) are not set, a NonComplianceDetail with INVALID_VALUE is reported.
     #[serde(rename = "extensionConfig")]
     pub extension_config: Option<ExtensionConfig>,
     /// Optional. The constraints for installing the app. You can specify a maximum of one InstallConstraint. Multiple constraints are rejected.
@@ -450,7 +564,15 @@ pub struct ApplicationPolicy {
     /// Explicit permission grants or denials for the app. These values override the default_permission_policy and permission_grants which apply to all apps.
     #[serde(rename = "permissionGrants")]
     pub permission_grants: Option<Vec<PermissionGrant>>,
-    /// Optional. Specifies whether user control is permitted for the app. User control includes user actions like force-stopping and clearing app data. Supported on Android 11 and above.
+    /// Optional. ID of the preferential network the application uses. There must be a configuration for the specified network ID in preferentialNetworkServiceConfigs. If set to PREFERENTIAL_NETWORK_ID_UNSPECIFIED, the application will use the default network ID specified in defaultPreferentialNetworkId. See the documentation of defaultPreferentialNetworkId for the list of apps excluded from this defaulting. This applies on both work profiles and fully managed devices on Android 13 and above.
+    #[serde(rename = "preferentialNetworkId")]
+    pub preferential_network_id: Option<String>,
+    /// Optional. Roles the app has.Apps having certain roles can be exempted from power and background execution restrictions, suspension and hibernation on Android 14 and above. The user control can also be disallowed for apps with certain roles on Android 11 and above. Refer to the documentation of each RoleType for more details.The app is notified about the roles that are set for it if the app has a notification receiver service with . The app is notified whenever its roles are updated or after the app is installed when it has nonempty list of roles. The app can use this notification to bootstrap itself after the installation. See Integrate with the AMAPI SDK (https://developers.google.com/android/management/sdk-integration) and Manage app roles (https://developers.google.com/android/management/app-roles) guides for more details on the requirements for the service.For the exemptions to be applied and the app to be notified about the roles, the signing key certificate fingerprint of the app on the device must match one of the signing key certificate fingerprints obtained from Play Store or one of the entries in ApplicationPolicy.signingKeyCerts. Otherwise, a NonComplianceDetail with APP_SIGNING_CERT_MISMATCH is reported.There must not be duplicate roles with the same roleType. Multiple apps cannot hold a role with the same roleType. A role with type ROLE_TYPE_UNSPECIFIED is not allowed.
+    pub roles: Option<Vec<Role>>,
+    /// Optional. Signing key certificates of the app.This field is required in the following cases: The app has installType set to CUSTOM (i.e. a custom app). The app has roles set to a nonempty list and the app does not exist on the Play Store. The app has extensionConfig set (i.e. an extension app) but ExtensionConfig.signingKeyFingerprintsSha256 (deprecated) is not set and the app does not exist on the Play Store.If this field is not set for a custom app, the policy is rejected. If it is not set when required for a non-custom app, a NonComplianceDetail with INVALID_VALUE is reported.For other cases, this field is optional and the signing key certificates obtained from Play Store are used.See following policy settings to see how this field is used: choosePrivateKeyRules ApplicationPolicy.InstallType.CUSTOM ApplicationPolicy.extensionConfig ApplicationPolicy.roles
+    #[serde(rename = "signingKeyCerts")]
+    pub signing_key_certs: Option<Vec<ApplicationSigningKeyCert>>,
+    /// Optional. Specifies whether user control is permitted for the app. User control includes user actions like force-stopping and clearing app data. Certain types of apps have special treatment, see USER_CONTROL_SETTINGS_UNSPECIFIED and USER_CONTROL_ALLOWED for more details.
     #[serde(rename = "userControlSettings")]
     pub user_control_settings: Option<String>,
     /// Specifies whether the app installed in the work profile is allowed to add widgets to the home screen.
@@ -459,6 +581,23 @@ pub struct ApplicationPolicy {
 }
 
 impl common::Part for ApplicationPolicy {}
+
+/// A change to be made to a single ApplicationPolicy object.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct ApplicationPolicyChange {
+    /// If ApplicationPolicy.packageName matches an existing ApplicationPolicy object within the Policy being modified, then that object will be updated. Otherwise, it will be added to the end of the Policy.applications.
+    pub application: Option<ApplicationPolicy>,
+    /// The field mask indicating the fields to update. If omitted, all modifiable fields are updated.
+    #[serde(rename = "updateMask")]
+    pub update_mask: Option<common::FieldMask>,
+}
+
+impl common::Part for ApplicationPolicyChange {}
 
 /// Information reported about an installed app.
 ///
@@ -521,6 +660,22 @@ pub struct ApplicationReportingSettings {
 
 impl common::Part for ApplicationReportingSettings {}
 
+/// The application signing key certificate.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct ApplicationSigningKeyCert {
+    /// Required. The SHA-256 hash value of the signing key certificate of the app. This must be a valid SHA-256 hash value, i.e. 32 bytes. Otherwise, the policy is rejected.
+    #[serde(rename = "signingKeyCertFingerprintSha256")]
+    #[serde_as(as = "Option<common::serde::standard_base64::Wrapper>")]
+    pub signing_key_cert_fingerprint_sha256: Option<Vec<u8>>,
+}
+
+impl common::Part for ApplicationSigningKeyCert {}
+
 /// An action to block access to apps and data on a fully managed device or in a work profile. This action also triggers a device or work profile to displays a user-facing notification with information (where possible) on how to correct the compliance issue. Note: wipeAction must also be specified.
 ///
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -547,7 +702,7 @@ impl common::Part for BlockAction {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct ChoosePrivateKeyRule {
-    /// The package names to which this rule applies. The hash of the signing certificate for each app is verified against the hash provided by Play. If no package names are specified, then the alias is provided to all apps that call KeyChain.choosePrivateKeyAlias (https://developer.android.com/reference/android/security/KeyChain#choosePrivateKeyAlias%28android.app.Activity,%20android.security.KeyChainAliasCallback,%20java.lang.String[],%20java.security.Principal[],%20java.lang.String,%20int,%20java.lang.String%29) or any overloads (but not without calling KeyChain.choosePrivateKeyAlias, even on Android 11 and above). Any app with the same Android UID as a package specified here will have access when they call KeyChain.choosePrivateKeyAlias.
+    /// The package names to which this rule applies. The signing key certificate fingerprint of the app is verified against the signing key certificate fingerprints provided by Play Store and ApplicationPolicy.signingKeyCerts . If no package names are specified, then the alias is provided to all apps that call KeyChain.choosePrivateKeyAlias (https://developer.android.com/reference/android/security/KeyChain#choosePrivateKeyAlias%28android.app.Activity,%20android.security.KeyChainAliasCallback,%20java.lang.String[],%20java.security.Principal[],%20java.lang.String,%20int,%20java.lang.String%29) or any overloads (but not without calling KeyChain.choosePrivateKeyAlias, even on Android 11 and above). Any app with the same Android UID as a package specified here will have access when they call KeyChain.choosePrivateKeyAlias.
     #[serde(rename = "packageNames")]
     pub package_names: Option<Vec<String>>,
     /// The alias of the private key to be used.
@@ -601,6 +756,9 @@ impl common::Part for ClearAppsDataStatus {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct Command {
+    /// Optional. Parameters for the ADD_ESIM command to add an eSIM profile to the device. If this is set, then it is suggested that type should not be set. In this case, the server automatically sets it to ADD_ESIM. It is also acceptable to explicitly set type to ADD_ESIM.
+    #[serde(rename = "addEsimParams")]
+    pub add_esim_params: Option<AddEsimParams>,
     /// Parameters for the CLEAR_APP_DATA command to clear the data of specified apps from the device. See ClearAppsDataParams. If this is set, then it is suggested that type should not be set. In this case, the server automatically sets it to CLEAR_APP_DATA. It is also acceptable to explicitly set type to CLEAR_APP_DATA.
     #[serde(rename = "clearAppsDataParams")]
     pub clear_apps_data_params: Option<ClearAppsDataParams>,
@@ -613,12 +771,24 @@ pub struct Command {
     /// The duration for which the command is valid. The command will expire if not executed by the device during this time. The default duration if unspecified is ten minutes. There is no maximum duration.
     #[serde_as(as = "Option<common::serde::duration::Wrapper>")]
     pub duration: Option<chrono::Duration>,
-    /// If the command failed, an error code explaining the failure. This is not set when the command is cancelled by the caller.
+    /// If the command failed, an error code explaining the failure. This is not set when the command is cancelled by the caller. For reasoning about command errors, prefer fields in the following order (most preferred first): 1. Command-specific fields like clearAppsDataStatus, startLostModeStatus, or similar, if they exist. 2. This field, if set. 3. The generic error field in the Operation that wraps the command.
     #[serde(rename = "errorCode")]
     pub error_code: Option<String>,
+    /// Output only. Status of an ADD_ESIM or REMOVE_ESIM command.
+    #[serde(rename = "esimStatus")]
+    pub esim_status: Option<EsimCommandStatus>,
     /// For commands of type RESET_PASSWORD, optionally specifies the new password. Note: The new password must be at least 6 characters long if it is numeric in case of Android 14 devices. Else the command will fail with INVALID_VALUE.
     #[serde(rename = "newPassword")]
     pub new_password: Option<String>,
+    /// Optional. Parameters for the REMOVE_ESIM command to remove an eSIM profile from the device. If this is set, then it is suggested that type should not be set. In this case, the server automatically sets it to REMOVE_ESIM. It is also acceptable to explicitly set type to REMOVE_ESIM.
+    #[serde(rename = "removeEsimParams")]
+    pub remove_esim_params: Option<RemoveEsimParams>,
+    /// Optional. Parameters for the REQUEST_DEVICE_INFO command to get device related information. If this is set, then it is suggested that type should not be set. In this case, the server automatically sets it to REQUEST_DEVICE_INFO . It is also acceptable to explicitly set type to REQUEST_DEVICE_INFO.
+    #[serde(rename = "requestDeviceInfoParams")]
+    pub request_device_info_params: Option<RequestDeviceInfoParams>,
+    /// Output only. Status of the REQUEST_DEVICE_INFO command.
+    #[serde(rename = "requestDeviceInfoStatus")]
+    pub request_device_info_status: Option<RequestDeviceInfoStatus>,
     /// For commands of type RESET_PASSWORD, optionally specifies flags.
     #[serde(rename = "resetPasswordFlags")]
     pub reset_password_flags: Option<Vec<String>>,
@@ -640,6 +810,9 @@ pub struct Command {
     /// The resource name of the user that owns the device in the form enterprises/{enterpriseId}/users/{userId}. This is automatically generated by the server based on the device the command is sent to.
     #[serde(rename = "userName")]
     pub user_name: Option<String>,
+    /// Optional. Parameters for the WIPE command to wipe the device. If this is set, then it is suggested that type should not be set. In this case, the server automatically sets it to WIPE. It is also acceptable to explicitly set type to WIPE.
+    #[serde(rename = "wipeParams")]
+    pub wipe_params: Option<WipeParams>,
 }
 
 impl common::RequestValue for Command {}
@@ -655,6 +828,9 @@ pub struct CommonCriteriaModeInfo {
     /// Whether Common Criteria Mode is enabled.
     #[serde(rename = "commonCriteriaModeStatus")]
     pub common_criteria_mode_status: Option<String>,
+    /// Output only. The status of policy signature verification.
+    #[serde(rename = "policySignatureVerificationStatus")]
+    pub policy_signature_verification_status: Option<String>,
 }
 
 impl common::Part for CommonCriteriaModeInfo {}
@@ -736,7 +912,7 @@ pub struct ContentProviderEndpoint {
 
 impl common::Part for ContentProviderEndpoint {}
 
-/// Controls the data from the work profile that can be accessed from the personal profile and vice versa. A nonComplianceDetail with MANAGEMENT_MODE is reported if the device does not have a work profile.
+/// Controls the data from the work profile that can be accessed from the personal profile and vice versa. A NonComplianceDetail with MANAGEMENT_MODE is reported if the device does not have a work profile.
 ///
 /// This type is not used in any activity, and only used as *part* of another schema.
 ///
@@ -744,13 +920,16 @@ impl common::Part for ContentProviderEndpoint {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct CrossProfilePolicies {
+    /// Optional. Controls whether personal profile apps can invoke app functions exposed by apps in the work profile.
+    #[serde(rename = "crossProfileAppFunctions")]
+    pub cross_profile_app_functions: Option<String>,
     /// Whether text copied from one profile (personal or work) can be pasted in the other profile.
     #[serde(rename = "crossProfileCopyPaste")]
     pub cross_profile_copy_paste: Option<String>,
     /// Whether data from one profile (personal or work) can be shared with apps in the other profile. Specifically controls simple data sharing via intents. Management of other cross-profile communication channels, such as contact search, copy/paste, or connected work & personal apps, are configured separately.
     #[serde(rename = "crossProfileDataSharing")]
     pub cross_profile_data_sharing: Option<String>,
-    /// List of apps which are excluded from the ShowWorkContactsInPersonalProfile setting. For this to be set, ShowWorkContactsInPersonalProfile must be set to one of the following values: SHOW_WORK_CONTACTS_IN_PERSONAL_PROFILE_ALLOWED. In this case, these exemptions act as a blocklist. SHOW_WORK_CONTACTS_IN_PERSONAL_PROFILE_DISALLOWED. In this case, these exemptions act as an allowlist. SHOW_WORK_CONTACTS_IN_PERSONAL_PROFILE_DISALLOWED_EXCEPT_SYSTEM. In this case, these exemptions act as an allowlist, in addition to the already allowlisted system apps.Supported on Android 14 and above. A nonComplianceDetail with API_LEVEL is reported if the Android version is less than 14.
+    /// List of apps which are excluded from the ShowWorkContactsInPersonalProfile setting. For this to be set, ShowWorkContactsInPersonalProfile must be set to one of the following values: SHOW_WORK_CONTACTS_IN_PERSONAL_PROFILE_ALLOWED. In this case, these exemptions act as a blocklist. SHOW_WORK_CONTACTS_IN_PERSONAL_PROFILE_DISALLOWED. In this case, these exemptions act as an allowlist. SHOW_WORK_CONTACTS_IN_PERSONAL_PROFILE_DISALLOWED_EXCEPT_SYSTEM. In this case, these exemptions act as an allowlist, in addition to the already allowlisted system apps.Supported on Android 14 and above. A NonComplianceDetail with API_LEVEL is reported if the Android version is less than 14.
     #[serde(rename = "exemptionsToShowWorkContactsInPersonalProfile")]
     pub exemptions_to_show_work_contacts_in_personal_profile: Option<PackageNameList>,
     /// Whether personal apps can access contacts stored in the work profile.See also exemptions_to_show_work_contacts_in_personal_profile.
@@ -762,6 +941,21 @@ pub struct CrossProfilePolicies {
 }
 
 impl common::Part for CrossProfilePolicies {}
+
+/// Configuration for a custom app.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct CustomAppConfig {
+    /// Optional. User uninstall settings of the custom app.
+    #[serde(rename = "userUninstallSettings")]
+    pub user_uninstall_settings: Option<String>,
+}
+
+impl common::Part for CustomAppConfig {}
 
 /// Represents a whole or partial calendar date, such as a birthday. The time of day and time zone are either specified elsewhere or are insignificant. The date is relative to the Gregorian Calendar. This can represent one of the following: A full date, with non-zero year, month, and day values. A month and day, with a zero year (for example, an anniversary). A year on its own, with a zero month and a zero day. A year and month, with a zero day (for example, a credit card expiration date).Related types: google.type.TimeOfDay google.type.DateTime google.protobuf.Timestamp
 ///
@@ -780,6 +974,96 @@ pub struct Date {
 }
 
 impl common::Part for Date {}
+
+/// Information about the application to be set as the default.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct DefaultApplication {
+    /// Required. The package name that should be set as the default application. The policy is rejected if the package name is invalid.
+    #[serde(rename = "packageName")]
+    pub package_name: Option<String>,
+}
+
+impl common::Part for DefaultApplication {}
+
+/// Additional context for non-compliance related to default application settings.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct DefaultApplicationContext {
+    /// Output only. The scope of non-compliant default application setting.
+    #[serde(rename = "defaultApplicationScope")]
+    pub default_application_scope: Option<String>,
+}
+
+impl common::Part for DefaultApplicationContext {}
+
+/// The default application information for a specific DefaultApplicationType.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct DefaultApplicationInfo {
+    /// Output only. Details on the default application setting attempts, in the same order as listed in defaultApplications.
+    #[serde(rename = "defaultApplicationSettingAttempts")]
+    pub default_application_setting_attempts: Option<Vec<DefaultApplicationSettingAttempt>>,
+    /// Output only. The default application type.
+    #[serde(rename = "defaultApplicationType")]
+    pub default_application_type: Option<String>,
+    /// Output only. The package name of the current default application.
+    #[serde(rename = "packageName")]
+    pub package_name: Option<String>,
+}
+
+impl common::Part for DefaultApplicationInfo {}
+
+/// The default application setting for a DefaultApplicationType.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct DefaultApplicationSetting {
+    /// Required. The scopes to which the policy should be applied. This list must not be empty or contain duplicates.A NonComplianceDetail with MANAGEMENT_MODE reason and DEFAULT_APPLICATION_SETTING_UNSUPPORTED_SCOPES specific reason is reported if none of the specified scopes can be applied to the management mode (e.g. a fully managed device receives a policy with only SCOPE_PERSONAL_PROFILE in the list).
+    #[serde(rename = "defaultApplicationScopes")]
+    pub default_application_scopes: Option<Vec<String>>,
+    /// Required. The app type to set the default application.
+    #[serde(rename = "defaultApplicationType")]
+    pub default_application_type: Option<String>,
+    /// Required. The list of applications that can be set as the default app for a given type. This list must not be empty or contain duplicates. The first app in the list that is installed and qualified for the defaultApplicationType (e.g. SMS app for DEFAULT_SMS) is set as the default app. The signing key certificate fingerprint of the app on the device must also match one of the signing key certificate fingerprints obtained from Play Store or one of the entries in ApplicationPolicy.signingKeyCerts in order to be set as the default.If the defaultApplicationScopes contains SCOPE_FULLY_MANAGED or SCOPE_WORK_PROFILE, the app must have an entry in applications with installType set to a value other than BLOCKED.A NonComplianceDetail with APP_NOT_INSTALLED reason and DEFAULT_APPLICATION_SETTING_FAILED_FOR_SCOPE specific reason is reported if none of the apps in the list are installed. A NonComplianceDetail with INVALID_VALUE reason and DEFAULT_APPLICATION_SETTING_FAILED_FOR_SCOPE specific reason is reported if at least one app is installed but the policy fails to apply due to other reasons (e.g. the app is not of the right type).When applying to SCOPE_PERSONAL_PROFILE on a company-owned device with a work profile, only pre-installed system apps can be set as the default. A NonComplianceDetail with INVALID_VALUE reason and DEFAULT_APPLICATION_SETTING_FAILED_FOR_SCOPE specific reason is reported if the policy fails to apply to the personal profile.
+    #[serde(rename = "defaultApplications")]
+    pub default_applications: Option<Vec<DefaultApplication>>,
+}
+
+impl common::Part for DefaultApplicationSetting {}
+
+/// Details on a default application setting attempt.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct DefaultApplicationSettingAttempt {
+    /// Output only. The outcome of setting the app as the default.
+    #[serde(rename = "attemptOutcome")]
+    pub attempt_outcome: Option<String>,
+    /// Output only. The package name of the attempted application.
+    #[serde(rename = "packageName")]
+    pub package_name: Option<String>,
+}
+
+impl common::Part for DefaultApplicationSettingAttempt {}
 
 /// A device owned by an enterprise. Unless otherwise noted, all fields are read-only and can’t be modified by enterprises.devices.patch.
 ///
@@ -800,7 +1084,7 @@ pub struct Device {
     /// Reports for apps installed on the device. This information is only available when application_reports_enabled is true in the device's policy.
     #[serde(rename = "applicationReports")]
     pub application_reports: Option<Vec<ApplicationReport>>,
-    /// The password requirements currently applied to the device. The applied requirements may be slightly different from those specified in passwordPolicies in some cases. fieldPath is set based on passwordPolicies.
+    /// The password requirements currently applied to the device. This field exists because the applied requirements may be slightly different from those specified in passwordPolicies in some cases. Note that this field does not provide information about password compliance. For non-compliance information, see nonComplianceDetails. NonComplianceDetail.fieldPath, is set based on passwordPolicies, not based on this field.
     #[serde(rename = "appliedPasswordPolicies")]
     pub applied_password_policies: Option<Vec<PasswordRequirements>>,
     /// The name of the policy currently applied to the device.
@@ -813,9 +1097,12 @@ pub struct Device {
     /// The state currently applied to the device.
     #[serde(rename = "appliedState")]
     pub applied_state: Option<String>,
-    /// Information about Common Criteria Mode—security standards defined in the Common Criteria for Information Technology Security Evaluation (https://www.commoncriteriaportal.org/) (CC).This information is only available if statusReportingSettings.commonCriteriaModeEnabled is true in the device's policy.
+    /// Information about Common Criteria Mode—security standards defined in the Common Criteria for Information Technology Security Evaluation (https://www.commoncriteriaportal.org/) (CC).This information is only available if statusReportingSettings.commonCriteriaModeEnabled is true in the device's policy the device is company-owned.
     #[serde(rename = "commonCriteriaModeInfo")]
     pub common_criteria_mode_info: Option<CommonCriteriaModeInfo>,
+    /// Output only. The default application information for the DefaultApplicationType. This information is only available if defaultApplicationInfoReportingEnabled is true in the device's policy. Available on Android 16 and above.All app types are reported on fully managed devices. DEFAULT_BROWSER, DEFAULT_CALL_REDIRECTION, DEFAULT_CALL_SCREENING and DEFAULT_DIALER types are reported for the work profiles on company-owned devices with a work profile and personally-owned devices. DEFAULT_WALLET is also reported for company-owned devices with a work profile, but will only include work profile information.
+    #[serde(rename = "defaultApplicationInfo")]
+    pub default_application_info: Option<Vec<DefaultApplicationInfo>>,
     /// Device settings information. This information is only available if deviceSettingsEnabled is true in the device's policy.
     #[serde(rename = "deviceSettings")]
     pub device_settings: Option<DeviceSettings>,
@@ -911,9 +1198,18 @@ impl common::ResponseResult for Device {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct DeviceConnectivityManagement {
+    /// Optional. Access Point Name (APN) policy. Configuration for Access Point Names (APNs) which may override any other APNs on the device. See OVERRIDE_APNS_ENABLED and overrideApns for details.
+    #[serde(rename = "apnPolicy")]
+    pub apn_policy: Option<ApnPolicy>,
+    /// Optional. Controls whether Bluetooth sharing is allowed.
+    #[serde(rename = "bluetoothSharing")]
+    pub bluetooth_sharing: Option<String>,
     /// Controls Wi-Fi configuring privileges. Based on the option set, user will have either full or limited or no control in configuring Wi-Fi networks.
     #[serde(rename = "configureWifi")]
     pub configure_wifi: Option<String>,
+    /// Optional. Preferential network service configuration. Setting this field will override preferentialNetworkService. This can be set on both work profiles and fully managed devices on Android 13 and above. See 5G network slicing (https://developers.google.com/android/management/5g-network-slicing) guide for more details.
+    #[serde(rename = "preferentialNetworkServiceSettings")]
+    pub preferential_network_service_settings: Option<PreferentialNetworkServiceSettings>,
     /// Controls tethering settings. Based on the value set, the user is partially or fully disallowed from using different forms of tethering.
     #[serde(rename = "tetheringSettings")]
     pub tethering_settings: Option<String>,
@@ -923,6 +1219,9 @@ pub struct DeviceConnectivityManagement {
     /// Controls configuring and using Wi-Fi direct settings. Supported on company-owned devices running Android 13 and above.
     #[serde(rename = "wifiDirectSettings")]
     pub wifi_direct_settings: Option<String>,
+    /// Optional. Wi-Fi roaming policy.
+    #[serde(rename = "wifiRoamingPolicy")]
+    pub wifi_roaming_policy: Option<WifiRoamingPolicy>,
     /// Restrictions on which Wi-Fi SSIDs the device can connect to. Note that this does not affect which networks can be configured on the device. Supported on company-owned devices running Android 13 and above.
     #[serde(rename = "wifiSsidPolicy")]
     pub wifi_ssid_policy: Option<WifiSsidPolicy>,
@@ -1054,6 +1353,34 @@ pub struct DpcMigrationInfo {
 
 impl common::Part for DpcMigrationInfo {}
 
+/// EID information for each eUICC chip.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct Eid {
+    /// Output only. The EID
+    pub eid: Option<String>,
+}
+
+impl common::Part for Eid {}
+
+/// Information related to the EIDs of the device.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct EidInfo {
+    /// Output only. EID information for each eUICC chip.
+    pub eids: Option<Vec<Eid>>,
+}
+
+impl common::Part for EidInfo {}
+
 /// A generic empty message that you can re-use to avoid defining duplicated empty messages in your APIs. A typical example is to use it as the request or the response type of an API method. For instance: service Foo { rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty); }
 ///
 /// # Activities
@@ -1147,7 +1474,9 @@ impl common::ResponseResult for EnrollmentToken {}
 /// * [policies delete enterprises](EnterprisePolicyDeleteCall) (none)
 /// * [policies get enterprises](EnterprisePolicyGetCall) (none)
 /// * [policies list enterprises](EnterprisePolicyListCall) (none)
+/// * [policies modify policy applications enterprises](EnterprisePolicyModifyPolicyApplicationCall) (none)
 /// * [policies patch enterprises](EnterprisePolicyPatchCall) (none)
+/// * [policies remove policy applications enterprises](EnterprisePolicyRemovePolicyApplicationCall) (none)
 /// * [web apps create enterprises](EnterpriseWebAppCreateCall) (none)
 /// * [web apps delete enterprises](EnterpriseWebAppDeleteCall) (none)
 /// * [web apps get enterprises](EnterpriseWebAppGetCall) (none)
@@ -1156,6 +1485,7 @@ impl common::ResponseResult for EnrollmentToken {}
 /// * [web tokens create enterprises](EnterpriseWebTokenCreateCall) (none)
 /// * [create enterprises](EnterpriseCreateCall) (request|response)
 /// * [delete enterprises](EnterpriseDeleteCall) (none)
+/// * [generate enterprise upgrade url enterprises](EnterpriseGenerateEnterpriseUpgradeUrlCall) (none)
 /// * [get enterprises](EnterpriseGetCall) (response)
 /// * [list enterprises](EnterpriseListCall) (none)
 /// * [patch enterprises](EnterprisePatchCall) (request|response)
@@ -1175,11 +1505,20 @@ pub struct Enterprise {
     /// The name of the enterprise displayed to users. This field has a maximum length of 100 characters.
     #[serde(rename = "enterpriseDisplayName")]
     pub enterprise_display_name: Option<String>,
+    /// Output only. The type of the enterprise.
+    #[serde(rename = "enterpriseType")]
+    pub enterprise_type: Option<String>,
     /// Settings for Google-provided user authentication.
     #[serde(rename = "googleAuthenticationSettings")]
     pub google_authentication_settings: Option<GoogleAuthenticationSettings>,
     /// An image displayed as a logo during device provisioning. Supported types are: image/bmp, image/gif, image/x-ico, image/jpeg, image/png, image/webp, image/vnd.wap.wbmp, image/x-adobe-dng.
     pub logo: Option<ExternalData>,
+    /// Output only. The type of managed Google domain.
+    #[serde(rename = "managedGoogleDomainType")]
+    pub managed_google_domain_type: Option<String>,
+    /// Output only. The type of a managed Google Play Accounts enterprise.
+    #[serde(rename = "managedGooglePlayAccountsEnterpriseType")]
+    pub managed_google_play_accounts_enterprise_type: Option<String>,
     /// The name of the enterprise which is generated by the server during creation, in the form enterprises/{enterpriseId}.
     pub name: Option<String>,
     /// A color in RGB format that indicates the predominant color to display in the device management app UI. The color components are stored as follows: (red << 16) | (green << 8) | blue, where the value of each component is between 0 and 255, inclusive.
@@ -1200,7 +1539,56 @@ impl common::RequestValue for Enterprise {}
 impl common::Resource for Enterprise {}
 impl common::ResponseResult for Enterprise {}
 
-/// Configuration to enable an app as an extension app, with the capability of interacting with Android Device Policy offline. For Android versions 13 and above, extension apps are exempt from battery restrictions so will not be placed into the restricted App Standby Bucket (https://developer.android.com/topic/performance/appstandby#restricted-bucket). Extensions apps are also protected against users clearing their data or force-closing the application, although admins can continue to use the clear app data command on extension apps if needed for Android 13 and above.
+/// Status and error details (if present) of an ADD_ESIM or REMOVE_ESIM command.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct EsimCommandStatus {
+    /// Output only. Information about the eSIM added or removed. This is populated only when the eSIM operation status is SUCCESS.
+    #[serde(rename = "esimInfo")]
+    pub esim_info: Option<EsimInfo>,
+    /// Output only. Details of the error if the status is set to INTERNAL_ERROR.
+    #[serde(rename = "internalErrorDetails")]
+    pub internal_error_details: Option<InternalErrorDetails>,
+    /// Output only. Status of an ADD_ESIM or REMOVE_ESIM command.
+    pub status: Option<String>,
+}
+
+impl common::Part for EsimCommandStatus {}
+
+/// Details of the eSIM added or removed.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct EsimInfo {
+    /// Output only. ICC ID of the eSIM.
+    #[serde(rename = "iccId")]
+    pub icc_id: Option<String>,
+}
+
+impl common::Part for EsimInfo {}
+
+/// Information related to the eUICC chip.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct EuiccChipInfo {
+    /// Output only. The Embedded Identity Document (EID) that identifies the eUICC chip for each eUICC chip on the device. This is available on company owned devices running Android 13 and above.
+    pub eid: Option<String>,
+}
+
+impl common::Part for EuiccChipInfo {}
+
+/// Configuration to enable an app as an extension app, with the capability of interacting with Android Device Policy offline. For Android versions 11 and above, extension apps are exempt from battery restrictions so will not be placed into the restricted App Standby Bucket (https://developer.android.com/topic/performance/appstandby#restricted-bucket). Extensions apps are also protected against users clearing their data or force-closing the application, although admins can continue to use the clear app data command on extension apps if needed for Android 11 and above.
 ///
 /// This type is not used in any activity, and only used as *part* of another schema.
 ///
@@ -1208,10 +1596,10 @@ impl common::ResponseResult for Enterprise {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct ExtensionConfig {
-    /// Fully qualified class name of the receiver service class for Android Device Policy to notify the extension app of any local command status updates.
+    /// Fully qualified class name of the receiver service class for Android Device Policy to notify the extension app of any local command status updates. The service must be exported in the extension app's AndroidManifest.xml and extend NotificationReceiverService (https://developers.google.com/android/management/reference/amapi/com/google/android/managementapi/notification/NotificationReceiverService) (see Integrate with the AMAPI SDK (https://developers.google.com/android/management/sdk-integration) guide for more details).
     #[serde(rename = "notificationReceiver")]
     pub notification_receiver: Option<String>,
-    /// Hex-encoded SHA-256 hash of the signing certificate of the extension app. Only hexadecimal string representations of 64 characters are valid.If not specified, the signature for the corresponding package name is obtained from the Play Store instead.If this list is empty, the signature of the extension app on the device must match the signature obtained from the Play Store for the app to be able to communicate with Android Device Policy.If this list is not empty, the signature of the extension app on the device must match one of the entries in this list for the app to be able to communicate with Android Device Policy.In production use cases, it is recommended to leave this empty.
+    /// Hex-encoded SHA-256 hashes of the signing key certificates of the extension app. Only hexadecimal string representations of 64 characters are valid.The signing key certificate fingerprints are always obtained from the Play Store and this field is used to provide additional signing key certificate fingerprints. However, if the application is not available on the Play Store, this field needs to be set. A NonComplianceDetail with INVALID_VALUE is reported if this field is not set when the application is not available on the Play Store.The signing key certificate fingerprint of the extension app on the device must match one of the signing key certificate fingerprints obtained from the Play Store or the ones provided in this field for the app to be able to communicate with Android Device Policy.In production use cases, it is recommended to leave this empty.
     #[serde(rename = "signingKeyFingerprintsSha256")]
     pub signing_key_fingerprints_sha256: Option<Vec<String>>,
 }
@@ -1243,15 +1631,55 @@ impl common::Part for ExternalData {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct FreezePeriod {
-    /// The end date (inclusive) of the freeze period. Must be no later than 90 days from the start date. If the end date is earlier than the start date, the freeze period is considered wrapping year-end. Note: year must not be set. For example, {"month": 1,"date": 30}.
+    /// The end date (inclusive) of the freeze period. Must be no later than 90 days from the start date. If the end date is earlier than the start date, the freeze period is considered wrapping year-end. Note: day and month must be set. year should not be set as it is not used. For example, {"month": 1,"date": 30}.
     #[serde(rename = "endDate")]
     pub end_date: Option<Date>,
-    /// The start date (inclusive) of the freeze period. Note: year must not be set. For example, {"month": 1,"date": 30}.
+    /// The start date (inclusive) of the freeze period. Note: day and month must be set. year should not be set as it is not used. For example, {"month": 1,"date": 30}.
     #[serde(rename = "startDate")]
     pub start_date: Option<Date>,
 }
 
 impl common::Part for FreezePeriod {}
+
+/// Request message for generating a URL to upgrade an existing managed Google Play Accounts enterprise to a managed Google domain.Note: This feature is not generally available.
+///
+/// # Activities
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+///
+/// * [generate enterprise upgrade url enterprises](EnterpriseGenerateEnterpriseUpgradeUrlCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct GenerateEnterpriseUpgradeUrlRequest {
+    /// Optional. Email address used to prefill the admin field of the enterprise signup form as part of the upgrade process. This value is a hint only and can be altered by the user. Personal email addresses are not allowed. If allowedDomains is non-empty then this must belong to one of the allowedDomains.
+    #[serde(rename = "adminEmail")]
+    pub admin_email: Option<String>,
+    /// Optional. A list of domains that are permitted for the admin email. The IT admin cannot enter an email address with a domain name that is not in this list. Subdomains of domains in this list are not allowed but can be allowed by adding a second entry which has *. prefixed to the domain name (e.g. *.example.com). If the field is not present or is an empty list then the IT admin is free to use any valid domain name. Personal email domains are not allowed.
+    #[serde(rename = "allowedDomains")]
+    pub allowed_domains: Option<Vec<String>>,
+}
+
+impl common::RequestValue for GenerateEnterpriseUpgradeUrlRequest {}
+
+/// Response message for generating a URL to upgrade an existing managed Google Play Accounts enterprise to a managed Google domain.Note: This feature is not generally available.
+///
+/// # Activities
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+///
+/// * [generate enterprise upgrade url enterprises](EnterpriseGenerateEnterpriseUpgradeUrlCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct GenerateEnterpriseUpgradeUrlResponse {
+    /// A URL for an enterprise admin to upgrade their enterprise. The page can't be rendered in an iframe.
+    pub url: Option<String>,
+}
+
+impl common::ResponseResult for GenerateEnterpriseUpgradeUrlResponse {}
 
 /// Contains settings for Google-provided user authentication.
 ///
@@ -1296,6 +1724,9 @@ pub struct HardwareInfo {
     /// Output only. ID that uniquely identifies a personally-owned device in a particular organization. On the same physical device when enrolled with the same organization, this ID persists across setups and even factory resets. This ID is available on personally-owned devices with a work profile on devices running Android 12 and above.
     #[serde(rename = "enterpriseSpecificId")]
     pub enterprise_specific_id: Option<String>,
+    /// Output only. Information related to the eUICC chip.
+    #[serde(rename = "euiccChipInfo")]
+    pub euicc_chip_info: Option<Vec<EuiccChipInfo>>,
     /// GPU shutdown temperature thresholds in Celsius for each GPU on the device.
     #[serde(rename = "gpuShutdownTemperatures")]
     pub gpu_shutdown_temperatures: Option<Vec<f32>>,
@@ -1308,7 +1739,7 @@ pub struct HardwareInfo {
     pub manufacturer: Option<String>,
     /// The model of the device. For example, Asus Nexus 7.
     pub model: Option<String>,
-    /// The device serial number.
+    /// The device serial number. However, for personally-owned devices running Android 12 and above, this is the same as the enterpriseSpecificId.
     #[serde(rename = "serialNumber")]
     pub serial_number: Option<String>,
     /// Device skin shutdown temperature thresholds in Celsius.
@@ -1374,6 +1805,32 @@ pub struct InstallConstraint {
 }
 
 impl common::Part for InstallConstraint {}
+
+/// Internal error details if present for the ADD_ESIM or REMOVE_ESIM command.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct InternalErrorDetails {
+    /// Output only. Integer representation of the error code as specified here (https://developer.android.com/reference/android/telephony/euicc/EuiccManager#EXTRA_EMBEDDED_SUBSCRIPTION_DETAILED_CODE). See also, OPERATION_SMDX_SUBJECT_REASON_CODE. See error_code_detail for more details.
+    #[serde(rename = "errorCode")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub error_code: Option<i64>,
+    /// Output only. The error code detail corresponding to the error_code.
+    #[serde(rename = "errorCodeDetail")]
+    pub error_code_detail: Option<String>,
+    /// Output only. Integer representation of the operation code as specified here (https://developer.android.com/reference/android/telephony/euicc/EuiccManager#EXTRA_EMBEDDED_SUBSCRIPTION_DETAILED_CODE). See operation_code_detail for more details.
+    #[serde(rename = "operationCode")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub operation_code: Option<i64>,
+    /// Output only. The operation code detail corresponding to the operation_code.
+    #[serde(rename = "operationCodeDetail")]
+    pub operation_code_detail: Option<String>,
+}
+
+impl common::Part for InternalErrorDetails {}
 
 /// Keyed app state reported by the app.
 ///
@@ -1546,6 +2003,8 @@ pub struct ListOperationsResponse {
     pub next_page_token: Option<String>,
     /// A list of operations that matches the specified filter in the request.
     pub operations: Option<Vec<Operation>>,
+    /// Unordered list. Unreachable resources. Populated when the request sets ListOperationsRequest.return_partial_success and reads across collections. For example, when attempting to list all resources across all supported locations.
+    pub unreachable: Option<Vec<String>>,
 }
 
 impl common::ResponseResult for ListOperationsResponse {}
@@ -1744,6 +2203,42 @@ pub struct MigrationToken {
 
 impl common::RequestValue for MigrationToken {}
 impl common::ResponseResult for MigrationToken {}
+
+/// Request to update or create ApplicationPolicy objects in the given Policy.
+///
+/// # Activities
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+///
+/// * [policies modify policy applications enterprises](EnterprisePolicyModifyPolicyApplicationCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct ModifyPolicyApplicationsRequest {
+    /// Required. The changes to be made to the ApplicationPolicy objects. There must be at least one ApplicationPolicyChange.
+    pub changes: Option<Vec<ApplicationPolicyChange>>,
+}
+
+impl common::RequestValue for ModifyPolicyApplicationsRequest {}
+
+/// Response to a request to update or create ApplicationPolicy objects in the given policy.
+///
+/// # Activities
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+///
+/// * [policies modify policy applications enterprises](EnterprisePolicyModifyPolicyApplicationCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct ModifyPolicyApplicationsResponse {
+    /// The updated policy.
+    pub policy: Option<Policy>,
+}
+
+impl common::ResponseResult for ModifyPolicyApplicationsResponse {}
 
 /// Device network info.
 ///
@@ -2051,6 +2546,9 @@ pub struct PersonalUsagePolicies {
     /// Account types that can't be managed by the user.
     #[serde(rename = "accountTypesWithManagementDisabled")]
     pub account_types_with_management_disabled: Option<Vec<String>>,
+    /// Optional. Whether bluetooth sharing is allowed.
+    #[serde(rename = "bluetoothSharing")]
+    pub bluetooth_sharing: Option<String>,
     /// If true, the camera is disabled on the personal profile.
     #[serde(rename = "cameraDisabled")]
     pub camera_disabled: Option<bool>,
@@ -2063,6 +2561,9 @@ pub struct PersonalUsagePolicies {
     /// Used together with personalApplications to control how apps in the personal profile are allowed or blocked.
     #[serde(rename = "personalPlayStoreMode")]
     pub personal_play_store_mode: Option<String>,
+    /// Optional. Controls whether a private space is allowed on the device.
+    #[serde(rename = "privateSpacePolicy")]
+    pub private_space_policy: Option<String>,
     /// If true, screen capture is disabled for all users.
     #[serde(rename = "screenCaptureDisabled")]
     pub screen_capture_disabled: Option<bool>,
@@ -2086,10 +2587,10 @@ pub struct Policy {
     /// Account types that can't be managed by the user.
     #[serde(rename = "accountTypesWithManagementDisabled")]
     pub account_types_with_management_disabled: Option<Vec<String>>,
-    /// Whether adding new users and profiles is disabled.
+    /// Whether adding new users and profiles is disabled. For devices where managementMode is DEVICE_OWNER this field is ignored and the user is never allowed to add or remove users.
     #[serde(rename = "addUserDisabled")]
     pub add_user_disabled: Option<bool>,
-    /// Whether adjusting the master volume is disabled. Also mutes the device.
+    /// Whether adjusting the master volume is disabled. Also mutes the device. The setting has effect only on fully managed devices.
     #[serde(rename = "adjustVolumeDisabled")]
     pub adjust_volume_disabled: Option<bool>,
     /// Advanced security settings. In most cases, setting these is not needed.
@@ -2104,8 +2605,14 @@ pub struct Policy {
     /// Recommended alternative: autoUpdateMode which is set per app, provides greater flexibility around update frequency.When autoUpdateMode is set to AUTO_UPDATE_POSTPONED or AUTO_UPDATE_HIGH_PRIORITY, this field has no effect.The app auto update policy, which controls when automatic app updates can be applied.
     #[serde(rename = "appAutoUpdatePolicy")]
     pub app_auto_update_policy: Option<String>,
+    /// Optional. Controls whether apps on the device for fully managed devices or in the work profile for devices with work profiles are allowed to expose app functions.
+    #[serde(rename = "appFunctions")]
+    pub app_functions: Option<String>,
     /// Policy applied to apps. This can have at most 3,000 elements.
     pub applications: Option<Vec<ApplicationPolicy>>,
+    /// Optional. Controls whether AssistContent (https://developer.android.com/reference/android/app/assist/AssistContent) is allowed to be sent to a privileged app such as an assistant app. AssistContent includes screenshots and information about an app, such as package name. This is supported on Android 15 and above.
+    #[serde(rename = "assistContentPolicy")]
+    pub assist_content_policy: Option<String>,
     /// Whether auto date, time, and time zone are enabled on a company-owned device. If this is set, then autoTimeRequired is ignored.
     #[serde(rename = "autoDateAndTimeZone")]
     pub auto_date_and_time_zone: Option<String>,
@@ -2157,6 +2664,9 @@ pub struct Policy {
     /// Whether the user is allowed to enable debugging features.
     #[serde(rename = "debuggingFeaturesAllowed")]
     pub debugging_features_allowed: Option<bool>,
+    /// Optional. The default application setting for supported types. If the default application is successfully set for at least one app type on a profile, users are prevented from changing any default applications on that profile.Only one DefaultApplicationSetting is allowed for each DefaultApplicationType.See Default application settings (https://developers.google.com/android/management/default-application-settings) guide for more details.
+    #[serde(rename = "defaultApplicationSettings")]
+    pub default_application_settings: Option<Vec<DefaultApplicationSetting>>,
     /// The default permission policy for runtime permission requests.
     #[serde(rename = "defaultPermissionPolicy")]
     pub default_permission_policy: Option<String>,
@@ -2178,6 +2688,9 @@ pub struct Policy {
     /// Whether app verification is force-enabled.
     #[serde(rename = "ensureVerifyAppsEnabled")]
     pub ensure_verify_apps_enabled: Option<bool>,
+    /// Optional. Controls whether the enterpriseDisplayName is visible on the device (e.g. lock screen message on company-owned devices).
+    #[serde(rename = "enterpriseDisplayNameVisibility")]
+    pub enterprise_display_name_visibility: Option<String>,
     /// Whether factory resetting from settings is disabled.
     #[serde(rename = "factoryResetDisabled")]
     pub factory_reset_disabled: Option<bool>,
@@ -2193,7 +2706,7 @@ pub struct Policy {
     /// This field has no effect.
     #[serde(rename = "installUnknownSourcesAllowed")]
     pub install_unknown_sources_allowed: Option<bool>,
-    /// If true, this disables the Lock Screen (https://source.android.com/docs/core/display/multi_display/lock-screen) for primary and/or secondary displays.
+    /// If true, this disables the Lock Screen (https://source.android.com/docs/core/display/multi_display/lock-screen) for primary and/or secondary displays. This policy is supported only in dedicated device management mode.
     #[serde(rename = "keyguardDisabled")]
     pub keyguard_disabled: Option<bool>,
     /// Disabled keyguard customizations, such as widgets.
@@ -2277,7 +2790,7 @@ pub struct Policy {
     /// Rules that define the behavior when a particular policy can not be applied on device
     #[serde(rename = "policyEnforcementRules")]
     pub policy_enforcement_rules: Option<Vec<PolicyEnforcementRule>>,
-    /// Controls whether preferential network service is enabled on the work profile. For example, an organization may have an agreement with a carrier that all of the work data from its employees' devices will be sent via a network service dedicated for enterprise use. An example of a supported preferential network service is the enterprise slice on 5G networks. This has no effect on fully managed devices.
+    /// Controls whether preferential network service is enabled on the work profile or on fully managed devices. For example, an organization may have an agreement with a carrier that all of the work data from its employees' devices will be sent via a network service dedicated for enterprise use. An example of a supported preferential network service is the enterprise slice on 5G networks. This policy has no effect if preferentialNetworkServiceSettings or ApplicationPolicy.preferentialNetworkId is set on devices running Android 13 or above.
     #[serde(rename = "preferentialNetworkService")]
     pub preferential_network_service: Option<String>,
     /// Optional. Controls whether printing is allowed. This is supported on devices running Android 9 and above. .
@@ -2298,7 +2811,7 @@ pub struct Policy {
     /// Whether screen capture is disabled.
     #[serde(rename = "screenCaptureDisabled")]
     pub screen_capture_disabled: Option<bool>,
-    /// Whether changing the user icon is disabled.
+    /// Whether changing the user icon is disabled. This applies only on devices running Android 7 and above.
     #[serde(rename = "setUserIconDisabled")]
     pub set_user_icon_disabled: Option<bool>,
     /// Whether changing the wallpaper is disabled.
@@ -2307,7 +2820,7 @@ pub struct Policy {
     /// Action to take during the setup process. At most one action may be specified.
     #[serde(rename = "setupActions")]
     pub setup_actions: Option<Vec<SetupAction>>,
-    /// Whether location sharing is disabled. share_location_disabled is supported for both fully managed devices and personally owned work profiles.
+    /// Whether location sharing is disabled.
     #[serde(rename = "shareLocationDisabled")]
     pub share_location_disabled: Option<bool>,
     /// A message displayed to the user in the settings screen wherever functionality has been disabled by the admin. If the message is longer than 200 characters it may be truncated.
@@ -2358,9 +2871,15 @@ pub struct Policy {
     /// Whether configuring Wi-Fi networks is disabled. Supported on fully managed devices and work profiles on company-owned devices. For fully managed devices, setting this to true removes all configured networks and retains only the networks configured using openNetworkConfiguration. For work profiles on company-owned devices, existing configured networks are not affected and the user is not allowed to add, remove, or modify Wi-Fi networks. If configureWifi is set to anything other than CONFIGURE_WIFI_UNSPECIFIED, this setting is ignored. Note: If a network connection can't be made at boot time and configuring Wi-Fi is disabled then network escape hatch will be shown in order to refresh the device policy (see networkEscapeHatchEnabled).
     #[serde(rename = "wifiConfigDisabled")]
     pub wifi_config_disabled: Option<bool>,
-    /// DEPRECATED - Use wifi_config_disabled.
+    /// This is deprecated.
     #[serde(rename = "wifiConfigsLockdownEnabled")]
     pub wifi_configs_lockdown_enabled: Option<bool>,
+    /// Optional. Wipe flags to indicate what data is wiped when a device or profile wipe is triggered due to any reason (for example, non-compliance). This does not apply to the enterprises.devices.delete method. . This list must not have duplicates.
+    #[serde(rename = "wipeDataFlags")]
+    pub wipe_data_flags: Option<Vec<String>>,
+    /// Optional. Controls the work account setup configuration, such as details of whether a Google authenticated account is required.
+    #[serde(rename = "workAccountSetupConfig")]
+    pub work_account_setup_config: Option<WorkAccountSetupConfig>,
 }
 
 impl common::RequestValue for Policy {}
@@ -2424,6 +2943,45 @@ pub struct PowerManagementEvent {
 }
 
 impl common::Part for PowerManagementEvent {}
+
+/// Individual preferential network service configuration.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct PreferentialNetworkServiceConfig {
+    /// Optional. Whether fallback to the device-wide default network is allowed. If this is set to FALLBACK_TO_DEFAULT_CONNECTION_ALLOWED, then nonMatchingNetworks must not be set to NON_MATCHING_NETWORKS_DISALLOWED, the policy will be rejected otherwise. Note: If this is set to FALLBACK_TO_DEFAULT_CONNECTION_DISALLOWED, applications are not able to access the internet if the 5G slice is not available.
+    #[serde(rename = "fallbackToDefaultConnection")]
+    pub fallback_to_default_connection: Option<String>,
+    /// Optional. Whether apps this configuration applies to are blocked from using networks other than the preferential service. If this is set to NON_MATCHING_NETWORKS_DISALLOWED, then fallbackToDefaultConnection must be set to FALLBACK_TO_DEFAULT_CONNECTION_DISALLOWED.
+    #[serde(rename = "nonMatchingNetworks")]
+    pub non_matching_networks: Option<String>,
+    /// Required. Preferential network identifier. This must not be set to NO_PREFERENTIAL_NETWORK or PREFERENTIAL_NETWORK_ID_UNSPECIFIED, the policy will be rejected otherwise.
+    #[serde(rename = "preferentialNetworkId")]
+    pub preferential_network_id: Option<String>,
+}
+
+impl common::Part for PreferentialNetworkServiceConfig {}
+
+/// Preferential network service settings.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct PreferentialNetworkServiceSettings {
+    /// Required. Default preferential network ID for the applications that are not in applications or if ApplicationPolicy.preferentialNetworkId is set to PREFERENTIAL_NETWORK_ID_UNSPECIFIED. There must be a configuration for the specified network ID in preferentialNetworkServiceConfigs, unless this is set to NO_PREFERENTIAL_NETWORK. If set to PREFERENTIAL_NETWORK_ID_UNSPECIFIED or unset, this defaults to NO_PREFERENTIAL_NETWORK. Note: If the default preferential network is misconfigured, applications with no ApplicationPolicy.preferentialNetworkId set are not able to access the internet. This setting does not apply to the following critical apps: com.google.android.apps.work.clouddpc com.google.android.gmsApplicationPolicy.preferentialNetworkId can still be used to configure the preferential network for them.
+    #[serde(rename = "defaultPreferentialNetworkId")]
+    pub default_preferential_network_id: Option<String>,
+    /// Required. Preferential network service configurations which enables having multiple enterprise slices. There must not be multiple configurations with the same preferentialNetworkId. If a configuration is not referenced by any application by setting ApplicationPolicy.preferentialNetworkId or by setting defaultPreferentialNetworkId, it will be ignored. For devices on 4G networks, enterprise APN needs to be configured additionally to set up data call for preferential network service. These APNs can be added using apnPolicy.
+    #[serde(rename = "preferentialNetworkServiceConfigs")]
+    pub preferential_network_service_configs: Option<Vec<PreferentialNetworkServiceConfig>>,
+}
+
+impl common::Part for PreferentialNetworkServiceSettings {}
 
 /// Information about a device that is available during setup.
 ///
@@ -2489,6 +3047,105 @@ pub struct ProxyInfo {
 
 impl common::Part for ProxyInfo {}
 
+/// Parameters associated with the REMOVE_ESIM command to remove an eSIM profile from the device.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct RemoveEsimParams {
+    /// Required. ICC ID of the eSIM profile to be deleted.
+    #[serde(rename = "iccId")]
+    pub icc_id: Option<String>,
+}
+
+impl common::Part for RemoveEsimParams {}
+
+/// Request to remove ApplicationPolicy objects in the given policy.
+///
+/// # Activities
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+///
+/// * [policies remove policy applications enterprises](EnterprisePolicyRemovePolicyApplicationCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct RemovePolicyApplicationsRequest {
+    /// Required. Package names to be removed. Entries that are not found are ignored. There must be at least one entry in package_names.
+    #[serde(rename = "packageNames")]
+    pub package_names: Option<Vec<String>>,
+}
+
+impl common::RequestValue for RemovePolicyApplicationsRequest {}
+
+/// Response to a request to remove ApplicationPolicy objects in the given policy.
+///
+/// # Activities
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+///
+/// * [policies remove policy applications enterprises](EnterprisePolicyRemovePolicyApplicationCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct RemovePolicyApplicationsResponse {
+    /// The updated policy after ApplicationPolicy objects have been removed.
+    pub policy: Option<Policy>,
+}
+
+impl common::ResponseResult for RemovePolicyApplicationsResponse {}
+
+/// Parameters associated with the REQUEST_DEVICE_INFO command to get device related information.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct RequestDeviceInfoParams {
+    /// Required. Type of device information to be requested.
+    #[serde(rename = "deviceInfo")]
+    pub device_info: Option<String>,
+}
+
+impl common::Part for RequestDeviceInfoParams {}
+
+/// Status of the REQUEST_DEVICE_INFO command.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct RequestDeviceInfoStatus {
+    /// Information related to the EIDs of the device.
+    #[serde(rename = "eidInfo")]
+    pub eid_info: Option<EidInfo>,
+    /// Output only. Status of a REQUEST_DEVICE_INFO command.
+    pub status: Option<String>,
+}
+
+impl common::Part for RequestDeviceInfoStatus {}
+
+/// Role an app can have.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct Role {
+    /// Required. The type of the role an app can have.
+    #[serde(rename = "roleType")]
+    pub role_type: Option<String>,
+}
+
+impl common::Part for Role {}
+
 /// Controls for the screen brightness settings.
 ///
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -2497,7 +3154,7 @@ impl common::Part for ProxyInfo {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct ScreenBrightnessSettings {
-    /// Optional. The screen brightness between 1 and 255 where 1 is the lowest and 255 is the highest brightness. A value of 0 (default) means no screen brightness set. Any other value is rejected. screenBrightnessMode must be either BRIGHTNESS_AUTOMATIC or BRIGHTNESS_FIXED to set this. Supported on Android 9 and above on fully managed devices. A NonComplianceDetail with API_LEVEL is reported if the Android version is less than 9.
+    /// Optional. The screen brightness between 1 and 255 where 1 is the lowest and 255 is the highest brightness. A value of 0 (default) means no screen brightness set. Any other value is rejected. screenBrightnessMode must be either BRIGHTNESS_AUTOMATIC or BRIGHTNESS_FIXED to set this. Supported on Android 9 and above on fully managed devices. A NonComplianceDetail with API_LEVEL is reported if the Android version is less than 9. Supported on work profiles on company-owned devices on Android 15 and above.
     #[serde(rename = "screenBrightness")]
     pub screen_brightness: Option<i32>,
     /// Optional. Controls the screen brightness mode.
@@ -2515,7 +3172,7 @@ impl common::Part for ScreenBrightnessSettings {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct ScreenTimeoutSettings {
-    /// Optional. Controls the screen timeout duration. The screen timeout duration must be greater than 0, otherwise it is rejected. Additionally, it should not be greater than maximumTimeToLock, otherwise the screen timeout is set to maximumTimeToLock and a NonComplianceDetail with INVALID_VALUE reason and SCREEN_TIMEOUT_GREATER_THAN_MAXIMUM_TIME_TO_LOCK specific reason is reported. If the screen timeout is less than a certain lower bound, it is set to the lower bound. The lower bound may vary across devices. If this is set, screenTimeoutMode must be SCREEN_TIMEOUT_ENFORCED. Supported on Android 9 and above on fully managed devices. A NonComplianceDetail with API_LEVEL is reported if the Android version is less than 9.
+    /// Optional. Controls the screen timeout duration. The screen timeout duration must be greater than 0, otherwise it is rejected. Additionally, it should not be greater than maximumTimeToLock, otherwise the screen timeout is set to maximumTimeToLock and a NonComplianceDetail with INVALID_VALUE reason and SCREEN_TIMEOUT_GREATER_THAN_MAXIMUM_TIME_TO_LOCK specific reason is reported. If the screen timeout is less than a certain lower bound, it is set to the lower bound. The lower bound may vary across devices. If this is set, screenTimeoutMode must be SCREEN_TIMEOUT_ENFORCED. Supported on Android 9 and above on fully managed devices. A NonComplianceDetail with API_LEVEL is reported if the Android version is less than 9. Supported on work profiles on company-owned devices on Android 15 and above.
     #[serde(rename = "screenTimeout")]
     #[serde_as(as = "Option<common::serde::duration::Wrapper>")]
     pub screen_timeout: Option<chrono::Duration>,
@@ -2574,6 +3231,9 @@ pub struct SigninDetail {
     /// Controls whether personal usage is allowed on a device provisioned with this enrollment token.For company-owned devices: Enabling personal usage allows the user to set up a work profile on the device. Disabling personal usage requires the user provision the device as a fully managed device.For personally-owned devices: Enabling personal usage allows the user to set up a work profile on the device. Disabling personal usage will prevent the device from provisioning. Personal usage cannot be disabled on personally-owned device.
     #[serde(rename = "allowPersonalUsage")]
     pub allow_personal_usage: Option<String>,
+    /// Optional. Whether the sign-in URL should be used by default for the enterprise. The SigninDetail with defaultStatus set to SIGNIN_DETAIL_IS_DEFAULT is used for Google account enrollment method. Only one of an enterprise's signinDetails can have defaultStatus set to SIGNIN_DETAIL_IS_DEFAULT. If an Enterprise has at least one signinDetails and none of them have defaultStatus set to SIGNIN_DETAIL_IS_DEFAULT then the first one from the list is selected and has set defaultStatus to SIGNIN_DETAIL_IS_DEFAULT. If no signinDetails specified for the Enterprise then the Google Account device enrollment will fail.
+    #[serde(rename = "defaultStatus")]
+    pub default_status: Option<String>,
     /// A JSON string whose UTF-8 representation can be used to generate a QR code to enroll a device with this enrollment token. To enroll a device using NFC, the NFC record must contain a serialized java.util.Properties representation of the properties in the JSON. This is a read-only field generated by the server.
     #[serde(rename = "qrCode")]
     pub qr_code: Option<String>,
@@ -2664,6 +3324,9 @@ impl common::Part for SoftwareInfo {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct SpecificNonComplianceContext {
+    /// Output only. Additional context for non-compliance related to default application settings. See DEFAULT_APPLICATION_SETTING_FAILED_FOR_SCOPE.
+    #[serde(rename = "defaultApplicationContext")]
+    pub default_application_context: Option<DefaultApplicationContext>,
     /// Additional context for non-compliance related to Wi-Fi configuration. See ONC_WIFI_INVALID_VALUE and ONC_WIFI_API_LEVEL
     #[serde(rename = "oncWifiContext")]
     pub onc_wifi_context: Option<OncWifiContext>,
@@ -2747,9 +3410,12 @@ pub struct StatusReportingSettings {
     /// Whether app reports are enabled.
     #[serde(rename = "applicationReportsEnabled")]
     pub application_reports_enabled: Option<bool>,
-    /// Whether Common Criteria Mode reporting is enabled.
+    /// Whether Common Criteria Mode reporting is enabled. This is supported only on company-owned devices.
     #[serde(rename = "commonCriteriaModeEnabled")]
     pub common_criteria_mode_enabled: Option<bool>,
+    /// Optional. Whether defaultApplicationInfo reporting is enabled.
+    #[serde(rename = "defaultApplicationInfoReportingEnabled")]
+    pub default_application_info_reporting_enabled: Option<bool>,
     /// Whether device settings reporting is enabled.
     #[serde(rename = "deviceSettingsEnabled")]
     pub device_settings_enabled: Option<bool>,
@@ -2855,9 +3521,18 @@ impl common::Part for SystemUpdateInfo {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct TelephonyInfo {
+    /// Output only. Activation state of the SIM card on the device. This is applicable for eSIMs only. This is supported on all devices for API level 35 and above. This is always ACTIVATION_STATE_UNSPECIFIED for physical SIMs and for devices below API level 35.
+    #[serde(rename = "activationState")]
+    pub activation_state: Option<String>,
     /// The carrier name associated with this SIM card.
     #[serde(rename = "carrierName")]
     pub carrier_name: Option<String>,
+    /// Output only. The configuration mode of the SIM card on the device. This is applicable for eSIMs only. This is supported on all devices for API level 35 and above. This is always CONFIG_MODE_UNSPECIFIED for physical SIMs and for devices below API level 35.
+    #[serde(rename = "configMode")]
+    pub config_mode: Option<String>,
+    /// Output only. The ICCID associated with this SIM card.
+    #[serde(rename = "iccId")]
+    pub icc_id: Option<String>,
     /// The phone number associated with this SIM card.
     #[serde(rename = "phoneNumber")]
     pub phone_number: Option<String>,
@@ -3011,6 +3686,39 @@ pub struct WebToken {
 impl common::RequestValue for WebToken {}
 impl common::ResponseResult for WebToken {}
 
+/// Wi-Fi roaming policy.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct WifiRoamingPolicy {
+    /// Optional. Wi-Fi roaming settings. SSIDs provided in this list must be unique, the policy will be rejected otherwise.
+    #[serde(rename = "wifiRoamingSettings")]
+    pub wifi_roaming_settings: Option<Vec<WifiRoamingSetting>>,
+}
+
+impl common::Part for WifiRoamingPolicy {}
+
+/// Wi-Fi roaming setting.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct WifiRoamingSetting {
+    /// Required. Wi-Fi roaming mode for the specified SSID.
+    #[serde(rename = "wifiRoamingMode")]
+    pub wifi_roaming_mode: Option<String>,
+    /// Required. SSID of the Wi-Fi network.
+    #[serde(rename = "wifiSsid")]
+    pub wifi_ssid: Option<String>,
+}
+
+impl common::Part for WifiRoamingSetting {}
+
 /// Represents a Wi-Fi SSID.
 ///
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -3037,7 +3745,7 @@ pub struct WifiSsidPolicy {
     /// Type of the Wi-Fi SSID policy to be applied.
     #[serde(rename = "wifiSsidPolicyType")]
     pub wifi_ssid_policy_type: Option<String>,
-    /// Optional. List of Wi-Fi SSIDs that should be applied in the policy. This field must be non-empty when WifiSsidPolicyType is set to WIFI_SSID_ALLOWLIST. If this is set to a non-empty list, then a nonComplianceDetail detail with API_LEVEL is reported if the Android version is less than 13 and a nonComplianceDetail with MANAGEMENT_MODE is reported for non-company-owned devices.
+    /// Optional. List of Wi-Fi SSIDs that should be applied in the policy. This field must be non-empty when WifiSsidPolicyType is set to WIFI_SSID_ALLOWLIST. If this is set to a non-empty list, then a NonComplianceDetail detail with API_LEVEL is reported if the Android version is less than 13 and a NonComplianceDetail with MANAGEMENT_MODE is reported for non-company-owned devices.
     #[serde(rename = "wifiSsids")]
     pub wifi_ssids: Option<Vec<WifiSsid>>,
 }
@@ -3062,6 +3770,42 @@ pub struct WipeAction {
 
 impl common::Part for WipeAction {}
 
+/// Parameters associated with the WIPE command to wipe the device.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct WipeParams {
+    /// Optional. Flags to determine what data to wipe.
+    #[serde(rename = "wipeDataFlags")]
+    pub wipe_data_flags: Option<Vec<String>>,
+    /// Optional. A short message displayed to the user before wiping the work profile on personal devices. This has no effect on company owned devices. The maximum message length is 200 characters.
+    #[serde(rename = "wipeReason")]
+    pub wipe_reason: Option<UserFacingMessage>,
+}
+
+impl common::Part for WipeParams {}
+
+/// Controls the work account setup configuration, such as details of whether a Google authenticated account is required.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct WorkAccountSetupConfig {
+    /// Optional. The authentication type of the user on the device.
+    #[serde(rename = "authenticationType")]
+    pub authentication_type: Option<String>,
+    /// Optional. The specific google work account email address to be added. This field is only relevant if authenticationType is GOOGLE_AUTHENTICATED. This must be an enterprise account and not a consumer account. Once set and a Google authenticated account is added to the device, changing this field will have no effect, and thus recommended to be set only once.
+    #[serde(rename = "requiredAccountEmail")]
+    pub required_account_email: Option<String>,
+}
+
+impl common::Part for WorkAccountSetupConfig {}
+
 // ###################
 // MethodBuilders ###
 // #################
@@ -3082,9 +3826,20 @@ impl common::Part for WipeAction {}
 /// use androidmanagement1::{AndroidManagement, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let connector = hyper_rustls::HttpsConnectorBuilder::new()
+///     .with_native_roots()
+///     .unwrap()
+///     .https_only()
+///     .enable_http2()
+///     .build();
+///
+/// let executor = hyper_util::rt::TokioExecutor::new();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 ///     secret,
 ///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///     yup_oauth2::client::CustomHyperClientBuilder::from(
+///         hyper_util::client::legacy::Client::builder(executor).build(connector),
+///     ),
 /// ).build().await.unwrap();
 ///
 /// let client = hyper_util::client::legacy::Client::builder(
@@ -3095,12 +3850,12 @@ impl common::Part for WipeAction {}
 ///         .with_native_roots()
 ///         .unwrap()
 ///         .https_or_http()
-///         .enable_http1()
+///         .enable_http2()
 ///         .build()
 /// );
 /// let mut hub = AndroidManagement::new(client, auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `applications_get(...)`, `create(...)`, `delete(...)`, `devices_delete(...)`, `devices_get(...)`, `devices_issue_command(...)`, `devices_list(...)`, `devices_operations_cancel(...)`, `devices_operations_get(...)`, `devices_operations_list(...)`, `devices_patch(...)`, `enrollment_tokens_create(...)`, `enrollment_tokens_delete(...)`, `enrollment_tokens_get(...)`, `enrollment_tokens_list(...)`, `get(...)`, `list(...)`, `migration_tokens_create(...)`, `migration_tokens_get(...)`, `migration_tokens_list(...)`, `patch(...)`, `policies_delete(...)`, `policies_get(...)`, `policies_list(...)`, `policies_patch(...)`, `web_apps_create(...)`, `web_apps_delete(...)`, `web_apps_get(...)`, `web_apps_list(...)`, `web_apps_patch(...)` and `web_tokens_create(...)`
+/// // like `applications_get(...)`, `create(...)`, `delete(...)`, `devices_delete(...)`, `devices_get(...)`, `devices_issue_command(...)`, `devices_list(...)`, `devices_operations_cancel(...)`, `devices_operations_get(...)`, `devices_operations_list(...)`, `devices_patch(...)`, `enrollment_tokens_create(...)`, `enrollment_tokens_delete(...)`, `enrollment_tokens_get(...)`, `enrollment_tokens_list(...)`, `generate_enterprise_upgrade_url(...)`, `get(...)`, `list(...)`, `migration_tokens_create(...)`, `migration_tokens_get(...)`, `migration_tokens_list(...)`, `patch(...)`, `policies_delete(...)`, `policies_get(...)`, `policies_list(...)`, `policies_modify_policy_applications(...)`, `policies_patch(...)`, `policies_remove_policy_applications(...)`, `web_apps_create(...)`, `web_apps_delete(...)`, `web_apps_get(...)`, `web_apps_list(...)`, `web_apps_patch(...)` and `web_tokens_create(...)`
 /// // to build up your call.
 /// let rb = hub.enterprises();
 /// # }
@@ -3181,6 +3936,7 @@ impl<'a, C> EnterpriseMethods<'a, C> {
         EnterpriseDeviceOperationListCall {
             hub: self.hub,
             _name: name.to_string(),
+            _return_partial_success: Default::default(),
             _page_token: Default::default(),
             _page_size: Default::default(),
             _filter: Default::default(),
@@ -3192,7 +3948,7 @@ impl<'a, C> EnterpriseMethods<'a, C> {
 
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes a device. This operation wipes the device. Deleted devices do not show up in enterprises.devices.list calls and a 404 is returned from enterprises.devices.get.
+    /// Deletes a device. This operation attempts to wipe the device but this is not guaranteed to succeed if the device is offline for an extended period. Deleted devices do not show up in enterprises.devices.list calls and a 404 is returned from enterprises.devices.get.
     ///
     /// # Arguments
     ///
@@ -3290,7 +4046,7 @@ impl<'a, C> EnterpriseMethods<'a, C> {
 
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates an enrollment token for a given enterprise. It's up to the caller's responsibility to manage the lifecycle of newly created tokens and deleting them when they're not intended to be used anymore. Once an enrollment token has been created, it's not possible to retrieve the token's content anymore using AM API. It is recommended for EMMs to securely store the token if it's intended to be reused.
+    /// Creates an enrollment token for a given enterprise. It's up to the caller's responsibility to manage the lifecycle of newly created tokens and deleting them when they're not intended to be used anymore.
     ///
     /// # Arguments
     ///
@@ -3481,6 +4237,29 @@ impl<'a, C> EnterpriseMethods<'a, C> {
 
     /// Create a builder to help you perform the following task:
     ///
+    /// Updates or creates applications in a policy.
+    ///
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `name` - Required. The name of the Policy containing the ApplicationPolicy objects to be updated, in the form enterprises/{enterpriseId}/policies/{policyId}.
+    pub fn policies_modify_policy_applications(
+        &self,
+        request: ModifyPolicyApplicationsRequest,
+        name: &str,
+    ) -> EnterprisePolicyModifyPolicyApplicationCall<'a, C> {
+        EnterprisePolicyModifyPolicyApplicationCall {
+            hub: self.hub,
+            _request: request,
+            _name: name.to_string(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
     /// Updates or creates a policy.
     ///
     /// # Arguments
@@ -3493,6 +4272,29 @@ impl<'a, C> EnterpriseMethods<'a, C> {
             _request: request,
             _name: name.to_string(),
             _update_mask: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Removes applications in a policy.
+    ///
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `name` - Required. The name of the policy containing the ApplicationPolicy objects to be removed, in the form enterprises/{enterpriseId}/policies/{policyId}.
+    pub fn policies_remove_policy_applications(
+        &self,
+        request: RemovePolicyApplicationsRequest,
+        name: &str,
+    ) -> EnterprisePolicyRemovePolicyApplicationCall<'a, C> {
+        EnterprisePolicyRemovePolicyApplicationCall {
+            hub: self.hub,
+            _request: request,
+            _name: name.to_string(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
             _scopes: Default::default(),
@@ -3545,7 +4347,7 @@ impl<'a, C> EnterpriseMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `name` - The name of the web app in the form enterprises/{enterpriseId}/webApp/{packageName}.
+    /// * `name` - The name of the web app in the form enterprises/{enterpriseId}/webApps/{packageName}.
     pub fn web_apps_get(&self, name: &str) -> EnterpriseWebAppGetCall<'a, C> {
         EnterpriseWebAppGetCall {
             hub: self.hub,
@@ -3658,6 +4460,29 @@ impl<'a, C> EnterpriseMethods<'a, C> {
 
     /// Create a builder to help you perform the following task:
     ///
+    /// Generates an enterprise upgrade URL to upgrade an existing managed Google Play Accounts enterprise to a managed Google domain. See the guide (https://developers.google.com/android/management/upgrade-an-enterprise) for more details.
+    ///
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `name` - Required. The name of the enterprise to be upgraded in the form enterprises/{enterpriseId}.
+    pub fn generate_enterprise_upgrade_url(
+        &self,
+        request: GenerateEnterpriseUpgradeUrlRequest,
+        name: &str,
+    ) -> EnterpriseGenerateEnterpriseUpgradeUrlCall<'a, C> {
+        EnterpriseGenerateEnterpriseUpgradeUrlCall {
+            hub: self.hub,
+            _request: request,
+            _name: name.to_string(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
     /// Gets an enterprise.
     ///
     /// # Arguments
@@ -3726,9 +4551,20 @@ impl<'a, C> EnterpriseMethods<'a, C> {
 /// use androidmanagement1::{AndroidManagement, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let connector = hyper_rustls::HttpsConnectorBuilder::new()
+///     .with_native_roots()
+///     .unwrap()
+///     .https_only()
+///     .enable_http2()
+///     .build();
+///
+/// let executor = hyper_util::rt::TokioExecutor::new();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 ///     secret,
 ///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///     yup_oauth2::client::CustomHyperClientBuilder::from(
+///         hyper_util::client::legacy::Client::builder(executor).build(connector),
+///     ),
 /// ).build().await.unwrap();
 ///
 /// let client = hyper_util::client::legacy::Client::builder(
@@ -3739,7 +4575,7 @@ impl<'a, C> EnterpriseMethods<'a, C> {
 ///         .with_native_roots()
 ///         .unwrap()
 ///         .https_or_http()
-///         .enable_http1()
+///         .enable_http2()
 ///         .build()
 /// );
 /// let mut hub = AndroidManagement::new(client, auth);
@@ -3793,9 +4629,20 @@ impl<'a, C> ProvisioningInfoMethods<'a, C> {
 /// use androidmanagement1::{AndroidManagement, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let connector = hyper_rustls::HttpsConnectorBuilder::new()
+///     .with_native_roots()
+///     .unwrap()
+///     .https_only()
+///     .enable_http2()
+///     .build();
+///
+/// let executor = hyper_util::rt::TokioExecutor::new();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 ///     secret,
 ///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///     yup_oauth2::client::CustomHyperClientBuilder::from(
+///         hyper_util::client::legacy::Client::builder(executor).build(connector),
+///     ),
 /// ).build().await.unwrap();
 ///
 /// let client = hyper_util::client::legacy::Client::builder(
@@ -3806,7 +4653,7 @@ impl<'a, C> ProvisioningInfoMethods<'a, C> {
 ///         .with_native_roots()
 ///         .unwrap()
 ///         .https_or_http()
-///         .enable_http1()
+///         .enable_http2()
 ///         .build()
 /// );
 /// let mut hub = AndroidManagement::new(client, auth);
@@ -3834,6 +4681,7 @@ impl<'a, C> SignupUrlMethods<'a, C> {
             hub: self.hub,
             _project_id: Default::default(),
             _callback_url: Default::default(),
+            _allowed_domains: Default::default(),
             _admin_email: Default::default(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
@@ -3863,9 +4711,20 @@ impl<'a, C> SignupUrlMethods<'a, C> {
 /// # use androidmanagement1::{AndroidManagement, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -3876,7 +4735,7 @@ impl<'a, C> SignupUrlMethods<'a, C> {
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = AndroidManagement::new(client, auth);
@@ -3884,7 +4743,7 @@ impl<'a, C> SignupUrlMethods<'a, C> {
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.enterprises().applications_get("name")
-///              .language_code("Lorem")
+///              .language_code("ipsum")
 ///              .doit().await;
 /// # }
 /// ```
@@ -4160,9 +5019,20 @@ where
 /// # use androidmanagement1::{AndroidManagement, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -4173,7 +5043,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = AndroidManagement::new(client, auth);
@@ -4445,9 +5315,20 @@ where
 /// # use androidmanagement1::{AndroidManagement, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -4458,7 +5339,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = AndroidManagement::new(client, auth);
@@ -4730,9 +5611,20 @@ where
 /// # use androidmanagement1::{AndroidManagement, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -4743,7 +5635,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = AndroidManagement::new(client, auth);
@@ -4751,9 +5643,10 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.enterprises().devices_operations_list("name")
-///              .page_token("ea")
-///              .page_size(-55)
-///              .filter("invidunt")
+///              .return_partial_success(true)
+///              .page_token("sed")
+///              .page_size(-37)
+///              .filter("gubergren")
 ///              .doit().await;
 /// # }
 /// ```
@@ -4763,6 +5656,7 @@ where
 {
     hub: &'a AndroidManagement<C>,
     _name: String,
+    _return_partial_success: Option<bool>,
     _page_token: Option<String>,
     _page_size: Option<i32>,
     _filter: Option<String>,
@@ -4792,15 +5686,27 @@ where
             http_method: hyper::Method::GET,
         });
 
-        for &field in ["alt", "name", "pageToken", "pageSize", "filter"].iter() {
+        for &field in [
+            "alt",
+            "name",
+            "returnPartialSuccess",
+            "pageToken",
+            "pageSize",
+            "filter",
+        ]
+        .iter()
+        {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(common::Error::FieldClash(field));
             }
         }
 
-        let mut params = Params::with_capacity(6 + self._additional_params.len());
+        let mut params = Params::with_capacity(7 + self._additional_params.len());
         params.push("name", self._name);
+        if let Some(value) = self._return_partial_success.as_ref() {
+            params.push("returnPartialSuccess", value.to_string());
+        }
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -4928,6 +5834,16 @@ where
         self._name = new_value.to_string();
         self
     }
+    /// When set to true, operations that are reachable are returned as normal, and those that are unreachable are returned in the ListOperationsResponse.unreachable field.This can only be true when reading across collections. For example, when parent is set to "projects/example/locations/-".This field is not supported by default and will result in an UNIMPLEMENTED error if set unless explicitly documented otherwise in service or product specific documentation.
+    ///
+    /// Sets the *return partial success* query property to the given value.
+    pub fn return_partial_success(
+        mut self,
+        new_value: bool,
+    ) -> EnterpriseDeviceOperationListCall<'a, C> {
+        self._return_partial_success = Some(new_value);
+        self
+    }
     /// The standard list page token.
     ///
     /// Sets the *page token* query property to the given value.
@@ -5034,7 +5950,7 @@ where
     }
 }
 
-/// Deletes a device. This operation wipes the device. Deleted devices do not show up in enterprises.devices.list calls and a 404 is returned from enterprises.devices.get.
+/// Deletes a device. This operation attempts to wipe the device but this is not guaranteed to succeed if the device is offline for an extended period. Deleted devices do not show up in enterprises.devices.list calls and a 404 is returned from enterprises.devices.get.
 ///
 /// A builder for the *devices.delete* method supported by a *enterprise* resource.
 /// It is not used directly, but through a [`EnterpriseMethods`] instance.
@@ -5051,9 +5967,20 @@ where
 /// # use androidmanagement1::{AndroidManagement, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -5064,7 +5991,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = AndroidManagement::new(client, auth);
@@ -5072,7 +5999,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.enterprises().devices_delete("name")
-///              .wipe_reason_message("duo")
+///              .wipe_reason_message("est")
 ///              .add_wipe_data_flags("ipsum")
 ///              .doit().await;
 /// # }
@@ -5363,9 +6290,20 @@ where
 /// # use androidmanagement1::{AndroidManagement, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -5376,7 +6314,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = AndroidManagement::new(client, auth);
@@ -5649,9 +6587,20 @@ where
 /// # use androidmanagement1::{AndroidManagement, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -5662,7 +6611,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = AndroidManagement::new(client, auth);
@@ -5970,9 +6919,20 @@ where
 /// # use androidmanagement1::{AndroidManagement, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -5983,7 +6943,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = AndroidManagement::new(client, auth);
@@ -5991,8 +6951,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.enterprises().devices_list("parent")
-///              .page_token("rebum.")
-///              .page_size(-57)
+///              .page_token("ea")
+///              .page_size(-99)
 ///              .doit().await;
 /// # }
 /// ```
@@ -6170,7 +7130,7 @@ where
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// The requested page size. The actual page size may be fixed to a min or max value.
+    /// The requested page size. If unspecified, at most 10 devices will be returned. The maximum value is 100; values above 100 will be coerced to 100. The limits can change over time.
     ///
     /// Sets the *page size* query property to the given value.
     pub fn page_size(mut self, new_value: i32) -> EnterpriseDeviceListCall<'a, C> {
@@ -6280,9 +7240,20 @@ where
 /// # use androidmanagement1::{AndroidManagement, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -6293,7 +7264,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = AndroidManagement::new(client, auth);
@@ -6596,7 +7567,7 @@ where
     }
 }
 
-/// Creates an enrollment token for a given enterprise. It's up to the caller's responsibility to manage the lifecycle of newly created tokens and deleting them when they're not intended to be used anymore. Once an enrollment token has been created, it's not possible to retrieve the token's content anymore using AM API. It is recommended for EMMs to securely store the token if it's intended to be reused.
+/// Creates an enrollment token for a given enterprise. It's up to the caller's responsibility to manage the lifecycle of newly created tokens and deleting them when they're not intended to be used anymore.
 ///
 /// A builder for the *enrollmentTokens.create* method supported by a *enterprise* resource.
 /// It is not used directly, but through a [`EnterpriseMethods`] instance.
@@ -6614,9 +7585,20 @@ where
 /// # use androidmanagement1::{AndroidManagement, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -6627,7 +7609,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = AndroidManagement::new(client, auth);
@@ -6938,9 +7920,20 @@ where
 /// # use androidmanagement1::{AndroidManagement, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -6951,7 +7944,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = AndroidManagement::new(client, auth);
@@ -7223,9 +8216,20 @@ where
 /// # use androidmanagement1::{AndroidManagement, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -7236,7 +8240,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = AndroidManagement::new(client, auth);
@@ -7508,9 +8512,20 @@ where
 /// # use androidmanagement1::{AndroidManagement, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -7521,7 +8536,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = AndroidManagement::new(client, auth);
@@ -7529,8 +8544,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.enterprises().enrollment_tokens_list("parent")
-///              .page_token("dolor")
-///              .page_size(-56)
+///              .page_token("sed")
+///              .page_size(-61)
 ///              .doit().await;
 /// # }
 /// ```
@@ -7820,9 +8835,20 @@ where
 /// # use androidmanagement1::{AndroidManagement, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -7833,7 +8859,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = AndroidManagement::new(client, auth);
@@ -8144,9 +9170,20 @@ where
 /// # use androidmanagement1::{AndroidManagement, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -8157,7 +9194,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = AndroidManagement::new(client, auth);
@@ -8429,9 +9466,20 @@ where
 /// # use androidmanagement1::{AndroidManagement, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -8442,7 +9490,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = AndroidManagement::new(client, auth);
@@ -8450,8 +9498,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.enterprises().migration_tokens_list("parent")
-///              .page_token("duo")
-///              .page_size(-80)
+///              .page_token("sed")
+///              .page_size(-24)
 ///              .doit().await;
 /// # }
 /// ```
@@ -8738,9 +9786,20 @@ where
 /// # use androidmanagement1::{AndroidManagement, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -8751,7 +9810,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = AndroidManagement::new(client, auth);
@@ -9023,9 +10082,20 @@ where
 /// # use androidmanagement1::{AndroidManagement, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -9036,7 +10106,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = AndroidManagement::new(client, auth);
@@ -9308,9 +10378,20 @@ where
 /// # use androidmanagement1::{AndroidManagement, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -9321,7 +10402,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = AndroidManagement::new(client, auth);
@@ -9329,8 +10410,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.enterprises().policies_list("parent")
-///              .page_token("et")
-///              .page_size(-43)
+///              .page_token("sed")
+///              .page_size(-20)
 ///              .doit().await;
 /// # }
 /// ```
@@ -9600,6 +10681,351 @@ where
     }
 }
 
+/// Updates or creates applications in a policy.
+///
+/// A builder for the *policies.modifyPolicyApplications* method supported by a *enterprise* resource.
+/// It is not used directly, but through a [`EnterpriseMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_androidmanagement1 as androidmanagement1;
+/// use androidmanagement1::api::ModifyPolicyApplicationsRequest;
+/// # async fn dox() {
+/// # use androidmanagement1::{AndroidManagement, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = AndroidManagement::new(client, auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = ModifyPolicyApplicationsRequest::default();
+///
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.enterprises().policies_modify_policy_applications(req, "name")
+///              .doit().await;
+/// # }
+/// ```
+pub struct EnterprisePolicyModifyPolicyApplicationCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a AndroidManagement<C>,
+    _request: ModifyPolicyApplicationsRequest,
+    _name: String,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder for EnterprisePolicyModifyPolicyApplicationCall<'a, C> {}
+
+impl<'a, C> EnterprisePolicyModifyPolicyApplicationCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(
+        mut self,
+    ) -> common::Result<(common::Response, ModifyPolicyApplicationsResponse)> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "androidmanagement.enterprises.policies.modifyPolicyApplications",
+            http_method: hyper::Method::POST,
+        });
+
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("name", self._name);
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+name}:modifyPolicyApplications";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader = {
+            let mut value = serde_json::value::to_value(&self._request).expect("serde to work");
+            common::remove_json_null_values(&mut value);
+            let mut dst = std::io::Cursor::new(Vec::with_capacity(128));
+            serde_json::to_writer(&mut dst, &value).unwrap();
+            dst
+        };
+        let request_size = request_value_reader
+            .seek(std::io::SeekFrom::End(0))
+            .unwrap();
+        request_value_reader
+            .seek(std::io::SeekFrom::Start(0))
+            .unwrap();
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            request_value_reader
+                .seek(std::io::SeekFrom::Start(0))
+                .unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_TYPE, json_mime_type.to_string())
+                    .header(CONTENT_LENGTH, request_size as u64)
+                    .body(common::to_body(
+                        request_value_reader.get_ref().clone().into(),
+                    ));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(
+        mut self,
+        new_value: ModifyPolicyApplicationsRequest,
+    ) -> EnterprisePolicyModifyPolicyApplicationCall<'a, C> {
+        self._request = new_value;
+        self
+    }
+    /// Required. The name of the Policy containing the ApplicationPolicy objects to be updated, in the form enterprises/{enterpriseId}/policies/{policyId}.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> EnterprisePolicyModifyPolicyApplicationCall<'a, C> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> EnterprisePolicyModifyPolicyApplicationCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(
+        mut self,
+        name: T,
+        value: T,
+    ) -> EnterprisePolicyModifyPolicyApplicationCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Full`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> EnterprisePolicyModifyPolicyApplicationCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(
+        mut self,
+        scopes: I,
+    ) -> EnterprisePolicyModifyPolicyApplicationCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> EnterprisePolicyModifyPolicyApplicationCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
 /// Updates or creates a policy.
 ///
 /// A builder for the *policies.patch* method supported by a *enterprise* resource.
@@ -9618,9 +11044,20 @@ where
 /// # use androidmanagement1::{AndroidManagement, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -9631,7 +11068,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = AndroidManagement::new(client, auth);
@@ -9934,6 +11371,351 @@ where
     }
 }
 
+/// Removes applications in a policy.
+///
+/// A builder for the *policies.removePolicyApplications* method supported by a *enterprise* resource.
+/// It is not used directly, but through a [`EnterpriseMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_androidmanagement1 as androidmanagement1;
+/// use androidmanagement1::api::RemovePolicyApplicationsRequest;
+/// # async fn dox() {
+/// # use androidmanagement1::{AndroidManagement, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = AndroidManagement::new(client, auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = RemovePolicyApplicationsRequest::default();
+///
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.enterprises().policies_remove_policy_applications(req, "name")
+///              .doit().await;
+/// # }
+/// ```
+pub struct EnterprisePolicyRemovePolicyApplicationCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a AndroidManagement<C>,
+    _request: RemovePolicyApplicationsRequest,
+    _name: String,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder for EnterprisePolicyRemovePolicyApplicationCall<'a, C> {}
+
+impl<'a, C> EnterprisePolicyRemovePolicyApplicationCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(
+        mut self,
+    ) -> common::Result<(common::Response, RemovePolicyApplicationsResponse)> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "androidmanagement.enterprises.policies.removePolicyApplications",
+            http_method: hyper::Method::POST,
+        });
+
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("name", self._name);
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+name}:removePolicyApplications";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader = {
+            let mut value = serde_json::value::to_value(&self._request).expect("serde to work");
+            common::remove_json_null_values(&mut value);
+            let mut dst = std::io::Cursor::new(Vec::with_capacity(128));
+            serde_json::to_writer(&mut dst, &value).unwrap();
+            dst
+        };
+        let request_size = request_value_reader
+            .seek(std::io::SeekFrom::End(0))
+            .unwrap();
+        request_value_reader
+            .seek(std::io::SeekFrom::Start(0))
+            .unwrap();
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            request_value_reader
+                .seek(std::io::SeekFrom::Start(0))
+                .unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_TYPE, json_mime_type.to_string())
+                    .header(CONTENT_LENGTH, request_size as u64)
+                    .body(common::to_body(
+                        request_value_reader.get_ref().clone().into(),
+                    ));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(
+        mut self,
+        new_value: RemovePolicyApplicationsRequest,
+    ) -> EnterprisePolicyRemovePolicyApplicationCall<'a, C> {
+        self._request = new_value;
+        self
+    }
+    /// Required. The name of the policy containing the ApplicationPolicy objects to be removed, in the form enterprises/{enterpriseId}/policies/{policyId}.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> EnterprisePolicyRemovePolicyApplicationCall<'a, C> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> EnterprisePolicyRemovePolicyApplicationCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(
+        mut self,
+        name: T,
+        value: T,
+    ) -> EnterprisePolicyRemovePolicyApplicationCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Full`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> EnterprisePolicyRemovePolicyApplicationCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(
+        mut self,
+        scopes: I,
+    ) -> EnterprisePolicyRemovePolicyApplicationCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> EnterprisePolicyRemovePolicyApplicationCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
 /// Creates a web app.
 ///
 /// A builder for the *webApps.create* method supported by a *enterprise* resource.
@@ -9952,9 +11734,20 @@ where
 /// # use androidmanagement1::{AndroidManagement, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -9965,7 +11758,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = AndroidManagement::new(client, auth);
@@ -10273,9 +12066,20 @@ where
 /// # use androidmanagement1::{AndroidManagement, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -10286,7 +12090,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = AndroidManagement::new(client, auth);
@@ -10558,9 +12362,20 @@ where
 /// # use androidmanagement1::{AndroidManagement, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -10571,7 +12386,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = AndroidManagement::new(client, auth);
@@ -10731,7 +12546,7 @@ where
         }
     }
 
-    /// The name of the web app in the form enterprises/{enterpriseId}/webApp/{packageName}.
+    /// The name of the web app in the form enterprises/{enterpriseId}/webApps/{packageName}.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -10843,9 +12658,20 @@ where
 /// # use androidmanagement1::{AndroidManagement, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -10856,7 +12682,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = AndroidManagement::new(client, auth);
@@ -10864,8 +12690,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.enterprises().web_apps_list("parent")
-///              .page_token("duo")
-///              .page_size(-34)
+///              .page_token("et")
+///              .page_size(-22)
 ///              .doit().await;
 /// # }
 /// ```
@@ -11153,9 +12979,20 @@ where
 /// # use androidmanagement1::{AndroidManagement, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -11166,7 +13003,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = AndroidManagement::new(client, auth);
@@ -11487,9 +13324,20 @@ where
 /// # use androidmanagement1::{AndroidManagement, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -11500,7 +13348,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = AndroidManagement::new(client, auth);
@@ -11809,9 +13657,20 @@ where
 /// # use androidmanagement1::{AndroidManagement, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -11822,7 +13681,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = AndroidManagement::new(client, auth);
@@ -11835,10 +13694,10 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.enterprises().create(req)
-///              .signup_url_name("amet.")
-///              .project_id("consetetur")
-///              .enterprise_token("diam")
-///              .agreement_accepted(true)
+///              .signup_url_name("dolor")
+///              .project_id("duo")
+///              .enterprise_token("vero")
+///              .agreement_accepted(false)
 ///              .doit().await;
 /// # }
 /// ```
@@ -12165,9 +14024,20 @@ where
 /// # use androidmanagement1::{AndroidManagement, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -12178,7 +14048,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = AndroidManagement::new(client, auth);
@@ -12433,6 +14303,351 @@ where
     }
 }
 
+/// Generates an enterprise upgrade URL to upgrade an existing managed Google Play Accounts enterprise to a managed Google domain. See the guide (https://developers.google.com/android/management/upgrade-an-enterprise) for more details.
+///
+/// A builder for the *generateEnterpriseUpgradeUrl* method supported by a *enterprise* resource.
+/// It is not used directly, but through a [`EnterpriseMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_androidmanagement1 as androidmanagement1;
+/// use androidmanagement1::api::GenerateEnterpriseUpgradeUrlRequest;
+/// # async fn dox() {
+/// # use androidmanagement1::{AndroidManagement, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = AndroidManagement::new(client, auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = GenerateEnterpriseUpgradeUrlRequest::default();
+///
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.enterprises().generate_enterprise_upgrade_url(req, "name")
+///              .doit().await;
+/// # }
+/// ```
+pub struct EnterpriseGenerateEnterpriseUpgradeUrlCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a AndroidManagement<C>,
+    _request: GenerateEnterpriseUpgradeUrlRequest,
+    _name: String,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder for EnterpriseGenerateEnterpriseUpgradeUrlCall<'a, C> {}
+
+impl<'a, C> EnterpriseGenerateEnterpriseUpgradeUrlCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(
+        mut self,
+    ) -> common::Result<(common::Response, GenerateEnterpriseUpgradeUrlResponse)> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "androidmanagement.enterprises.generateEnterpriseUpgradeUrl",
+            http_method: hyper::Method::POST,
+        });
+
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("name", self._name);
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+name}:generateEnterpriseUpgradeUrl";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader = {
+            let mut value = serde_json::value::to_value(&self._request).expect("serde to work");
+            common::remove_json_null_values(&mut value);
+            let mut dst = std::io::Cursor::new(Vec::with_capacity(128));
+            serde_json::to_writer(&mut dst, &value).unwrap();
+            dst
+        };
+        let request_size = request_value_reader
+            .seek(std::io::SeekFrom::End(0))
+            .unwrap();
+        request_value_reader
+            .seek(std::io::SeekFrom::Start(0))
+            .unwrap();
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            request_value_reader
+                .seek(std::io::SeekFrom::Start(0))
+                .unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_TYPE, json_mime_type.to_string())
+                    .header(CONTENT_LENGTH, request_size as u64)
+                    .body(common::to_body(
+                        request_value_reader.get_ref().clone().into(),
+                    ));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(
+        mut self,
+        new_value: GenerateEnterpriseUpgradeUrlRequest,
+    ) -> EnterpriseGenerateEnterpriseUpgradeUrlCall<'a, C> {
+        self._request = new_value;
+        self
+    }
+    /// Required. The name of the enterprise to be upgraded in the form enterprises/{enterpriseId}.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> EnterpriseGenerateEnterpriseUpgradeUrlCall<'a, C> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> EnterpriseGenerateEnterpriseUpgradeUrlCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(
+        mut self,
+        name: T,
+        value: T,
+    ) -> EnterpriseGenerateEnterpriseUpgradeUrlCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Full`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> EnterpriseGenerateEnterpriseUpgradeUrlCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(
+        mut self,
+        scopes: I,
+    ) -> EnterpriseGenerateEnterpriseUpgradeUrlCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> EnterpriseGenerateEnterpriseUpgradeUrlCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
 /// Gets an enterprise.
 ///
 /// A builder for the *get* method supported by a *enterprise* resource.
@@ -12450,9 +14665,20 @@ where
 /// # use androidmanagement1::{AndroidManagement, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -12463,7 +14689,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = AndroidManagement::new(client, auth);
@@ -12732,9 +14958,20 @@ where
 /// # use androidmanagement1::{AndroidManagement, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -12745,7 +14982,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = AndroidManagement::new(client, auth);
@@ -12753,10 +14990,10 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.enterprises().list()
-///              .view("sadipscing")
-///              .project_id("Stet")
-///              .page_token("dolor")
-///              .page_size(-20)
+///              .view("elitr")
+///              .project_id("Lorem")
+///              .page_token("diam")
+///              .page_size(-61)
 ///              .doit().await;
 /// # }
 /// ```
@@ -13045,9 +15282,20 @@ where
 /// # use androidmanagement1::{AndroidManagement, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -13058,7 +15306,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = AndroidManagement::new(client, auth);
@@ -13378,9 +15626,20 @@ where
 /// # use androidmanagement1::{AndroidManagement, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -13391,7 +15650,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = AndroidManagement::new(client, auth);
@@ -13663,9 +15922,20 @@ where
 /// # use androidmanagement1::{AndroidManagement, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -13676,7 +15946,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = AndroidManagement::new(client, auth);
@@ -13684,9 +15954,10 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.signup_urls().create()
-///              .project_id("invidunt")
-///              .callback_url("Stet")
-///              .admin_email("vero")
+///              .project_id("takimata")
+///              .callback_url("consetetur")
+///              .add_allowed_domains("voluptua.")
+///              .admin_email("et")
 ///              .doit().await;
 /// # }
 /// ```
@@ -13697,6 +15968,7 @@ where
     hub: &'a AndroidManagement<C>,
     _project_id: Option<String>,
     _callback_url: Option<String>,
+    _allowed_domains: Vec<String>,
     _admin_email: Option<String>,
     _delegate: Option<&'a mut dyn common::Delegate>,
     _additional_params: HashMap<String, String>,
@@ -13724,19 +15996,32 @@ where
             http_method: hyper::Method::POST,
         });
 
-        for &field in ["alt", "projectId", "callbackUrl", "adminEmail"].iter() {
+        for &field in [
+            "alt",
+            "projectId",
+            "callbackUrl",
+            "allowedDomains",
+            "adminEmail",
+        ]
+        .iter()
+        {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(common::Error::FieldClash(field));
             }
         }
 
-        let mut params = Params::with_capacity(5 + self._additional_params.len());
+        let mut params = Params::with_capacity(6 + self._additional_params.len());
         if let Some(value) = self._project_id.as_ref() {
             params.push("projectId", value);
         }
         if let Some(value) = self._callback_url.as_ref() {
             params.push("callbackUrl", value);
+        }
+        if !self._allowed_domains.is_empty() {
+            for f in self._allowed_domains.iter() {
+                params.push("allowedDomains", f);
+            }
         }
         if let Some(value) = self._admin_email.as_ref() {
             params.push("adminEmail", value);
@@ -13854,7 +16139,15 @@ where
         self._callback_url = Some(new_value.to_string());
         self
     }
-    /// Optional. Email address used to prefill the admin field of the enterprise signup form. This value is a hint only and can be altered by the user.
+    /// Optional. A list of domains that are permitted for the admin email. The IT admin cannot enter an email address with a domain name that is not in this list. Subdomains of domains in this list are not allowed but can be allowed by adding a second entry which has *. prefixed to the domain name (e.g. *.example.com). If the field is not present or is an empty list then the IT admin is free to use any valid domain name. Personal email domains are always allowed, but will result in the creation of a managed Google Play Accounts enterprise.
+    ///
+    /// Append the given value to the *allowed domains* query property.
+    /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
+    pub fn add_allowed_domains(mut self, new_value: &str) -> SignupUrlCreateCall<'a, C> {
+        self._allowed_domains.push(new_value.to_string());
+        self
+    }
+    /// Optional. Email address used to prefill the admin field of the enterprise signup form. This value is a hint only and can be altered by the user. If allowedDomains is non-empty then this must belong to one of the allowedDomains.
     ///
     /// Sets the *admin email* query property to the given value.
     pub fn admin_email(mut self, new_value: &str) -> SignupUrlCreateCall<'a, C> {

@@ -157,6 +157,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "cluster-type" => Some((
+                    "clusterType",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "id" => Some((
                     "id",
                     JsonTypeInfo {
@@ -225,6 +232,7 @@ where
                         key,
                         &vec![
                             "basic-algorithm",
+                            "cluster-type",
                             "cooldown-period",
                             "graceful-decommission-timeout",
                             "id",
@@ -1130,6 +1138,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "cluster-type" => Some((
+                    "clusterType",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "id" => Some((
                     "id",
                     JsonTypeInfo {
@@ -1198,6 +1213,7 @@ where
                         key,
                         &vec![
                             "basic-algorithm",
+                            "cluster-type",
                             "cooldown-period",
                             "graceful-decommission-timeout",
                             "id",
@@ -1349,8 +1365,16 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "requestor-id" => Some((
+                    "requestorId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["request-id"]);
+                    let suggestion =
+                        FieldCursor::did_you_mean(key, &vec!["request-id", "requestor-id"]);
                     err.issues.push(CLIError::Field(FieldError::Unknown(
                         temp_cursor.to_string(),
                         suggestion,
@@ -1478,6 +1502,7 @@ where
                 match &temp_cursor.to_string()[..] {
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "creator" => Some(("creator", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "environment-config.execution-config.authentication-config.user-workload-authentication-type" => Some(("environmentConfig.executionConfig.authenticationConfig.userWorkloadAuthenticationType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "environment-config.execution-config.idle-ttl" => Some(("environmentConfig.executionConfig.idleTtl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "environment-config.execution-config.kms-key" => Some(("environmentConfig.executionConfig.kmsKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "environment-config.execution-config.network-tags" => Some(("environmentConfig.executionConfig.networkTags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
@@ -1507,6 +1532,7 @@ where
                     "runtime-info.approximate-usage.milli-accelerator-seconds" => Some(("runtimeInfo.approximateUsage.milliAcceleratorSeconds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "runtime-info.approximate-usage.milli-dcu-seconds" => Some(("runtimeInfo.approximateUsage.milliDcuSeconds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "runtime-info.approximate-usage.shuffle-storage-gb-seconds" => Some(("runtimeInfo.approximateUsage.shuffleStorageGbSeconds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "runtime-info.approximate-usage.update-time" => Some(("runtimeInfo.approximateUsage.updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "runtime-info.current-usage.accelerator-type" => Some(("runtimeInfo.currentUsage.acceleratorType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "runtime-info.current-usage.milli-accelerator" => Some(("runtimeInfo.currentUsage.milliAccelerator", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "runtime-info.current-usage.milli-dcu" => Some(("runtimeInfo.currentUsage.milliDcu", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1535,7 +1561,7 @@ where
                     "state-time" => Some(("stateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "uuid" => Some(("uuid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["accelerator-type", "approximate-usage", "archive-uris", "args", "autotuning-config", "cohort", "container-image", "create-time", "creator", "current-usage", "dataproc-cluster", "diagnostic-output-uri", "endpoints", "environment-config", "execution-config", "file-uris", "idle-ttl", "jar-file-uris", "kms-key", "labels", "main-class", "main-jar-file-uri", "main-python-file-uri", "main-r-file-uri", "metastore-service", "milli-accelerator", "milli-accelerator-seconds", "milli-dcu", "milli-dcu-premium", "milli-dcu-seconds", "name", "network-tags", "network-uri", "operation", "output-uri", "peripherals-config", "properties", "pypi-repository", "pypi-repository-config", "pyspark-batch", "python-file-uris", "query-file-uri", "query-variables", "repository-config", "runtime-config", "runtime-info", "scenarios", "service-account", "shuffle-storage-gb", "shuffle-storage-gb-premium", "shuffle-storage-gb-seconds", "snapshot-time", "spark-batch", "spark-history-server-config", "spark-r-batch", "spark-sql-batch", "staging-bucket", "state", "state-message", "state-time", "subnetwork-uri", "ttl", "uuid", "version"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["accelerator-type", "approximate-usage", "archive-uris", "args", "authentication-config", "autotuning-config", "cohort", "container-image", "create-time", "creator", "current-usage", "dataproc-cluster", "diagnostic-output-uri", "endpoints", "environment-config", "execution-config", "file-uris", "idle-ttl", "jar-file-uris", "kms-key", "labels", "main-class", "main-jar-file-uri", "main-python-file-uri", "main-r-file-uri", "metastore-service", "milli-accelerator", "milli-accelerator-seconds", "milli-dcu", "milli-dcu-premium", "milli-dcu-seconds", "name", "network-tags", "network-uri", "operation", "output-uri", "peripherals-config", "properties", "pypi-repository", "pypi-repository-config", "pyspark-batch", "python-file-uris", "query-file-uri", "query-variables", "repository-config", "runtime-config", "runtime-info", "scenarios", "service-account", "shuffle-storage-gb", "shuffle-storage-gb-premium", "shuffle-storage-gb-seconds", "snapshot-time", "spark-batch", "spark-history-server-config", "spark-r-batch", "spark-sql-batch", "staging-bucket", "state", "state-message", "state-time", "subnetwork-uri", "ttl", "update-time", "user-workload-authentication-type", "uuid", "version"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1897,6 +1923,2149 @@ where
         }
     }
 
+    async fn _projects_locations_batches_spark_applications_access(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .locations_batches_spark_applications_access(opt.value_of("name").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "parent" => {
+                    call = call.parent(value.unwrap_or(""));
+                }
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["parent"].iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_batches_spark_applications_access_environment_info(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .locations_batches_spark_applications_access_environment_info(
+                opt.value_of("name").unwrap_or(""),
+            );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "parent" => {
+                    call = call.parent(value.unwrap_or(""));
+                }
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["parent"].iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_batches_spark_applications_access_job(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .locations_batches_spark_applications_access_job(opt.value_of("name").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "parent" => {
+                    call = call.parent(value.unwrap_or(""));
+                }
+                "job-id" => {
+                    call = call.job_id(
+                        value
+                            .map(|v| arg_from_str(v, err, "job-id", "int64"))
+                            .unwrap_or(-0),
+                    );
+                }
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["job-id", "parent"].iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_batches_spark_applications_access_sql_plan(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .locations_batches_spark_applications_access_sql_plan(
+                opt.value_of("name").unwrap_or(""),
+            );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "parent" => {
+                    call = call.parent(value.unwrap_or(""));
+                }
+                "execution-id" => {
+                    call = call.execution_id(
+                        value
+                            .map(|v| arg_from_str(v, err, "execution-id", "int64"))
+                            .unwrap_or(-0),
+                    );
+                }
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["execution-id", "parent"].iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_batches_spark_applications_access_sql_query(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .locations_batches_spark_applications_access_sql_query(
+                opt.value_of("name").unwrap_or(""),
+            );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "plan-description" => {
+                    call = call.plan_description(
+                        value
+                            .map(|v| arg_from_str(v, err, "plan-description", "boolean"))
+                            .unwrap_or(false),
+                    );
+                }
+                "parent" => {
+                    call = call.parent(value.unwrap_or(""));
+                }
+                "execution-id" => {
+                    call = call.execution_id(
+                        value
+                            .map(|v| arg_from_str(v, err, "execution-id", "int64"))
+                            .unwrap_or(-0),
+                    );
+                }
+                "details" => {
+                    call = call.details(
+                        value
+                            .map(|v| arg_from_str(v, err, "details", "boolean"))
+                            .unwrap_or(false),
+                    );
+                }
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(
+                                    ["details", "execution-id", "parent", "plan-description"]
+                                        .iter()
+                                        .map(|v| *v),
+                                );
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_batches_spark_applications_access_stage_attempt(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .locations_batches_spark_applications_access_stage_attempt(
+                opt.value_of("name").unwrap_or(""),
+            );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "summary-metrics-mask" => {
+                    call = call.summary_metrics_mask(
+                        value
+                            .map(|v| {
+                                arg_from_str(v, err, "summary-metrics-mask", "google-fieldmask")
+                            })
+                            .unwrap_or(apis_common::FieldMask::default()),
+                    );
+                }
+                "stage-id" => {
+                    call = call.stage_id(
+                        value
+                            .map(|v| arg_from_str(v, err, "stage-id", "int64"))
+                            .unwrap_or(-0),
+                    );
+                }
+                "stage-attempt-id" => {
+                    call = call.stage_attempt_id(
+                        value
+                            .map(|v| arg_from_str(v, err, "stage-attempt-id", "int32"))
+                            .unwrap_or(-0),
+                    );
+                }
+                "parent" => {
+                    call = call.parent(value.unwrap_or(""));
+                }
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(
+                                    [
+                                        "parent",
+                                        "stage-attempt-id",
+                                        "stage-id",
+                                        "summary-metrics-mask",
+                                    ]
+                                    .iter()
+                                    .map(|v| *v),
+                                );
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_batches_spark_applications_access_stage_rdd_graph(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .locations_batches_spark_applications_access_stage_rdd_graph(
+                opt.value_of("name").unwrap_or(""),
+            );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "stage-id" => {
+                    call = call.stage_id(
+                        value
+                            .map(|v| arg_from_str(v, err, "stage-id", "int64"))
+                            .unwrap_or(-0),
+                    );
+                }
+                "parent" => {
+                    call = call.parent(value.unwrap_or(""));
+                }
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["parent", "stage-id"].iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_batches_spark_applications_search(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .locations_batches_spark_applications_search(opt.value_of("parent").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                }
+                "page-size" => {
+                    call = call.page_size(
+                        value
+                            .map(|v| arg_from_str(v, err, "page-size", "int32"))
+                            .unwrap_or(-0),
+                    );
+                }
+                "min-time" => {
+                    call = call.min_time(
+                        value
+                            .map(|v| arg_from_str(v, err, "min-time", "google-datetime"))
+                            .unwrap_or(chrono::Utc::now()),
+                    );
+                }
+                "min-end-time" => {
+                    call = call.min_end_time(
+                        value
+                            .map(|v| arg_from_str(v, err, "min-end-time", "google-datetime"))
+                            .unwrap_or(chrono::Utc::now()),
+                    );
+                }
+                "max-time" => {
+                    call = call.max_time(
+                        value
+                            .map(|v| arg_from_str(v, err, "max-time", "google-datetime"))
+                            .unwrap_or(chrono::Utc::now()),
+                    );
+                }
+                "max-end-time" => {
+                    call = call.max_end_time(
+                        value
+                            .map(|v| arg_from_str(v, err, "max-end-time", "google-datetime"))
+                            .unwrap_or(chrono::Utc::now()),
+                    );
+                }
+                "application-status" => {
+                    call = call.application_status(value.unwrap_or(""));
+                }
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(
+                                    [
+                                        "application-status",
+                                        "max-end-time",
+                                        "max-time",
+                                        "min-end-time",
+                                        "min-time",
+                                        "page-size",
+                                        "page-token",
+                                    ]
+                                    .iter()
+                                    .map(|v| *v),
+                                );
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_batches_spark_applications_search_executor_stage_summary(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .locations_batches_spark_applications_search_executor_stage_summary(
+                opt.value_of("name").unwrap_or(""),
+            );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "stage-id" => {
+                    call = call.stage_id(
+                        value
+                            .map(|v| arg_from_str(v, err, "stage-id", "int64"))
+                            .unwrap_or(-0),
+                    );
+                }
+                "stage-attempt-id" => {
+                    call = call.stage_attempt_id(
+                        value
+                            .map(|v| arg_from_str(v, err, "stage-attempt-id", "int32"))
+                            .unwrap_or(-0),
+                    );
+                }
+                "parent" => {
+                    call = call.parent(value.unwrap_or(""));
+                }
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                }
+                "page-size" => {
+                    call = call.page_size(
+                        value
+                            .map(|v| arg_from_str(v, err, "page-size", "int32"))
+                            .unwrap_or(-0),
+                    );
+                }
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(
+                                    [
+                                        "page-size",
+                                        "page-token",
+                                        "parent",
+                                        "stage-attempt-id",
+                                        "stage-id",
+                                    ]
+                                    .iter()
+                                    .map(|v| *v),
+                                );
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_batches_spark_applications_search_executors(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .locations_batches_spark_applications_search_executors(
+                opt.value_of("name").unwrap_or(""),
+            );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "parent" => {
+                    call = call.parent(value.unwrap_or(""));
+                }
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                }
+                "page-size" => {
+                    call = call.page_size(
+                        value
+                            .map(|v| arg_from_str(v, err, "page-size", "int32"))
+                            .unwrap_or(-0),
+                    );
+                }
+                "executor-status" => {
+                    call = call.executor_status(value.unwrap_or(""));
+                }
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(
+                                    ["executor-status", "page-size", "page-token", "parent"]
+                                        .iter()
+                                        .map(|v| *v),
+                                );
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_batches_spark_applications_search_jobs(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .locations_batches_spark_applications_search_jobs(opt.value_of("name").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "parent" => {
+                    call = call.parent(value.unwrap_or(""));
+                }
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                }
+                "page-size" => {
+                    call = call.page_size(
+                        value
+                            .map(|v| arg_from_str(v, err, "page-size", "int32"))
+                            .unwrap_or(-0),
+                    );
+                }
+                "job-status" => {
+                    call = call.job_status(value.unwrap_or(""));
+                }
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(
+                                    ["job-status", "page-size", "page-token", "parent"]
+                                        .iter()
+                                        .map(|v| *v),
+                                );
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_batches_spark_applications_search_sql_queries(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .locations_batches_spark_applications_search_sql_queries(
+                opt.value_of("name").unwrap_or(""),
+            );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "plan-description" => {
+                    call = call.plan_description(
+                        value
+                            .map(|v| arg_from_str(v, err, "plan-description", "boolean"))
+                            .unwrap_or(false),
+                    );
+                }
+                "parent" => {
+                    call = call.parent(value.unwrap_or(""));
+                }
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                }
+                "page-size" => {
+                    call = call.page_size(
+                        value
+                            .map(|v| arg_from_str(v, err, "page-size", "int32"))
+                            .unwrap_or(-0),
+                    );
+                }
+                "details" => {
+                    call = call.details(
+                        value
+                            .map(|v| arg_from_str(v, err, "details", "boolean"))
+                            .unwrap_or(false),
+                    );
+                }
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(
+                                    [
+                                        "details",
+                                        "page-size",
+                                        "page-token",
+                                        "parent",
+                                        "plan-description",
+                                    ]
+                                    .iter()
+                                    .map(|v| *v),
+                                );
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_batches_spark_applications_search_stage_attempt_tasks(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .locations_batches_spark_applications_search_stage_attempt_tasks(
+                opt.value_of("name").unwrap_or(""),
+            );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "task-status" => {
+                    call = call.task_status(value.unwrap_or(""));
+                }
+                "stage-id" => {
+                    call = call.stage_id(
+                        value
+                            .map(|v| arg_from_str(v, err, "stage-id", "int64"))
+                            .unwrap_or(-0),
+                    );
+                }
+                "stage-attempt-id" => {
+                    call = call.stage_attempt_id(
+                        value
+                            .map(|v| arg_from_str(v, err, "stage-attempt-id", "int32"))
+                            .unwrap_or(-0),
+                    );
+                }
+                "sort-runtime" => {
+                    call = call.sort_runtime(
+                        value
+                            .map(|v| arg_from_str(v, err, "sort-runtime", "boolean"))
+                            .unwrap_or(false),
+                    );
+                }
+                "parent" => {
+                    call = call.parent(value.unwrap_or(""));
+                }
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                }
+                "page-size" => {
+                    call = call.page_size(
+                        value
+                            .map(|v| arg_from_str(v, err, "page-size", "int32"))
+                            .unwrap_or(-0),
+                    );
+                }
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(
+                                    [
+                                        "page-size",
+                                        "page-token",
+                                        "parent",
+                                        "sort-runtime",
+                                        "stage-attempt-id",
+                                        "stage-id",
+                                        "task-status",
+                                    ]
+                                    .iter()
+                                    .map(|v| *v),
+                                );
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_batches_spark_applications_search_stage_attempts(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .locations_batches_spark_applications_search_stage_attempts(
+                opt.value_of("name").unwrap_or(""),
+            );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "summary-metrics-mask" => {
+                    call = call.summary_metrics_mask(
+                        value
+                            .map(|v| {
+                                arg_from_str(v, err, "summary-metrics-mask", "google-fieldmask")
+                            })
+                            .unwrap_or(apis_common::FieldMask::default()),
+                    );
+                }
+                "stage-id" => {
+                    call = call.stage_id(
+                        value
+                            .map(|v| arg_from_str(v, err, "stage-id", "int64"))
+                            .unwrap_or(-0),
+                    );
+                }
+                "parent" => {
+                    call = call.parent(value.unwrap_or(""));
+                }
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                }
+                "page-size" => {
+                    call = call.page_size(
+                        value
+                            .map(|v| arg_from_str(v, err, "page-size", "int32"))
+                            .unwrap_or(-0),
+                    );
+                }
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(
+                                    [
+                                        "page-size",
+                                        "page-token",
+                                        "parent",
+                                        "stage-id",
+                                        "summary-metrics-mask",
+                                    ]
+                                    .iter()
+                                    .map(|v| *v),
+                                );
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_batches_spark_applications_search_stages(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .locations_batches_spark_applications_search_stages(opt.value_of("name").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "summary-metrics-mask" => {
+                    call = call.summary_metrics_mask(
+                        value
+                            .map(|v| {
+                                arg_from_str(v, err, "summary-metrics-mask", "google-fieldmask")
+                            })
+                            .unwrap_or(apis_common::FieldMask::default()),
+                    );
+                }
+                "stage-status" => {
+                    call = call.stage_status(value.unwrap_or(""));
+                }
+                "parent" => {
+                    call = call.parent(value.unwrap_or(""));
+                }
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                }
+                "page-size" => {
+                    call = call.page_size(
+                        value
+                            .map(|v| arg_from_str(v, err, "page-size", "int32"))
+                            .unwrap_or(-0),
+                    );
+                }
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(
+                                    [
+                                        "page-size",
+                                        "page-token",
+                                        "parent",
+                                        "stage-status",
+                                        "summary-metrics-mask",
+                                    ]
+                                    .iter()
+                                    .map(|v| *v),
+                                );
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_batches_spark_applications_summarize_executors(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .locations_batches_spark_applications_summarize_executors(
+                opt.value_of("name").unwrap_or(""),
+            );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "parent" => {
+                    call = call.parent(value.unwrap_or(""));
+                }
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["parent"].iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_batches_spark_applications_summarize_jobs(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .locations_batches_spark_applications_summarize_jobs(
+                opt.value_of("name").unwrap_or(""),
+            );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "parent" => {
+                    call = call.parent(value.unwrap_or(""));
+                }
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["parent"].iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_batches_spark_applications_summarize_stage_attempt_tasks(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .locations_batches_spark_applications_summarize_stage_attempt_tasks(
+                opt.value_of("name").unwrap_or(""),
+            );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "stage-id" => {
+                    call = call.stage_id(
+                        value
+                            .map(|v| arg_from_str(v, err, "stage-id", "int64"))
+                            .unwrap_or(-0),
+                    );
+                }
+                "stage-attempt-id" => {
+                    call = call.stage_attempt_id(
+                        value
+                            .map(|v| arg_from_str(v, err, "stage-attempt-id", "int32"))
+                            .unwrap_or(-0),
+                    );
+                }
+                "parent" => {
+                    call = call.parent(value.unwrap_or(""));
+                }
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(
+                                    ["parent", "stage-attempt-id", "stage-id"]
+                                        .iter()
+                                        .map(|v| *v),
+                                );
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_batches_spark_applications_summarize_stages(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .locations_batches_spark_applications_summarize_stages(
+                opt.value_of("name").unwrap_or(""),
+            );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "parent" => {
+                    call = call.parent(value.unwrap_or(""));
+                }
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["parent"].iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_batches_spark_applications_write(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut field_cursor = FieldCursor::default();
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "parent" => Some((
+                    "parent",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(key, &vec!["parent"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
+            }
+        }
+        let mut request: api::WriteSparkApplicationContextRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .locations_batches_spark_applications_write(
+                request,
+                opt.value_of("name").unwrap_or(""),
+            );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _projects_locations_operations_cancel(
         &self,
         opt: &ArgMatches<'n>,
@@ -2158,6 +4327,13 @@ where
         {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "return-partial-success" => {
+                    call = call.return_partial_success(
+                        value
+                            .map(|v| arg_from_str(v, err, "return-partial-success", "boolean"))
+                            .unwrap_or(false),
+                    );
+                }
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
                 }
@@ -2188,7 +4364,16 @@ where
                             .push(CLIError::UnknownParameter(key.to_string(), {
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
-                                v.extend(["filter", "page-size", "page-token"].iter().map(|v| *v));
+                                v.extend(
+                                    [
+                                        "filter",
+                                        "page-size",
+                                        "page-token",
+                                        "return-partial-success",
+                                    ]
+                                    .iter()
+                                    .map(|v| *v),
+                                );
                                 v
                             }));
                     }
@@ -2269,6 +4454,7 @@ where
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "creator" => Some(("creator", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "environment-config.execution-config.authentication-config.user-workload-authentication-type" => Some(("environmentConfig.executionConfig.authenticationConfig.userWorkloadAuthenticationType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "environment-config.execution-config.idle-ttl" => Some(("environmentConfig.executionConfig.idleTtl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "environment-config.execution-config.kms-key" => Some(("environmentConfig.executionConfig.kmsKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "environment-config.execution-config.network-tags" => Some(("environmentConfig.executionConfig.networkTags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
@@ -2292,7 +4478,7 @@ where
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "uuid" => Some(("uuid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["autotuning-config", "cohort", "container-image", "create-time", "creator", "dataproc-cluster", "description", "display-name", "environment-config", "execution-config", "idle-ttl", "jupyter-session", "kernel", "kms-key", "labels", "metastore-service", "name", "network-tags", "network-uri", "peripherals-config", "properties", "pypi-repository", "pypi-repository-config", "repository-config", "runtime-config", "scenarios", "service-account", "spark-history-server-config", "staging-bucket", "subnetwork-uri", "ttl", "update-time", "uuid", "version"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["authentication-config", "autotuning-config", "cohort", "container-image", "create-time", "creator", "dataproc-cluster", "description", "display-name", "environment-config", "execution-config", "idle-ttl", "jupyter-session", "kernel", "kms-key", "labels", "metastore-service", "name", "network-tags", "network-uri", "peripherals-config", "properties", "pypi-repository", "pypi-repository-config", "repository-config", "runtime-config", "scenarios", "service-account", "spark-history-server-config", "staging-bucket", "subnetwork-uri", "ttl", "update-time", "user-workload-authentication-type", "uuid", "version"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2674,6 +4860,7 @@ where
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "creator" => Some(("creator", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "environment-config.execution-config.authentication-config.user-workload-authentication-type" => Some(("environmentConfig.executionConfig.authenticationConfig.userWorkloadAuthenticationType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "environment-config.execution-config.idle-ttl" => Some(("environmentConfig.executionConfig.idleTtl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "environment-config.execution-config.kms-key" => Some(("environmentConfig.executionConfig.kmsKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "environment-config.execution-config.network-tags" => Some(("environmentConfig.executionConfig.networkTags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
@@ -2697,7 +4884,7 @@ where
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "uuid" => Some(("uuid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["autotuning-config", "cohort", "container-image", "create-time", "creator", "dataproc-cluster", "description", "display-name", "environment-config", "execution-config", "idle-ttl", "jupyter-session", "kernel", "kms-key", "labels", "metastore-service", "name", "network-tags", "network-uri", "peripherals-config", "properties", "pypi-repository", "pypi-repository-config", "repository-config", "runtime-config", "scenarios", "service-account", "spark-history-server-config", "staging-bucket", "subnetwork-uri", "ttl", "update-time", "uuid", "version"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["authentication-config", "autotuning-config", "cohort", "container-image", "create-time", "creator", "dataproc-cluster", "description", "display-name", "environment-config", "execution-config", "idle-ttl", "jupyter-session", "kernel", "kms-key", "labels", "metastore-service", "name", "network-tags", "network-uri", "peripherals-config", "properties", "pypi-repository", "pypi-repository-config", "repository-config", "runtime-config", "scenarios", "service-account", "spark-history-server-config", "staging-bucket", "subnetwork-uri", "ttl", "update-time", "user-workload-authentication-type", "uuid", "version"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2821,6 +5008,7 @@ where
                 match &temp_cursor.to_string()[..] {
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "creator" => Some(("creator", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "environment-config.execution-config.authentication-config.user-workload-authentication-type" => Some(("environmentConfig.executionConfig.authenticationConfig.userWorkloadAuthenticationType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "environment-config.execution-config.idle-ttl" => Some(("environmentConfig.executionConfig.idleTtl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "environment-config.execution-config.kms-key" => Some(("environmentConfig.executionConfig.kmsKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "environment-config.execution-config.network-tags" => Some(("environmentConfig.executionConfig.networkTags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
@@ -2845,6 +5033,7 @@ where
                     "runtime-info.approximate-usage.milli-accelerator-seconds" => Some(("runtimeInfo.approximateUsage.milliAcceleratorSeconds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "runtime-info.approximate-usage.milli-dcu-seconds" => Some(("runtimeInfo.approximateUsage.milliDcuSeconds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "runtime-info.approximate-usage.shuffle-storage-gb-seconds" => Some(("runtimeInfo.approximateUsage.shuffleStorageGbSeconds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "runtime-info.approximate-usage.update-time" => Some(("runtimeInfo.approximateUsage.updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "runtime-info.current-usage.accelerator-type" => Some(("runtimeInfo.currentUsage.acceleratorType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "runtime-info.current-usage.milli-accelerator" => Some(("runtimeInfo.currentUsage.milliAccelerator", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "runtime-info.current-usage.milli-dcu" => Some(("runtimeInfo.currentUsage.milliDcu", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2862,7 +5051,7 @@ where
                     "user" => Some(("user", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "uuid" => Some(("uuid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["accelerator-type", "approximate-usage", "autotuning-config", "cohort", "container-image", "create-time", "creator", "current-usage", "dataproc-cluster", "diagnostic-output-uri", "display-name", "endpoints", "environment-config", "execution-config", "idle-ttl", "jupyter-session", "kernel", "kms-key", "labels", "metastore-service", "milli-accelerator", "milli-accelerator-seconds", "milli-dcu", "milli-dcu-premium", "milli-dcu-seconds", "name", "network-tags", "network-uri", "output-uri", "peripherals-config", "properties", "pypi-repository", "pypi-repository-config", "repository-config", "runtime-config", "runtime-info", "scenarios", "service-account", "session-template", "shuffle-storage-gb", "shuffle-storage-gb-premium", "shuffle-storage-gb-seconds", "snapshot-time", "spark-history-server-config", "staging-bucket", "state", "state-message", "state-time", "subnetwork-uri", "ttl", "user", "uuid", "version"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["accelerator-type", "approximate-usage", "authentication-config", "autotuning-config", "cohort", "container-image", "create-time", "creator", "current-usage", "dataproc-cluster", "diagnostic-output-uri", "display-name", "endpoints", "environment-config", "execution-config", "idle-ttl", "jupyter-session", "kernel", "kms-key", "labels", "metastore-service", "milli-accelerator", "milli-accelerator-seconds", "milli-dcu", "milli-dcu-premium", "milli-dcu-seconds", "name", "network-tags", "network-uri", "output-uri", "peripherals-config", "properties", "pypi-repository", "pypi-repository-config", "repository-config", "runtime-config", "runtime-info", "scenarios", "service-account", "session-template", "shuffle-storage-gb", "shuffle-storage-gb-premium", "shuffle-storage-gb-seconds", "snapshot-time", "spark-history-server-config", "staging-bucket", "state", "state-message", "state-time", "subnetwork-uri", "ttl", "update-time", "user", "user-workload-authentication-type", "uuid", "version"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3221,6 +5410,2184 @@ where
         }
     }
 
+    async fn _projects_locations_sessions_spark_applications_access(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .locations_sessions_spark_applications_access(opt.value_of("name").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "parent" => {
+                    call = call.parent(value.unwrap_or(""));
+                }
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["parent"].iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_sessions_spark_applications_access_environment_info(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .locations_sessions_spark_applications_access_environment_info(
+                opt.value_of("name").unwrap_or(""),
+            );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "parent" => {
+                    call = call.parent(value.unwrap_or(""));
+                }
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["parent"].iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_sessions_spark_applications_access_job(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .locations_sessions_spark_applications_access_job(opt.value_of("name").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "parent" => {
+                    call = call.parent(value.unwrap_or(""));
+                }
+                "job-id" => {
+                    call = call.job_id(
+                        value
+                            .map(|v| arg_from_str(v, err, "job-id", "int64"))
+                            .unwrap_or(-0),
+                    );
+                }
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["job-id", "parent"].iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_sessions_spark_applications_access_sql_plan(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .locations_sessions_spark_applications_access_sql_plan(
+                opt.value_of("name").unwrap_or(""),
+            );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "parent" => {
+                    call = call.parent(value.unwrap_or(""));
+                }
+                "execution-id" => {
+                    call = call.execution_id(
+                        value
+                            .map(|v| arg_from_str(v, err, "execution-id", "int64"))
+                            .unwrap_or(-0),
+                    );
+                }
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["execution-id", "parent"].iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_sessions_spark_applications_access_sql_query(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .locations_sessions_spark_applications_access_sql_query(
+                opt.value_of("name").unwrap_or(""),
+            );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "plan-description" => {
+                    call = call.plan_description(
+                        value
+                            .map(|v| arg_from_str(v, err, "plan-description", "boolean"))
+                            .unwrap_or(false),
+                    );
+                }
+                "parent" => {
+                    call = call.parent(value.unwrap_or(""));
+                }
+                "execution-id" => {
+                    call = call.execution_id(
+                        value
+                            .map(|v| arg_from_str(v, err, "execution-id", "int64"))
+                            .unwrap_or(-0),
+                    );
+                }
+                "details" => {
+                    call = call.details(
+                        value
+                            .map(|v| arg_from_str(v, err, "details", "boolean"))
+                            .unwrap_or(false),
+                    );
+                }
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(
+                                    ["details", "execution-id", "parent", "plan-description"]
+                                        .iter()
+                                        .map(|v| *v),
+                                );
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_sessions_spark_applications_access_stage_attempt(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .locations_sessions_spark_applications_access_stage_attempt(
+                opt.value_of("name").unwrap_or(""),
+            );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "summary-metrics-mask" => {
+                    call = call.summary_metrics_mask(
+                        value
+                            .map(|v| {
+                                arg_from_str(v, err, "summary-metrics-mask", "google-fieldmask")
+                            })
+                            .unwrap_or(apis_common::FieldMask::default()),
+                    );
+                }
+                "stage-id" => {
+                    call = call.stage_id(
+                        value
+                            .map(|v| arg_from_str(v, err, "stage-id", "int64"))
+                            .unwrap_or(-0),
+                    );
+                }
+                "stage-attempt-id" => {
+                    call = call.stage_attempt_id(
+                        value
+                            .map(|v| arg_from_str(v, err, "stage-attempt-id", "int32"))
+                            .unwrap_or(-0),
+                    );
+                }
+                "parent" => {
+                    call = call.parent(value.unwrap_or(""));
+                }
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(
+                                    [
+                                        "parent",
+                                        "stage-attempt-id",
+                                        "stage-id",
+                                        "summary-metrics-mask",
+                                    ]
+                                    .iter()
+                                    .map(|v| *v),
+                                );
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_sessions_spark_applications_access_stage_rdd_graph(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .locations_sessions_spark_applications_access_stage_rdd_graph(
+                opt.value_of("name").unwrap_or(""),
+            );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "stage-id" => {
+                    call = call.stage_id(
+                        value
+                            .map(|v| arg_from_str(v, err, "stage-id", "int64"))
+                            .unwrap_or(-0),
+                    );
+                }
+                "parent" => {
+                    call = call.parent(value.unwrap_or(""));
+                }
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["parent", "stage-id"].iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_sessions_spark_applications_search(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .locations_sessions_spark_applications_search(opt.value_of("parent").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                }
+                "page-size" => {
+                    call = call.page_size(
+                        value
+                            .map(|v| arg_from_str(v, err, "page-size", "int32"))
+                            .unwrap_or(-0),
+                    );
+                }
+                "min-time" => {
+                    call = call.min_time(
+                        value
+                            .map(|v| arg_from_str(v, err, "min-time", "google-datetime"))
+                            .unwrap_or(chrono::Utc::now()),
+                    );
+                }
+                "min-end-time" => {
+                    call = call.min_end_time(
+                        value
+                            .map(|v| arg_from_str(v, err, "min-end-time", "google-datetime"))
+                            .unwrap_or(chrono::Utc::now()),
+                    );
+                }
+                "max-time" => {
+                    call = call.max_time(
+                        value
+                            .map(|v| arg_from_str(v, err, "max-time", "google-datetime"))
+                            .unwrap_or(chrono::Utc::now()),
+                    );
+                }
+                "max-end-time" => {
+                    call = call.max_end_time(
+                        value
+                            .map(|v| arg_from_str(v, err, "max-end-time", "google-datetime"))
+                            .unwrap_or(chrono::Utc::now()),
+                    );
+                }
+                "application-status" => {
+                    call = call.application_status(value.unwrap_or(""));
+                }
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(
+                                    [
+                                        "application-status",
+                                        "max-end-time",
+                                        "max-time",
+                                        "min-end-time",
+                                        "min-time",
+                                        "page-size",
+                                        "page-token",
+                                    ]
+                                    .iter()
+                                    .map(|v| *v),
+                                );
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_sessions_spark_applications_search_executor_stage_summary(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .locations_sessions_spark_applications_search_executor_stage_summary(
+                opt.value_of("name").unwrap_or(""),
+            );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "stage-id" => {
+                    call = call.stage_id(
+                        value
+                            .map(|v| arg_from_str(v, err, "stage-id", "int64"))
+                            .unwrap_or(-0),
+                    );
+                }
+                "stage-attempt-id" => {
+                    call = call.stage_attempt_id(
+                        value
+                            .map(|v| arg_from_str(v, err, "stage-attempt-id", "int32"))
+                            .unwrap_or(-0),
+                    );
+                }
+                "parent" => {
+                    call = call.parent(value.unwrap_or(""));
+                }
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                }
+                "page-size" => {
+                    call = call.page_size(
+                        value
+                            .map(|v| arg_from_str(v, err, "page-size", "int32"))
+                            .unwrap_or(-0),
+                    );
+                }
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(
+                                    [
+                                        "page-size",
+                                        "page-token",
+                                        "parent",
+                                        "stage-attempt-id",
+                                        "stage-id",
+                                    ]
+                                    .iter()
+                                    .map(|v| *v),
+                                );
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_sessions_spark_applications_search_executors(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .locations_sessions_spark_applications_search_executors(
+                opt.value_of("name").unwrap_or(""),
+            );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "parent" => {
+                    call = call.parent(value.unwrap_or(""));
+                }
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                }
+                "page-size" => {
+                    call = call.page_size(
+                        value
+                            .map(|v| arg_from_str(v, err, "page-size", "int32"))
+                            .unwrap_or(-0),
+                    );
+                }
+                "executor-status" => {
+                    call = call.executor_status(value.unwrap_or(""));
+                }
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(
+                                    ["executor-status", "page-size", "page-token", "parent"]
+                                        .iter()
+                                        .map(|v| *v),
+                                );
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_sessions_spark_applications_search_jobs(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .locations_sessions_spark_applications_search_jobs(opt.value_of("name").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "parent" => {
+                    call = call.parent(value.unwrap_or(""));
+                }
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                }
+                "page-size" => {
+                    call = call.page_size(
+                        value
+                            .map(|v| arg_from_str(v, err, "page-size", "int32"))
+                            .unwrap_or(-0),
+                    );
+                }
+                "job-status" => {
+                    call = call.job_status(value.unwrap_or(""));
+                }
+                "job-ids" => {
+                    call = call.add_job_ids(
+                        value
+                            .map(|v| arg_from_str(v, err, "job-ids", "int64"))
+                            .unwrap_or(-0),
+                    );
+                }
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(
+                                    ["job-ids", "job-status", "page-size", "page-token", "parent"]
+                                        .iter()
+                                        .map(|v| *v),
+                                );
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_sessions_spark_applications_search_sql_queries(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .locations_sessions_spark_applications_search_sql_queries(
+                opt.value_of("name").unwrap_or(""),
+            );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "plan-description" => {
+                    call = call.plan_description(
+                        value
+                            .map(|v| arg_from_str(v, err, "plan-description", "boolean"))
+                            .unwrap_or(false),
+                    );
+                }
+                "parent" => {
+                    call = call.parent(value.unwrap_or(""));
+                }
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                }
+                "page-size" => {
+                    call = call.page_size(
+                        value
+                            .map(|v| arg_from_str(v, err, "page-size", "int32"))
+                            .unwrap_or(-0),
+                    );
+                }
+                "operation-ids" => {
+                    call = call.add_operation_ids(value.unwrap_or(""));
+                }
+                "details" => {
+                    call = call.details(
+                        value
+                            .map(|v| arg_from_str(v, err, "details", "boolean"))
+                            .unwrap_or(false),
+                    );
+                }
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(
+                                    [
+                                        "details",
+                                        "operation-ids",
+                                        "page-size",
+                                        "page-token",
+                                        "parent",
+                                        "plan-description",
+                                    ]
+                                    .iter()
+                                    .map(|v| *v),
+                                );
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_sessions_spark_applications_search_stage_attempt_tasks(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .locations_sessions_spark_applications_search_stage_attempt_tasks(
+                opt.value_of("name").unwrap_or(""),
+            );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "task-status" => {
+                    call = call.task_status(value.unwrap_or(""));
+                }
+                "stage-id" => {
+                    call = call.stage_id(
+                        value
+                            .map(|v| arg_from_str(v, err, "stage-id", "int64"))
+                            .unwrap_or(-0),
+                    );
+                }
+                "stage-attempt-id" => {
+                    call = call.stage_attempt_id(
+                        value
+                            .map(|v| arg_from_str(v, err, "stage-attempt-id", "int32"))
+                            .unwrap_or(-0),
+                    );
+                }
+                "sort-runtime" => {
+                    call = call.sort_runtime(
+                        value
+                            .map(|v| arg_from_str(v, err, "sort-runtime", "boolean"))
+                            .unwrap_or(false),
+                    );
+                }
+                "parent" => {
+                    call = call.parent(value.unwrap_or(""));
+                }
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                }
+                "page-size" => {
+                    call = call.page_size(
+                        value
+                            .map(|v| arg_from_str(v, err, "page-size", "int32"))
+                            .unwrap_or(-0),
+                    );
+                }
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(
+                                    [
+                                        "page-size",
+                                        "page-token",
+                                        "parent",
+                                        "sort-runtime",
+                                        "stage-attempt-id",
+                                        "stage-id",
+                                        "task-status",
+                                    ]
+                                    .iter()
+                                    .map(|v| *v),
+                                );
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_sessions_spark_applications_search_stage_attempts(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .locations_sessions_spark_applications_search_stage_attempts(
+                opt.value_of("name").unwrap_or(""),
+            );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "summary-metrics-mask" => {
+                    call = call.summary_metrics_mask(
+                        value
+                            .map(|v| {
+                                arg_from_str(v, err, "summary-metrics-mask", "google-fieldmask")
+                            })
+                            .unwrap_or(apis_common::FieldMask::default()),
+                    );
+                }
+                "stage-id" => {
+                    call = call.stage_id(
+                        value
+                            .map(|v| arg_from_str(v, err, "stage-id", "int64"))
+                            .unwrap_or(-0),
+                    );
+                }
+                "parent" => {
+                    call = call.parent(value.unwrap_or(""));
+                }
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                }
+                "page-size" => {
+                    call = call.page_size(
+                        value
+                            .map(|v| arg_from_str(v, err, "page-size", "int32"))
+                            .unwrap_or(-0),
+                    );
+                }
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(
+                                    [
+                                        "page-size",
+                                        "page-token",
+                                        "parent",
+                                        "stage-id",
+                                        "summary-metrics-mask",
+                                    ]
+                                    .iter()
+                                    .map(|v| *v),
+                                );
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_sessions_spark_applications_search_stages(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .locations_sessions_spark_applications_search_stages(
+                opt.value_of("name").unwrap_or(""),
+            );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "summary-metrics-mask" => {
+                    call = call.summary_metrics_mask(
+                        value
+                            .map(|v| {
+                                arg_from_str(v, err, "summary-metrics-mask", "google-fieldmask")
+                            })
+                            .unwrap_or(apis_common::FieldMask::default()),
+                    );
+                }
+                "stage-status" => {
+                    call = call.stage_status(value.unwrap_or(""));
+                }
+                "stage-ids" => {
+                    call = call.add_stage_ids(
+                        value
+                            .map(|v| arg_from_str(v, err, "stage-ids", "int64"))
+                            .unwrap_or(-0),
+                    );
+                }
+                "parent" => {
+                    call = call.parent(value.unwrap_or(""));
+                }
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                }
+                "page-size" => {
+                    call = call.page_size(
+                        value
+                            .map(|v| arg_from_str(v, err, "page-size", "int32"))
+                            .unwrap_or(-0),
+                    );
+                }
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(
+                                    [
+                                        "page-size",
+                                        "page-token",
+                                        "parent",
+                                        "stage-ids",
+                                        "stage-status",
+                                        "summary-metrics-mask",
+                                    ]
+                                    .iter()
+                                    .map(|v| *v),
+                                );
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_sessions_spark_applications_summarize_executors(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .locations_sessions_spark_applications_summarize_executors(
+                opt.value_of("name").unwrap_or(""),
+            );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "parent" => {
+                    call = call.parent(value.unwrap_or(""));
+                }
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["parent"].iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_sessions_spark_applications_summarize_jobs(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .locations_sessions_spark_applications_summarize_jobs(
+                opt.value_of("name").unwrap_or(""),
+            );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "parent" => {
+                    call = call.parent(value.unwrap_or(""));
+                }
+                "job-ids" => {
+                    call = call.add_job_ids(
+                        value
+                            .map(|v| arg_from_str(v, err, "job-ids", "int64"))
+                            .unwrap_or(-0),
+                    );
+                }
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["job-ids", "parent"].iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_sessions_spark_applications_summarize_stage_attempt_tasks(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .locations_sessions_spark_applications_summarize_stage_attempt_tasks(
+                opt.value_of("name").unwrap_or(""),
+            );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "stage-id" => {
+                    call = call.stage_id(
+                        value
+                            .map(|v| arg_from_str(v, err, "stage-id", "int64"))
+                            .unwrap_or(-0),
+                    );
+                }
+                "stage-attempt-id" => {
+                    call = call.stage_attempt_id(
+                        value
+                            .map(|v| arg_from_str(v, err, "stage-attempt-id", "int32"))
+                            .unwrap_or(-0),
+                    );
+                }
+                "parent" => {
+                    call = call.parent(value.unwrap_or(""));
+                }
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(
+                                    ["parent", "stage-attempt-id", "stage-id"]
+                                        .iter()
+                                        .map(|v| *v),
+                                );
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_sessions_spark_applications_summarize_stages(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .locations_sessions_spark_applications_summarize_stages(
+                opt.value_of("name").unwrap_or(""),
+            );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "stage-ids" => {
+                    call = call.add_stage_ids(
+                        value
+                            .map(|v| arg_from_str(v, err, "stage-ids", "int64"))
+                            .unwrap_or(-0),
+                    );
+                }
+                "parent" => {
+                    call = call.parent(value.unwrap_or(""));
+                }
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["parent", "stage-ids"].iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_sessions_spark_applications_write(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut field_cursor = FieldCursor::default();
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "parent" => Some((
+                    "parent",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(key, &vec!["parent"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
+            }
+        }
+        let mut request: api::WriteSessionSparkApplicationContextRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .locations_sessions_spark_applications_write(
+                request,
+                opt.value_of("name").unwrap_or(""),
+            );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _projects_locations_sessions_terminate(
         &self,
         opt: &ArgMatches<'n>,
@@ -3397,11 +7764,15 @@ where
                     "placement.cluster-selector.zone" => Some(("placement.clusterSelector.zone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.cluster-name" => Some(("placement.managedCluster.clusterName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.autoscaling-config.policy-uri" => Some(("placement.managedCluster.config.autoscalingConfig.policyUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.cluster-tier" => Some(("placement.managedCluster.config.clusterTier", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.cluster-type" => Some(("placement.managedCluster.config.clusterType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.config-bucket" => Some(("placement.managedCluster.config.configBucket", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.diagnostic-bucket" => Some(("placement.managedCluster.config.diagnosticBucket", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.encryption-config.gce-pd-kms-key-name" => Some(("placement.managedCluster.config.encryptionConfig.gcePdKmsKeyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.encryption-config.kms-key" => Some(("placement.managedCluster.config.encryptionConfig.kmsKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.endpoint-config.enable-http-port-access" => Some(("placement.managedCluster.config.endpointConfig.enableHttpPortAccess", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.endpoint-config.http-ports" => Some(("placement.managedCluster.config.endpointConfig.httpPorts", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "placement.managed-cluster.config.gce-cluster-config.auto-zone-exclude-zone-uris" => Some(("placement.managedCluster.config.gceClusterConfig.autoZoneExcludeZoneUris", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "placement.managed-cluster.config.gce-cluster-config.confidential-instance-config.enable-confidential-compute" => Some(("placement.managedCluster.config.gceClusterConfig.confidentialInstanceConfig.enableConfidentialCompute", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.gce-cluster-config.internal-ip-only" => Some(("placement.managedCluster.config.gceClusterConfig.internalIpOnly", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.gce-cluster-config.metadata" => Some(("placement.managedCluster.config.gceClusterConfig.metadata", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
@@ -3411,6 +7782,7 @@ where
                     "placement.managed-cluster.config.gce-cluster-config.reservation-affinity.consume-reservation-type" => Some(("placement.managedCluster.config.gceClusterConfig.reservationAffinity.consumeReservationType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.gce-cluster-config.reservation-affinity.key" => Some(("placement.managedCluster.config.gceClusterConfig.reservationAffinity.key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.gce-cluster-config.reservation-affinity.values" => Some(("placement.managedCluster.config.gceClusterConfig.reservationAffinity.values", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "placement.managed-cluster.config.gce-cluster-config.resource-manager-tags" => Some(("placement.managedCluster.config.gceClusterConfig.resourceManagerTags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "placement.managed-cluster.config.gce-cluster-config.service-account" => Some(("placement.managedCluster.config.gceClusterConfig.serviceAccount", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.gce-cluster-config.service-account-scopes" => Some(("placement.managedCluster.config.gceClusterConfig.serviceAccountScopes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "placement.managed-cluster.config.gce-cluster-config.shielded-instance-config.enable-integrity-monitoring" => Some(("placement.managedCluster.config.gceClusterConfig.shieldedInstanceConfig.enableIntegrityMonitoring", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -3424,8 +7796,11 @@ where
                     "placement.managed-cluster.config.gke-cluster-config.namespaced-gke-deployment-target.target-gke-cluster" => Some(("placement.managedCluster.config.gkeClusterConfig.namespacedGkeDeploymentTarget.targetGkeCluster", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.lifecycle-config.auto-delete-time" => Some(("placement.managedCluster.config.lifecycleConfig.autoDeleteTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.lifecycle-config.auto-delete-ttl" => Some(("placement.managedCluster.config.lifecycleConfig.autoDeleteTtl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.lifecycle-config.auto-stop-time" => Some(("placement.managedCluster.config.lifecycleConfig.autoStopTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.lifecycle-config.auto-stop-ttl" => Some(("placement.managedCluster.config.lifecycleConfig.autoStopTtl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.lifecycle-config.idle-delete-ttl" => Some(("placement.managedCluster.config.lifecycleConfig.idleDeleteTtl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.lifecycle-config.idle-start-time" => Some(("placement.managedCluster.config.lifecycleConfig.idleStartTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.lifecycle-config.idle-stop-ttl" => Some(("placement.managedCluster.config.lifecycleConfig.idleStopTtl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.master-config.disk-config.boot-disk-provisioned-iops" => Some(("placement.managedCluster.config.masterConfig.diskConfig.bootDiskProvisionedIops", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.master-config.disk-config.boot-disk-provisioned-throughput" => Some(("placement.managedCluster.config.masterConfig.diskConfig.bootDiskProvisionedThroughput", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.master-config.disk-config.boot-disk-size-gb" => Some(("placement.managedCluster.config.masterConfig.diskConfig.bootDiskSizeGb", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
@@ -3433,6 +7808,8 @@ where
                     "placement.managed-cluster.config.master-config.disk-config.local-ssd-interface" => Some(("placement.managedCluster.config.masterConfig.diskConfig.localSsdInterface", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.master-config.disk-config.num-local-ssds" => Some(("placement.managedCluster.config.masterConfig.diskConfig.numLocalSsds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.master-config.image-uri" => Some(("placement.managedCluster.config.masterConfig.imageUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.master-config.instance-flexibility-policy.provisioning-model-mix.standard-capacity-base" => Some(("placement.managedCluster.config.masterConfig.instanceFlexibilityPolicy.provisioningModelMix.standardCapacityBase", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.master-config.instance-flexibility-policy.provisioning-model-mix.standard-capacity-percent-above-base" => Some(("placement.managedCluster.config.masterConfig.instanceFlexibilityPolicy.provisioningModelMix.standardCapacityPercentAboveBase", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.master-config.instance-names" => Some(("placement.managedCluster.config.masterConfig.instanceNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "placement.managed-cluster.config.master-config.is-preemptible" => Some(("placement.managedCluster.config.masterConfig.isPreemptible", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.master-config.machine-type-uri" => Some(("placement.managedCluster.config.masterConfig.machineTypeUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -3452,6 +7829,8 @@ where
                     "placement.managed-cluster.config.secondary-worker-config.disk-config.local-ssd-interface" => Some(("placement.managedCluster.config.secondaryWorkerConfig.diskConfig.localSsdInterface", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.secondary-worker-config.disk-config.num-local-ssds" => Some(("placement.managedCluster.config.secondaryWorkerConfig.diskConfig.numLocalSsds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.secondary-worker-config.image-uri" => Some(("placement.managedCluster.config.secondaryWorkerConfig.imageUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.secondary-worker-config.instance-flexibility-policy.provisioning-model-mix.standard-capacity-base" => Some(("placement.managedCluster.config.secondaryWorkerConfig.instanceFlexibilityPolicy.provisioningModelMix.standardCapacityBase", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.secondary-worker-config.instance-flexibility-policy.provisioning-model-mix.standard-capacity-percent-above-base" => Some(("placement.managedCluster.config.secondaryWorkerConfig.instanceFlexibilityPolicy.provisioningModelMix.standardCapacityPercentAboveBase", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.secondary-worker-config.instance-names" => Some(("placement.managedCluster.config.secondaryWorkerConfig.instanceNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "placement.managed-cluster.config.secondary-worker-config.is-preemptible" => Some(("placement.managedCluster.config.secondaryWorkerConfig.isPreemptible", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.secondary-worker-config.machine-type-uri" => Some(("placement.managedCluster.config.secondaryWorkerConfig.machineTypeUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -3490,6 +7869,8 @@ where
                     "placement.managed-cluster.config.worker-config.disk-config.local-ssd-interface" => Some(("placement.managedCluster.config.workerConfig.diskConfig.localSsdInterface", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.worker-config.disk-config.num-local-ssds" => Some(("placement.managedCluster.config.workerConfig.diskConfig.numLocalSsds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.worker-config.image-uri" => Some(("placement.managedCluster.config.workerConfig.imageUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.worker-config.instance-flexibility-policy.provisioning-model-mix.standard-capacity-base" => Some(("placement.managedCluster.config.workerConfig.instanceFlexibilityPolicy.provisioningModelMix.standardCapacityBase", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.worker-config.instance-flexibility-policy.provisioning-model-mix.standard-capacity-percent-above-base" => Some(("placement.managedCluster.config.workerConfig.instanceFlexibilityPolicy.provisioningModelMix.standardCapacityPercentAboveBase", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.worker-config.instance-names" => Some(("placement.managedCluster.config.workerConfig.instanceNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "placement.managed-cluster.config.worker-config.is-preemptible" => Some(("placement.managedCluster.config.workerConfig.isPreemptible", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.worker-config.machine-type-uri" => Some(("placement.managedCluster.config.workerConfig.machineTypeUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -3505,7 +7886,7 @@ where
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "version" => Some(("version", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["auto-delete-time", "auto-delete-ttl", "autoscaling-config", "boot-disk-provisioned-iops", "boot-disk-provisioned-throughput", "boot-disk-size-gb", "boot-disk-type", "cluster-labels", "cluster-name", "cluster-namespace", "cluster-selector", "confidential-instance-config", "config", "config-bucket", "consume-reservation-type", "create-time", "cross-realm-trust-admin-server", "cross-realm-trust-kdc", "cross-realm-trust-realm", "cross-realm-trust-shared-password-uri", "dag-timeout", "dataproc-metastore-service", "disk-config", "enable-confidential-compute", "enable-http-port-access", "enable-integrity-monitoring", "enable-kerberos", "enable-secure-boot", "enable-vtpm", "encryption-config", "endpoint-config", "gce-cluster-config", "gce-pd-kms-key-name", "gke-cluster-config", "gke-cluster-target", "http-ports", "id", "identity-config", "idle-delete-ttl", "idle-start-time", "image-uri", "image-version", "instance-group-manager-name", "instance-group-manager-uri", "instance-names", "instance-template-name", "internal-ip-only", "is-preemptible", "kdc-db-key-uri", "kerberos-config", "key", "key-password-uri", "keystore-password-uri", "keystore-uri", "kms-key", "kms-key-uri", "labels", "lifecycle-config", "local-ssd-interface", "machine-type-uri", "managed-cluster", "managed-group-config", "master-config", "metadata", "metastore-config", "min-cpu-platform", "min-num-instances", "name", "namespaced-gke-deployment-target", "network-uri", "node-group-affinity", "node-group-uri", "num-instances", "num-local-ssds", "optional-components", "placement", "policy-uri", "preemptibility", "private-ipv6-google-access", "properties", "realm", "required-registration-fraction", "reservation-affinity", "root-principal-password-uri", "secondary-worker-config", "security-config", "service-account", "service-account-scopes", "shielded-instance-config", "software-config", "startup-config", "subnetwork-uri", "tags", "target-gke-cluster", "temp-bucket", "tgt-lifetime-hours", "truststore-password-uri", "truststore-uri", "update-time", "user-service-account-mapping", "values", "version", "worker-config", "zone", "zone-uri"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["auto-delete-time", "auto-delete-ttl", "auto-stop-time", "auto-stop-ttl", "auto-zone-exclude-zone-uris", "autoscaling-config", "boot-disk-provisioned-iops", "boot-disk-provisioned-throughput", "boot-disk-size-gb", "boot-disk-type", "cluster-labels", "cluster-name", "cluster-namespace", "cluster-selector", "cluster-tier", "cluster-type", "confidential-instance-config", "config", "config-bucket", "consume-reservation-type", "create-time", "cross-realm-trust-admin-server", "cross-realm-trust-kdc", "cross-realm-trust-realm", "cross-realm-trust-shared-password-uri", "dag-timeout", "dataproc-metastore-service", "diagnostic-bucket", "disk-config", "enable-confidential-compute", "enable-http-port-access", "enable-integrity-monitoring", "enable-kerberos", "enable-secure-boot", "enable-vtpm", "encryption-config", "endpoint-config", "gce-cluster-config", "gce-pd-kms-key-name", "gke-cluster-config", "gke-cluster-target", "http-ports", "id", "identity-config", "idle-delete-ttl", "idle-start-time", "idle-stop-ttl", "image-uri", "image-version", "instance-flexibility-policy", "instance-group-manager-name", "instance-group-manager-uri", "instance-names", "instance-template-name", "internal-ip-only", "is-preemptible", "kdc-db-key-uri", "kerberos-config", "key", "key-password-uri", "keystore-password-uri", "keystore-uri", "kms-key", "kms-key-uri", "labels", "lifecycle-config", "local-ssd-interface", "machine-type-uri", "managed-cluster", "managed-group-config", "master-config", "metadata", "metastore-config", "min-cpu-platform", "min-num-instances", "name", "namespaced-gke-deployment-target", "network-uri", "node-group-affinity", "node-group-uri", "num-instances", "num-local-ssds", "optional-components", "placement", "policy-uri", "preemptibility", "private-ipv6-google-access", "properties", "provisioning-model-mix", "realm", "required-registration-fraction", "reservation-affinity", "resource-manager-tags", "root-principal-password-uri", "secondary-worker-config", "security-config", "service-account", "service-account-scopes", "shielded-instance-config", "software-config", "standard-capacity-base", "standard-capacity-percent-above-base", "startup-config", "subnetwork-uri", "tags", "target-gke-cluster", "temp-bucket", "tgt-lifetime-hours", "truststore-password-uri", "truststore-uri", "update-time", "user-service-account-mapping", "values", "version", "worker-config", "zone", "zone-uri"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -4107,11 +8488,15 @@ where
                     "placement.cluster-selector.zone" => Some(("placement.clusterSelector.zone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.cluster-name" => Some(("placement.managedCluster.clusterName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.autoscaling-config.policy-uri" => Some(("placement.managedCluster.config.autoscalingConfig.policyUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.cluster-tier" => Some(("placement.managedCluster.config.clusterTier", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.cluster-type" => Some(("placement.managedCluster.config.clusterType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.config-bucket" => Some(("placement.managedCluster.config.configBucket", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.diagnostic-bucket" => Some(("placement.managedCluster.config.diagnosticBucket", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.encryption-config.gce-pd-kms-key-name" => Some(("placement.managedCluster.config.encryptionConfig.gcePdKmsKeyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.encryption-config.kms-key" => Some(("placement.managedCluster.config.encryptionConfig.kmsKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.endpoint-config.enable-http-port-access" => Some(("placement.managedCluster.config.endpointConfig.enableHttpPortAccess", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.endpoint-config.http-ports" => Some(("placement.managedCluster.config.endpointConfig.httpPorts", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "placement.managed-cluster.config.gce-cluster-config.auto-zone-exclude-zone-uris" => Some(("placement.managedCluster.config.gceClusterConfig.autoZoneExcludeZoneUris", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "placement.managed-cluster.config.gce-cluster-config.confidential-instance-config.enable-confidential-compute" => Some(("placement.managedCluster.config.gceClusterConfig.confidentialInstanceConfig.enableConfidentialCompute", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.gce-cluster-config.internal-ip-only" => Some(("placement.managedCluster.config.gceClusterConfig.internalIpOnly", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.gce-cluster-config.metadata" => Some(("placement.managedCluster.config.gceClusterConfig.metadata", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
@@ -4121,6 +8506,7 @@ where
                     "placement.managed-cluster.config.gce-cluster-config.reservation-affinity.consume-reservation-type" => Some(("placement.managedCluster.config.gceClusterConfig.reservationAffinity.consumeReservationType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.gce-cluster-config.reservation-affinity.key" => Some(("placement.managedCluster.config.gceClusterConfig.reservationAffinity.key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.gce-cluster-config.reservation-affinity.values" => Some(("placement.managedCluster.config.gceClusterConfig.reservationAffinity.values", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "placement.managed-cluster.config.gce-cluster-config.resource-manager-tags" => Some(("placement.managedCluster.config.gceClusterConfig.resourceManagerTags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "placement.managed-cluster.config.gce-cluster-config.service-account" => Some(("placement.managedCluster.config.gceClusterConfig.serviceAccount", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.gce-cluster-config.service-account-scopes" => Some(("placement.managedCluster.config.gceClusterConfig.serviceAccountScopes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "placement.managed-cluster.config.gce-cluster-config.shielded-instance-config.enable-integrity-monitoring" => Some(("placement.managedCluster.config.gceClusterConfig.shieldedInstanceConfig.enableIntegrityMonitoring", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -4134,8 +8520,11 @@ where
                     "placement.managed-cluster.config.gke-cluster-config.namespaced-gke-deployment-target.target-gke-cluster" => Some(("placement.managedCluster.config.gkeClusterConfig.namespacedGkeDeploymentTarget.targetGkeCluster", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.lifecycle-config.auto-delete-time" => Some(("placement.managedCluster.config.lifecycleConfig.autoDeleteTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.lifecycle-config.auto-delete-ttl" => Some(("placement.managedCluster.config.lifecycleConfig.autoDeleteTtl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.lifecycle-config.auto-stop-time" => Some(("placement.managedCluster.config.lifecycleConfig.autoStopTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.lifecycle-config.auto-stop-ttl" => Some(("placement.managedCluster.config.lifecycleConfig.autoStopTtl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.lifecycle-config.idle-delete-ttl" => Some(("placement.managedCluster.config.lifecycleConfig.idleDeleteTtl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.lifecycle-config.idle-start-time" => Some(("placement.managedCluster.config.lifecycleConfig.idleStartTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.lifecycle-config.idle-stop-ttl" => Some(("placement.managedCluster.config.lifecycleConfig.idleStopTtl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.master-config.disk-config.boot-disk-provisioned-iops" => Some(("placement.managedCluster.config.masterConfig.diskConfig.bootDiskProvisionedIops", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.master-config.disk-config.boot-disk-provisioned-throughput" => Some(("placement.managedCluster.config.masterConfig.diskConfig.bootDiskProvisionedThroughput", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.master-config.disk-config.boot-disk-size-gb" => Some(("placement.managedCluster.config.masterConfig.diskConfig.bootDiskSizeGb", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
@@ -4143,6 +8532,8 @@ where
                     "placement.managed-cluster.config.master-config.disk-config.local-ssd-interface" => Some(("placement.managedCluster.config.masterConfig.diskConfig.localSsdInterface", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.master-config.disk-config.num-local-ssds" => Some(("placement.managedCluster.config.masterConfig.diskConfig.numLocalSsds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.master-config.image-uri" => Some(("placement.managedCluster.config.masterConfig.imageUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.master-config.instance-flexibility-policy.provisioning-model-mix.standard-capacity-base" => Some(("placement.managedCluster.config.masterConfig.instanceFlexibilityPolicy.provisioningModelMix.standardCapacityBase", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.master-config.instance-flexibility-policy.provisioning-model-mix.standard-capacity-percent-above-base" => Some(("placement.managedCluster.config.masterConfig.instanceFlexibilityPolicy.provisioningModelMix.standardCapacityPercentAboveBase", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.master-config.instance-names" => Some(("placement.managedCluster.config.masterConfig.instanceNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "placement.managed-cluster.config.master-config.is-preemptible" => Some(("placement.managedCluster.config.masterConfig.isPreemptible", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.master-config.machine-type-uri" => Some(("placement.managedCluster.config.masterConfig.machineTypeUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -4162,6 +8553,8 @@ where
                     "placement.managed-cluster.config.secondary-worker-config.disk-config.local-ssd-interface" => Some(("placement.managedCluster.config.secondaryWorkerConfig.diskConfig.localSsdInterface", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.secondary-worker-config.disk-config.num-local-ssds" => Some(("placement.managedCluster.config.secondaryWorkerConfig.diskConfig.numLocalSsds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.secondary-worker-config.image-uri" => Some(("placement.managedCluster.config.secondaryWorkerConfig.imageUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.secondary-worker-config.instance-flexibility-policy.provisioning-model-mix.standard-capacity-base" => Some(("placement.managedCluster.config.secondaryWorkerConfig.instanceFlexibilityPolicy.provisioningModelMix.standardCapacityBase", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.secondary-worker-config.instance-flexibility-policy.provisioning-model-mix.standard-capacity-percent-above-base" => Some(("placement.managedCluster.config.secondaryWorkerConfig.instanceFlexibilityPolicy.provisioningModelMix.standardCapacityPercentAboveBase", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.secondary-worker-config.instance-names" => Some(("placement.managedCluster.config.secondaryWorkerConfig.instanceNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "placement.managed-cluster.config.secondary-worker-config.is-preemptible" => Some(("placement.managedCluster.config.secondaryWorkerConfig.isPreemptible", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.secondary-worker-config.machine-type-uri" => Some(("placement.managedCluster.config.secondaryWorkerConfig.machineTypeUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -4200,6 +8593,8 @@ where
                     "placement.managed-cluster.config.worker-config.disk-config.local-ssd-interface" => Some(("placement.managedCluster.config.workerConfig.diskConfig.localSsdInterface", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.worker-config.disk-config.num-local-ssds" => Some(("placement.managedCluster.config.workerConfig.diskConfig.numLocalSsds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.worker-config.image-uri" => Some(("placement.managedCluster.config.workerConfig.imageUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.worker-config.instance-flexibility-policy.provisioning-model-mix.standard-capacity-base" => Some(("placement.managedCluster.config.workerConfig.instanceFlexibilityPolicy.provisioningModelMix.standardCapacityBase", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.worker-config.instance-flexibility-policy.provisioning-model-mix.standard-capacity-percent-above-base" => Some(("placement.managedCluster.config.workerConfig.instanceFlexibilityPolicy.provisioningModelMix.standardCapacityPercentAboveBase", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.worker-config.instance-names" => Some(("placement.managedCluster.config.workerConfig.instanceNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "placement.managed-cluster.config.worker-config.is-preemptible" => Some(("placement.managedCluster.config.workerConfig.isPreemptible", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.worker-config.machine-type-uri" => Some(("placement.managedCluster.config.workerConfig.machineTypeUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -4215,7 +8610,7 @@ where
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "version" => Some(("version", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["auto-delete-time", "auto-delete-ttl", "autoscaling-config", "boot-disk-provisioned-iops", "boot-disk-provisioned-throughput", "boot-disk-size-gb", "boot-disk-type", "cluster-labels", "cluster-name", "cluster-namespace", "cluster-selector", "confidential-instance-config", "config", "config-bucket", "consume-reservation-type", "create-time", "cross-realm-trust-admin-server", "cross-realm-trust-kdc", "cross-realm-trust-realm", "cross-realm-trust-shared-password-uri", "dag-timeout", "dataproc-metastore-service", "disk-config", "enable-confidential-compute", "enable-http-port-access", "enable-integrity-monitoring", "enable-kerberos", "enable-secure-boot", "enable-vtpm", "encryption-config", "endpoint-config", "gce-cluster-config", "gce-pd-kms-key-name", "gke-cluster-config", "gke-cluster-target", "http-ports", "id", "identity-config", "idle-delete-ttl", "idle-start-time", "image-uri", "image-version", "instance-group-manager-name", "instance-group-manager-uri", "instance-names", "instance-template-name", "internal-ip-only", "is-preemptible", "kdc-db-key-uri", "kerberos-config", "key", "key-password-uri", "keystore-password-uri", "keystore-uri", "kms-key", "kms-key-uri", "labels", "lifecycle-config", "local-ssd-interface", "machine-type-uri", "managed-cluster", "managed-group-config", "master-config", "metadata", "metastore-config", "min-cpu-platform", "min-num-instances", "name", "namespaced-gke-deployment-target", "network-uri", "node-group-affinity", "node-group-uri", "num-instances", "num-local-ssds", "optional-components", "placement", "policy-uri", "preemptibility", "private-ipv6-google-access", "properties", "realm", "required-registration-fraction", "reservation-affinity", "root-principal-password-uri", "secondary-worker-config", "security-config", "service-account", "service-account-scopes", "shielded-instance-config", "software-config", "startup-config", "subnetwork-uri", "tags", "target-gke-cluster", "temp-bucket", "tgt-lifetime-hours", "truststore-password-uri", "truststore-uri", "update-time", "user-service-account-mapping", "values", "version", "worker-config", "zone", "zone-uri"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["auto-delete-time", "auto-delete-ttl", "auto-stop-time", "auto-stop-ttl", "auto-zone-exclude-zone-uris", "autoscaling-config", "boot-disk-provisioned-iops", "boot-disk-provisioned-throughput", "boot-disk-size-gb", "boot-disk-type", "cluster-labels", "cluster-name", "cluster-namespace", "cluster-selector", "cluster-tier", "cluster-type", "confidential-instance-config", "config", "config-bucket", "consume-reservation-type", "create-time", "cross-realm-trust-admin-server", "cross-realm-trust-kdc", "cross-realm-trust-realm", "cross-realm-trust-shared-password-uri", "dag-timeout", "dataproc-metastore-service", "diagnostic-bucket", "disk-config", "enable-confidential-compute", "enable-http-port-access", "enable-integrity-monitoring", "enable-kerberos", "enable-secure-boot", "enable-vtpm", "encryption-config", "endpoint-config", "gce-cluster-config", "gce-pd-kms-key-name", "gke-cluster-config", "gke-cluster-target", "http-ports", "id", "identity-config", "idle-delete-ttl", "idle-start-time", "idle-stop-ttl", "image-uri", "image-version", "instance-flexibility-policy", "instance-group-manager-name", "instance-group-manager-uri", "instance-names", "instance-template-name", "internal-ip-only", "is-preemptible", "kdc-db-key-uri", "kerberos-config", "key", "key-password-uri", "keystore-password-uri", "keystore-uri", "kms-key", "kms-key-uri", "labels", "lifecycle-config", "local-ssd-interface", "machine-type-uri", "managed-cluster", "managed-group-config", "master-config", "metadata", "metastore-config", "min-cpu-platform", "min-num-instances", "name", "namespaced-gke-deployment-target", "network-uri", "node-group-affinity", "node-group-uri", "num-instances", "num-local-ssds", "optional-components", "placement", "policy-uri", "preemptibility", "private-ipv6-google-access", "properties", "provisioning-model-mix", "realm", "required-registration-fraction", "reservation-affinity", "resource-manager-tags", "root-principal-password-uri", "secondary-worker-config", "security-config", "service-account", "service-account-scopes", "shielded-instance-config", "software-config", "standard-capacity-base", "standard-capacity-percent-above-base", "startup-config", "subnetwork-uri", "tags", "target-gke-cluster", "temp-bucket", "tgt-lifetime-hours", "truststore-password-uri", "truststore-uri", "update-time", "user-service-account-mapping", "values", "version", "worker-config", "zone", "zone-uri"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -4729,11 +9124,15 @@ where
                     "placement.cluster-selector.zone" => Some(("placement.clusterSelector.zone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.cluster-name" => Some(("placement.managedCluster.clusterName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.autoscaling-config.policy-uri" => Some(("placement.managedCluster.config.autoscalingConfig.policyUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.cluster-tier" => Some(("placement.managedCluster.config.clusterTier", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.cluster-type" => Some(("placement.managedCluster.config.clusterType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.config-bucket" => Some(("placement.managedCluster.config.configBucket", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.diagnostic-bucket" => Some(("placement.managedCluster.config.diagnosticBucket", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.encryption-config.gce-pd-kms-key-name" => Some(("placement.managedCluster.config.encryptionConfig.gcePdKmsKeyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.encryption-config.kms-key" => Some(("placement.managedCluster.config.encryptionConfig.kmsKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.endpoint-config.enable-http-port-access" => Some(("placement.managedCluster.config.endpointConfig.enableHttpPortAccess", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.endpoint-config.http-ports" => Some(("placement.managedCluster.config.endpointConfig.httpPorts", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "placement.managed-cluster.config.gce-cluster-config.auto-zone-exclude-zone-uris" => Some(("placement.managedCluster.config.gceClusterConfig.autoZoneExcludeZoneUris", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "placement.managed-cluster.config.gce-cluster-config.confidential-instance-config.enable-confidential-compute" => Some(("placement.managedCluster.config.gceClusterConfig.confidentialInstanceConfig.enableConfidentialCompute", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.gce-cluster-config.internal-ip-only" => Some(("placement.managedCluster.config.gceClusterConfig.internalIpOnly", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.gce-cluster-config.metadata" => Some(("placement.managedCluster.config.gceClusterConfig.metadata", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
@@ -4743,6 +9142,7 @@ where
                     "placement.managed-cluster.config.gce-cluster-config.reservation-affinity.consume-reservation-type" => Some(("placement.managedCluster.config.gceClusterConfig.reservationAffinity.consumeReservationType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.gce-cluster-config.reservation-affinity.key" => Some(("placement.managedCluster.config.gceClusterConfig.reservationAffinity.key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.gce-cluster-config.reservation-affinity.values" => Some(("placement.managedCluster.config.gceClusterConfig.reservationAffinity.values", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "placement.managed-cluster.config.gce-cluster-config.resource-manager-tags" => Some(("placement.managedCluster.config.gceClusterConfig.resourceManagerTags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "placement.managed-cluster.config.gce-cluster-config.service-account" => Some(("placement.managedCluster.config.gceClusterConfig.serviceAccount", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.gce-cluster-config.service-account-scopes" => Some(("placement.managedCluster.config.gceClusterConfig.serviceAccountScopes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "placement.managed-cluster.config.gce-cluster-config.shielded-instance-config.enable-integrity-monitoring" => Some(("placement.managedCluster.config.gceClusterConfig.shieldedInstanceConfig.enableIntegrityMonitoring", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -4756,8 +9156,11 @@ where
                     "placement.managed-cluster.config.gke-cluster-config.namespaced-gke-deployment-target.target-gke-cluster" => Some(("placement.managedCluster.config.gkeClusterConfig.namespacedGkeDeploymentTarget.targetGkeCluster", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.lifecycle-config.auto-delete-time" => Some(("placement.managedCluster.config.lifecycleConfig.autoDeleteTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.lifecycle-config.auto-delete-ttl" => Some(("placement.managedCluster.config.lifecycleConfig.autoDeleteTtl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.lifecycle-config.auto-stop-time" => Some(("placement.managedCluster.config.lifecycleConfig.autoStopTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.lifecycle-config.auto-stop-ttl" => Some(("placement.managedCluster.config.lifecycleConfig.autoStopTtl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.lifecycle-config.idle-delete-ttl" => Some(("placement.managedCluster.config.lifecycleConfig.idleDeleteTtl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.lifecycle-config.idle-start-time" => Some(("placement.managedCluster.config.lifecycleConfig.idleStartTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.lifecycle-config.idle-stop-ttl" => Some(("placement.managedCluster.config.lifecycleConfig.idleStopTtl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.master-config.disk-config.boot-disk-provisioned-iops" => Some(("placement.managedCluster.config.masterConfig.diskConfig.bootDiskProvisionedIops", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.master-config.disk-config.boot-disk-provisioned-throughput" => Some(("placement.managedCluster.config.masterConfig.diskConfig.bootDiskProvisionedThroughput", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.master-config.disk-config.boot-disk-size-gb" => Some(("placement.managedCluster.config.masterConfig.diskConfig.bootDiskSizeGb", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
@@ -4765,6 +9168,8 @@ where
                     "placement.managed-cluster.config.master-config.disk-config.local-ssd-interface" => Some(("placement.managedCluster.config.masterConfig.diskConfig.localSsdInterface", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.master-config.disk-config.num-local-ssds" => Some(("placement.managedCluster.config.masterConfig.diskConfig.numLocalSsds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.master-config.image-uri" => Some(("placement.managedCluster.config.masterConfig.imageUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.master-config.instance-flexibility-policy.provisioning-model-mix.standard-capacity-base" => Some(("placement.managedCluster.config.masterConfig.instanceFlexibilityPolicy.provisioningModelMix.standardCapacityBase", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.master-config.instance-flexibility-policy.provisioning-model-mix.standard-capacity-percent-above-base" => Some(("placement.managedCluster.config.masterConfig.instanceFlexibilityPolicy.provisioningModelMix.standardCapacityPercentAboveBase", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.master-config.instance-names" => Some(("placement.managedCluster.config.masterConfig.instanceNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "placement.managed-cluster.config.master-config.is-preemptible" => Some(("placement.managedCluster.config.masterConfig.isPreemptible", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.master-config.machine-type-uri" => Some(("placement.managedCluster.config.masterConfig.machineTypeUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -4784,6 +9189,8 @@ where
                     "placement.managed-cluster.config.secondary-worker-config.disk-config.local-ssd-interface" => Some(("placement.managedCluster.config.secondaryWorkerConfig.diskConfig.localSsdInterface", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.secondary-worker-config.disk-config.num-local-ssds" => Some(("placement.managedCluster.config.secondaryWorkerConfig.diskConfig.numLocalSsds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.secondary-worker-config.image-uri" => Some(("placement.managedCluster.config.secondaryWorkerConfig.imageUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.secondary-worker-config.instance-flexibility-policy.provisioning-model-mix.standard-capacity-base" => Some(("placement.managedCluster.config.secondaryWorkerConfig.instanceFlexibilityPolicy.provisioningModelMix.standardCapacityBase", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.secondary-worker-config.instance-flexibility-policy.provisioning-model-mix.standard-capacity-percent-above-base" => Some(("placement.managedCluster.config.secondaryWorkerConfig.instanceFlexibilityPolicy.provisioningModelMix.standardCapacityPercentAboveBase", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.secondary-worker-config.instance-names" => Some(("placement.managedCluster.config.secondaryWorkerConfig.instanceNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "placement.managed-cluster.config.secondary-worker-config.is-preemptible" => Some(("placement.managedCluster.config.secondaryWorkerConfig.isPreemptible", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.secondary-worker-config.machine-type-uri" => Some(("placement.managedCluster.config.secondaryWorkerConfig.machineTypeUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -4822,6 +9229,8 @@ where
                     "placement.managed-cluster.config.worker-config.disk-config.local-ssd-interface" => Some(("placement.managedCluster.config.workerConfig.diskConfig.localSsdInterface", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.worker-config.disk-config.num-local-ssds" => Some(("placement.managedCluster.config.workerConfig.diskConfig.numLocalSsds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.worker-config.image-uri" => Some(("placement.managedCluster.config.workerConfig.imageUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.worker-config.instance-flexibility-policy.provisioning-model-mix.standard-capacity-base" => Some(("placement.managedCluster.config.workerConfig.instanceFlexibilityPolicy.provisioningModelMix.standardCapacityBase", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.worker-config.instance-flexibility-policy.provisioning-model-mix.standard-capacity-percent-above-base" => Some(("placement.managedCluster.config.workerConfig.instanceFlexibilityPolicy.provisioningModelMix.standardCapacityPercentAboveBase", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.worker-config.instance-names" => Some(("placement.managedCluster.config.workerConfig.instanceNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "placement.managed-cluster.config.worker-config.is-preemptible" => Some(("placement.managedCluster.config.workerConfig.isPreemptible", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.worker-config.machine-type-uri" => Some(("placement.managedCluster.config.workerConfig.machineTypeUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -4837,7 +9246,7 @@ where
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "version" => Some(("version", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["auto-delete-time", "auto-delete-ttl", "autoscaling-config", "boot-disk-provisioned-iops", "boot-disk-provisioned-throughput", "boot-disk-size-gb", "boot-disk-type", "cluster-labels", "cluster-name", "cluster-namespace", "cluster-selector", "confidential-instance-config", "config", "config-bucket", "consume-reservation-type", "create-time", "cross-realm-trust-admin-server", "cross-realm-trust-kdc", "cross-realm-trust-realm", "cross-realm-trust-shared-password-uri", "dag-timeout", "dataproc-metastore-service", "disk-config", "enable-confidential-compute", "enable-http-port-access", "enable-integrity-monitoring", "enable-kerberos", "enable-secure-boot", "enable-vtpm", "encryption-config", "endpoint-config", "gce-cluster-config", "gce-pd-kms-key-name", "gke-cluster-config", "gke-cluster-target", "http-ports", "id", "identity-config", "idle-delete-ttl", "idle-start-time", "image-uri", "image-version", "instance-group-manager-name", "instance-group-manager-uri", "instance-names", "instance-template-name", "internal-ip-only", "is-preemptible", "kdc-db-key-uri", "kerberos-config", "key", "key-password-uri", "keystore-password-uri", "keystore-uri", "kms-key", "kms-key-uri", "labels", "lifecycle-config", "local-ssd-interface", "machine-type-uri", "managed-cluster", "managed-group-config", "master-config", "metadata", "metastore-config", "min-cpu-platform", "min-num-instances", "name", "namespaced-gke-deployment-target", "network-uri", "node-group-affinity", "node-group-uri", "num-instances", "num-local-ssds", "optional-components", "placement", "policy-uri", "preemptibility", "private-ipv6-google-access", "properties", "realm", "required-registration-fraction", "reservation-affinity", "root-principal-password-uri", "secondary-worker-config", "security-config", "service-account", "service-account-scopes", "shielded-instance-config", "software-config", "startup-config", "subnetwork-uri", "tags", "target-gke-cluster", "temp-bucket", "tgt-lifetime-hours", "truststore-password-uri", "truststore-uri", "update-time", "user-service-account-mapping", "values", "version", "worker-config", "zone", "zone-uri"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["auto-delete-time", "auto-delete-ttl", "auto-stop-time", "auto-stop-ttl", "auto-zone-exclude-zone-uris", "autoscaling-config", "boot-disk-provisioned-iops", "boot-disk-provisioned-throughput", "boot-disk-size-gb", "boot-disk-type", "cluster-labels", "cluster-name", "cluster-namespace", "cluster-selector", "cluster-tier", "cluster-type", "confidential-instance-config", "config", "config-bucket", "consume-reservation-type", "create-time", "cross-realm-trust-admin-server", "cross-realm-trust-kdc", "cross-realm-trust-realm", "cross-realm-trust-shared-password-uri", "dag-timeout", "dataproc-metastore-service", "diagnostic-bucket", "disk-config", "enable-confidential-compute", "enable-http-port-access", "enable-integrity-monitoring", "enable-kerberos", "enable-secure-boot", "enable-vtpm", "encryption-config", "endpoint-config", "gce-cluster-config", "gce-pd-kms-key-name", "gke-cluster-config", "gke-cluster-target", "http-ports", "id", "identity-config", "idle-delete-ttl", "idle-start-time", "idle-stop-ttl", "image-uri", "image-version", "instance-flexibility-policy", "instance-group-manager-name", "instance-group-manager-uri", "instance-names", "instance-template-name", "internal-ip-only", "is-preemptible", "kdc-db-key-uri", "kerberos-config", "key", "key-password-uri", "keystore-password-uri", "keystore-uri", "kms-key", "kms-key-uri", "labels", "lifecycle-config", "local-ssd-interface", "machine-type-uri", "managed-cluster", "managed-group-config", "master-config", "metadata", "metastore-config", "min-cpu-platform", "min-num-instances", "name", "namespaced-gke-deployment-target", "network-uri", "node-group-affinity", "node-group-uri", "num-instances", "num-local-ssds", "optional-components", "placement", "policy-uri", "preemptibility", "private-ipv6-google-access", "properties", "provisioning-model-mix", "realm", "required-registration-fraction", "reservation-affinity", "resource-manager-tags", "root-principal-password-uri", "secondary-worker-config", "security-config", "service-account", "service-account-scopes", "shielded-instance-config", "software-config", "standard-capacity-base", "standard-capacity-percent-above-base", "startup-config", "subnetwork-uri", "tags", "target-gke-cluster", "temp-bucket", "tgt-lifetime-hours", "truststore-password-uri", "truststore-uri", "update-time", "user-service-account-mapping", "values", "version", "worker-config", "zone", "zone-uri"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -5043,6 +9452,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "cluster-type" => Some((
+                    "clusterType",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "id" => Some((
                     "id",
                     JsonTypeInfo {
@@ -5111,6 +9527,7 @@ where
                         key,
                         &vec![
                             "basic-algorithm",
+                            "cluster-type",
                             "cooldown-period",
                             "graceful-decommission-timeout",
                             "id",
@@ -6016,6 +10433,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "cluster-type" => Some((
+                    "clusterType",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "id" => Some((
                     "id",
                     JsonTypeInfo {
@@ -6084,6 +10508,7 @@ where
                         key,
                         &vec![
                             "basic-algorithm",
+                            "cluster-type",
                             "cooldown-period",
                             "graceful-decommission-timeout",
                             "id",
@@ -6231,11 +10656,15 @@ where
                     "cluster-name" => Some(("clusterName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster-uuid" => Some(("clusterUuid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.autoscaling-config.policy-uri" => Some(("config.autoscalingConfig.policyUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.cluster-tier" => Some(("config.clusterTier", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.cluster-type" => Some(("config.clusterType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.config-bucket" => Some(("config.configBucket", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.diagnostic-bucket" => Some(("config.diagnosticBucket", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.encryption-config.gce-pd-kms-key-name" => Some(("config.encryptionConfig.gcePdKmsKeyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.encryption-config.kms-key" => Some(("config.encryptionConfig.kmsKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.endpoint-config.enable-http-port-access" => Some(("config.endpointConfig.enableHttpPortAccess", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "config.endpoint-config.http-ports" => Some(("config.endpointConfig.httpPorts", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "config.gce-cluster-config.auto-zone-exclude-zone-uris" => Some(("config.gceClusterConfig.autoZoneExcludeZoneUris", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "config.gce-cluster-config.confidential-instance-config.enable-confidential-compute" => Some(("config.gceClusterConfig.confidentialInstanceConfig.enableConfidentialCompute", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "config.gce-cluster-config.internal-ip-only" => Some(("config.gceClusterConfig.internalIpOnly", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "config.gce-cluster-config.metadata" => Some(("config.gceClusterConfig.metadata", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
@@ -6245,6 +10674,7 @@ where
                     "config.gce-cluster-config.reservation-affinity.consume-reservation-type" => Some(("config.gceClusterConfig.reservationAffinity.consumeReservationType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.gce-cluster-config.reservation-affinity.key" => Some(("config.gceClusterConfig.reservationAffinity.key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.gce-cluster-config.reservation-affinity.values" => Some(("config.gceClusterConfig.reservationAffinity.values", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "config.gce-cluster-config.resource-manager-tags" => Some(("config.gceClusterConfig.resourceManagerTags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "config.gce-cluster-config.service-account" => Some(("config.gceClusterConfig.serviceAccount", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.gce-cluster-config.service-account-scopes" => Some(("config.gceClusterConfig.serviceAccountScopes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "config.gce-cluster-config.shielded-instance-config.enable-integrity-monitoring" => Some(("config.gceClusterConfig.shieldedInstanceConfig.enableIntegrityMonitoring", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -6258,8 +10688,11 @@ where
                     "config.gke-cluster-config.namespaced-gke-deployment-target.target-gke-cluster" => Some(("config.gkeClusterConfig.namespacedGkeDeploymentTarget.targetGkeCluster", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.lifecycle-config.auto-delete-time" => Some(("config.lifecycleConfig.autoDeleteTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.lifecycle-config.auto-delete-ttl" => Some(("config.lifecycleConfig.autoDeleteTtl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.lifecycle-config.auto-stop-time" => Some(("config.lifecycleConfig.autoStopTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.lifecycle-config.auto-stop-ttl" => Some(("config.lifecycleConfig.autoStopTtl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.lifecycle-config.idle-delete-ttl" => Some(("config.lifecycleConfig.idleDeleteTtl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.lifecycle-config.idle-start-time" => Some(("config.lifecycleConfig.idleStartTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.lifecycle-config.idle-stop-ttl" => Some(("config.lifecycleConfig.idleStopTtl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.master-config.disk-config.boot-disk-provisioned-iops" => Some(("config.masterConfig.diskConfig.bootDiskProvisionedIops", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.master-config.disk-config.boot-disk-provisioned-throughput" => Some(("config.masterConfig.diskConfig.bootDiskProvisionedThroughput", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.master-config.disk-config.boot-disk-size-gb" => Some(("config.masterConfig.diskConfig.bootDiskSizeGb", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
@@ -6267,6 +10700,8 @@ where
                     "config.master-config.disk-config.local-ssd-interface" => Some(("config.masterConfig.diskConfig.localSsdInterface", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.master-config.disk-config.num-local-ssds" => Some(("config.masterConfig.diskConfig.numLocalSsds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "config.master-config.image-uri" => Some(("config.masterConfig.imageUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.master-config.instance-flexibility-policy.provisioning-model-mix.standard-capacity-base" => Some(("config.masterConfig.instanceFlexibilityPolicy.provisioningModelMix.standardCapacityBase", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "config.master-config.instance-flexibility-policy.provisioning-model-mix.standard-capacity-percent-above-base" => Some(("config.masterConfig.instanceFlexibilityPolicy.provisioningModelMix.standardCapacityPercentAboveBase", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "config.master-config.instance-names" => Some(("config.masterConfig.instanceNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "config.master-config.is-preemptible" => Some(("config.masterConfig.isPreemptible", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "config.master-config.machine-type-uri" => Some(("config.masterConfig.machineTypeUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -6286,6 +10721,8 @@ where
                     "config.secondary-worker-config.disk-config.local-ssd-interface" => Some(("config.secondaryWorkerConfig.diskConfig.localSsdInterface", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.secondary-worker-config.disk-config.num-local-ssds" => Some(("config.secondaryWorkerConfig.diskConfig.numLocalSsds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "config.secondary-worker-config.image-uri" => Some(("config.secondaryWorkerConfig.imageUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.secondary-worker-config.instance-flexibility-policy.provisioning-model-mix.standard-capacity-base" => Some(("config.secondaryWorkerConfig.instanceFlexibilityPolicy.provisioningModelMix.standardCapacityBase", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "config.secondary-worker-config.instance-flexibility-policy.provisioning-model-mix.standard-capacity-percent-above-base" => Some(("config.secondaryWorkerConfig.instanceFlexibilityPolicy.provisioningModelMix.standardCapacityPercentAboveBase", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "config.secondary-worker-config.instance-names" => Some(("config.secondaryWorkerConfig.instanceNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "config.secondary-worker-config.is-preemptible" => Some(("config.secondaryWorkerConfig.isPreemptible", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "config.secondary-worker-config.machine-type-uri" => Some(("config.secondaryWorkerConfig.machineTypeUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -6324,6 +10761,8 @@ where
                     "config.worker-config.disk-config.local-ssd-interface" => Some(("config.workerConfig.diskConfig.localSsdInterface", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.worker-config.disk-config.num-local-ssds" => Some(("config.workerConfig.diskConfig.numLocalSsds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "config.worker-config.image-uri" => Some(("config.workerConfig.imageUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.worker-config.instance-flexibility-policy.provisioning-model-mix.standard-capacity-base" => Some(("config.workerConfig.instanceFlexibilityPolicy.provisioningModelMix.standardCapacityBase", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "config.worker-config.instance-flexibility-policy.provisioning-model-mix.standard-capacity-percent-above-base" => Some(("config.workerConfig.instanceFlexibilityPolicy.provisioningModelMix.standardCapacityPercentAboveBase", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "config.worker-config.instance-names" => Some(("config.workerConfig.instanceNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "config.worker-config.is-preemptible" => Some(("config.workerConfig.isPreemptible", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "config.worker-config.machine-type-uri" => Some(("config.workerConfig.machineTypeUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -6353,7 +10792,7 @@ where
                     "virtual-cluster-config.kubernetes-cluster-config.kubernetes-software-config.properties" => Some(("virtualClusterConfig.kubernetesClusterConfig.kubernetesSoftwareConfig.properties", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "virtual-cluster-config.staging-bucket" => Some(("virtualClusterConfig.stagingBucket", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["auto-delete-time", "auto-delete-ttl", "autoscaling-config", "auxiliary-services-config", "boot-disk-provisioned-iops", "boot-disk-provisioned-throughput", "boot-disk-size-gb", "boot-disk-type", "cluster-name", "cluster-namespace", "cluster-uuid", "component-version", "confidential-instance-config", "config", "config-bucket", "consume-reservation-type", "cross-realm-trust-admin-server", "cross-realm-trust-kdc", "cross-realm-trust-realm", "cross-realm-trust-shared-password-uri", "dataproc-cluster", "dataproc-metastore-service", "detail", "disk-config", "enable-confidential-compute", "enable-http-port-access", "enable-integrity-monitoring", "enable-kerberos", "enable-secure-boot", "enable-vtpm", "encryption-config", "endpoint-config", "gce-cluster-config", "gce-pd-kms-key-name", "gke-cluster-config", "gke-cluster-target", "hdfs-metrics", "http-ports", "identity-config", "idle-delete-ttl", "idle-start-time", "image-uri", "image-version", "instance-group-manager-name", "instance-group-manager-uri", "instance-names", "instance-template-name", "internal-ip-only", "is-preemptible", "kdc-db-key-uri", "kerberos-config", "key", "key-password-uri", "keystore-password-uri", "keystore-uri", "kms-key", "kms-key-uri", "kubernetes-cluster-config", "kubernetes-namespace", "kubernetes-software-config", "labels", "lifecycle-config", "local-ssd-interface", "machine-type-uri", "managed-group-config", "master-config", "metadata", "metastore-config", "metrics", "min-cpu-platform", "min-num-instances", "namespaced-gke-deployment-target", "network-uri", "node-group-affinity", "node-group-uri", "num-instances", "num-local-ssds", "optional-components", "policy-uri", "preemptibility", "private-ipv6-google-access", "project-id", "properties", "realm", "required-registration-fraction", "reservation-affinity", "root-principal-password-uri", "secondary-worker-config", "security-config", "service-account", "service-account-scopes", "shielded-instance-config", "software-config", "spark-history-server-config", "staging-bucket", "startup-config", "state", "state-start-time", "status", "subnetwork-uri", "substate", "tags", "target-gke-cluster", "temp-bucket", "tgt-lifetime-hours", "truststore-password-uri", "truststore-uri", "user-service-account-mapping", "values", "virtual-cluster-config", "worker-config", "yarn-metrics", "zone-uri"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["auto-delete-time", "auto-delete-ttl", "auto-stop-time", "auto-stop-ttl", "auto-zone-exclude-zone-uris", "autoscaling-config", "auxiliary-services-config", "boot-disk-provisioned-iops", "boot-disk-provisioned-throughput", "boot-disk-size-gb", "boot-disk-type", "cluster-name", "cluster-namespace", "cluster-tier", "cluster-type", "cluster-uuid", "component-version", "confidential-instance-config", "config", "config-bucket", "consume-reservation-type", "cross-realm-trust-admin-server", "cross-realm-trust-kdc", "cross-realm-trust-realm", "cross-realm-trust-shared-password-uri", "dataproc-cluster", "dataproc-metastore-service", "detail", "diagnostic-bucket", "disk-config", "enable-confidential-compute", "enable-http-port-access", "enable-integrity-monitoring", "enable-kerberos", "enable-secure-boot", "enable-vtpm", "encryption-config", "endpoint-config", "gce-cluster-config", "gce-pd-kms-key-name", "gke-cluster-config", "gke-cluster-target", "hdfs-metrics", "http-ports", "identity-config", "idle-delete-ttl", "idle-start-time", "idle-stop-ttl", "image-uri", "image-version", "instance-flexibility-policy", "instance-group-manager-name", "instance-group-manager-uri", "instance-names", "instance-template-name", "internal-ip-only", "is-preemptible", "kdc-db-key-uri", "kerberos-config", "key", "key-password-uri", "keystore-password-uri", "keystore-uri", "kms-key", "kms-key-uri", "kubernetes-cluster-config", "kubernetes-namespace", "kubernetes-software-config", "labels", "lifecycle-config", "local-ssd-interface", "machine-type-uri", "managed-group-config", "master-config", "metadata", "metastore-config", "metrics", "min-cpu-platform", "min-num-instances", "namespaced-gke-deployment-target", "network-uri", "node-group-affinity", "node-group-uri", "num-instances", "num-local-ssds", "optional-components", "policy-uri", "preemptibility", "private-ipv6-google-access", "project-id", "properties", "provisioning-model-mix", "realm", "required-registration-fraction", "reservation-affinity", "resource-manager-tags", "root-principal-password-uri", "secondary-worker-config", "security-config", "service-account", "service-account-scopes", "shielded-instance-config", "software-config", "spark-history-server-config", "staging-bucket", "standard-capacity-base", "standard-capacity-percent-above-base", "startup-config", "state", "state-start-time", "status", "subnetwork-uri", "substate", "tags", "target-gke-cluster", "temp-bucket", "tgt-lifetime-hours", "truststore-password-uri", "truststore-uri", "user-service-account-mapping", "values", "virtual-cluster-config", "worker-config", "yarn-metrics", "zone-uri"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -7252,194 +11691,37 @@ where
                 continue;
             }
 
-            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
-            {
-                "labels" => Some((
-                    "labels",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Map,
-                    },
-                )),
-                "name" => Some((
-                    "name",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "node-group-config.disk-config.boot-disk-provisioned-iops" => Some((
-                    "nodeGroupConfig.diskConfig.bootDiskProvisionedIops",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "node-group-config.disk-config.boot-disk-provisioned-throughput" => Some((
-                    "nodeGroupConfig.diskConfig.bootDiskProvisionedThroughput",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "node-group-config.disk-config.boot-disk-size-gb" => Some((
-                    "nodeGroupConfig.diskConfig.bootDiskSizeGb",
-                    JsonTypeInfo {
-                        jtype: JsonType::Int,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "node-group-config.disk-config.boot-disk-type" => Some((
-                    "nodeGroupConfig.diskConfig.bootDiskType",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "node-group-config.disk-config.local-ssd-interface" => Some((
-                    "nodeGroupConfig.diskConfig.localSsdInterface",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "node-group-config.disk-config.num-local-ssds" => Some((
-                    "nodeGroupConfig.diskConfig.numLocalSsds",
-                    JsonTypeInfo {
-                        jtype: JsonType::Int,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "node-group-config.image-uri" => Some((
-                    "nodeGroupConfig.imageUri",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "node-group-config.instance-names" => Some((
-                    "nodeGroupConfig.instanceNames",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Vec,
-                    },
-                )),
-                "node-group-config.is-preemptible" => Some((
-                    "nodeGroupConfig.isPreemptible",
-                    JsonTypeInfo {
-                        jtype: JsonType::Boolean,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "node-group-config.machine-type-uri" => Some((
-                    "nodeGroupConfig.machineTypeUri",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "node-group-config.managed-group-config.instance-group-manager-name" => Some((
-                    "nodeGroupConfig.managedGroupConfig.instanceGroupManagerName",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "node-group-config.managed-group-config.instance-group-manager-uri" => Some((
-                    "nodeGroupConfig.managedGroupConfig.instanceGroupManagerUri",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "node-group-config.managed-group-config.instance-template-name" => Some((
-                    "nodeGroupConfig.managedGroupConfig.instanceTemplateName",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "node-group-config.min-cpu-platform" => Some((
-                    "nodeGroupConfig.minCpuPlatform",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "node-group-config.min-num-instances" => Some((
-                    "nodeGroupConfig.minNumInstances",
-                    JsonTypeInfo {
-                        jtype: JsonType::Int,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "node-group-config.num-instances" => Some((
-                    "nodeGroupConfig.numInstances",
-                    JsonTypeInfo {
-                        jtype: JsonType::Int,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "node-group-config.preemptibility" => Some((
-                    "nodeGroupConfig.preemptibility",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "node-group-config.startup-config.required-registration-fraction" => Some((
-                    "nodeGroupConfig.startupConfig.requiredRegistrationFraction",
-                    JsonTypeInfo {
-                        jtype: JsonType::Float,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "roles" => Some((
-                    "roles",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Vec,
-                    },
-                )),
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(
-                        key,
-                        &vec![
-                            "boot-disk-provisioned-iops",
-                            "boot-disk-provisioned-throughput",
-                            "boot-disk-size-gb",
-                            "boot-disk-type",
-                            "disk-config",
-                            "image-uri",
-                            "instance-group-manager-name",
-                            "instance-group-manager-uri",
-                            "instance-names",
-                            "instance-template-name",
-                            "is-preemptible",
-                            "labels",
-                            "local-ssd-interface",
-                            "machine-type-uri",
-                            "managed-group-config",
-                            "min-cpu-platform",
-                            "min-num-instances",
-                            "name",
-                            "node-group-config",
-                            "num-instances",
-                            "num-local-ssds",
-                            "preemptibility",
-                            "required-registration-fraction",
-                            "roles",
-                            "startup-config",
-                        ],
-                    );
-                    err.issues.push(CLIError::Field(FieldError::Unknown(
-                        temp_cursor.to_string(),
-                        suggestion,
-                        value.map(|v| v.to_string()),
-                    )));
-                    None
-                }
-            };
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "node-group-config.disk-config.boot-disk-provisioned-iops" => Some(("nodeGroupConfig.diskConfig.bootDiskProvisionedIops", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "node-group-config.disk-config.boot-disk-provisioned-throughput" => Some(("nodeGroupConfig.diskConfig.bootDiskProvisionedThroughput", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "node-group-config.disk-config.boot-disk-size-gb" => Some(("nodeGroupConfig.diskConfig.bootDiskSizeGb", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "node-group-config.disk-config.boot-disk-type" => Some(("nodeGroupConfig.diskConfig.bootDiskType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "node-group-config.disk-config.local-ssd-interface" => Some(("nodeGroupConfig.diskConfig.localSsdInterface", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "node-group-config.disk-config.num-local-ssds" => Some(("nodeGroupConfig.diskConfig.numLocalSsds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "node-group-config.image-uri" => Some(("nodeGroupConfig.imageUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "node-group-config.instance-flexibility-policy.provisioning-model-mix.standard-capacity-base" => Some(("nodeGroupConfig.instanceFlexibilityPolicy.provisioningModelMix.standardCapacityBase", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "node-group-config.instance-flexibility-policy.provisioning-model-mix.standard-capacity-percent-above-base" => Some(("nodeGroupConfig.instanceFlexibilityPolicy.provisioningModelMix.standardCapacityPercentAboveBase", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "node-group-config.instance-names" => Some(("nodeGroupConfig.instanceNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "node-group-config.is-preemptible" => Some(("nodeGroupConfig.isPreemptible", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "node-group-config.machine-type-uri" => Some(("nodeGroupConfig.machineTypeUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "node-group-config.managed-group-config.instance-group-manager-name" => Some(("nodeGroupConfig.managedGroupConfig.instanceGroupManagerName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "node-group-config.managed-group-config.instance-group-manager-uri" => Some(("nodeGroupConfig.managedGroupConfig.instanceGroupManagerUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "node-group-config.managed-group-config.instance-template-name" => Some(("nodeGroupConfig.managedGroupConfig.instanceTemplateName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "node-group-config.min-cpu-platform" => Some(("nodeGroupConfig.minCpuPlatform", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "node-group-config.min-num-instances" => Some(("nodeGroupConfig.minNumInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "node-group-config.num-instances" => Some(("nodeGroupConfig.numInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "node-group-config.preemptibility" => Some(("nodeGroupConfig.preemptibility", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "node-group-config.startup-config.required-registration-fraction" => Some(("nodeGroupConfig.startupConfig.requiredRegistrationFraction", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "roles" => Some(("roles", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["boot-disk-provisioned-iops", "boot-disk-provisioned-throughput", "boot-disk-size-gb", "boot-disk-type", "disk-config", "image-uri", "instance-flexibility-policy", "instance-group-manager-name", "instance-group-manager-uri", "instance-names", "instance-template-name", "is-preemptible", "labels", "local-ssd-interface", "machine-type-uri", "managed-group-config", "min-cpu-platform", "min-num-instances", "name", "node-group-config", "num-instances", "num-local-ssds", "preemptibility", "provisioning-model-mix", "required-registration-fraction", "roles", "standard-capacity-base", "standard-capacity-percent-above-base", "startup-config"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
             if let Some((field_cursor_str, type_info)) = type_info {
                 FieldCursor::from(field_cursor_str).set_json_value(
                     &mut object,
@@ -7971,11 +12253,15 @@ where
                     "cluster-name" => Some(("clusterName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster-uuid" => Some(("clusterUuid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.autoscaling-config.policy-uri" => Some(("config.autoscalingConfig.policyUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.cluster-tier" => Some(("config.clusterTier", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.cluster-type" => Some(("config.clusterType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.config-bucket" => Some(("config.configBucket", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.diagnostic-bucket" => Some(("config.diagnosticBucket", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.encryption-config.gce-pd-kms-key-name" => Some(("config.encryptionConfig.gcePdKmsKeyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.encryption-config.kms-key" => Some(("config.encryptionConfig.kmsKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.endpoint-config.enable-http-port-access" => Some(("config.endpointConfig.enableHttpPortAccess", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "config.endpoint-config.http-ports" => Some(("config.endpointConfig.httpPorts", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "config.gce-cluster-config.auto-zone-exclude-zone-uris" => Some(("config.gceClusterConfig.autoZoneExcludeZoneUris", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "config.gce-cluster-config.confidential-instance-config.enable-confidential-compute" => Some(("config.gceClusterConfig.confidentialInstanceConfig.enableConfidentialCompute", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "config.gce-cluster-config.internal-ip-only" => Some(("config.gceClusterConfig.internalIpOnly", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "config.gce-cluster-config.metadata" => Some(("config.gceClusterConfig.metadata", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
@@ -7985,6 +12271,7 @@ where
                     "config.gce-cluster-config.reservation-affinity.consume-reservation-type" => Some(("config.gceClusterConfig.reservationAffinity.consumeReservationType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.gce-cluster-config.reservation-affinity.key" => Some(("config.gceClusterConfig.reservationAffinity.key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.gce-cluster-config.reservation-affinity.values" => Some(("config.gceClusterConfig.reservationAffinity.values", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "config.gce-cluster-config.resource-manager-tags" => Some(("config.gceClusterConfig.resourceManagerTags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "config.gce-cluster-config.service-account" => Some(("config.gceClusterConfig.serviceAccount", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.gce-cluster-config.service-account-scopes" => Some(("config.gceClusterConfig.serviceAccountScopes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "config.gce-cluster-config.shielded-instance-config.enable-integrity-monitoring" => Some(("config.gceClusterConfig.shieldedInstanceConfig.enableIntegrityMonitoring", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -7998,8 +12285,11 @@ where
                     "config.gke-cluster-config.namespaced-gke-deployment-target.target-gke-cluster" => Some(("config.gkeClusterConfig.namespacedGkeDeploymentTarget.targetGkeCluster", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.lifecycle-config.auto-delete-time" => Some(("config.lifecycleConfig.autoDeleteTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.lifecycle-config.auto-delete-ttl" => Some(("config.lifecycleConfig.autoDeleteTtl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.lifecycle-config.auto-stop-time" => Some(("config.lifecycleConfig.autoStopTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.lifecycle-config.auto-stop-ttl" => Some(("config.lifecycleConfig.autoStopTtl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.lifecycle-config.idle-delete-ttl" => Some(("config.lifecycleConfig.idleDeleteTtl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.lifecycle-config.idle-start-time" => Some(("config.lifecycleConfig.idleStartTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.lifecycle-config.idle-stop-ttl" => Some(("config.lifecycleConfig.idleStopTtl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.master-config.disk-config.boot-disk-provisioned-iops" => Some(("config.masterConfig.diskConfig.bootDiskProvisionedIops", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.master-config.disk-config.boot-disk-provisioned-throughput" => Some(("config.masterConfig.diskConfig.bootDiskProvisionedThroughput", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.master-config.disk-config.boot-disk-size-gb" => Some(("config.masterConfig.diskConfig.bootDiskSizeGb", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
@@ -8007,6 +12297,8 @@ where
                     "config.master-config.disk-config.local-ssd-interface" => Some(("config.masterConfig.diskConfig.localSsdInterface", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.master-config.disk-config.num-local-ssds" => Some(("config.masterConfig.diskConfig.numLocalSsds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "config.master-config.image-uri" => Some(("config.masterConfig.imageUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.master-config.instance-flexibility-policy.provisioning-model-mix.standard-capacity-base" => Some(("config.masterConfig.instanceFlexibilityPolicy.provisioningModelMix.standardCapacityBase", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "config.master-config.instance-flexibility-policy.provisioning-model-mix.standard-capacity-percent-above-base" => Some(("config.masterConfig.instanceFlexibilityPolicy.provisioningModelMix.standardCapacityPercentAboveBase", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "config.master-config.instance-names" => Some(("config.masterConfig.instanceNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "config.master-config.is-preemptible" => Some(("config.masterConfig.isPreemptible", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "config.master-config.machine-type-uri" => Some(("config.masterConfig.machineTypeUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -8026,6 +12318,8 @@ where
                     "config.secondary-worker-config.disk-config.local-ssd-interface" => Some(("config.secondaryWorkerConfig.diskConfig.localSsdInterface", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.secondary-worker-config.disk-config.num-local-ssds" => Some(("config.secondaryWorkerConfig.diskConfig.numLocalSsds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "config.secondary-worker-config.image-uri" => Some(("config.secondaryWorkerConfig.imageUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.secondary-worker-config.instance-flexibility-policy.provisioning-model-mix.standard-capacity-base" => Some(("config.secondaryWorkerConfig.instanceFlexibilityPolicy.provisioningModelMix.standardCapacityBase", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "config.secondary-worker-config.instance-flexibility-policy.provisioning-model-mix.standard-capacity-percent-above-base" => Some(("config.secondaryWorkerConfig.instanceFlexibilityPolicy.provisioningModelMix.standardCapacityPercentAboveBase", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "config.secondary-worker-config.instance-names" => Some(("config.secondaryWorkerConfig.instanceNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "config.secondary-worker-config.is-preemptible" => Some(("config.secondaryWorkerConfig.isPreemptible", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "config.secondary-worker-config.machine-type-uri" => Some(("config.secondaryWorkerConfig.machineTypeUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -8064,6 +12358,8 @@ where
                     "config.worker-config.disk-config.local-ssd-interface" => Some(("config.workerConfig.diskConfig.localSsdInterface", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.worker-config.disk-config.num-local-ssds" => Some(("config.workerConfig.diskConfig.numLocalSsds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "config.worker-config.image-uri" => Some(("config.workerConfig.imageUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.worker-config.instance-flexibility-policy.provisioning-model-mix.standard-capacity-base" => Some(("config.workerConfig.instanceFlexibilityPolicy.provisioningModelMix.standardCapacityBase", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "config.worker-config.instance-flexibility-policy.provisioning-model-mix.standard-capacity-percent-above-base" => Some(("config.workerConfig.instanceFlexibilityPolicy.provisioningModelMix.standardCapacityPercentAboveBase", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "config.worker-config.instance-names" => Some(("config.workerConfig.instanceNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "config.worker-config.is-preemptible" => Some(("config.workerConfig.isPreemptible", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "config.worker-config.machine-type-uri" => Some(("config.workerConfig.machineTypeUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -8093,7 +12389,7 @@ where
                     "virtual-cluster-config.kubernetes-cluster-config.kubernetes-software-config.properties" => Some(("virtualClusterConfig.kubernetesClusterConfig.kubernetesSoftwareConfig.properties", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "virtual-cluster-config.staging-bucket" => Some(("virtualClusterConfig.stagingBucket", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["auto-delete-time", "auto-delete-ttl", "autoscaling-config", "auxiliary-services-config", "boot-disk-provisioned-iops", "boot-disk-provisioned-throughput", "boot-disk-size-gb", "boot-disk-type", "cluster-name", "cluster-namespace", "cluster-uuid", "component-version", "confidential-instance-config", "config", "config-bucket", "consume-reservation-type", "cross-realm-trust-admin-server", "cross-realm-trust-kdc", "cross-realm-trust-realm", "cross-realm-trust-shared-password-uri", "dataproc-cluster", "dataproc-metastore-service", "detail", "disk-config", "enable-confidential-compute", "enable-http-port-access", "enable-integrity-monitoring", "enable-kerberos", "enable-secure-boot", "enable-vtpm", "encryption-config", "endpoint-config", "gce-cluster-config", "gce-pd-kms-key-name", "gke-cluster-config", "gke-cluster-target", "hdfs-metrics", "http-ports", "identity-config", "idle-delete-ttl", "idle-start-time", "image-uri", "image-version", "instance-group-manager-name", "instance-group-manager-uri", "instance-names", "instance-template-name", "internal-ip-only", "is-preemptible", "kdc-db-key-uri", "kerberos-config", "key", "key-password-uri", "keystore-password-uri", "keystore-uri", "kms-key", "kms-key-uri", "kubernetes-cluster-config", "kubernetes-namespace", "kubernetes-software-config", "labels", "lifecycle-config", "local-ssd-interface", "machine-type-uri", "managed-group-config", "master-config", "metadata", "metastore-config", "metrics", "min-cpu-platform", "min-num-instances", "namespaced-gke-deployment-target", "network-uri", "node-group-affinity", "node-group-uri", "num-instances", "num-local-ssds", "optional-components", "policy-uri", "preemptibility", "private-ipv6-google-access", "project-id", "properties", "realm", "required-registration-fraction", "reservation-affinity", "root-principal-password-uri", "secondary-worker-config", "security-config", "service-account", "service-account-scopes", "shielded-instance-config", "software-config", "spark-history-server-config", "staging-bucket", "startup-config", "state", "state-start-time", "status", "subnetwork-uri", "substate", "tags", "target-gke-cluster", "temp-bucket", "tgt-lifetime-hours", "truststore-password-uri", "truststore-uri", "user-service-account-mapping", "values", "virtual-cluster-config", "worker-config", "yarn-metrics", "zone-uri"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["auto-delete-time", "auto-delete-ttl", "auto-stop-time", "auto-stop-ttl", "auto-zone-exclude-zone-uris", "autoscaling-config", "auxiliary-services-config", "boot-disk-provisioned-iops", "boot-disk-provisioned-throughput", "boot-disk-size-gb", "boot-disk-type", "cluster-name", "cluster-namespace", "cluster-tier", "cluster-type", "cluster-uuid", "component-version", "confidential-instance-config", "config", "config-bucket", "consume-reservation-type", "cross-realm-trust-admin-server", "cross-realm-trust-kdc", "cross-realm-trust-realm", "cross-realm-trust-shared-password-uri", "dataproc-cluster", "dataproc-metastore-service", "detail", "diagnostic-bucket", "disk-config", "enable-confidential-compute", "enable-http-port-access", "enable-integrity-monitoring", "enable-kerberos", "enable-secure-boot", "enable-vtpm", "encryption-config", "endpoint-config", "gce-cluster-config", "gce-pd-kms-key-name", "gke-cluster-config", "gke-cluster-target", "hdfs-metrics", "http-ports", "identity-config", "idle-delete-ttl", "idle-start-time", "idle-stop-ttl", "image-uri", "image-version", "instance-flexibility-policy", "instance-group-manager-name", "instance-group-manager-uri", "instance-names", "instance-template-name", "internal-ip-only", "is-preemptible", "kdc-db-key-uri", "kerberos-config", "key", "key-password-uri", "keystore-password-uri", "keystore-uri", "kms-key", "kms-key-uri", "kubernetes-cluster-config", "kubernetes-namespace", "kubernetes-software-config", "labels", "lifecycle-config", "local-ssd-interface", "machine-type-uri", "managed-group-config", "master-config", "metadata", "metastore-config", "metrics", "min-cpu-platform", "min-num-instances", "namespaced-gke-deployment-target", "network-uri", "node-group-affinity", "node-group-uri", "num-instances", "num-local-ssds", "optional-components", "policy-uri", "preemptibility", "private-ipv6-google-access", "project-id", "properties", "provisioning-model-mix", "realm", "required-registration-fraction", "reservation-affinity", "resource-manager-tags", "root-principal-password-uri", "secondary-worker-config", "security-config", "service-account", "service-account-scopes", "shielded-instance-config", "software-config", "spark-history-server-config", "staging-bucket", "standard-capacity-base", "standard-capacity-percent-above-base", "startup-config", "state", "state-start-time", "status", "subnetwork-uri", "substate", "tags", "target-gke-cluster", "temp-bucket", "tgt-lifetime-hours", "truststore-password-uri", "truststore-uri", "user-service-account-mapping", "values", "virtual-cluster-config", "worker-config", "yarn-metrics", "zone-uri"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -8246,10 +12542,24 @@ where
 
             let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
             {
+                "cluster.cluster-repair-action" => Some((
+                    "cluster.clusterRepairAction",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "cluster-uuid" => Some((
                     "clusterUuid",
                     JsonTypeInfo {
                         jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "dataproc-super-user" => Some((
+                    "dataprocSuperUser",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
                         ctype: ComplexType::Pod,
                     },
                 )),
@@ -8278,7 +12588,10 @@ where
                     let suggestion = FieldCursor::did_you_mean(
                         key,
                         &vec![
+                            "cluster",
+                            "cluster-repair-action",
                             "cluster-uuid",
+                            "dataproc-super-user",
                             "graceful-decommission-timeout",
                             "parent-operation-id",
                             "request-id",
@@ -12591,6 +16904,13 @@ where
         {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "return-partial-success" => {
+                    call = call.return_partial_success(
+                        value
+                            .map(|v| arg_from_str(v, err, "return-partial-success", "boolean"))
+                            .unwrap_or(false),
+                    );
+                }
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
                 }
@@ -12621,7 +16941,16 @@ where
                             .push(CLIError::UnknownParameter(key.to_string(), {
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
-                                v.extend(["filter", "page-size", "page-token"].iter().map(|v| *v));
+                                v.extend(
+                                    [
+                                        "filter",
+                                        "page-size",
+                                        "page-token",
+                                        "return-partial-success",
+                                    ]
+                                    .iter()
+                                    .map(|v| *v),
+                                );
                                 v
                             }));
                     }
@@ -12986,11 +17315,15 @@ where
                     "placement.cluster-selector.zone" => Some(("placement.clusterSelector.zone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.cluster-name" => Some(("placement.managedCluster.clusterName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.autoscaling-config.policy-uri" => Some(("placement.managedCluster.config.autoscalingConfig.policyUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.cluster-tier" => Some(("placement.managedCluster.config.clusterTier", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.cluster-type" => Some(("placement.managedCluster.config.clusterType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.config-bucket" => Some(("placement.managedCluster.config.configBucket", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.diagnostic-bucket" => Some(("placement.managedCluster.config.diagnosticBucket", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.encryption-config.gce-pd-kms-key-name" => Some(("placement.managedCluster.config.encryptionConfig.gcePdKmsKeyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.encryption-config.kms-key" => Some(("placement.managedCluster.config.encryptionConfig.kmsKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.endpoint-config.enable-http-port-access" => Some(("placement.managedCluster.config.endpointConfig.enableHttpPortAccess", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.endpoint-config.http-ports" => Some(("placement.managedCluster.config.endpointConfig.httpPorts", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "placement.managed-cluster.config.gce-cluster-config.auto-zone-exclude-zone-uris" => Some(("placement.managedCluster.config.gceClusterConfig.autoZoneExcludeZoneUris", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "placement.managed-cluster.config.gce-cluster-config.confidential-instance-config.enable-confidential-compute" => Some(("placement.managedCluster.config.gceClusterConfig.confidentialInstanceConfig.enableConfidentialCompute", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.gce-cluster-config.internal-ip-only" => Some(("placement.managedCluster.config.gceClusterConfig.internalIpOnly", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.gce-cluster-config.metadata" => Some(("placement.managedCluster.config.gceClusterConfig.metadata", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
@@ -13000,6 +17333,7 @@ where
                     "placement.managed-cluster.config.gce-cluster-config.reservation-affinity.consume-reservation-type" => Some(("placement.managedCluster.config.gceClusterConfig.reservationAffinity.consumeReservationType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.gce-cluster-config.reservation-affinity.key" => Some(("placement.managedCluster.config.gceClusterConfig.reservationAffinity.key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.gce-cluster-config.reservation-affinity.values" => Some(("placement.managedCluster.config.gceClusterConfig.reservationAffinity.values", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "placement.managed-cluster.config.gce-cluster-config.resource-manager-tags" => Some(("placement.managedCluster.config.gceClusterConfig.resourceManagerTags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "placement.managed-cluster.config.gce-cluster-config.service-account" => Some(("placement.managedCluster.config.gceClusterConfig.serviceAccount", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.gce-cluster-config.service-account-scopes" => Some(("placement.managedCluster.config.gceClusterConfig.serviceAccountScopes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "placement.managed-cluster.config.gce-cluster-config.shielded-instance-config.enable-integrity-monitoring" => Some(("placement.managedCluster.config.gceClusterConfig.shieldedInstanceConfig.enableIntegrityMonitoring", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -13013,8 +17347,11 @@ where
                     "placement.managed-cluster.config.gke-cluster-config.namespaced-gke-deployment-target.target-gke-cluster" => Some(("placement.managedCluster.config.gkeClusterConfig.namespacedGkeDeploymentTarget.targetGkeCluster", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.lifecycle-config.auto-delete-time" => Some(("placement.managedCluster.config.lifecycleConfig.autoDeleteTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.lifecycle-config.auto-delete-ttl" => Some(("placement.managedCluster.config.lifecycleConfig.autoDeleteTtl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.lifecycle-config.auto-stop-time" => Some(("placement.managedCluster.config.lifecycleConfig.autoStopTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.lifecycle-config.auto-stop-ttl" => Some(("placement.managedCluster.config.lifecycleConfig.autoStopTtl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.lifecycle-config.idle-delete-ttl" => Some(("placement.managedCluster.config.lifecycleConfig.idleDeleteTtl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.lifecycle-config.idle-start-time" => Some(("placement.managedCluster.config.lifecycleConfig.idleStartTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.lifecycle-config.idle-stop-ttl" => Some(("placement.managedCluster.config.lifecycleConfig.idleStopTtl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.master-config.disk-config.boot-disk-provisioned-iops" => Some(("placement.managedCluster.config.masterConfig.diskConfig.bootDiskProvisionedIops", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.master-config.disk-config.boot-disk-provisioned-throughput" => Some(("placement.managedCluster.config.masterConfig.diskConfig.bootDiskProvisionedThroughput", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.master-config.disk-config.boot-disk-size-gb" => Some(("placement.managedCluster.config.masterConfig.diskConfig.bootDiskSizeGb", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
@@ -13022,6 +17359,8 @@ where
                     "placement.managed-cluster.config.master-config.disk-config.local-ssd-interface" => Some(("placement.managedCluster.config.masterConfig.diskConfig.localSsdInterface", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.master-config.disk-config.num-local-ssds" => Some(("placement.managedCluster.config.masterConfig.diskConfig.numLocalSsds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.master-config.image-uri" => Some(("placement.managedCluster.config.masterConfig.imageUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.master-config.instance-flexibility-policy.provisioning-model-mix.standard-capacity-base" => Some(("placement.managedCluster.config.masterConfig.instanceFlexibilityPolicy.provisioningModelMix.standardCapacityBase", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.master-config.instance-flexibility-policy.provisioning-model-mix.standard-capacity-percent-above-base" => Some(("placement.managedCluster.config.masterConfig.instanceFlexibilityPolicy.provisioningModelMix.standardCapacityPercentAboveBase", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.master-config.instance-names" => Some(("placement.managedCluster.config.masterConfig.instanceNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "placement.managed-cluster.config.master-config.is-preemptible" => Some(("placement.managedCluster.config.masterConfig.isPreemptible", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.master-config.machine-type-uri" => Some(("placement.managedCluster.config.masterConfig.machineTypeUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -13041,6 +17380,8 @@ where
                     "placement.managed-cluster.config.secondary-worker-config.disk-config.local-ssd-interface" => Some(("placement.managedCluster.config.secondaryWorkerConfig.diskConfig.localSsdInterface", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.secondary-worker-config.disk-config.num-local-ssds" => Some(("placement.managedCluster.config.secondaryWorkerConfig.diskConfig.numLocalSsds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.secondary-worker-config.image-uri" => Some(("placement.managedCluster.config.secondaryWorkerConfig.imageUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.secondary-worker-config.instance-flexibility-policy.provisioning-model-mix.standard-capacity-base" => Some(("placement.managedCluster.config.secondaryWorkerConfig.instanceFlexibilityPolicy.provisioningModelMix.standardCapacityBase", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.secondary-worker-config.instance-flexibility-policy.provisioning-model-mix.standard-capacity-percent-above-base" => Some(("placement.managedCluster.config.secondaryWorkerConfig.instanceFlexibilityPolicy.provisioningModelMix.standardCapacityPercentAboveBase", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.secondary-worker-config.instance-names" => Some(("placement.managedCluster.config.secondaryWorkerConfig.instanceNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "placement.managed-cluster.config.secondary-worker-config.is-preemptible" => Some(("placement.managedCluster.config.secondaryWorkerConfig.isPreemptible", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.secondary-worker-config.machine-type-uri" => Some(("placement.managedCluster.config.secondaryWorkerConfig.machineTypeUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -13079,6 +17420,8 @@ where
                     "placement.managed-cluster.config.worker-config.disk-config.local-ssd-interface" => Some(("placement.managedCluster.config.workerConfig.diskConfig.localSsdInterface", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.worker-config.disk-config.num-local-ssds" => Some(("placement.managedCluster.config.workerConfig.diskConfig.numLocalSsds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.worker-config.image-uri" => Some(("placement.managedCluster.config.workerConfig.imageUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.worker-config.instance-flexibility-policy.provisioning-model-mix.standard-capacity-base" => Some(("placement.managedCluster.config.workerConfig.instanceFlexibilityPolicy.provisioningModelMix.standardCapacityBase", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.worker-config.instance-flexibility-policy.provisioning-model-mix.standard-capacity-percent-above-base" => Some(("placement.managedCluster.config.workerConfig.instanceFlexibilityPolicy.provisioningModelMix.standardCapacityPercentAboveBase", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.worker-config.instance-names" => Some(("placement.managedCluster.config.workerConfig.instanceNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "placement.managed-cluster.config.worker-config.is-preemptible" => Some(("placement.managedCluster.config.workerConfig.isPreemptible", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.worker-config.machine-type-uri" => Some(("placement.managedCluster.config.workerConfig.machineTypeUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -13094,7 +17437,7 @@ where
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "version" => Some(("version", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["auto-delete-time", "auto-delete-ttl", "autoscaling-config", "boot-disk-provisioned-iops", "boot-disk-provisioned-throughput", "boot-disk-size-gb", "boot-disk-type", "cluster-labels", "cluster-name", "cluster-namespace", "cluster-selector", "confidential-instance-config", "config", "config-bucket", "consume-reservation-type", "create-time", "cross-realm-trust-admin-server", "cross-realm-trust-kdc", "cross-realm-trust-realm", "cross-realm-trust-shared-password-uri", "dag-timeout", "dataproc-metastore-service", "disk-config", "enable-confidential-compute", "enable-http-port-access", "enable-integrity-monitoring", "enable-kerberos", "enable-secure-boot", "enable-vtpm", "encryption-config", "endpoint-config", "gce-cluster-config", "gce-pd-kms-key-name", "gke-cluster-config", "gke-cluster-target", "http-ports", "id", "identity-config", "idle-delete-ttl", "idle-start-time", "image-uri", "image-version", "instance-group-manager-name", "instance-group-manager-uri", "instance-names", "instance-template-name", "internal-ip-only", "is-preemptible", "kdc-db-key-uri", "kerberos-config", "key", "key-password-uri", "keystore-password-uri", "keystore-uri", "kms-key", "kms-key-uri", "labels", "lifecycle-config", "local-ssd-interface", "machine-type-uri", "managed-cluster", "managed-group-config", "master-config", "metadata", "metastore-config", "min-cpu-platform", "min-num-instances", "name", "namespaced-gke-deployment-target", "network-uri", "node-group-affinity", "node-group-uri", "num-instances", "num-local-ssds", "optional-components", "placement", "policy-uri", "preemptibility", "private-ipv6-google-access", "properties", "realm", "required-registration-fraction", "reservation-affinity", "root-principal-password-uri", "secondary-worker-config", "security-config", "service-account", "service-account-scopes", "shielded-instance-config", "software-config", "startup-config", "subnetwork-uri", "tags", "target-gke-cluster", "temp-bucket", "tgt-lifetime-hours", "truststore-password-uri", "truststore-uri", "update-time", "user-service-account-mapping", "values", "version", "worker-config", "zone", "zone-uri"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["auto-delete-time", "auto-delete-ttl", "auto-stop-time", "auto-stop-ttl", "auto-zone-exclude-zone-uris", "autoscaling-config", "boot-disk-provisioned-iops", "boot-disk-provisioned-throughput", "boot-disk-size-gb", "boot-disk-type", "cluster-labels", "cluster-name", "cluster-namespace", "cluster-selector", "cluster-tier", "cluster-type", "confidential-instance-config", "config", "config-bucket", "consume-reservation-type", "create-time", "cross-realm-trust-admin-server", "cross-realm-trust-kdc", "cross-realm-trust-realm", "cross-realm-trust-shared-password-uri", "dag-timeout", "dataproc-metastore-service", "diagnostic-bucket", "disk-config", "enable-confidential-compute", "enable-http-port-access", "enable-integrity-monitoring", "enable-kerberos", "enable-secure-boot", "enable-vtpm", "encryption-config", "endpoint-config", "gce-cluster-config", "gce-pd-kms-key-name", "gke-cluster-config", "gke-cluster-target", "http-ports", "id", "identity-config", "idle-delete-ttl", "idle-start-time", "idle-stop-ttl", "image-uri", "image-version", "instance-flexibility-policy", "instance-group-manager-name", "instance-group-manager-uri", "instance-names", "instance-template-name", "internal-ip-only", "is-preemptible", "kdc-db-key-uri", "kerberos-config", "key", "key-password-uri", "keystore-password-uri", "keystore-uri", "kms-key", "kms-key-uri", "labels", "lifecycle-config", "local-ssd-interface", "machine-type-uri", "managed-cluster", "managed-group-config", "master-config", "metadata", "metastore-config", "min-cpu-platform", "min-num-instances", "name", "namespaced-gke-deployment-target", "network-uri", "node-group-affinity", "node-group-uri", "num-instances", "num-local-ssds", "optional-components", "placement", "policy-uri", "preemptibility", "private-ipv6-google-access", "properties", "provisioning-model-mix", "realm", "required-registration-fraction", "reservation-affinity", "resource-manager-tags", "root-principal-password-uri", "secondary-worker-config", "security-config", "service-account", "service-account-scopes", "shielded-instance-config", "software-config", "standard-capacity-base", "standard-capacity-percent-above-base", "startup-config", "subnetwork-uri", "tags", "target-gke-cluster", "temp-bucket", "tgt-lifetime-hours", "truststore-password-uri", "truststore-uri", "update-time", "user-service-account-mapping", "values", "version", "worker-config", "zone", "zone-uri"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -13696,11 +18039,15 @@ where
                     "placement.cluster-selector.zone" => Some(("placement.clusterSelector.zone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.cluster-name" => Some(("placement.managedCluster.clusterName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.autoscaling-config.policy-uri" => Some(("placement.managedCluster.config.autoscalingConfig.policyUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.cluster-tier" => Some(("placement.managedCluster.config.clusterTier", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.cluster-type" => Some(("placement.managedCluster.config.clusterType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.config-bucket" => Some(("placement.managedCluster.config.configBucket", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.diagnostic-bucket" => Some(("placement.managedCluster.config.diagnosticBucket", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.encryption-config.gce-pd-kms-key-name" => Some(("placement.managedCluster.config.encryptionConfig.gcePdKmsKeyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.encryption-config.kms-key" => Some(("placement.managedCluster.config.encryptionConfig.kmsKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.endpoint-config.enable-http-port-access" => Some(("placement.managedCluster.config.endpointConfig.enableHttpPortAccess", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.endpoint-config.http-ports" => Some(("placement.managedCluster.config.endpointConfig.httpPorts", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "placement.managed-cluster.config.gce-cluster-config.auto-zone-exclude-zone-uris" => Some(("placement.managedCluster.config.gceClusterConfig.autoZoneExcludeZoneUris", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "placement.managed-cluster.config.gce-cluster-config.confidential-instance-config.enable-confidential-compute" => Some(("placement.managedCluster.config.gceClusterConfig.confidentialInstanceConfig.enableConfidentialCompute", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.gce-cluster-config.internal-ip-only" => Some(("placement.managedCluster.config.gceClusterConfig.internalIpOnly", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.gce-cluster-config.metadata" => Some(("placement.managedCluster.config.gceClusterConfig.metadata", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
@@ -13710,6 +18057,7 @@ where
                     "placement.managed-cluster.config.gce-cluster-config.reservation-affinity.consume-reservation-type" => Some(("placement.managedCluster.config.gceClusterConfig.reservationAffinity.consumeReservationType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.gce-cluster-config.reservation-affinity.key" => Some(("placement.managedCluster.config.gceClusterConfig.reservationAffinity.key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.gce-cluster-config.reservation-affinity.values" => Some(("placement.managedCluster.config.gceClusterConfig.reservationAffinity.values", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "placement.managed-cluster.config.gce-cluster-config.resource-manager-tags" => Some(("placement.managedCluster.config.gceClusterConfig.resourceManagerTags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "placement.managed-cluster.config.gce-cluster-config.service-account" => Some(("placement.managedCluster.config.gceClusterConfig.serviceAccount", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.gce-cluster-config.service-account-scopes" => Some(("placement.managedCluster.config.gceClusterConfig.serviceAccountScopes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "placement.managed-cluster.config.gce-cluster-config.shielded-instance-config.enable-integrity-monitoring" => Some(("placement.managedCluster.config.gceClusterConfig.shieldedInstanceConfig.enableIntegrityMonitoring", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -13723,8 +18071,11 @@ where
                     "placement.managed-cluster.config.gke-cluster-config.namespaced-gke-deployment-target.target-gke-cluster" => Some(("placement.managedCluster.config.gkeClusterConfig.namespacedGkeDeploymentTarget.targetGkeCluster", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.lifecycle-config.auto-delete-time" => Some(("placement.managedCluster.config.lifecycleConfig.autoDeleteTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.lifecycle-config.auto-delete-ttl" => Some(("placement.managedCluster.config.lifecycleConfig.autoDeleteTtl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.lifecycle-config.auto-stop-time" => Some(("placement.managedCluster.config.lifecycleConfig.autoStopTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.lifecycle-config.auto-stop-ttl" => Some(("placement.managedCluster.config.lifecycleConfig.autoStopTtl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.lifecycle-config.idle-delete-ttl" => Some(("placement.managedCluster.config.lifecycleConfig.idleDeleteTtl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.lifecycle-config.idle-start-time" => Some(("placement.managedCluster.config.lifecycleConfig.idleStartTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.lifecycle-config.idle-stop-ttl" => Some(("placement.managedCluster.config.lifecycleConfig.idleStopTtl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.master-config.disk-config.boot-disk-provisioned-iops" => Some(("placement.managedCluster.config.masterConfig.diskConfig.bootDiskProvisionedIops", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.master-config.disk-config.boot-disk-provisioned-throughput" => Some(("placement.managedCluster.config.masterConfig.diskConfig.bootDiskProvisionedThroughput", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.master-config.disk-config.boot-disk-size-gb" => Some(("placement.managedCluster.config.masterConfig.diskConfig.bootDiskSizeGb", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
@@ -13732,6 +18083,8 @@ where
                     "placement.managed-cluster.config.master-config.disk-config.local-ssd-interface" => Some(("placement.managedCluster.config.masterConfig.diskConfig.localSsdInterface", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.master-config.disk-config.num-local-ssds" => Some(("placement.managedCluster.config.masterConfig.diskConfig.numLocalSsds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.master-config.image-uri" => Some(("placement.managedCluster.config.masterConfig.imageUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.master-config.instance-flexibility-policy.provisioning-model-mix.standard-capacity-base" => Some(("placement.managedCluster.config.masterConfig.instanceFlexibilityPolicy.provisioningModelMix.standardCapacityBase", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.master-config.instance-flexibility-policy.provisioning-model-mix.standard-capacity-percent-above-base" => Some(("placement.managedCluster.config.masterConfig.instanceFlexibilityPolicy.provisioningModelMix.standardCapacityPercentAboveBase", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.master-config.instance-names" => Some(("placement.managedCluster.config.masterConfig.instanceNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "placement.managed-cluster.config.master-config.is-preemptible" => Some(("placement.managedCluster.config.masterConfig.isPreemptible", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.master-config.machine-type-uri" => Some(("placement.managedCluster.config.masterConfig.machineTypeUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -13751,6 +18104,8 @@ where
                     "placement.managed-cluster.config.secondary-worker-config.disk-config.local-ssd-interface" => Some(("placement.managedCluster.config.secondaryWorkerConfig.diskConfig.localSsdInterface", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.secondary-worker-config.disk-config.num-local-ssds" => Some(("placement.managedCluster.config.secondaryWorkerConfig.diskConfig.numLocalSsds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.secondary-worker-config.image-uri" => Some(("placement.managedCluster.config.secondaryWorkerConfig.imageUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.secondary-worker-config.instance-flexibility-policy.provisioning-model-mix.standard-capacity-base" => Some(("placement.managedCluster.config.secondaryWorkerConfig.instanceFlexibilityPolicy.provisioningModelMix.standardCapacityBase", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.secondary-worker-config.instance-flexibility-policy.provisioning-model-mix.standard-capacity-percent-above-base" => Some(("placement.managedCluster.config.secondaryWorkerConfig.instanceFlexibilityPolicy.provisioningModelMix.standardCapacityPercentAboveBase", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.secondary-worker-config.instance-names" => Some(("placement.managedCluster.config.secondaryWorkerConfig.instanceNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "placement.managed-cluster.config.secondary-worker-config.is-preemptible" => Some(("placement.managedCluster.config.secondaryWorkerConfig.isPreemptible", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.secondary-worker-config.machine-type-uri" => Some(("placement.managedCluster.config.secondaryWorkerConfig.machineTypeUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -13789,6 +18144,8 @@ where
                     "placement.managed-cluster.config.worker-config.disk-config.local-ssd-interface" => Some(("placement.managedCluster.config.workerConfig.diskConfig.localSsdInterface", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.worker-config.disk-config.num-local-ssds" => Some(("placement.managedCluster.config.workerConfig.diskConfig.numLocalSsds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.worker-config.image-uri" => Some(("placement.managedCluster.config.workerConfig.imageUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.worker-config.instance-flexibility-policy.provisioning-model-mix.standard-capacity-base" => Some(("placement.managedCluster.config.workerConfig.instanceFlexibilityPolicy.provisioningModelMix.standardCapacityBase", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.worker-config.instance-flexibility-policy.provisioning-model-mix.standard-capacity-percent-above-base" => Some(("placement.managedCluster.config.workerConfig.instanceFlexibilityPolicy.provisioningModelMix.standardCapacityPercentAboveBase", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.worker-config.instance-names" => Some(("placement.managedCluster.config.workerConfig.instanceNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "placement.managed-cluster.config.worker-config.is-preemptible" => Some(("placement.managedCluster.config.workerConfig.isPreemptible", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.worker-config.machine-type-uri" => Some(("placement.managedCluster.config.workerConfig.machineTypeUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -13804,7 +18161,7 @@ where
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "version" => Some(("version", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["auto-delete-time", "auto-delete-ttl", "autoscaling-config", "boot-disk-provisioned-iops", "boot-disk-provisioned-throughput", "boot-disk-size-gb", "boot-disk-type", "cluster-labels", "cluster-name", "cluster-namespace", "cluster-selector", "confidential-instance-config", "config", "config-bucket", "consume-reservation-type", "create-time", "cross-realm-trust-admin-server", "cross-realm-trust-kdc", "cross-realm-trust-realm", "cross-realm-trust-shared-password-uri", "dag-timeout", "dataproc-metastore-service", "disk-config", "enable-confidential-compute", "enable-http-port-access", "enable-integrity-monitoring", "enable-kerberos", "enable-secure-boot", "enable-vtpm", "encryption-config", "endpoint-config", "gce-cluster-config", "gce-pd-kms-key-name", "gke-cluster-config", "gke-cluster-target", "http-ports", "id", "identity-config", "idle-delete-ttl", "idle-start-time", "image-uri", "image-version", "instance-group-manager-name", "instance-group-manager-uri", "instance-names", "instance-template-name", "internal-ip-only", "is-preemptible", "kdc-db-key-uri", "kerberos-config", "key", "key-password-uri", "keystore-password-uri", "keystore-uri", "kms-key", "kms-key-uri", "labels", "lifecycle-config", "local-ssd-interface", "machine-type-uri", "managed-cluster", "managed-group-config", "master-config", "metadata", "metastore-config", "min-cpu-platform", "min-num-instances", "name", "namespaced-gke-deployment-target", "network-uri", "node-group-affinity", "node-group-uri", "num-instances", "num-local-ssds", "optional-components", "placement", "policy-uri", "preemptibility", "private-ipv6-google-access", "properties", "realm", "required-registration-fraction", "reservation-affinity", "root-principal-password-uri", "secondary-worker-config", "security-config", "service-account", "service-account-scopes", "shielded-instance-config", "software-config", "startup-config", "subnetwork-uri", "tags", "target-gke-cluster", "temp-bucket", "tgt-lifetime-hours", "truststore-password-uri", "truststore-uri", "update-time", "user-service-account-mapping", "values", "version", "worker-config", "zone", "zone-uri"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["auto-delete-time", "auto-delete-ttl", "auto-stop-time", "auto-stop-ttl", "auto-zone-exclude-zone-uris", "autoscaling-config", "boot-disk-provisioned-iops", "boot-disk-provisioned-throughput", "boot-disk-size-gb", "boot-disk-type", "cluster-labels", "cluster-name", "cluster-namespace", "cluster-selector", "cluster-tier", "cluster-type", "confidential-instance-config", "config", "config-bucket", "consume-reservation-type", "create-time", "cross-realm-trust-admin-server", "cross-realm-trust-kdc", "cross-realm-trust-realm", "cross-realm-trust-shared-password-uri", "dag-timeout", "dataproc-metastore-service", "diagnostic-bucket", "disk-config", "enable-confidential-compute", "enable-http-port-access", "enable-integrity-monitoring", "enable-kerberos", "enable-secure-boot", "enable-vtpm", "encryption-config", "endpoint-config", "gce-cluster-config", "gce-pd-kms-key-name", "gke-cluster-config", "gke-cluster-target", "http-ports", "id", "identity-config", "idle-delete-ttl", "idle-start-time", "idle-stop-ttl", "image-uri", "image-version", "instance-flexibility-policy", "instance-group-manager-name", "instance-group-manager-uri", "instance-names", "instance-template-name", "internal-ip-only", "is-preemptible", "kdc-db-key-uri", "kerberos-config", "key", "key-password-uri", "keystore-password-uri", "keystore-uri", "kms-key", "kms-key-uri", "labels", "lifecycle-config", "local-ssd-interface", "machine-type-uri", "managed-cluster", "managed-group-config", "master-config", "metadata", "metastore-config", "min-cpu-platform", "min-num-instances", "name", "namespaced-gke-deployment-target", "network-uri", "node-group-affinity", "node-group-uri", "num-instances", "num-local-ssds", "optional-components", "placement", "policy-uri", "preemptibility", "private-ipv6-google-access", "properties", "provisioning-model-mix", "realm", "required-registration-fraction", "reservation-affinity", "resource-manager-tags", "root-principal-password-uri", "secondary-worker-config", "security-config", "service-account", "service-account-scopes", "shielded-instance-config", "software-config", "standard-capacity-base", "standard-capacity-percent-above-base", "startup-config", "subnetwork-uri", "tags", "target-gke-cluster", "temp-bucket", "tgt-lifetime-hours", "truststore-password-uri", "truststore-uri", "update-time", "user-service-account-mapping", "values", "version", "worker-config", "zone", "zone-uri"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -14318,11 +18675,15 @@ where
                     "placement.cluster-selector.zone" => Some(("placement.clusterSelector.zone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.cluster-name" => Some(("placement.managedCluster.clusterName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.autoscaling-config.policy-uri" => Some(("placement.managedCluster.config.autoscalingConfig.policyUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.cluster-tier" => Some(("placement.managedCluster.config.clusterTier", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.cluster-type" => Some(("placement.managedCluster.config.clusterType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.config-bucket" => Some(("placement.managedCluster.config.configBucket", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.diagnostic-bucket" => Some(("placement.managedCluster.config.diagnosticBucket", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.encryption-config.gce-pd-kms-key-name" => Some(("placement.managedCluster.config.encryptionConfig.gcePdKmsKeyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.encryption-config.kms-key" => Some(("placement.managedCluster.config.encryptionConfig.kmsKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.endpoint-config.enable-http-port-access" => Some(("placement.managedCluster.config.endpointConfig.enableHttpPortAccess", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.endpoint-config.http-ports" => Some(("placement.managedCluster.config.endpointConfig.httpPorts", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "placement.managed-cluster.config.gce-cluster-config.auto-zone-exclude-zone-uris" => Some(("placement.managedCluster.config.gceClusterConfig.autoZoneExcludeZoneUris", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "placement.managed-cluster.config.gce-cluster-config.confidential-instance-config.enable-confidential-compute" => Some(("placement.managedCluster.config.gceClusterConfig.confidentialInstanceConfig.enableConfidentialCompute", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.gce-cluster-config.internal-ip-only" => Some(("placement.managedCluster.config.gceClusterConfig.internalIpOnly", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.gce-cluster-config.metadata" => Some(("placement.managedCluster.config.gceClusterConfig.metadata", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
@@ -14332,6 +18693,7 @@ where
                     "placement.managed-cluster.config.gce-cluster-config.reservation-affinity.consume-reservation-type" => Some(("placement.managedCluster.config.gceClusterConfig.reservationAffinity.consumeReservationType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.gce-cluster-config.reservation-affinity.key" => Some(("placement.managedCluster.config.gceClusterConfig.reservationAffinity.key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.gce-cluster-config.reservation-affinity.values" => Some(("placement.managedCluster.config.gceClusterConfig.reservationAffinity.values", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "placement.managed-cluster.config.gce-cluster-config.resource-manager-tags" => Some(("placement.managedCluster.config.gceClusterConfig.resourceManagerTags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "placement.managed-cluster.config.gce-cluster-config.service-account" => Some(("placement.managedCluster.config.gceClusterConfig.serviceAccount", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.gce-cluster-config.service-account-scopes" => Some(("placement.managedCluster.config.gceClusterConfig.serviceAccountScopes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "placement.managed-cluster.config.gce-cluster-config.shielded-instance-config.enable-integrity-monitoring" => Some(("placement.managedCluster.config.gceClusterConfig.shieldedInstanceConfig.enableIntegrityMonitoring", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -14345,8 +18707,11 @@ where
                     "placement.managed-cluster.config.gke-cluster-config.namespaced-gke-deployment-target.target-gke-cluster" => Some(("placement.managedCluster.config.gkeClusterConfig.namespacedGkeDeploymentTarget.targetGkeCluster", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.lifecycle-config.auto-delete-time" => Some(("placement.managedCluster.config.lifecycleConfig.autoDeleteTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.lifecycle-config.auto-delete-ttl" => Some(("placement.managedCluster.config.lifecycleConfig.autoDeleteTtl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.lifecycle-config.auto-stop-time" => Some(("placement.managedCluster.config.lifecycleConfig.autoStopTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.lifecycle-config.auto-stop-ttl" => Some(("placement.managedCluster.config.lifecycleConfig.autoStopTtl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.lifecycle-config.idle-delete-ttl" => Some(("placement.managedCluster.config.lifecycleConfig.idleDeleteTtl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.lifecycle-config.idle-start-time" => Some(("placement.managedCluster.config.lifecycleConfig.idleStartTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.lifecycle-config.idle-stop-ttl" => Some(("placement.managedCluster.config.lifecycleConfig.idleStopTtl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.master-config.disk-config.boot-disk-provisioned-iops" => Some(("placement.managedCluster.config.masterConfig.diskConfig.bootDiskProvisionedIops", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.master-config.disk-config.boot-disk-provisioned-throughput" => Some(("placement.managedCluster.config.masterConfig.diskConfig.bootDiskProvisionedThroughput", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.master-config.disk-config.boot-disk-size-gb" => Some(("placement.managedCluster.config.masterConfig.diskConfig.bootDiskSizeGb", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
@@ -14354,6 +18719,8 @@ where
                     "placement.managed-cluster.config.master-config.disk-config.local-ssd-interface" => Some(("placement.managedCluster.config.masterConfig.diskConfig.localSsdInterface", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.master-config.disk-config.num-local-ssds" => Some(("placement.managedCluster.config.masterConfig.diskConfig.numLocalSsds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.master-config.image-uri" => Some(("placement.managedCluster.config.masterConfig.imageUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.master-config.instance-flexibility-policy.provisioning-model-mix.standard-capacity-base" => Some(("placement.managedCluster.config.masterConfig.instanceFlexibilityPolicy.provisioningModelMix.standardCapacityBase", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.master-config.instance-flexibility-policy.provisioning-model-mix.standard-capacity-percent-above-base" => Some(("placement.managedCluster.config.masterConfig.instanceFlexibilityPolicy.provisioningModelMix.standardCapacityPercentAboveBase", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.master-config.instance-names" => Some(("placement.managedCluster.config.masterConfig.instanceNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "placement.managed-cluster.config.master-config.is-preemptible" => Some(("placement.managedCluster.config.masterConfig.isPreemptible", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.master-config.machine-type-uri" => Some(("placement.managedCluster.config.masterConfig.machineTypeUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -14373,6 +18740,8 @@ where
                     "placement.managed-cluster.config.secondary-worker-config.disk-config.local-ssd-interface" => Some(("placement.managedCluster.config.secondaryWorkerConfig.diskConfig.localSsdInterface", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.secondary-worker-config.disk-config.num-local-ssds" => Some(("placement.managedCluster.config.secondaryWorkerConfig.diskConfig.numLocalSsds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.secondary-worker-config.image-uri" => Some(("placement.managedCluster.config.secondaryWorkerConfig.imageUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.secondary-worker-config.instance-flexibility-policy.provisioning-model-mix.standard-capacity-base" => Some(("placement.managedCluster.config.secondaryWorkerConfig.instanceFlexibilityPolicy.provisioningModelMix.standardCapacityBase", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.secondary-worker-config.instance-flexibility-policy.provisioning-model-mix.standard-capacity-percent-above-base" => Some(("placement.managedCluster.config.secondaryWorkerConfig.instanceFlexibilityPolicy.provisioningModelMix.standardCapacityPercentAboveBase", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.secondary-worker-config.instance-names" => Some(("placement.managedCluster.config.secondaryWorkerConfig.instanceNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "placement.managed-cluster.config.secondary-worker-config.is-preemptible" => Some(("placement.managedCluster.config.secondaryWorkerConfig.isPreemptible", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.secondary-worker-config.machine-type-uri" => Some(("placement.managedCluster.config.secondaryWorkerConfig.machineTypeUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -14411,6 +18780,8 @@ where
                     "placement.managed-cluster.config.worker-config.disk-config.local-ssd-interface" => Some(("placement.managedCluster.config.workerConfig.diskConfig.localSsdInterface", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.worker-config.disk-config.num-local-ssds" => Some(("placement.managedCluster.config.workerConfig.diskConfig.numLocalSsds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.worker-config.image-uri" => Some(("placement.managedCluster.config.workerConfig.imageUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.worker-config.instance-flexibility-policy.provisioning-model-mix.standard-capacity-base" => Some(("placement.managedCluster.config.workerConfig.instanceFlexibilityPolicy.provisioningModelMix.standardCapacityBase", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.worker-config.instance-flexibility-policy.provisioning-model-mix.standard-capacity-percent-above-base" => Some(("placement.managedCluster.config.workerConfig.instanceFlexibilityPolicy.provisioningModelMix.standardCapacityPercentAboveBase", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.worker-config.instance-names" => Some(("placement.managedCluster.config.workerConfig.instanceNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "placement.managed-cluster.config.worker-config.is-preemptible" => Some(("placement.managedCluster.config.workerConfig.isPreemptible", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.worker-config.machine-type-uri" => Some(("placement.managedCluster.config.workerConfig.machineTypeUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -14426,7 +18797,7 @@ where
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "version" => Some(("version", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["auto-delete-time", "auto-delete-ttl", "autoscaling-config", "boot-disk-provisioned-iops", "boot-disk-provisioned-throughput", "boot-disk-size-gb", "boot-disk-type", "cluster-labels", "cluster-name", "cluster-namespace", "cluster-selector", "confidential-instance-config", "config", "config-bucket", "consume-reservation-type", "create-time", "cross-realm-trust-admin-server", "cross-realm-trust-kdc", "cross-realm-trust-realm", "cross-realm-trust-shared-password-uri", "dag-timeout", "dataproc-metastore-service", "disk-config", "enable-confidential-compute", "enable-http-port-access", "enable-integrity-monitoring", "enable-kerberos", "enable-secure-boot", "enable-vtpm", "encryption-config", "endpoint-config", "gce-cluster-config", "gce-pd-kms-key-name", "gke-cluster-config", "gke-cluster-target", "http-ports", "id", "identity-config", "idle-delete-ttl", "idle-start-time", "image-uri", "image-version", "instance-group-manager-name", "instance-group-manager-uri", "instance-names", "instance-template-name", "internal-ip-only", "is-preemptible", "kdc-db-key-uri", "kerberos-config", "key", "key-password-uri", "keystore-password-uri", "keystore-uri", "kms-key", "kms-key-uri", "labels", "lifecycle-config", "local-ssd-interface", "machine-type-uri", "managed-cluster", "managed-group-config", "master-config", "metadata", "metastore-config", "min-cpu-platform", "min-num-instances", "name", "namespaced-gke-deployment-target", "network-uri", "node-group-affinity", "node-group-uri", "num-instances", "num-local-ssds", "optional-components", "placement", "policy-uri", "preemptibility", "private-ipv6-google-access", "properties", "realm", "required-registration-fraction", "reservation-affinity", "root-principal-password-uri", "secondary-worker-config", "security-config", "service-account", "service-account-scopes", "shielded-instance-config", "software-config", "startup-config", "subnetwork-uri", "tags", "target-gke-cluster", "temp-bucket", "tgt-lifetime-hours", "truststore-password-uri", "truststore-uri", "update-time", "user-service-account-mapping", "values", "version", "worker-config", "zone", "zone-uri"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["auto-delete-time", "auto-delete-ttl", "auto-stop-time", "auto-stop-ttl", "auto-zone-exclude-zone-uris", "autoscaling-config", "boot-disk-provisioned-iops", "boot-disk-provisioned-throughput", "boot-disk-size-gb", "boot-disk-type", "cluster-labels", "cluster-name", "cluster-namespace", "cluster-selector", "cluster-tier", "cluster-type", "confidential-instance-config", "config", "config-bucket", "consume-reservation-type", "create-time", "cross-realm-trust-admin-server", "cross-realm-trust-kdc", "cross-realm-trust-realm", "cross-realm-trust-shared-password-uri", "dag-timeout", "dataproc-metastore-service", "diagnostic-bucket", "disk-config", "enable-confidential-compute", "enable-http-port-access", "enable-integrity-monitoring", "enable-kerberos", "enable-secure-boot", "enable-vtpm", "encryption-config", "endpoint-config", "gce-cluster-config", "gce-pd-kms-key-name", "gke-cluster-config", "gke-cluster-target", "http-ports", "id", "identity-config", "idle-delete-ttl", "idle-start-time", "idle-stop-ttl", "image-uri", "image-version", "instance-flexibility-policy", "instance-group-manager-name", "instance-group-manager-uri", "instance-names", "instance-template-name", "internal-ip-only", "is-preemptible", "kdc-db-key-uri", "kerberos-config", "key", "key-password-uri", "keystore-password-uri", "keystore-uri", "kms-key", "kms-key-uri", "labels", "lifecycle-config", "local-ssd-interface", "machine-type-uri", "managed-cluster", "managed-group-config", "master-config", "metadata", "metastore-config", "min-cpu-platform", "min-num-instances", "name", "namespaced-gke-deployment-target", "network-uri", "node-group-affinity", "node-group-uri", "num-instances", "num-local-ssds", "optional-components", "placement", "policy-uri", "preemptibility", "private-ipv6-google-access", "properties", "provisioning-model-mix", "realm", "required-registration-fraction", "reservation-affinity", "resource-manager-tags", "root-principal-password-uri", "secondary-worker-config", "security-config", "service-account", "service-account-scopes", "shielded-instance-config", "software-config", "standard-capacity-base", "standard-capacity-percent-above-base", "startup-config", "subnetwork-uri", "tags", "target-gke-cluster", "temp-bucket", "tgt-lifetime-hours", "truststore-password-uri", "truststore-uri", "update-time", "user-service-account-mapping", "values", "version", "worker-config", "zone", "zone-uri"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -14597,6 +18968,144 @@ where
                         ._projects_locations_batches_list(opt, dry_run, &mut err)
                         .await;
                 }
+                ("locations-batches-spark-applications-access", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_batches_spark_applications_access(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
+                ("locations-batches-spark-applications-access-environment-info", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_batches_spark_applications_access_environment_info(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
+                ("locations-batches-spark-applications-access-job", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_batches_spark_applications_access_job(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
+                ("locations-batches-spark-applications-access-sql-plan", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_batches_spark_applications_access_sql_plan(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
+                ("locations-batches-spark-applications-access-sql-query", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_batches_spark_applications_access_sql_query(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
+                ("locations-batches-spark-applications-access-stage-attempt", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_batches_spark_applications_access_stage_attempt(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
+                ("locations-batches-spark-applications-access-stage-rdd-graph", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_batches_spark_applications_access_stage_rdd_graph(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
+                ("locations-batches-spark-applications-search", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_batches_spark_applications_search(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
+                (
+                    "locations-batches-spark-applications-search-executor-stage-summary",
+                    Some(opt),
+                ) => {
+                    call_result = self._projects_locations_batches_spark_applications_search_executor_stage_summary(opt, dry_run, &mut err).await;
+                }
+                ("locations-batches-spark-applications-search-executors", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_batches_spark_applications_search_executors(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
+                ("locations-batches-spark-applications-search-jobs", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_batches_spark_applications_search_jobs(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
+                ("locations-batches-spark-applications-search-sql-queries", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_batches_spark_applications_search_sql_queries(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
+                ("locations-batches-spark-applications-search-stage-attempt-tasks", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_batches_spark_applications_search_stage_attempt_tasks(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
+                ("locations-batches-spark-applications-search-stage-attempts", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_batches_spark_applications_search_stage_attempts(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
+                ("locations-batches-spark-applications-search-stages", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_batches_spark_applications_search_stages(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
+                ("locations-batches-spark-applications-summarize-executors", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_batches_spark_applications_summarize_executors(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
+                ("locations-batches-spark-applications-summarize-jobs", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_batches_spark_applications_summarize_jobs(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
+                (
+                    "locations-batches-spark-applications-summarize-stage-attempt-tasks",
+                    Some(opt),
+                ) => {
+                    call_result = self._projects_locations_batches_spark_applications_summarize_stage_attempt_tasks(opt, dry_run, &mut err).await;
+                }
+                ("locations-batches-spark-applications-summarize-stages", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_batches_spark_applications_summarize_stages(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
+                ("locations-batches-spark-applications-write", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_batches_spark_applications_write(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
                 ("locations-operations-cancel", Some(opt)) => {
                     call_result = self
                         ._projects_locations_operations_cancel(opt, dry_run, &mut err)
@@ -14660,6 +19169,144 @@ where
                 ("locations-sessions-list", Some(opt)) => {
                     call_result = self
                         ._projects_locations_sessions_list(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("locations-sessions-spark-applications-access", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_sessions_spark_applications_access(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
+                ("locations-sessions-spark-applications-access-environment-info", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_sessions_spark_applications_access_environment_info(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
+                ("locations-sessions-spark-applications-access-job", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_sessions_spark_applications_access_job(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
+                ("locations-sessions-spark-applications-access-sql-plan", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_sessions_spark_applications_access_sql_plan(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
+                ("locations-sessions-spark-applications-access-sql-query", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_sessions_spark_applications_access_sql_query(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
+                ("locations-sessions-spark-applications-access-stage-attempt", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_sessions_spark_applications_access_stage_attempt(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
+                ("locations-sessions-spark-applications-access-stage-rdd-graph", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_sessions_spark_applications_access_stage_rdd_graph(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
+                ("locations-sessions-spark-applications-search", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_sessions_spark_applications_search(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
+                (
+                    "locations-sessions-spark-applications-search-executor-stage-summary",
+                    Some(opt),
+                ) => {
+                    call_result = self._projects_locations_sessions_spark_applications_search_executor_stage_summary(opt, dry_run, &mut err).await;
+                }
+                ("locations-sessions-spark-applications-search-executors", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_sessions_spark_applications_search_executors(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
+                ("locations-sessions-spark-applications-search-jobs", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_sessions_spark_applications_search_jobs(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
+                ("locations-sessions-spark-applications-search-sql-queries", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_sessions_spark_applications_search_sql_queries(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
+                ("locations-sessions-spark-applications-search-stage-attempt-tasks", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_sessions_spark_applications_search_stage_attempt_tasks(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
+                ("locations-sessions-spark-applications-search-stage-attempts", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_sessions_spark_applications_search_stage_attempts(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
+                ("locations-sessions-spark-applications-search-stages", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_sessions_spark_applications_search_stages(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
+                ("locations-sessions-spark-applications-summarize-executors", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_sessions_spark_applications_summarize_executors(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
+                ("locations-sessions-spark-applications-summarize-jobs", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_sessions_spark_applications_summarize_jobs(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
+                (
+                    "locations-sessions-spark-applications-summarize-stage-attempt-tasks",
+                    Some(opt),
+                ) => {
+                    call_result = self._projects_locations_sessions_spark_applications_summarize_stage_attempt_tasks(opt, dry_run, &mut err).await;
+                }
+                ("locations-sessions-spark-applications-summarize-stages", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_sessions_spark_applications_summarize_stages(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
+                ("locations-sessions-spark-applications-write", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_sessions_spark_applications_write(
+                            opt, dry_run, &mut err,
+                        )
                         .await;
                 }
                 ("locations-sessions-terminate", Some(opt)) => {
@@ -15041,7 +19688,9 @@ where
         let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
             secret,
             yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-            hyper_util::client::legacy::Client::builder(executor).build(connector),
+            yup_oauth2::client::CustomHyperClientBuilder::from(
+                hyper_util::client::legacy::Client::builder(executor).build(connector),
+            ),
         )
         .persist_tokens_to_disk(format!("{}/dataproc1", config_dir))
         .build()
@@ -15094,7 +19743,7 @@ where
 async fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("projects", "methods: 'locations-autoscaling-policies-create', 'locations-autoscaling-policies-delete', 'locations-autoscaling-policies-get', 'locations-autoscaling-policies-get-iam-policy', 'locations-autoscaling-policies-list', 'locations-autoscaling-policies-set-iam-policy', 'locations-autoscaling-policies-test-iam-permissions', 'locations-autoscaling-policies-update', 'locations-batches-analyze', 'locations-batches-create', 'locations-batches-delete', 'locations-batches-get', 'locations-batches-list', 'locations-operations-cancel', 'locations-operations-delete', 'locations-operations-get', 'locations-operations-list', 'locations-session-templates-create', 'locations-session-templates-delete', 'locations-session-templates-get', 'locations-session-templates-list', 'locations-session-templates-patch', 'locations-sessions-create', 'locations-sessions-delete', 'locations-sessions-get', 'locations-sessions-list', 'locations-sessions-terminate', 'locations-workflow-templates-create', 'locations-workflow-templates-delete', 'locations-workflow-templates-get', 'locations-workflow-templates-get-iam-policy', 'locations-workflow-templates-instantiate', 'locations-workflow-templates-instantiate-inline', 'locations-workflow-templates-list', 'locations-workflow-templates-set-iam-policy', 'locations-workflow-templates-test-iam-permissions', 'locations-workflow-templates-update', 'regions-autoscaling-policies-create', 'regions-autoscaling-policies-delete', 'regions-autoscaling-policies-get', 'regions-autoscaling-policies-get-iam-policy', 'regions-autoscaling-policies-list', 'regions-autoscaling-policies-set-iam-policy', 'regions-autoscaling-policies-test-iam-permissions', 'regions-autoscaling-policies-update', 'regions-clusters-create', 'regions-clusters-delete', 'regions-clusters-diagnose', 'regions-clusters-get', 'regions-clusters-get-iam-policy', 'regions-clusters-inject-credentials', 'regions-clusters-list', 'regions-clusters-node-groups-create', 'regions-clusters-node-groups-get', 'regions-clusters-node-groups-repair', 'regions-clusters-node-groups-resize', 'regions-clusters-patch', 'regions-clusters-repair', 'regions-clusters-set-iam-policy', 'regions-clusters-start', 'regions-clusters-stop', 'regions-clusters-test-iam-permissions', 'regions-jobs-cancel', 'regions-jobs-delete', 'regions-jobs-get', 'regions-jobs-get-iam-policy', 'regions-jobs-list', 'regions-jobs-patch', 'regions-jobs-set-iam-policy', 'regions-jobs-submit', 'regions-jobs-submit-as-operation', 'regions-jobs-test-iam-permissions', 'regions-operations-cancel', 'regions-operations-delete', 'regions-operations-get', 'regions-operations-get-iam-policy', 'regions-operations-list', 'regions-operations-set-iam-policy', 'regions-operations-test-iam-permissions', 'regions-workflow-templates-create', 'regions-workflow-templates-delete', 'regions-workflow-templates-get', 'regions-workflow-templates-get-iam-policy', 'regions-workflow-templates-instantiate', 'regions-workflow-templates-instantiate-inline', 'regions-workflow-templates-list', 'regions-workflow-templates-set-iam-policy', 'regions-workflow-templates-test-iam-permissions' and 'regions-workflow-templates-update'", vec![
+        ("projects", "methods: 'locations-autoscaling-policies-create', 'locations-autoscaling-policies-delete', 'locations-autoscaling-policies-get', 'locations-autoscaling-policies-get-iam-policy', 'locations-autoscaling-policies-list', 'locations-autoscaling-policies-set-iam-policy', 'locations-autoscaling-policies-test-iam-permissions', 'locations-autoscaling-policies-update', 'locations-batches-analyze', 'locations-batches-create', 'locations-batches-delete', 'locations-batches-get', 'locations-batches-list', 'locations-batches-spark-applications-access', 'locations-batches-spark-applications-access-environment-info', 'locations-batches-spark-applications-access-job', 'locations-batches-spark-applications-access-sql-plan', 'locations-batches-spark-applications-access-sql-query', 'locations-batches-spark-applications-access-stage-attempt', 'locations-batches-spark-applications-access-stage-rdd-graph', 'locations-batches-spark-applications-search', 'locations-batches-spark-applications-search-executor-stage-summary', 'locations-batches-spark-applications-search-executors', 'locations-batches-spark-applications-search-jobs', 'locations-batches-spark-applications-search-sql-queries', 'locations-batches-spark-applications-search-stage-attempt-tasks', 'locations-batches-spark-applications-search-stage-attempts', 'locations-batches-spark-applications-search-stages', 'locations-batches-spark-applications-summarize-executors', 'locations-batches-spark-applications-summarize-jobs', 'locations-batches-spark-applications-summarize-stage-attempt-tasks', 'locations-batches-spark-applications-summarize-stages', 'locations-batches-spark-applications-write', 'locations-operations-cancel', 'locations-operations-delete', 'locations-operations-get', 'locations-operations-list', 'locations-session-templates-create', 'locations-session-templates-delete', 'locations-session-templates-get', 'locations-session-templates-list', 'locations-session-templates-patch', 'locations-sessions-create', 'locations-sessions-delete', 'locations-sessions-get', 'locations-sessions-list', 'locations-sessions-spark-applications-access', 'locations-sessions-spark-applications-access-environment-info', 'locations-sessions-spark-applications-access-job', 'locations-sessions-spark-applications-access-sql-plan', 'locations-sessions-spark-applications-access-sql-query', 'locations-sessions-spark-applications-access-stage-attempt', 'locations-sessions-spark-applications-access-stage-rdd-graph', 'locations-sessions-spark-applications-search', 'locations-sessions-spark-applications-search-executor-stage-summary', 'locations-sessions-spark-applications-search-executors', 'locations-sessions-spark-applications-search-jobs', 'locations-sessions-spark-applications-search-sql-queries', 'locations-sessions-spark-applications-search-stage-attempt-tasks', 'locations-sessions-spark-applications-search-stage-attempts', 'locations-sessions-spark-applications-search-stages', 'locations-sessions-spark-applications-summarize-executors', 'locations-sessions-spark-applications-summarize-jobs', 'locations-sessions-spark-applications-summarize-stage-attempt-tasks', 'locations-sessions-spark-applications-summarize-stages', 'locations-sessions-spark-applications-write', 'locations-sessions-terminate', 'locations-workflow-templates-create', 'locations-workflow-templates-delete', 'locations-workflow-templates-get', 'locations-workflow-templates-get-iam-policy', 'locations-workflow-templates-instantiate', 'locations-workflow-templates-instantiate-inline', 'locations-workflow-templates-list', 'locations-workflow-templates-set-iam-policy', 'locations-workflow-templates-test-iam-permissions', 'locations-workflow-templates-update', 'regions-autoscaling-policies-create', 'regions-autoscaling-policies-delete', 'regions-autoscaling-policies-get', 'regions-autoscaling-policies-get-iam-policy', 'regions-autoscaling-policies-list', 'regions-autoscaling-policies-set-iam-policy', 'regions-autoscaling-policies-test-iam-permissions', 'regions-autoscaling-policies-update', 'regions-clusters-create', 'regions-clusters-delete', 'regions-clusters-diagnose', 'regions-clusters-get', 'regions-clusters-get-iam-policy', 'regions-clusters-inject-credentials', 'regions-clusters-list', 'regions-clusters-node-groups-create', 'regions-clusters-node-groups-get', 'regions-clusters-node-groups-repair', 'regions-clusters-node-groups-resize', 'regions-clusters-patch', 'regions-clusters-repair', 'regions-clusters-set-iam-policy', 'regions-clusters-start', 'regions-clusters-stop', 'regions-clusters-test-iam-permissions', 'regions-jobs-cancel', 'regions-jobs-delete', 'regions-jobs-get', 'regions-jobs-get-iam-policy', 'regions-jobs-list', 'regions-jobs-patch', 'regions-jobs-set-iam-policy', 'regions-jobs-submit', 'regions-jobs-submit-as-operation', 'regions-jobs-test-iam-permissions', 'regions-operations-cancel', 'regions-operations-delete', 'regions-operations-get', 'regions-operations-get-iam-policy', 'regions-operations-list', 'regions-operations-set-iam-policy', 'regions-operations-test-iam-permissions', 'regions-workflow-templates-create', 'regions-workflow-templates-delete', 'regions-workflow-templates-get', 'regions-workflow-templates-get-iam-policy', 'regions-workflow-templates-instantiate', 'regions-workflow-templates-instantiate-inline', 'regions-workflow-templates-list', 'regions-workflow-templates-set-iam-policy', 'regions-workflow-templates-test-iam-permissions' and 'regions-workflow-templates-update'", vec![
             ("locations-autoscaling-policies-create",
                     Some(r##"Creates new autoscaling policy."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dataproc1_cli/projects_locations-autoscaling-policies-create",
@@ -15390,6 +20039,411 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("locations-batches-spark-applications-access",
+                    Some(r##"Obtain high level information corresponding to a single Spark Application."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dataproc1_cli/projects_locations-batches-spark-applications-access",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The fully qualified name of the batch to retrieve in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/batches/BATCH_ID/sparkApplications/APPLICATION_ID""##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-batches-spark-applications-access-environment-info",
+                    Some(r##"Obtain environment details for a Spark Application"##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dataproc1_cli/projects_locations-batches-spark-applications-access-environment-info",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The fully qualified name of the batch to retrieve in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/batches/BATCH_ID/sparkApplications/APPLICATION_ID""##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-batches-spark-applications-access-job",
+                    Some(r##"Obtain data corresponding to a spark job for a Spark Application."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dataproc1_cli/projects_locations-batches-spark-applications-access-job",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The fully qualified name of the batch to retrieve in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/batches/BATCH_ID/sparkApplications/APPLICATION_ID""##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-batches-spark-applications-access-sql-plan",
+                    Some(r##"Obtain Spark Plan Graph for a Spark Application SQL execution. Limits the number of clusters returned as part of the graph to 10000."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dataproc1_cli/projects_locations-batches-spark-applications-access-sql-plan",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The fully qualified name of the batch to retrieve in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/batches/BATCH_ID/sparkApplications/APPLICATION_ID""##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-batches-spark-applications-access-sql-query",
+                    Some(r##"Obtain data corresponding to a particular SQL Query for a Spark Application."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dataproc1_cli/projects_locations-batches-spark-applications-access-sql-query",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The fully qualified name of the batch to retrieve in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/batches/BATCH_ID/sparkApplications/APPLICATION_ID""##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-batches-spark-applications-access-stage-attempt",
+                    Some(r##"Obtain data corresponding to a spark stage attempt for a Spark Application."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dataproc1_cli/projects_locations-batches-spark-applications-access-stage-attempt",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The fully qualified name of the batch to retrieve in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/batches/BATCH_ID/sparkApplications/APPLICATION_ID""##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-batches-spark-applications-access-stage-rdd-graph",
+                    Some(r##"Obtain RDD operation graph for a Spark Application Stage. Limits the number of clusters returned as part of the graph to 10000."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dataproc1_cli/projects_locations-batches-spark-applications-access-stage-rdd-graph",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The fully qualified name of the batch to retrieve in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/batches/BATCH_ID/sparkApplications/APPLICATION_ID""##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-batches-spark-applications-search",
+                    Some(r##"Obtain high level information and list of Spark Applications corresponding to a batch"##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dataproc1_cli/projects_locations-batches-spark-applications-search",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. The fully qualified name of the batch to retrieve in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/batches/BATCH_ID""##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-batches-spark-applications-search-executor-stage-summary",
+                    Some(r##"Obtain executor summary with respect to a spark stage attempt."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dataproc1_cli/projects_locations-batches-spark-applications-search-executor-stage-summary",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The fully qualified name of the batch to retrieve in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/batches/BATCH_ID/sparkApplications/APPLICATION_ID""##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-batches-spark-applications-search-executors",
+                    Some(r##"Obtain data corresponding to executors for a Spark Application."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dataproc1_cli/projects_locations-batches-spark-applications-search-executors",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The fully qualified name of the batch to retrieve in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/batches/BATCH_ID/sparkApplications/APPLICATION_ID""##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-batches-spark-applications-search-jobs",
+                    Some(r##"Obtain list of spark jobs corresponding to a Spark Application."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dataproc1_cli/projects_locations-batches-spark-applications-search-jobs",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The fully qualified name of the batch to retrieve in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/batches/BATCH_ID/sparkApplications/APPLICATION_ID""##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-batches-spark-applications-search-sql-queries",
+                    Some(r##"Obtain data corresponding to SQL Queries for a Spark Application."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dataproc1_cli/projects_locations-batches-spark-applications-search-sql-queries",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The fully qualified name of the batch to retrieve in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/batches/BATCH_ID/sparkApplications/APPLICATION_ID""##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-batches-spark-applications-search-stage-attempt-tasks",
+                    Some(r##"Obtain data corresponding to tasks for a spark stage attempt for a Spark Application."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dataproc1_cli/projects_locations-batches-spark-applications-search-stage-attempt-tasks",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The fully qualified name of the batch to retrieve in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/batches/BATCH_ID/sparkApplications/APPLICATION_ID""##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-batches-spark-applications-search-stage-attempts",
+                    Some(r##"Obtain data corresponding to a spark stage attempts for a Spark Application."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dataproc1_cli/projects_locations-batches-spark-applications-search-stage-attempts",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The fully qualified name of the batch to retrieve in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/batches/BATCH_ID/sparkApplications/APPLICATION_ID""##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-batches-spark-applications-search-stages",
+                    Some(r##"Obtain data corresponding to stages for a Spark Application."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dataproc1_cli/projects_locations-batches-spark-applications-search-stages",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The fully qualified name of the batch to retrieve in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/batches/BATCH_ID/sparkApplications/APPLICATION_ID""##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-batches-spark-applications-summarize-executors",
+                    Some(r##"Obtain summary of Executor Summary for a Spark Application"##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dataproc1_cli/projects_locations-batches-spark-applications-summarize-executors",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The fully qualified name of the batch to retrieve in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/batches/BATCH_ID/sparkApplications/APPLICATION_ID""##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-batches-spark-applications-summarize-jobs",
+                    Some(r##"Obtain summary of Jobs for a Spark Application"##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dataproc1_cli/projects_locations-batches-spark-applications-summarize-jobs",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The fully qualified name of the batch to retrieve in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/batches/BATCH_ID/sparkApplications/APPLICATION_ID""##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-batches-spark-applications-summarize-stage-attempt-tasks",
+                    Some(r##"Obtain summary of Tasks for a Spark Application Stage Attempt"##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dataproc1_cli/projects_locations-batches-spark-applications-summarize-stage-attempt-tasks",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The fully qualified name of the batch to retrieve in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/batches/BATCH_ID/sparkApplications/APPLICATION_ID""##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-batches-spark-applications-summarize-stages",
+                    Some(r##"Obtain summary of Stages for a Spark Application"##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dataproc1_cli/projects_locations-batches-spark-applications-summarize-stages",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The fully qualified name of the batch to retrieve in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/batches/BATCH_ID/sparkApplications/APPLICATION_ID""##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-batches-spark-applications-write",
+                    Some(r##"Write wrapper objects from dataplane to spanner"##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dataproc1_cli/projects_locations-batches-spark-applications-write",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The fully qualified name of the spark application to write data about in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/batches/BATCH_ID/sparkApplications/APPLICATION_ID""##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("locations-operations-cancel",
                     Some(r##"Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns google.rpc.Code.UNIMPLEMENTED. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of 1, corresponding to Code.CANCELLED."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dataproc1_cli/projects_locations-operations-cancel",
@@ -15561,7 +20615,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The resource name of the session template."##),
+                     Some(r##"Required. Identifier. The resource name of the session template."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -15654,6 +20708,411 @@ async fn main() {
                      Some(r##"Required. The parent, which owns this collection of sessions."##),
                      Some(true),
                      Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-sessions-spark-applications-access",
+                    Some(r##"Obtain high level information corresponding to a single Spark Application."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dataproc1_cli/projects_locations-sessions-spark-applications-access",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The fully qualified name of the session to retrieve in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/sessions/SESSION_ID/sparkApplications/APPLICATION_ID""##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-sessions-spark-applications-access-environment-info",
+                    Some(r##"Obtain environment details for a Spark Application"##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dataproc1_cli/projects_locations-sessions-spark-applications-access-environment-info",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The fully qualified name of the session to retrieve in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/sessions/SESSION_ID/sparkApplications/APPLICATION_ID""##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-sessions-spark-applications-access-job",
+                    Some(r##"Obtain data corresponding to a spark job for a Spark Application."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dataproc1_cli/projects_locations-sessions-spark-applications-access-job",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The fully qualified name of the session to retrieve in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/sessions/SESSION_ID/sparkApplications/APPLICATION_ID""##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-sessions-spark-applications-access-sql-plan",
+                    Some(r##"Obtain Spark Plan Graph for a Spark Application SQL execution. Limits the number of clusters returned as part of the graph to 10000."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dataproc1_cli/projects_locations-sessions-spark-applications-access-sql-plan",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The fully qualified name of the session to retrieve in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/sessions/SESSION_ID/sparkApplications/APPLICATION_ID""##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-sessions-spark-applications-access-sql-query",
+                    Some(r##"Obtain data corresponding to a particular SQL Query for a Spark Application."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dataproc1_cli/projects_locations-sessions-spark-applications-access-sql-query",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The fully qualified name of the session to retrieve in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/sessions/SESSION_ID/sparkApplications/APPLICATION_ID""##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-sessions-spark-applications-access-stage-attempt",
+                    Some(r##"Obtain data corresponding to a spark stage attempt for a Spark Application."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dataproc1_cli/projects_locations-sessions-spark-applications-access-stage-attempt",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The fully qualified name of the session to retrieve in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/sessions/SESSION_ID/sparkApplications/APPLICATION_ID""##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-sessions-spark-applications-access-stage-rdd-graph",
+                    Some(r##"Obtain RDD operation graph for a Spark Application Stage. Limits the number of clusters returned as part of the graph to 10000."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dataproc1_cli/projects_locations-sessions-spark-applications-access-stage-rdd-graph",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The fully qualified name of the session to retrieve in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/sessions/SESSION_ID/sparkApplications/APPLICATION_ID""##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-sessions-spark-applications-search",
+                    Some(r##"Obtain high level information and list of Spark Applications corresponding to a batch"##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dataproc1_cli/projects_locations-sessions-spark-applications-search",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. The fully qualified name of the session to retrieve in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/sessions/SESSION_ID""##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-sessions-spark-applications-search-executor-stage-summary",
+                    Some(r##"Obtain executor summary with respect to a spark stage attempt."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dataproc1_cli/projects_locations-sessions-spark-applications-search-executor-stage-summary",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The fully qualified name of the session to retrieve in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/sessions/SESSION_ID/sparkApplications/APPLICATION_ID""##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-sessions-spark-applications-search-executors",
+                    Some(r##"Obtain data corresponding to executors for a Spark Application."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dataproc1_cli/projects_locations-sessions-spark-applications-search-executors",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The fully qualified name of the session to retrieve in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/sessions/SESSION_ID/sparkApplications/APPLICATION_ID""##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-sessions-spark-applications-search-jobs",
+                    Some(r##"Obtain list of spark jobs corresponding to a Spark Application."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dataproc1_cli/projects_locations-sessions-spark-applications-search-jobs",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The fully qualified name of the session to retrieve in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/sessions/SESSION_ID/sparkApplications/APPLICATION_ID""##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-sessions-spark-applications-search-sql-queries",
+                    Some(r##"Obtain data corresponding to SQL Queries for a Spark Application."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dataproc1_cli/projects_locations-sessions-spark-applications-search-sql-queries",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The fully qualified name of the session to retrieve in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/sessions/SESSION_ID/sparkApplications/APPLICATION_ID""##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-sessions-spark-applications-search-stage-attempt-tasks",
+                    Some(r##"Obtain data corresponding to tasks for a spark stage attempt for a Spark Application."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dataproc1_cli/projects_locations-sessions-spark-applications-search-stage-attempt-tasks",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The fully qualified name of the session to retrieve in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/sessions/SESSION_ID/sparkApplications/APPLICATION_ID""##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-sessions-spark-applications-search-stage-attempts",
+                    Some(r##"Obtain data corresponding to a spark stage attempts for a Spark Application."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dataproc1_cli/projects_locations-sessions-spark-applications-search-stage-attempts",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The fully qualified name of the session to retrieve in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/sessions/SESSION_ID/sparkApplications/APPLICATION_ID""##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-sessions-spark-applications-search-stages",
+                    Some(r##"Obtain data corresponding to stages for a Spark Application."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dataproc1_cli/projects_locations-sessions-spark-applications-search-stages",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The fully qualified name of the session to retrieve in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/sessions/SESSION_ID/sparkApplications/APPLICATION_ID""##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-sessions-spark-applications-summarize-executors",
+                    Some(r##"Obtain summary of Executor Summary for a Spark Application"##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dataproc1_cli/projects_locations-sessions-spark-applications-summarize-executors",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The fully qualified name of the session to retrieve in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/sessions/SESSION_ID/sparkApplications/APPLICATION_ID""##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-sessions-spark-applications-summarize-jobs",
+                    Some(r##"Obtain summary of Jobs for a Spark Application"##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dataproc1_cli/projects_locations-sessions-spark-applications-summarize-jobs",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The fully qualified name of the session to retrieve in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/sessions/SESSION_ID/sparkApplications/APPLICATION_ID""##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-sessions-spark-applications-summarize-stage-attempt-tasks",
+                    Some(r##"Obtain summary of Tasks for a Spark Application Stage Attempt"##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dataproc1_cli/projects_locations-sessions-spark-applications-summarize-stage-attempt-tasks",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The fully qualified name of the session to retrieve in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/sessions/SESSION_ID/sparkApplications/APPLICATION_ID""##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-sessions-spark-applications-summarize-stages",
+                    Some(r##"Obtain summary of Stages for a Spark Application"##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dataproc1_cli/projects_locations-sessions-spark-applications-summarize-stages",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The fully qualified name of the session to retrieve in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/sessions/SESSION_ID/sparkApplications/APPLICATION_ID""##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-sessions-spark-applications-write",
+                    Some(r##"Write wrapper objects from dataplane to spanner"##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dataproc1_cli/projects_locations-sessions-spark-applications-write",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The fully qualified name of the spark application to write data about in the format "projects/PROJECT_ID/locations/DATAPROC_REGION/sessions/SESSION_ID/sparkApplications/APPLICATION_ID""##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
@@ -17290,7 +22749,7 @@ async fn main() {
 
     let mut app = App::new("dataproc1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("6.0.0+20240617")
+           .version("7.0.0+20251203")
            .about("Manages Hadoop-based clusters and jobs on Google Cloud Platform.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_dataproc1_cli")
            .arg(Arg::with_name("url")
@@ -17355,7 +22814,7 @@ async fn main() {
         .with_native_roots()
         .unwrap()
         .https_or_http()
-        .enable_http1()
+        .enable_http2()
         .build();
 
     match Engine::new(matches, connector).await {

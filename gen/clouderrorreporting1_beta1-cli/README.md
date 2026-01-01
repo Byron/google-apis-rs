@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Clouderrorreporting* API at revision *20240621*. The CLI is at version *6.0.0*.
+This documentation was generated from the *Clouderrorreporting* API at revision *20251205*. The CLI is at version *7.0.0*.
 
 ```bash
 clouderrorreporting1-beta1 [options]
@@ -36,6 +36,11 @@ clouderrorreporting1-beta1 [options]
                 group-stats-list <project-name> [-p <v>]... [-o <out>]
                 groups-get <group-name> [-p <v>]... [-o <out>]
                 groups-update <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-delete-events <project-name> [-p <v>]... [-o <out>]
+                locations-events-list <project-name> [-p <v>]... [-o <out>]
+                locations-group-stats-list <project-name> [-p <v>]... [-o <out>]
+                locations-groups-get <group-name> [-p <v>]... [-o <out>]
+                locations-groups-update <name> (-r <kv>)... [-p <v>]... [-o <out>]
   clouderrorreporting1-beta1 --help
 
 Configuration:

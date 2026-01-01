@@ -1005,6 +1005,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "ssl-policy" => Some((
+                    "sslPolicy",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 _ => {
                     let suggestion = FieldCursor::did_you_mean(
                         key,
@@ -1028,6 +1035,7 @@ where
                             "service-account",
                             "serving-status",
                             "split-health-checks",
+                            "ssl-policy",
                             "use-container-optimized-os",
                         ],
                     );
@@ -2726,6 +2734,9 @@ where
                 "filter" => {
                     call = call.filter(value.unwrap_or(""));
                 }
+                "extra-location-types" => {
+                    call = call.add_extra_location_types(value.unwrap_or(""));
+                }
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -2743,7 +2754,11 @@ where
                             .push(CLIError::UnknownParameter(key.to_string(), {
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
-                                v.extend(["filter", "page-size", "page-token"].iter().map(|v| *v));
+                                v.extend(
+                                    ["extra-location-types", "filter", "page-size", "page-token"]
+                                        .iter()
+                                        .map(|v| *v),
+                                );
                                 v
                             }));
                     }
@@ -2889,6 +2904,13 @@ where
         {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "return-partial-success" => {
+                    call = call.return_partial_success(
+                        value
+                            .map(|v| arg_from_str(v, err, "return-partial-success", "boolean"))
+                            .unwrap_or(false),
+                    );
+                }
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
                 }
@@ -2919,7 +2941,16 @@ where
                             .push(CLIError::UnknownParameter(key.to_string(), {
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
-                                v.extend(["filter", "page-size", "page-token"].iter().map(|v| *v));
+                                v.extend(
+                                    [
+                                        "filter",
+                                        "page-size",
+                                        "page-token",
+                                        "return-partial-success",
+                                    ]
+                                    .iter()
+                                    .map(|v| *v),
+                                );
                                 v
                             }));
                     }
@@ -3123,6 +3154,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "ssl-policy" => Some((
+                    "sslPolicy",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 _ => {
                     let suggestion = FieldCursor::did_you_mean(
                         key,
@@ -3146,6 +3184,7 @@ where
                             "service-account",
                             "serving-status",
                             "split-health-checks",
+                            "ssl-policy",
                             "use-container-optimized-os",
                         ],
                     );
@@ -4865,6 +4904,153 @@ where
         }
     }
 
+    async fn _apps_services_versions_export_app_image(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut field_cursor = FieldCursor::default();
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "destination-repository" => Some((
+                    "destinationRepository",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "service-account" => Some((
+                    "serviceAccount",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec!["destination-repository", "service-account"],
+                    );
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
+            }
+        }
+        let mut request: api::ExportAppImageRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self.hub.apps().services_versions_export_app_image(
+            request,
+            opt.value_of("apps-id").unwrap_or(""),
+            opt.value_of("services-id").unwrap_or(""),
+            opt.value_of("versions-id").unwrap_or(""),
+        );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _apps_services_versions_get(
         &self,
         opt: &ArgMatches<'n>,
@@ -6404,6 +6590,744 @@ where
         }
     }
 
+    async fn _projects_locations_applications_authorized_certificates_create(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut field_cursor = FieldCursor::default();
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "certificate-raw-data.private-key" => Some((
+                    "certificateRawData.privateKey",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "certificate-raw-data.public-certificate" => Some((
+                    "certificateRawData.publicCertificate",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "display-name" => Some((
+                    "displayName",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "domain-mappings-count" => Some((
+                    "domainMappingsCount",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "domain-names" => Some((
+                    "domainNames",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "expire-time" => Some((
+                    "expireTime",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "id" => Some((
+                    "id",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "managed-certificate.last-renewal-time" => Some((
+                    "managedCertificate.lastRenewalTime",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "managed-certificate.status" => Some((
+                    "managedCertificate.status",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "name" => Some((
+                    "name",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "visible-domain-mappings" => Some((
+                    "visibleDomainMappings",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec![
+                            "certificate-raw-data",
+                            "display-name",
+                            "domain-mappings-count",
+                            "domain-names",
+                            "expire-time",
+                            "id",
+                            "last-renewal-time",
+                            "managed-certificate",
+                            "name",
+                            "private-key",
+                            "public-certificate",
+                            "status",
+                            "visible-domain-mappings",
+                        ],
+                    );
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
+            }
+        }
+        let mut request: api::AuthorizedCertificate =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .locations_applications_authorized_certificates_create(
+                request,
+                opt.value_of("projects-id").unwrap_or(""),
+                opt.value_of("locations-id").unwrap_or(""),
+                opt.value_of("applications-id").unwrap_or(""),
+            );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_applications_authorized_certificates_delete(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .locations_applications_authorized_certificates_delete(
+                opt.value_of("projects-id").unwrap_or(""),
+                opt.value_of("locations-id").unwrap_or(""),
+                opt.value_of("applications-id").unwrap_or(""),
+                opt.value_of("authorized-certificates-id").unwrap_or(""),
+            );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_applications_authorized_certificates_get(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .locations_applications_authorized_certificates_get(
+                opt.value_of("projects-id").unwrap_or(""),
+                opt.value_of("locations-id").unwrap_or(""),
+                opt.value_of("applications-id").unwrap_or(""),
+                opt.value_of("authorized-certificates-id").unwrap_or(""),
+            );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "view" => {
+                    call = call.view(value.unwrap_or(""));
+                }
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["view"].iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_applications_authorized_certificates_list(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .locations_applications_authorized_certificates_list(
+                opt.value_of("projects-id").unwrap_or(""),
+                opt.value_of("locations-id").unwrap_or(""),
+                opt.value_of("applications-id").unwrap_or(""),
+            );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "view" => {
+                    call = call.view(value.unwrap_or(""));
+                }
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                }
+                "page-size" => {
+                    call = call.page_size(
+                        value
+                            .map(|v| arg_from_str(v, err, "page-size", "int32"))
+                            .unwrap_or(-0),
+                    );
+                }
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["page-size", "page-token", "view"].iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_applications_authorized_certificates_patch(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut field_cursor = FieldCursor::default();
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "certificate-raw-data.private-key" => Some((
+                    "certificateRawData.privateKey",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "certificate-raw-data.public-certificate" => Some((
+                    "certificateRawData.publicCertificate",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "display-name" => Some((
+                    "displayName",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "domain-mappings-count" => Some((
+                    "domainMappingsCount",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "domain-names" => Some((
+                    "domainNames",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "expire-time" => Some((
+                    "expireTime",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "id" => Some((
+                    "id",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "managed-certificate.last-renewal-time" => Some((
+                    "managedCertificate.lastRenewalTime",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "managed-certificate.status" => Some((
+                    "managedCertificate.status",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "name" => Some((
+                    "name",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "visible-domain-mappings" => Some((
+                    "visibleDomainMappings",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec![
+                            "certificate-raw-data",
+                            "display-name",
+                            "domain-mappings-count",
+                            "domain-names",
+                            "expire-time",
+                            "id",
+                            "last-renewal-time",
+                            "managed-certificate",
+                            "name",
+                            "private-key",
+                            "public-certificate",
+                            "status",
+                            "visible-domain-mappings",
+                        ],
+                    );
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
+            }
+        }
+        let mut request: api::AuthorizedCertificate =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .locations_applications_authorized_certificates_patch(
+                request,
+                opt.value_of("projects-id").unwrap_or(""),
+                opt.value_of("locations-id").unwrap_or(""),
+                opt.value_of("applications-id").unwrap_or(""),
+                opt.value_of("authorized-certificates-id").unwrap_or(""),
+            );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "update-mask" => {
+                    call = call.update_mask(
+                        value
+                            .map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask"))
+                            .unwrap_or(apis_common::FieldMask::default()),
+                    );
+                }
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["update-mask"].iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _projects_locations_applications_authorized_domains_list(
         &self,
         opt: &ArgMatches<'n>,
@@ -6454,6 +7378,2424 @@ where
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
                                 v.extend(["page-size", "page-token"].iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_applications_domain_mappings_create(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut field_cursor = FieldCursor::default();
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "id" => Some((
+                    "id",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "name" => Some((
+                    "name",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "ssl-settings.certificate-id" => Some((
+                    "sslSettings.certificateId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "ssl-settings.pending-managed-certificate-id" => Some((
+                    "sslSettings.pendingManagedCertificateId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "ssl-settings.ssl-management-type" => Some((
+                    "sslSettings.sslManagementType",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec![
+                            "certificate-id",
+                            "id",
+                            "name",
+                            "pending-managed-certificate-id",
+                            "ssl-management-type",
+                            "ssl-settings",
+                        ],
+                    );
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
+            }
+        }
+        let mut request: api::DomainMapping = serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .locations_applications_domain_mappings_create(
+                request,
+                opt.value_of("projects-id").unwrap_or(""),
+                opt.value_of("locations-id").unwrap_or(""),
+                opt.value_of("applications-id").unwrap_or(""),
+            );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "override-strategy" => {
+                    call = call.override_strategy(value.unwrap_or(""));
+                }
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["override-strategy"].iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_applications_domain_mappings_delete(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .locations_applications_domain_mappings_delete(
+                opt.value_of("projects-id").unwrap_or(""),
+                opt.value_of("locations-id").unwrap_or(""),
+                opt.value_of("applications-id").unwrap_or(""),
+                opt.value_of("domain-mappings-id").unwrap_or(""),
+            );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_applications_domain_mappings_get(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .locations_applications_domain_mappings_get(
+                opt.value_of("projects-id").unwrap_or(""),
+                opt.value_of("locations-id").unwrap_or(""),
+                opt.value_of("applications-id").unwrap_or(""),
+                opt.value_of("domain-mappings-id").unwrap_or(""),
+            );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_applications_domain_mappings_list(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .locations_applications_domain_mappings_list(
+                opt.value_of("projects-id").unwrap_or(""),
+                opt.value_of("locations-id").unwrap_or(""),
+                opt.value_of("applications-id").unwrap_or(""),
+            );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                }
+                "page-size" => {
+                    call = call.page_size(
+                        value
+                            .map(|v| arg_from_str(v, err, "page-size", "int32"))
+                            .unwrap_or(-0),
+                    );
+                }
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["page-size", "page-token"].iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_applications_domain_mappings_patch(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut field_cursor = FieldCursor::default();
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "id" => Some((
+                    "id",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "name" => Some((
+                    "name",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "ssl-settings.certificate-id" => Some((
+                    "sslSettings.certificateId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "ssl-settings.pending-managed-certificate-id" => Some((
+                    "sslSettings.pendingManagedCertificateId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "ssl-settings.ssl-management-type" => Some((
+                    "sslSettings.sslManagementType",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec![
+                            "certificate-id",
+                            "id",
+                            "name",
+                            "pending-managed-certificate-id",
+                            "ssl-management-type",
+                            "ssl-settings",
+                        ],
+                    );
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
+            }
+        }
+        let mut request: api::DomainMapping = serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .locations_applications_domain_mappings_patch(
+                request,
+                opt.value_of("projects-id").unwrap_or(""),
+                opt.value_of("locations-id").unwrap_or(""),
+                opt.value_of("applications-id").unwrap_or(""),
+                opt.value_of("domain-mappings-id").unwrap_or(""),
+            );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "update-mask" => {
+                    call = call.update_mask(
+                        value
+                            .map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask"))
+                            .unwrap_or(apis_common::FieldMask::default()),
+                    );
+                }
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["update-mask"].iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_applications_patch(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut field_cursor = FieldCursor::default();
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "auth-domain" => Some((
+                    "authDomain",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "code-bucket" => Some((
+                    "codeBucket",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "database-type" => Some((
+                    "databaseType",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "default-bucket" => Some((
+                    "defaultBucket",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "default-cookie-expiration" => Some((
+                    "defaultCookieExpiration",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "default-hostname" => Some((
+                    "defaultHostname",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "feature-settings.split-health-checks" => Some((
+                    "featureSettings.splitHealthChecks",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "feature-settings.use-container-optimized-os" => Some((
+                    "featureSettings.useContainerOptimizedOs",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "gcr-domain" => Some((
+                    "gcrDomain",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "iap.enabled" => Some((
+                    "iap.enabled",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "iap.oauth2-client-id" => Some((
+                    "iap.oauth2ClientId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "iap.oauth2-client-secret" => Some((
+                    "iap.oauth2ClientSecret",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "iap.oauth2-client-secret-sha256" => Some((
+                    "iap.oauth2ClientSecretSha256",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "id" => Some((
+                    "id",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "location-id" => Some((
+                    "locationId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "name" => Some((
+                    "name",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "service-account" => Some((
+                    "serviceAccount",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "serving-status" => Some((
+                    "servingStatus",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "ssl-policy" => Some((
+                    "sslPolicy",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec![
+                            "auth-domain",
+                            "code-bucket",
+                            "database-type",
+                            "default-bucket",
+                            "default-cookie-expiration",
+                            "default-hostname",
+                            "enabled",
+                            "feature-settings",
+                            "gcr-domain",
+                            "iap",
+                            "id",
+                            "location-id",
+                            "name",
+                            "oauth2-client-id",
+                            "oauth2-client-secret",
+                            "oauth2-client-secret-sha256",
+                            "service-account",
+                            "serving-status",
+                            "split-health-checks",
+                            "ssl-policy",
+                            "use-container-optimized-os",
+                        ],
+                    );
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
+            }
+        }
+        let mut request: api::Application = serde_json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_applications_patch(
+            request,
+            opt.value_of("projects-id").unwrap_or(""),
+            opt.value_of("locations-id").unwrap_or(""),
+            opt.value_of("applications-id").unwrap_or(""),
+        );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "update-mask" => {
+                    call = call.update_mask(
+                        value
+                            .map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask"))
+                            .unwrap_or(apis_common::FieldMask::default()),
+                    );
+                }
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["update-mask"].iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_applications_services_delete(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self.hub.projects().locations_applications_services_delete(
+            opt.value_of("projects-id").unwrap_or(""),
+            opt.value_of("locations-id").unwrap_or(""),
+            opt.value_of("applications-id").unwrap_or(""),
+            opt.value_of("services-id").unwrap_or(""),
+        );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_applications_services_patch(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut field_cursor = FieldCursor::default();
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "id" => Some((
+                    "id",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "labels" => Some((
+                    "labels",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Map,
+                    },
+                )),
+                "name" => Some((
+                    "name",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "network-settings.ingress-traffic-allowed" => Some((
+                    "networkSettings.ingressTrafficAllowed",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "split.allocations" => Some((
+                    "split.allocations",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Map,
+                    },
+                )),
+                "split.shard-by" => Some((
+                    "split.shardBy",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec![
+                            "allocations",
+                            "id",
+                            "ingress-traffic-allowed",
+                            "labels",
+                            "name",
+                            "network-settings",
+                            "shard-by",
+                            "split",
+                        ],
+                    );
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
+            }
+        }
+        let mut request: api::Service = serde_json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_applications_services_patch(
+            request,
+            opt.value_of("projects-id").unwrap_or(""),
+            opt.value_of("locations-id").unwrap_or(""),
+            opt.value_of("applications-id").unwrap_or(""),
+            opt.value_of("services-id").unwrap_or(""),
+        );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "update-mask" => {
+                    call = call.update_mask(
+                        value
+                            .map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask"))
+                            .unwrap_or(apis_common::FieldMask::default()),
+                    );
+                }
+                "migrate-traffic" => {
+                    call = call.migrate_traffic(
+                        value
+                            .map(|v| arg_from_str(v, err, "migrate-traffic", "boolean"))
+                            .unwrap_or(false),
+                    );
+                }
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["migrate-traffic", "update-mask"].iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_applications_services_versions_delete(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .locations_applications_services_versions_delete(
+                opt.value_of("projects-id").unwrap_or(""),
+                opt.value_of("locations-id").unwrap_or(""),
+                opt.value_of("applications-id").unwrap_or(""),
+                opt.value_of("services-id").unwrap_or(""),
+                opt.value_of("versions-id").unwrap_or(""),
+            );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_applications_services_versions_export_app_image(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut field_cursor = FieldCursor::default();
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "destination-repository" => Some((
+                    "destinationRepository",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "service-account" => Some((
+                    "serviceAccount",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec!["destination-repository", "service-account"],
+                    );
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
+            }
+        }
+        let mut request: api::ExportAppImageRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .locations_applications_services_versions_export_app_image(
+                request,
+                opt.value_of("projects-id").unwrap_or(""),
+                opt.value_of("locations-id").unwrap_or(""),
+                opt.value_of("applications-id").unwrap_or(""),
+                opt.value_of("services-id").unwrap_or(""),
+                opt.value_of("versions-id").unwrap_or(""),
+            );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_applications_services_versions_patch(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut field_cursor = FieldCursor::default();
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "api-config.auth-fail-action" => Some((
+                    "apiConfig.authFailAction",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "api-config.login" => Some((
+                    "apiConfig.login",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "api-config.script" => Some((
+                    "apiConfig.script",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "api-config.security-level" => Some((
+                    "apiConfig.securityLevel",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "api-config.url" => Some((
+                    "apiConfig.url",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "app-engine-apis" => Some((
+                    "appEngineApis",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "automatic-scaling.cool-down-period" => Some((
+                    "automaticScaling.coolDownPeriod",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "automatic-scaling.cpu-utilization.aggregation-window-length" => Some((
+                    "automaticScaling.cpuUtilization.aggregationWindowLength",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "automatic-scaling.cpu-utilization.target-utilization" => Some((
+                    "automaticScaling.cpuUtilization.targetUtilization",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "automatic-scaling.disk-utilization.target-read-bytes-per-second" => Some((
+                    "automaticScaling.diskUtilization.targetReadBytesPerSecond",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "automatic-scaling.disk-utilization.target-read-ops-per-second" => Some((
+                    "automaticScaling.diskUtilization.targetReadOpsPerSecond",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "automatic-scaling.disk-utilization.target-write-bytes-per-second" => Some((
+                    "automaticScaling.diskUtilization.targetWriteBytesPerSecond",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "automatic-scaling.disk-utilization.target-write-ops-per-second" => Some((
+                    "automaticScaling.diskUtilization.targetWriteOpsPerSecond",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "automatic-scaling.max-concurrent-requests" => Some((
+                    "automaticScaling.maxConcurrentRequests",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "automatic-scaling.max-idle-instances" => Some((
+                    "automaticScaling.maxIdleInstances",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "automatic-scaling.max-pending-latency" => Some((
+                    "automaticScaling.maxPendingLatency",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "automatic-scaling.max-total-instances" => Some((
+                    "automaticScaling.maxTotalInstances",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "automatic-scaling.min-idle-instances" => Some((
+                    "automaticScaling.minIdleInstances",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "automatic-scaling.min-pending-latency" => Some((
+                    "automaticScaling.minPendingLatency",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "automatic-scaling.min-total-instances" => Some((
+                    "automaticScaling.minTotalInstances",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "automatic-scaling.network-utilization.target-received-bytes-per-second" => Some((
+                    "automaticScaling.networkUtilization.targetReceivedBytesPerSecond",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "automatic-scaling.network-utilization.target-received-packets-per-second" => {
+                    Some((
+                        "automaticScaling.networkUtilization.targetReceivedPacketsPerSecond",
+                        JsonTypeInfo {
+                            jtype: JsonType::Int,
+                            ctype: ComplexType::Pod,
+                        },
+                    ))
+                }
+                "automatic-scaling.network-utilization.target-sent-bytes-per-second" => Some((
+                    "automaticScaling.networkUtilization.targetSentBytesPerSecond",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "automatic-scaling.network-utilization.target-sent-packets-per-second" => Some((
+                    "automaticScaling.networkUtilization.targetSentPacketsPerSecond",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "automatic-scaling.request-utilization.target-concurrent-requests" => Some((
+                    "automaticScaling.requestUtilization.targetConcurrentRequests",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "automatic-scaling.request-utilization.target-request-count-per-second" => Some((
+                    "automaticScaling.requestUtilization.targetRequestCountPerSecond",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "automatic-scaling.standard-scheduler-settings.max-instances" => Some((
+                    "automaticScaling.standardSchedulerSettings.maxInstances",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "automatic-scaling.standard-scheduler-settings.min-instances" => Some((
+                    "automaticScaling.standardSchedulerSettings.minInstances",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "automatic-scaling.standard-scheduler-settings.target-cpu-utilization" => Some((
+                    "automaticScaling.standardSchedulerSettings.targetCpuUtilization",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "automatic-scaling.standard-scheduler-settings.target-throughput-utilization" => {
+                    Some((
+                        "automaticScaling.standardSchedulerSettings.targetThroughputUtilization",
+                        JsonTypeInfo {
+                            jtype: JsonType::Float,
+                            ctype: ComplexType::Pod,
+                        },
+                    ))
+                }
+                "basic-scaling.idle-timeout" => Some((
+                    "basicScaling.idleTimeout",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "basic-scaling.max-instances" => Some((
+                    "basicScaling.maxInstances",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "beta-settings" => Some((
+                    "betaSettings",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Map,
+                    },
+                )),
+                "build-env-variables" => Some((
+                    "buildEnvVariables",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Map,
+                    },
+                )),
+                "create-time" => Some((
+                    "createTime",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "created-by" => Some((
+                    "createdBy",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "default-expiration" => Some((
+                    "defaultExpiration",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "deployment.cloud-build-options.app-yaml-path" => Some((
+                    "deployment.cloudBuildOptions.appYamlPath",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "deployment.cloud-build-options.cloud-build-timeout" => Some((
+                    "deployment.cloudBuildOptions.cloudBuildTimeout",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "deployment.container.image" => Some((
+                    "deployment.container.image",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "deployment.zip.files-count" => Some((
+                    "deployment.zip.filesCount",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "deployment.zip.source-url" => Some((
+                    "deployment.zip.sourceUrl",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "disk-usage-bytes" => Some((
+                    "diskUsageBytes",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "endpoints-api-service.config-id" => Some((
+                    "endpointsApiService.configId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "endpoints-api-service.disable-trace-sampling" => Some((
+                    "endpointsApiService.disableTraceSampling",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "endpoints-api-service.name" => Some((
+                    "endpointsApiService.name",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "endpoints-api-service.rollout-strategy" => Some((
+                    "endpointsApiService.rolloutStrategy",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "entrypoint.shell" => Some((
+                    "entrypoint.shell",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "env" => Some((
+                    "env",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "env-variables" => Some((
+                    "envVariables",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Map,
+                    },
+                )),
+                "flexible-runtime-settings.operating-system" => Some((
+                    "flexibleRuntimeSettings.operatingSystem",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "flexible-runtime-settings.runtime-version" => Some((
+                    "flexibleRuntimeSettings.runtimeVersion",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "health-check.check-interval" => Some((
+                    "healthCheck.checkInterval",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "health-check.disable-health-check" => Some((
+                    "healthCheck.disableHealthCheck",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "health-check.healthy-threshold" => Some((
+                    "healthCheck.healthyThreshold",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "health-check.host" => Some((
+                    "healthCheck.host",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "health-check.restart-threshold" => Some((
+                    "healthCheck.restartThreshold",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "health-check.timeout" => Some((
+                    "healthCheck.timeout",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "health-check.unhealthy-threshold" => Some((
+                    "healthCheck.unhealthyThreshold",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "id" => Some((
+                    "id",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "inbound-services" => Some((
+                    "inboundServices",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "instance-class" => Some((
+                    "instanceClass",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "liveness-check.check-interval" => Some((
+                    "livenessCheck.checkInterval",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "liveness-check.failure-threshold" => Some((
+                    "livenessCheck.failureThreshold",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "liveness-check.host" => Some((
+                    "livenessCheck.host",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "liveness-check.initial-delay" => Some((
+                    "livenessCheck.initialDelay",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "liveness-check.path" => Some((
+                    "livenessCheck.path",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "liveness-check.success-threshold" => Some((
+                    "livenessCheck.successThreshold",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "liveness-check.timeout" => Some((
+                    "livenessCheck.timeout",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "manual-scaling.instances" => Some((
+                    "manualScaling.instances",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "name" => Some((
+                    "name",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "network.forwarded-ports" => Some((
+                    "network.forwardedPorts",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "network.instance-ip-mode" => Some((
+                    "network.instanceIpMode",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "network.instance-tag" => Some((
+                    "network.instanceTag",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "network.name" => Some((
+                    "network.name",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "network.session-affinity" => Some((
+                    "network.sessionAffinity",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "network.subnetwork-name" => Some((
+                    "network.subnetworkName",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "nobuild-files-regex" => Some((
+                    "nobuildFilesRegex",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "readiness-check.app-start-timeout" => Some((
+                    "readinessCheck.appStartTimeout",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "readiness-check.check-interval" => Some((
+                    "readinessCheck.checkInterval",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "readiness-check.failure-threshold" => Some((
+                    "readinessCheck.failureThreshold",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "readiness-check.host" => Some((
+                    "readinessCheck.host",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "readiness-check.path" => Some((
+                    "readinessCheck.path",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "readiness-check.success-threshold" => Some((
+                    "readinessCheck.successThreshold",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "readiness-check.timeout" => Some((
+                    "readinessCheck.timeout",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "resources.cpu" => Some((
+                    "resources.cpu",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "resources.disk-gb" => Some((
+                    "resources.diskGb",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "resources.kms-key-reference" => Some((
+                    "resources.kmsKeyReference",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "resources.memory-gb" => Some((
+                    "resources.memoryGb",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "runtime" => Some((
+                    "runtime",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "runtime-api-version" => Some((
+                    "runtimeApiVersion",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "runtime-channel" => Some((
+                    "runtimeChannel",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "runtime-main-executable-path" => Some((
+                    "runtimeMainExecutablePath",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "service-account" => Some((
+                    "serviceAccount",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "serving-status" => Some((
+                    "servingStatus",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "threadsafe" => Some((
+                    "threadsafe",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "version-url" => Some((
+                    "versionUrl",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "vm" => Some((
+                    "vm",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "vpc-access-connector.egress-setting" => Some((
+                    "vpcAccessConnector.egressSetting",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "vpc-access-connector.name" => Some((
+                    "vpcAccessConnector.name",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "zones" => Some((
+                    "zones",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec![
+                            "aggregation-window-length",
+                            "api-config",
+                            "app-engine-apis",
+                            "app-start-timeout",
+                            "app-yaml-path",
+                            "auth-fail-action",
+                            "automatic-scaling",
+                            "basic-scaling",
+                            "beta-settings",
+                            "build-env-variables",
+                            "check-interval",
+                            "cloud-build-options",
+                            "cloud-build-timeout",
+                            "config-id",
+                            "container",
+                            "cool-down-period",
+                            "cpu",
+                            "cpu-utilization",
+                            "create-time",
+                            "created-by",
+                            "default-expiration",
+                            "deployment",
+                            "disable-health-check",
+                            "disable-trace-sampling",
+                            "disk-gb",
+                            "disk-usage-bytes",
+                            "disk-utilization",
+                            "egress-setting",
+                            "endpoints-api-service",
+                            "entrypoint",
+                            "env",
+                            "env-variables",
+                            "failure-threshold",
+                            "files-count",
+                            "flexible-runtime-settings",
+                            "forwarded-ports",
+                            "health-check",
+                            "healthy-threshold",
+                            "host",
+                            "id",
+                            "idle-timeout",
+                            "image",
+                            "inbound-services",
+                            "initial-delay",
+                            "instance-class",
+                            "instance-ip-mode",
+                            "instance-tag",
+                            "instances",
+                            "kms-key-reference",
+                            "liveness-check",
+                            "login",
+                            "manual-scaling",
+                            "max-concurrent-requests",
+                            "max-idle-instances",
+                            "max-instances",
+                            "max-pending-latency",
+                            "max-total-instances",
+                            "memory-gb",
+                            "min-idle-instances",
+                            "min-instances",
+                            "min-pending-latency",
+                            "min-total-instances",
+                            "name",
+                            "network",
+                            "network-utilization",
+                            "nobuild-files-regex",
+                            "operating-system",
+                            "path",
+                            "readiness-check",
+                            "request-utilization",
+                            "resources",
+                            "restart-threshold",
+                            "rollout-strategy",
+                            "runtime",
+                            "runtime-api-version",
+                            "runtime-channel",
+                            "runtime-main-executable-path",
+                            "runtime-version",
+                            "script",
+                            "security-level",
+                            "service-account",
+                            "serving-status",
+                            "session-affinity",
+                            "shell",
+                            "source-url",
+                            "standard-scheduler-settings",
+                            "subnetwork-name",
+                            "success-threshold",
+                            "target-concurrent-requests",
+                            "target-cpu-utilization",
+                            "target-read-bytes-per-second",
+                            "target-read-ops-per-second",
+                            "target-received-bytes-per-second",
+                            "target-received-packets-per-second",
+                            "target-request-count-per-second",
+                            "target-sent-bytes-per-second",
+                            "target-sent-packets-per-second",
+                            "target-throughput-utilization",
+                            "target-utilization",
+                            "target-write-bytes-per-second",
+                            "target-write-ops-per-second",
+                            "threadsafe",
+                            "timeout",
+                            "unhealthy-threshold",
+                            "url",
+                            "version-url",
+                            "vm",
+                            "vpc-access-connector",
+                            "zip",
+                            "zones",
+                        ],
+                    );
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
+            }
+        }
+        let mut request: api::Version = serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .locations_applications_services_versions_patch(
+                request,
+                opt.value_of("projects-id").unwrap_or(""),
+                opt.value_of("locations-id").unwrap_or(""),
+                opt.value_of("applications-id").unwrap_or(""),
+                opt.value_of("services-id").unwrap_or(""),
+                opt.value_of("versions-id").unwrap_or(""),
+            );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "update-mask" => {
+                    call = call.update_mask(
+                        value
+                            .map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask"))
+                            .unwrap_or(apis_common::FieldMask::default()),
+                    );
+                }
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["update-mask"].iter().map(|v| *v));
                                 v
                             }));
                     }
@@ -6641,6 +9983,11 @@ where
                         ._apps_services_versions_delete(opt, dry_run, &mut err)
                         .await;
                 }
+                ("services-versions-export-app-image", Some(opt)) => {
+                    call_result = self
+                        ._apps_services_versions_export_app_image(opt, dry_run, &mut err)
+                        .await;
+                }
                 ("services-versions-get", Some(opt)) => {
                     call_result = self
                         ._apps_services_versions_get(opt, dry_run, &mut err)
@@ -6683,9 +10030,115 @@ where
                 }
             },
             ("projects", Some(opt)) => match opt.subcommand() {
+                ("locations-applications-authorized-certificates-create", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_applications_authorized_certificates_create(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
+                ("locations-applications-authorized-certificates-delete", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_applications_authorized_certificates_delete(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
+                ("locations-applications-authorized-certificates-get", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_applications_authorized_certificates_get(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
+                ("locations-applications-authorized-certificates-list", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_applications_authorized_certificates_list(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
+                ("locations-applications-authorized-certificates-patch", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_applications_authorized_certificates_patch(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
                 ("locations-applications-authorized-domains-list", Some(opt)) => {
                     call_result = self
                         ._projects_locations_applications_authorized_domains_list(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
+                ("locations-applications-domain-mappings-create", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_applications_domain_mappings_create(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
+                ("locations-applications-domain-mappings-delete", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_applications_domain_mappings_delete(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
+                ("locations-applications-domain-mappings-get", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_applications_domain_mappings_get(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
+                ("locations-applications-domain-mappings-list", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_applications_domain_mappings_list(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
+                ("locations-applications-domain-mappings-patch", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_applications_domain_mappings_patch(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
+                ("locations-applications-patch", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_applications_patch(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("locations-applications-services-delete", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_applications_services_delete(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("locations-applications-services-patch", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_applications_services_patch(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("locations-applications-services-versions-delete", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_applications_services_versions_delete(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
+                ("locations-applications-services-versions-export-app-image", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_applications_services_versions_export_app_image(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
+                ("locations-applications-services-versions-patch", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_applications_services_versions_patch(
                             opt, dry_run, &mut err,
                         )
                         .await;
@@ -6736,7 +10189,9 @@ where
         let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
             secret,
             yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-            hyper_util::client::legacy::Client::builder(executor).build(connector),
+            yup_oauth2::client::CustomHyperClientBuilder::from(
+                hyper_util::client::legacy::Client::builder(executor).build(connector),
+            ),
         )
         .persist_tokens_to_disk(format!("{}/appengine1", config_dir))
         .build()
@@ -6789,14 +10244,14 @@ where
 async fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("apps", "methods: 'authorized-certificates-create', 'authorized-certificates-delete', 'authorized-certificates-get', 'authorized-certificates-list', 'authorized-certificates-patch', 'authorized-domains-list', 'create', 'domain-mappings-create', 'domain-mappings-delete', 'domain-mappings-get', 'domain-mappings-list', 'domain-mappings-patch', 'firewall-ingress-rules-batch-update', 'firewall-ingress-rules-create', 'firewall-ingress-rules-delete', 'firewall-ingress-rules-get', 'firewall-ingress-rules-list', 'firewall-ingress-rules-patch', 'get', 'list-runtimes', 'locations-get', 'locations-list', 'operations-get', 'operations-list', 'patch', 'repair', 'services-delete', 'services-get', 'services-list', 'services-patch', 'services-versions-create', 'services-versions-delete', 'services-versions-get', 'services-versions-instances-debug', 'services-versions-instances-delete', 'services-versions-instances-get', 'services-versions-instances-list', 'services-versions-list' and 'services-versions-patch'", vec![
+        ("apps", "methods: 'authorized-certificates-create', 'authorized-certificates-delete', 'authorized-certificates-get', 'authorized-certificates-list', 'authorized-certificates-patch', 'authorized-domains-list', 'create', 'domain-mappings-create', 'domain-mappings-delete', 'domain-mappings-get', 'domain-mappings-list', 'domain-mappings-patch', 'firewall-ingress-rules-batch-update', 'firewall-ingress-rules-create', 'firewall-ingress-rules-delete', 'firewall-ingress-rules-get', 'firewall-ingress-rules-list', 'firewall-ingress-rules-patch', 'get', 'list-runtimes', 'locations-get', 'locations-list', 'operations-get', 'operations-list', 'patch', 'repair', 'services-delete', 'services-get', 'services-list', 'services-patch', 'services-versions-create', 'services-versions-delete', 'services-versions-export-app-image', 'services-versions-get', 'services-versions-instances-debug', 'services-versions-instances-delete', 'services-versions-instances-get', 'services-versions-instances-list', 'services-versions-list' and 'services-versions-patch'", vec![
             ("authorized-certificates-create",
                     Some(r##"Uploads the specified SSL certificate."##),
                     "Details at http://byron.github.io/google-apis-rs/google_appengine1_cli/apps_authorized-certificates-create",
                   vec![
                     (Some(r##"apps-id"##),
                      None,
-                     Some(r##"Part of `parent`. Name of the parent Application resource. Example: apps/myapp."##),
+                     Some(r##"Part of `parent`. Required. Name of the parent Application resource. Example: apps/myapp."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -6821,7 +10276,7 @@ async fn main() {
                   vec![
                     (Some(r##"apps-id"##),
                      None,
-                     Some(r##"Part of `name`. Name of the resource to delete. Example: apps/myapp/authorizedCertificates/12345."##),
+                     Some(r##"Part of `name`. Required. Name of the resource to delete. Example: apps/myapp/authorizedCertificates/12345."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"authorized-certificates-id"##),
@@ -6846,7 +10301,7 @@ async fn main() {
                   vec![
                     (Some(r##"apps-id"##),
                      None,
-                     Some(r##"Part of `name`. Name of the resource requested. Example: apps/myapp/authorizedCertificates/12345."##),
+                     Some(r##"Part of `name`. Required. Name of the resource requested. Example: apps/myapp/authorizedCertificates/12345."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"authorized-certificates-id"##),
@@ -6871,7 +10326,7 @@ async fn main() {
                   vec![
                     (Some(r##"apps-id"##),
                      None,
-                     Some(r##"Part of `parent`. Name of the parent Application resource. Example: apps/myapp."##),
+                     Some(r##"Part of `parent`. Required. Name of the parent Application resource. Example: apps/myapp."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -6891,7 +10346,7 @@ async fn main() {
                   vec![
                     (Some(r##"apps-id"##),
                      None,
-                     Some(r##"Part of `name`. Name of the resource to update. Example: apps/myapp/authorizedCertificates/12345."##),
+                     Some(r##"Part of `name`. Required. Name of the resource to update. Example: apps/myapp/authorizedCertificates/12345."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"authorized-certificates-id"##),
@@ -6921,7 +10376,7 @@ async fn main() {
                   vec![
                     (Some(r##"apps-id"##),
                      None,
-                     Some(r##"Part of `parent`. Name of the parent Application resource. Example: apps/myapp."##),
+                     Some(r##"Part of `parent`. Required. Name of the parent Application resource. Example: apps/myapp."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -6961,7 +10416,7 @@ async fn main() {
                   vec![
                     (Some(r##"apps-id"##),
                      None,
-                     Some(r##"Part of `parent`. Name of the parent Application resource. Example: apps/myapp."##),
+                     Some(r##"Part of `parent`. Required. Name of the parent Application resource. Example: apps/myapp."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -6986,7 +10441,7 @@ async fn main() {
                   vec![
                     (Some(r##"apps-id"##),
                      None,
-                     Some(r##"Part of `name`. Name of the resource to delete. Example: apps/myapp/domainMappings/example.com."##),
+                     Some(r##"Part of `name`. Required. Name of the resource to delete. Example: apps/myapp/domainMappings/example.com."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"domain-mappings-id"##),
@@ -7011,7 +10466,7 @@ async fn main() {
                   vec![
                     (Some(r##"apps-id"##),
                      None,
-                     Some(r##"Part of `name`. Name of the resource requested. Example: apps/myapp/domainMappings/example.com."##),
+                     Some(r##"Part of `name`. Required. Name of the resource requested. Example: apps/myapp/domainMappings/example.com."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"domain-mappings-id"##),
@@ -7036,7 +10491,7 @@ async fn main() {
                   vec![
                     (Some(r##"apps-id"##),
                      None,
-                     Some(r##"Part of `parent`. Name of the parent Application resource. Example: apps/myapp."##),
+                     Some(r##"Part of `parent`. Required. Name of the parent Application resource. Example: apps/myapp."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -7056,7 +10511,7 @@ async fn main() {
                   vec![
                     (Some(r##"apps-id"##),
                      None,
-                     Some(r##"Part of `name`. Name of the resource to update. Example: apps/myapp/domainMappings/example.com."##),
+                     Some(r##"Part of `name`. Required. Name of the resource to update. Example: apps/myapp/domainMappings/example.com."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"domain-mappings-id"##),
@@ -7111,7 +10566,7 @@ async fn main() {
                   vec![
                     (Some(r##"apps-id"##),
                      None,
-                     Some(r##"Part of `parent`. Name of the parent Firewall collection in which to create a new rule. Example: apps/myapp/firewall/ingressRules."##),
+                     Some(r##"Part of `parent`. Required. Name of the parent Firewall collection in which to create a new rule. Example: apps/myapp/firewall/ingressRules."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -7236,7 +10691,7 @@ async fn main() {
                   vec![
                     (Some(r##"apps-id"##),
                      None,
-                     Some(r##"Part of `name`. Name of the Application resource to get. Example: apps/myapp."##),
+                     Some(r##"Part of `name`. Required. Name of the Application resource to get. Example: apps/myapp."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -7366,7 +10821,7 @@ async fn main() {
                   vec![
                     (Some(r##"apps-id"##),
                      None,
-                     Some(r##"Part of `name`. Name of the Application resource to update. Example: apps/myapp."##),
+                     Some(r##"Part of `name`. Required. Name of the Application resource to update. Example: apps/myapp."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -7391,7 +10846,7 @@ async fn main() {
                   vec![
                     (Some(r##"apps-id"##),
                      None,
-                     Some(r##"Part of `name`. Name of the application to repair. Example: apps/myapp"##),
+                     Some(r##"Part of `name`. Required. Name of the application to repair. Example: apps/myapp"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -7416,7 +10871,7 @@ async fn main() {
                   vec![
                     (Some(r##"apps-id"##),
                      None,
-                     Some(r##"Part of `name`. Name of the resource requested. Example: apps/myapp/services/default."##),
+                     Some(r##"Part of `name`. Required. Name of the resource requested. Example: apps/myapp/services/default."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"services-id"##),
@@ -7441,7 +10896,7 @@ async fn main() {
                   vec![
                     (Some(r##"apps-id"##),
                      None,
-                     Some(r##"Part of `name`. Name of the resource requested. Example: apps/myapp/services/default."##),
+                     Some(r##"Part of `name`. Required. Name of the resource requested. Example: apps/myapp/services/default."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"services-id"##),
@@ -7466,7 +10921,7 @@ async fn main() {
                   vec![
                     (Some(r##"apps-id"##),
                      None,
-                     Some(r##"Part of `parent`. Name of the parent Application resource. Example: apps/myapp."##),
+                     Some(r##"Part of `parent`. Required. Name of the parent Application resource. Example: apps/myapp."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -7486,7 +10941,7 @@ async fn main() {
                   vec![
                     (Some(r##"apps-id"##),
                      None,
-                     Some(r##"Part of `name`. Name of the resource to update. Example: apps/myapp/services/default."##),
+                     Some(r##"Part of `name`. Required. Name of the resource to update. Example: apps/myapp/services/default."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"services-id"##),
@@ -7516,7 +10971,7 @@ async fn main() {
                   vec![
                     (Some(r##"apps-id"##),
                      None,
-                     Some(r##"Part of `parent`. Name of the parent resource to create this version under. Example: apps/myapp/services/default."##),
+                     Some(r##"Part of `parent`. Required. Name of the parent resource to create this version under. Example: apps/myapp/services/default."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"services-id"##),
@@ -7546,7 +11001,7 @@ async fn main() {
                   vec![
                     (Some(r##"apps-id"##),
                      None,
-                     Some(r##"Part of `name`. Name of the resource requested. Example: apps/myapp/services/default/versions/v1."##),
+                     Some(r##"Part of `name`. Required. Name of the resource requested. Example: apps/myapp/services/default/versions/v1."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"services-id"##),
@@ -7570,13 +11025,48 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("services-versions-export-app-image",
+                    Some(r##"Exports a user image to Artifact Registry."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_appengine1_cli/apps_services-versions-export-app-image",
+                  vec![
+                    (Some(r##"apps-id"##),
+                     None,
+                     Some(r##"Part of `name`. Required. Name of the App Engine version resource. Format: apps/{app}/services/{service}/versions/{version}"##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"services-id"##),
+                     None,
+                     Some(r##"Part of `name`. See documentation of `appsId`."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"versions-id"##),
+                     None,
+                     Some(r##"Part of `name`. See documentation of `appsId`."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("services-versions-get",
                     Some(r##"Gets the specified Version resource. By default, only a BASIC_VIEW will be returned. Specify the FULL_VIEW parameter to get the full resource."##),
                     "Details at http://byron.github.io/google-apis-rs/google_appengine1_cli/apps_services-versions-get",
                   vec![
                     (Some(r##"apps-id"##),
                      None,
-                     Some(r##"Part of `name`. Name of the resource requested. Example: apps/myapp/services/default/versions/v1."##),
+                     Some(r##"Part of `name`. Required. Name of the resource requested. Example: apps/myapp/services/default/versions/v1."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"services-id"##),
@@ -7606,7 +11096,7 @@ async fn main() {
                   vec![
                     (Some(r##"apps-id"##),
                      None,
-                     Some(r##"Part of `name`. Name of the resource requested. Example: apps/myapp/services/default/versions/v1/instances/instance-1."##),
+                     Some(r##"Part of `name`. Required. Name of the resource requested. Example: apps/myapp/services/default/versions/v1/instances/instance-1."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"services-id"##),
@@ -7646,7 +11136,7 @@ async fn main() {
                   vec![
                     (Some(r##"apps-id"##),
                      None,
-                     Some(r##"Part of `name`. Name of the resource requested. Example: apps/myapp/services/default/versions/v1/instances/instance-1."##),
+                     Some(r##"Part of `name`. Required. Name of the resource requested. Example: apps/myapp/services/default/versions/v1/instances/instance-1."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"services-id"##),
@@ -7681,7 +11171,7 @@ async fn main() {
                   vec![
                     (Some(r##"apps-id"##),
                      None,
-                     Some(r##"Part of `name`. Name of the resource requested. Example: apps/myapp/services/default/versions/v1/instances/instance-1."##),
+                     Some(r##"Part of `name`. Required. Name of the resource requested. Example: apps/myapp/services/default/versions/v1/instances/instance-1."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"services-id"##),
@@ -7716,7 +11206,7 @@ async fn main() {
                   vec![
                     (Some(r##"apps-id"##),
                      None,
-                     Some(r##"Part of `parent`. Name of the parent Version resource. Example: apps/myapp/services/default/versions/v1."##),
+                     Some(r##"Part of `parent`. Required. Name of the parent Version resource. Example: apps/myapp/services/default/versions/v1."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"services-id"##),
@@ -7746,7 +11236,7 @@ async fn main() {
                   vec![
                     (Some(r##"apps-id"##),
                      None,
-                     Some(r##"Part of `parent`. Name of the parent Service resource. Example: apps/myapp/services/default."##),
+                     Some(r##"Part of `parent`. Required. Name of the parent Service resource. Example: apps/myapp/services/default."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"services-id"##),
@@ -7771,7 +11261,7 @@ async fn main() {
                   vec![
                     (Some(r##"apps-id"##),
                      None,
-                     Some(r##"Part of `name`. Name of the resource to update. Example: apps/myapp/services/default/versions/1."##),
+                     Some(r##"Part of `name`. Required. Name of the resource to update. Example: apps/myapp/services/default/versions/1."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"services-id"##),
@@ -7801,14 +11291,119 @@ async fn main() {
                      Some(false)),
                   ]),
             ]),
-            ("projects", "methods: 'locations-applications-authorized-domains-list'", vec![
-            ("locations-applications-authorized-domains-list",
-                    Some(r##"Lists all domains the user is authorized to administer."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_appengine1_cli/projects_locations-applications-authorized-domains-list",
+            ("projects", "methods: 'locations-applications-authorized-certificates-create', 'locations-applications-authorized-certificates-delete', 'locations-applications-authorized-certificates-get', 'locations-applications-authorized-certificates-list', 'locations-applications-authorized-certificates-patch', 'locations-applications-authorized-domains-list', 'locations-applications-domain-mappings-create', 'locations-applications-domain-mappings-delete', 'locations-applications-domain-mappings-get', 'locations-applications-domain-mappings-list', 'locations-applications-domain-mappings-patch', 'locations-applications-patch', 'locations-applications-services-delete', 'locations-applications-services-patch', 'locations-applications-services-versions-delete', 'locations-applications-services-versions-export-app-image' and 'locations-applications-services-versions-patch'", vec![
+            ("locations-applications-authorized-certificates-create",
+                    Some(r##"Uploads the specified SSL certificate."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_appengine1_cli/projects_locations-applications-authorized-certificates-create",
                   vec![
                     (Some(r##"projects-id"##),
                      None,
-                     Some(r##"Part of `parent`. Name of the parent Application resource. Example: apps/myapp."##),
+                     Some(r##"Part of `parent`. Required. Name of the parent Application resource. Example: apps/myapp."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"locations-id"##),
+                     None,
+                     Some(r##"Part of `parent`. See documentation of `projectsId`."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"applications-id"##),
+                     None,
+                     Some(r##"Part of `parent`. See documentation of `projectsId`."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-applications-authorized-certificates-delete",
+                    Some(r##"Deletes the specified SSL certificate."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_appengine1_cli/projects_locations-applications-authorized-certificates-delete",
+                  vec![
+                    (Some(r##"projects-id"##),
+                     None,
+                     Some(r##"Part of `name`. Required. Name of the resource to delete. Example: apps/myapp/authorizedCertificates/12345."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"locations-id"##),
+                     None,
+                     Some(r##"Part of `name`. See documentation of `projectsId`."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"applications-id"##),
+                     None,
+                     Some(r##"Part of `name`. See documentation of `projectsId`."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"authorized-certificates-id"##),
+                     None,
+                     Some(r##"Part of `name`. See documentation of `projectsId`."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-applications-authorized-certificates-get",
+                    Some(r##"Gets the specified SSL certificate."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_appengine1_cli/projects_locations-applications-authorized-certificates-get",
+                  vec![
+                    (Some(r##"projects-id"##),
+                     None,
+                     Some(r##"Part of `name`. Required. Name of the resource requested. Example: apps/myapp/authorizedCertificates/12345."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"locations-id"##),
+                     None,
+                     Some(r##"Part of `name`. See documentation of `projectsId`."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"applications-id"##),
+                     None,
+                     Some(r##"Part of `name`. See documentation of `projectsId`."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"authorized-certificates-id"##),
+                     None,
+                     Some(r##"Part of `name`. See documentation of `projectsId`."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-applications-authorized-certificates-list",
+                    Some(r##"Lists all SSL certificates the user is authorized to administer."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_appengine1_cli/projects_locations-applications-authorized-certificates-list",
+                  vec![
+                    (Some(r##"projects-id"##),
+                     None,
+                     Some(r##"Part of `parent`. Required. Name of the parent Application resource. Example: apps/myapp."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"locations-id"##),
@@ -7832,12 +11427,497 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("locations-applications-authorized-certificates-patch",
+                    Some(r##"Updates the specified SSL certificate. To renew a certificate and maintain its existing domain mappings, update certificate_data with a new certificate. The new certificate must be applicable to the same domains as the original certificate. The certificate display_name may also be updated."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_appengine1_cli/projects_locations-applications-authorized-certificates-patch",
+                  vec![
+                    (Some(r##"projects-id"##),
+                     None,
+                     Some(r##"Part of `name`. Required. Name of the resource to update. Example: apps/myapp/authorizedCertificates/12345."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"locations-id"##),
+                     None,
+                     Some(r##"Part of `name`. See documentation of `projectsId`."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"applications-id"##),
+                     None,
+                     Some(r##"Part of `name`. See documentation of `projectsId`."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"authorized-certificates-id"##),
+                     None,
+                     Some(r##"Part of `name`. See documentation of `projectsId`."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-applications-authorized-domains-list",
+                    Some(r##"Lists all domains the user is authorized to administer."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_appengine1_cli/projects_locations-applications-authorized-domains-list",
+                  vec![
+                    (Some(r##"projects-id"##),
+                     None,
+                     Some(r##"Part of `parent`. Required. Name of the parent Application resource. Example: apps/myapp."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"locations-id"##),
+                     None,
+                     Some(r##"Part of `parent`. See documentation of `projectsId`."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"applications-id"##),
+                     None,
+                     Some(r##"Part of `parent`. See documentation of `projectsId`."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-applications-domain-mappings-create",
+                    Some(r##"Maps a domain to an application. A user must be authorized to administer a domain in order to map it to an application. For a list of available authorized domains, see AuthorizedDomains.ListAuthorizedDomains."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_appengine1_cli/projects_locations-applications-domain-mappings-create",
+                  vec![
+                    (Some(r##"projects-id"##),
+                     None,
+                     Some(r##"Part of `parent`. Required. Name of the parent Application resource. Example: apps/myapp."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"locations-id"##),
+                     None,
+                     Some(r##"Part of `parent`. See documentation of `projectsId`."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"applications-id"##),
+                     None,
+                     Some(r##"Part of `parent`. See documentation of `projectsId`."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-applications-domain-mappings-delete",
+                    Some(r##"Deletes the specified domain mapping. A user must be authorized to administer the associated domain in order to delete a DomainMapping resource."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_appengine1_cli/projects_locations-applications-domain-mappings-delete",
+                  vec![
+                    (Some(r##"projects-id"##),
+                     None,
+                     Some(r##"Part of `name`. Required. Name of the resource to delete. Example: apps/myapp/domainMappings/example.com."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"locations-id"##),
+                     None,
+                     Some(r##"Part of `name`. See documentation of `projectsId`."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"applications-id"##),
+                     None,
+                     Some(r##"Part of `name`. See documentation of `projectsId`."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"domain-mappings-id"##),
+                     None,
+                     Some(r##"Part of `name`. See documentation of `projectsId`."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-applications-domain-mappings-get",
+                    Some(r##"Gets the specified domain mapping."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_appengine1_cli/projects_locations-applications-domain-mappings-get",
+                  vec![
+                    (Some(r##"projects-id"##),
+                     None,
+                     Some(r##"Part of `name`. Required. Name of the resource requested. Example: apps/myapp/domainMappings/example.com."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"locations-id"##),
+                     None,
+                     Some(r##"Part of `name`. See documentation of `projectsId`."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"applications-id"##),
+                     None,
+                     Some(r##"Part of `name`. See documentation of `projectsId`."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"domain-mappings-id"##),
+                     None,
+                     Some(r##"Part of `name`. See documentation of `projectsId`."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-applications-domain-mappings-list",
+                    Some(r##"Lists the domain mappings on an application."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_appengine1_cli/projects_locations-applications-domain-mappings-list",
+                  vec![
+                    (Some(r##"projects-id"##),
+                     None,
+                     Some(r##"Part of `parent`. Required. Name of the parent Application resource. Example: apps/myapp."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"locations-id"##),
+                     None,
+                     Some(r##"Part of `parent`. See documentation of `projectsId`."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"applications-id"##),
+                     None,
+                     Some(r##"Part of `parent`. See documentation of `projectsId`."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-applications-domain-mappings-patch",
+                    Some(r##"Updates the specified domain mapping. To map an SSL certificate to a domain mapping, update certificate_id to point to an AuthorizedCertificate resource. A user must be authorized to administer the associated domain in order to update a DomainMapping resource."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_appengine1_cli/projects_locations-applications-domain-mappings-patch",
+                  vec![
+                    (Some(r##"projects-id"##),
+                     None,
+                     Some(r##"Part of `name`. Required. Name of the resource to update. Example: apps/myapp/domainMappings/example.com."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"locations-id"##),
+                     None,
+                     Some(r##"Part of `name`. See documentation of `projectsId`."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"applications-id"##),
+                     None,
+                     Some(r##"Part of `name`. See documentation of `projectsId`."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"domain-mappings-id"##),
+                     None,
+                     Some(r##"Part of `name`. See documentation of `projectsId`."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-applications-patch",
+                    Some(r##"Updates the specified Application resource. You can update the following fields: auth_domain - Google authentication domain for controlling user access to the application. default_cookie_expiration - Cookie expiration policy for the application. iap - Identity-Aware Proxy properties for the application."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_appengine1_cli/projects_locations-applications-patch",
+                  vec![
+                    (Some(r##"projects-id"##),
+                     None,
+                     Some(r##"Part of `name`. Required. Name of the Application resource to update. Example: apps/myapp."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"locations-id"##),
+                     None,
+                     Some(r##"Part of `name`. See documentation of `projectsId`."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"applications-id"##),
+                     None,
+                     Some(r##"Part of `name`. See documentation of `projectsId`."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-applications-services-delete",
+                    Some(r##"Deletes the specified service and all enclosed versions."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_appengine1_cli/projects_locations-applications-services-delete",
+                  vec![
+                    (Some(r##"projects-id"##),
+                     None,
+                     Some(r##"Part of `name`. Required. Name of the resource requested. Example: apps/myapp/services/default."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"locations-id"##),
+                     None,
+                     Some(r##"Part of `name`. See documentation of `projectsId`."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"applications-id"##),
+                     None,
+                     Some(r##"Part of `name`. See documentation of `projectsId`."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"services-id"##),
+                     None,
+                     Some(r##"Part of `name`. See documentation of `projectsId`."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-applications-services-patch",
+                    Some(r##"Updates the configuration of the specified service."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_appengine1_cli/projects_locations-applications-services-patch",
+                  vec![
+                    (Some(r##"projects-id"##),
+                     None,
+                     Some(r##"Part of `name`. Required. Name of the resource to update. Example: apps/myapp/services/default."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"locations-id"##),
+                     None,
+                     Some(r##"Part of `name`. See documentation of `projectsId`."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"applications-id"##),
+                     None,
+                     Some(r##"Part of `name`. See documentation of `projectsId`."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"services-id"##),
+                     None,
+                     Some(r##"Part of `name`. See documentation of `projectsId`."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-applications-services-versions-delete",
+                    Some(r##"Deletes an existing Version resource."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_appengine1_cli/projects_locations-applications-services-versions-delete",
+                  vec![
+                    (Some(r##"projects-id"##),
+                     None,
+                     Some(r##"Part of `name`. Required. Name of the resource requested. Example: apps/myapp/services/default/versions/v1."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"locations-id"##),
+                     None,
+                     Some(r##"Part of `name`. See documentation of `projectsId`."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"applications-id"##),
+                     None,
+                     Some(r##"Part of `name`. See documentation of `projectsId`."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"services-id"##),
+                     None,
+                     Some(r##"Part of `name`. See documentation of `projectsId`."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"versions-id"##),
+                     None,
+                     Some(r##"Part of `name`. See documentation of `projectsId`."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-applications-services-versions-export-app-image",
+                    Some(r##"Exports a user image to Artifact Registry."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_appengine1_cli/projects_locations-applications-services-versions-export-app-image",
+                  vec![
+                    (Some(r##"projects-id"##),
+                     None,
+                     Some(r##"Part of `name`. Required. Name of the App Engine version resource. Format: apps/{app}/services/{service}/versions/{version}"##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"locations-id"##),
+                     None,
+                     Some(r##"Part of `name`. See documentation of `projectsId`."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"applications-id"##),
+                     None,
+                     Some(r##"Part of `name`. See documentation of `projectsId`."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"services-id"##),
+                     None,
+                     Some(r##"Part of `name`. See documentation of `projectsId`."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"versions-id"##),
+                     None,
+                     Some(r##"Part of `name`. See documentation of `projectsId`."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-applications-services-versions-patch",
+                    Some(r##"Updates the specified Version resource. You can specify the following fields depending on the App Engine environment and type of scaling that the version resource uses:Standard environment instance_class (https://cloud.google.com/appengine/docs/admin-api/reference/rest/v1/apps.services.versions#Version.FIELDS.instance_class)automatic scaling in the standard environment: automatic_scaling.min_idle_instances (https://cloud.google.com/appengine/docs/admin-api/reference/rest/v1/apps.services.versions#Version.FIELDS.automatic_scaling) automatic_scaling.max_idle_instances (https://cloud.google.com/appengine/docs/admin-api/reference/rest/v1/apps.services.versions#Version.FIELDS.automatic_scaling) automaticScaling.standard_scheduler_settings.max_instances (https://cloud.google.com/appengine/docs/admin-api/reference/rest/v1/apps.services.versions#StandardSchedulerSettings) automaticScaling.standard_scheduler_settings.min_instances (https://cloud.google.com/appengine/docs/admin-api/reference/rest/v1/apps.services.versions#StandardSchedulerSettings) automaticScaling.standard_scheduler_settings.target_cpu_utilization (https://cloud.google.com/appengine/docs/admin-api/reference/rest/v1/apps.services.versions#StandardSchedulerSettings) automaticScaling.standard_scheduler_settings.target_throughput_utilization (https://cloud.google.com/appengine/docs/admin-api/reference/rest/v1/apps.services.versions#StandardSchedulerSettings)basic scaling or manual scaling in the standard environment: serving_status (https://cloud.google.com/appengine/docs/admin-api/reference/rest/v1/apps.services.versions#Version.FIELDS.serving_status) manual_scaling.instances (https://cloud.google.com/appengine/docs/admin-api/reference/rest/v1/apps.services.versions#manualscaling)Flexible environment serving_status (https://cloud.google.com/appengine/docs/admin-api/reference/rest/v1/apps.services.versions#Version.FIELDS.serving_status)automatic scaling in the flexible environment: automatic_scaling.min_total_instances (https://cloud.google.com/appengine/docs/admin-api/reference/rest/v1/apps.services.versions#Version.FIELDS.automatic_scaling) automatic_scaling.max_total_instances (https://cloud.google.com/appengine/docs/admin-api/reference/rest/v1/apps.services.versions#Version.FIELDS.automatic_scaling) automatic_scaling.cool_down_period_sec (https://cloud.google.com/appengine/docs/admin-api/reference/rest/v1/apps.services.versions#Version.FIELDS.automatic_scaling) automatic_scaling.cpu_utilization.target_utilization (https://cloud.google.com/appengine/docs/admin-api/reference/rest/v1/apps.services.versions#Version.FIELDS.automatic_scaling)manual scaling in the flexible environment: manual_scaling.instances (https://cloud.google.com/appengine/docs/admin-api/reference/rest/v1/apps.services.versions#manualscaling)"##),
+                    "Details at http://byron.github.io/google-apis-rs/google_appengine1_cli/projects_locations-applications-services-versions-patch",
+                  vec![
+                    (Some(r##"projects-id"##),
+                     None,
+                     Some(r##"Part of `name`. Required. Name of the resource to update. Example: apps/myapp/services/default/versions/1."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"locations-id"##),
+                     None,
+                     Some(r##"Part of `name`. See documentation of `projectsId`."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"applications-id"##),
+                     None,
+                     Some(r##"Part of `name`. See documentation of `projectsId`."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"services-id"##),
+                     None,
+                     Some(r##"Part of `name`. See documentation of `projectsId`."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"versions-id"##),
+                     None,
+                     Some(r##"Part of `name`. See documentation of `projectsId`."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ]),
         ];
 
     let mut app = App::new("appengine1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("6.0.0+20240624")
+           .version("7.0.0+20251210")
            .about("Provisions and manages developers' App Engine applications.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_appengine1_cli")
            .arg(Arg::with_name("url")
@@ -7902,7 +11982,7 @@ async fn main() {
         .with_native_roots()
         .unwrap()
         .https_or_http()
-        .enable_http1()
+        .enable_http2()
         .build();
 
     match Engine::new(matches, connector).await {

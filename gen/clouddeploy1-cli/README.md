@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Cloud Deploy* API at revision *20240619*. The CLI is at version *6.0.0*.
+This documentation was generated from the *Cloud Deploy* API at revision *20251203*. The CLI is at version *7.0.0*.
 
 ```bash
 clouddeploy1 [options]
@@ -69,6 +69,13 @@ clouddeploy1 [options]
                 locations-delivery-pipelines-rollback-target <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-delivery-pipelines-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-delivery-pipelines-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-deploy-policies-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-deploy-policies-delete <name> [-p <v>]... [-o <out>]
+                locations-deploy-policies-get <name> [-p <v>]... [-o <out>]
+                locations-deploy-policies-get-iam-policy <resource> [-p <v>]... [-o <out>]
+                locations-deploy-policies-list <parent> [-p <v>]... [-o <out>]
+                locations-deploy-policies-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-deploy-policies-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-get <name> [-p <v>]... [-o <out>]
                 locations-get-config <name> [-p <v>]... [-o <out>]
                 locations-list <name> [-p <v>]... [-o <out>]

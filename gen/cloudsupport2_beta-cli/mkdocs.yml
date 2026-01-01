@@ -1,4 +1,4 @@
-site_name: Cloud Support v6.0.0+20240624
+site_name: Cloud Support v7.0.0+20251216
 site_url: http://byron.github.io/google-apis-rs/google-cloudsupport2_beta-cli
 site_description: A complete library to interact with Cloud Support (protocol v2beta)
 
@@ -12,9 +12,11 @@ nav:
 - 'Case Classifications':
     - 'Search': 'case-classifications_search.md'
 - 'Cases':
+    - 'Attachments Get': 'cases_attachments-get.md'
     - 'Attachments List': 'cases_attachments-list.md'
     - 'Close': 'cases_close.md'
     - 'Comments Create': 'cases_comments-create.md'
+    - 'Comments Get': 'cases_comments-get.md'
     - 'Comments List': 'cases_comments-list.md'
     - 'Create': 'cases_create.md'
     - 'Escalate': 'cases_escalate.md'

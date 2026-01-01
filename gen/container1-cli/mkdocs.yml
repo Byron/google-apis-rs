@@ -1,4 +1,4 @@
-site_name: Container v6.0.0+20240608
+site_name: Container v7.0.0+20251216
 site_url: http://byron.github.io/google-apis-rs/google-container1-cli
 site_description: A complete library to interact with Container (protocol v1)
 
@@ -15,12 +15,14 @@ nav:
     - 'Locations Clusters Complete Ip Rotation': 'projects_locations-clusters-complete-ip-rotation.md'
     - 'Locations Clusters Create': 'projects_locations-clusters-create.md'
     - 'Locations Clusters Delete': 'projects_locations-clusters-delete.md'
+    - 'Locations Clusters Fetch Cluster Upgrade Info': 'projects_locations-clusters-fetch-cluster-upgrade-info.md'
     - 'Locations Clusters Get': 'projects_locations-clusters-get.md'
     - 'Locations Clusters Get Jwks': 'projects_locations-clusters-get-jwks.md'
     - 'Locations Clusters List': 'projects_locations-clusters-list.md'
     - 'Locations Clusters Node Pools Complete Upgrade': 'projects_locations-clusters-node-pools-complete-upgrade.md'
     - 'Locations Clusters Node Pools Create': 'projects_locations-clusters-node-pools-create.md'
     - 'Locations Clusters Node Pools Delete': 'projects_locations-clusters-node-pools-delete.md'
+    - 'Locations Clusters Node Pools Fetch Node Pool Upgrade Info': 'projects_locations-clusters-node-pools-fetch-node-pool-upgrade-info.md'
     - 'Locations Clusters Node Pools Get': 'projects_locations-clusters-node-pools-get.md'
     - 'Locations Clusters Node Pools List': 'projects_locations-clusters-node-pools-list.md'
     - 'Locations Clusters Node Pools Rollback': 'projects_locations-clusters-node-pools-rollback.md'
@@ -49,6 +51,7 @@ nav:
     - 'Zones Clusters Complete Ip Rotation': 'projects_zones-clusters-complete-ip-rotation.md'
     - 'Zones Clusters Create': 'projects_zones-clusters-create.md'
     - 'Zones Clusters Delete': 'projects_zones-clusters-delete.md'
+    - 'Zones Clusters Fetch Cluster Upgrade Info': 'projects_zones-clusters-fetch-cluster-upgrade-info.md'
     - 'Zones Clusters Get': 'projects_zones-clusters-get.md'
     - 'Zones Clusters Legacy Abac': 'projects_zones-clusters-legacy-abac.md'
     - 'Zones Clusters List': 'projects_zones-clusters-list.md'
@@ -59,6 +62,7 @@ nav:
     - 'Zones Clusters Node Pools Autoscaling': 'projects_zones-clusters-node-pools-autoscaling.md'
     - 'Zones Clusters Node Pools Create': 'projects_zones-clusters-node-pools-create.md'
     - 'Zones Clusters Node Pools Delete': 'projects_zones-clusters-node-pools-delete.md'
+    - 'Zones Clusters Node Pools Fetch Node Pool Upgrade Info': 'projects_zones-clusters-node-pools-fetch-node-pool-upgrade-info.md'
     - 'Zones Clusters Node Pools Get': 'projects_zones-clusters-node-pools-get.md'
     - 'Zones Clusters Node Pools List': 'projects_zones-clusters-node-pools-list.md'
     - 'Zones Clusters Node Pools Rollback': 'projects_zones-clusters-node-pools-rollback.md'

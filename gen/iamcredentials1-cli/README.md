@@ -25,13 +25,17 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *IAM Credentials* API at revision *20240605*. The CLI is at version *6.0.0*.
+This documentation was generated from the *IAM Credentials* API at revision *20251108*. The CLI is at version *7.0.0*.
 
 ```bash
 iamcredentials1 [options]
+        locations
+                workforce-pools-get-allowed-locations <name> [-p <v>]... [-o <out>]
         projects
+                locations-workload-identity-pools-get-allowed-locations <name> [-p <v>]... [-o <out>]
                 service-accounts-generate-access-token <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 service-accounts-generate-id-token <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                service-accounts-get-allowed-locations <name> [-p <v>]... [-o <out>]
                 service-accounts-sign-blob <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 service-accounts-sign-jwt <name> (-r <kv>)... [-p <v>]... [-o <out>]
   iamcredentials1 --help

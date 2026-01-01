@@ -106,8 +106,10 @@
     "protocol": "rest",
     "resources": {
         "catalog": {
+            "deprecated": true,
             "methods": {
                 "search": {
+                    "deprecated": true,
                     "description": "Searches Data Catalog for multiple resources like entries and tags that match a query. This is a [Custom Method] (https://cloud.google.com/apis/design/custom_methods) that doesn't return all information on a resource, only its ID and high level fields. To get more information, you can subsequently call specific get methods. Note: Data Catalog search queries don't guarantee full recall. Results that match your query might not be returned, even in subsequent result pages. Additionally, returned (and not returned) results can vary if you repeat search queries. For more information, see [Data Catalog search syntax] (https://cloud.google.com/data-catalog/docs/how-to/search-reference).",
                     "flatPath": "v1/catalog:search",
                     "httpMethod": "POST",
@@ -128,8 +130,10 @@
             }
         },
         "entries": {
+            "deprecated": true,
             "methods": {
                 "lookup": {
+                    "deprecated": true,
                     "description": "Gets an entry by its target resource name. The resource name comes from the source Google Cloud Platform service.",
                     "flatPath": "v1/entries:lookup",
                     "httpMethod": "GET",
@@ -157,7 +161,7 @@
                             "type": "string"
                         },
                         "sqlResource": {
-                            "description": "The SQL name of the entry. SQL names are case-sensitive. Examples: * `pubsub.topic.{PROJECT_ID}.{TOPIC_ID}` * `pubsub.topic.{PROJECT_ID}.`\\``{TOPIC.ID.SEPARATED.WITH.DOTS}`\\` * `bigquery.table.{PROJECT_ID}.{DATASET_ID}.{TABLE_ID}` * `bigquery.dataset.{PROJECT_ID}.{DATASET_ID}` * `datacatalog.entry.{PROJECT_ID}.{LOCATION_ID}.{ENTRY_GROUP_ID}.{ENTRY_ID}` Identifiers (`*_ID`) should comply with the [Lexical structure in Standard SQL] (https://cloud.google.com/bigquery/docs/reference/standard-sql/lexical).",
+                            "description": "The SQL name of the entry. SQL names are case-sensitive. Examples: * `pubsub.topic.{PROJECT_ID}.{TOPIC_ID}` * `pubsub.topic.{PROJECT_ID}.`\\``{TOPIC.ID.SEPARATED.WITH.DOTS}`\\` * `bigquery.table.{PROJECT_ID}.{DATASET_ID}.{TABLE_ID}` * `bigquery.dataset.{PROJECT_ID}.{DATASET_ID}` * `datacatalog.entry.{PROJECT_ID}.{LOCATION_ID}.{ENTRY_GROUP_ID}.{ENTRY_ID}` Identifiers (`*_ID`) should comply with the [Lexical structure in GoogleSQL] (https://cloud.google.com/bigquery/docs/reference/standard-sql/lexical).",
                             "location": "query",
                             "type": "string"
                         }
@@ -172,13 +176,161 @@
                 }
             }
         },
+        "organizations": {
+            "resources": {
+                "locations": {
+                    "deprecated": true,
+                    "methods": {
+                        "retrieveConfig": {
+                            "deprecated": true,
+                            "description": "Retrieves the configuration related to the migration from Data Catalog to Dataplex Universal Catalog for a specific organization, including all the projects under it which have a separate configuration set.",
+                            "flatPath": "v1/organizations/{organizationsId}/locations/{locationsId}:retrieveConfig",
+                            "httpMethod": "GET",
+                            "id": "datacatalog.organizations.locations.retrieveConfig",
+                            "parameterOrder": [
+                                "name"
+                            ],
+                            "parameters": {
+                                "name": {
+                                    "description": "Required. The organization whose config is being retrieved.",
+                                    "location": "path",
+                                    "pattern": "^organizations/[^/]+/locations/[^/]+$",
+                                    "required": true,
+                                    "type": "string"
+                                }
+                            },
+                            "path": "v1/{+name}:retrieveConfig",
+                            "response": {
+                                "$ref": "GoogleCloudDatacatalogV1OrganizationConfig"
+                            },
+                            "scopes": [
+                                "https://www.googleapis.com/auth/cloud-platform"
+                            ]
+                        },
+                        "retrieveEffectiveConfig": {
+                            "deprecated": true,
+                            "description": "Retrieves the effective configuration related to the migration from Data Catalog to Dataplex Universal Catalog for a specific organization or project. If there is no specific configuration set for the resource, the setting is checked hierarchicahlly through the ancestors of the resource, starting from the resource itself.",
+                            "flatPath": "v1/organizations/{organizationsId}/locations/{locationsId}:retrieveEffectiveConfig",
+                            "httpMethod": "GET",
+                            "id": "datacatalog.organizations.locations.retrieveEffectiveConfig",
+                            "parameterOrder": [
+                                "name"
+                            ],
+                            "parameters": {
+                                "name": {
+                                    "description": "Required. The resource whose effective config is being retrieved.",
+                                    "location": "path",
+                                    "pattern": "^organizations/[^/]+/locations/[^/]+$",
+                                    "required": true,
+                                    "type": "string"
+                                }
+                            },
+                            "path": "v1/{+name}:retrieveEffectiveConfig",
+                            "response": {
+                                "$ref": "GoogleCloudDatacatalogV1MigrationConfig"
+                            },
+                            "scopes": [
+                                "https://www.googleapis.com/auth/cloud-platform"
+                            ]
+                        },
+                        "setConfig": {
+                            "deprecated": true,
+                            "description": "Sets the configuration related to the migration to Dataplex Universal Catalog for an organization or project.",
+                            "flatPath": "v1/organizations/{organizationsId}/locations/{locationsId}:setConfig",
+                            "httpMethod": "POST",
+                            "id": "datacatalog.organizations.locations.setConfig",
+                            "parameterOrder": [
+                                "name"
+                            ],
+                            "parameters": {
+                                "name": {
+                                    "description": "Required. The organization or project whose config is being specified.",
+                                    "location": "path",
+                                    "pattern": "^organizations/[^/]+/locations/[^/]+$",
+                                    "required": true,
+                                    "type": "string"
+                                }
+                            },
+                            "path": "v1/{+name}:setConfig",
+                            "request": {
+                                "$ref": "GoogleCloudDatacatalogV1SetConfigRequest"
+                            },
+                            "response": {
+                                "$ref": "GoogleCloudDatacatalogV1MigrationConfig"
+                            },
+                            "scopes": [
+                                "https://www.googleapis.com/auth/cloud-platform"
+                            ]
+                        }
+                    }
+                }
+            }
+        },
         "projects": {
             "resources": {
                 "locations": {
+                    "methods": {
+                        "retrieveEffectiveConfig": {
+                            "deprecated": true,
+                            "description": "Retrieves the effective configuration related to the migration from Data Catalog to Dataplex Universal Catalog for a specific organization or project. If there is no specific configuration set for the resource, the setting is checked hierarchicahlly through the ancestors of the resource, starting from the resource itself.",
+                            "flatPath": "v1/projects/{projectsId}/locations/{locationsId}:retrieveEffectiveConfig",
+                            "httpMethod": "GET",
+                            "id": "datacatalog.projects.locations.retrieveEffectiveConfig",
+                            "parameterOrder": [
+                                "name"
+                            ],
+                            "parameters": {
+                                "name": {
+                                    "description": "Required. The resource whose effective config is being retrieved.",
+                                    "location": "path",
+                                    "pattern": "^projects/[^/]+/locations/[^/]+$",
+                                    "required": true,
+                                    "type": "string"
+                                }
+                            },
+                            "path": "v1/{+name}:retrieveEffectiveConfig",
+                            "response": {
+                                "$ref": "GoogleCloudDatacatalogV1MigrationConfig"
+                            },
+                            "scopes": [
+                                "https://www.googleapis.com/auth/cloud-platform"
+                            ]
+                        },
+                        "setConfig": {
+                            "deprecated": true,
+                            "description": "Sets the configuration related to the migration to Dataplex Universal Catalog for an organization or project.",
+                            "flatPath": "v1/projects/{projectsId}/locations/{locationsId}:setConfig",
+                            "httpMethod": "POST",
+                            "id": "datacatalog.projects.locations.setConfig",
+                            "parameterOrder": [
+                                "name"
+                            ],
+                            "parameters": {
+                                "name": {
+                                    "description": "Required. The organization or project whose config is being specified.",
+                                    "location": "path",
+                                    "pattern": "^projects/[^/]+/locations/[^/]+$",
+                                    "required": true,
+                                    "type": "string"
+                                }
+                            },
+                            "path": "v1/{+name}:setConfig",
+                            "request": {
+                                "$ref": "GoogleCloudDatacatalogV1SetConfigRequest"
+                            },
+                            "response": {
+                                "$ref": "GoogleCloudDatacatalogV1MigrationConfig"
+                            },
+                            "scopes": [
+                                "https://www.googleapis.com/auth/cloud-platform"
+                            ]
+                        }
+                    },
                     "resources": {
                         "entryGroups": {
                             "methods": {
                                 "create": {
+                                    "deprecated": true,
                                     "description": "Creates an entry group. An entry group contains logically related entries together with [Cloud Identity and Access Management](/data-catalog/docs/concepts/iam) policies. These policies specify users who can create, edit, and view entries within entry groups. Data Catalog automatically creates entry groups with names that start with the `@` symbol for the following resources: * BigQuery entries (`@bigquery`) * Pub/Sub topics (`@pubsub`) * Dataproc Metastore services (`@dataproc_metastore_{SERVICE_NAME_HASH}`) You can create your own entry groups for Cloud Storage fileset entries and custom entries together with the corresponding IAM policies. User-created entry groups can't contain the `@` symbol, it is reserved for automatically created groups. Entry groups, like entries, can be searched. A maximum of 10,000 entry groups may be created per organization across all locations. You must enable the Data Catalog API in the project identified by the `parent` parameter. For more information, see [Data Catalog resource project](https://cloud.google.com/data-catalog/docs/concepts/resource-project).",
                                     "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/entryGroups",
                                     "httpMethod": "POST",
@@ -212,6 +364,7 @@
                                     ]
                                 },
                                 "delete": {
+                                    "deprecated": true,
                                     "description": "Deletes an entry group. You must enable the Data Catalog API in the project identified by the `name` parameter. For more information, see [Data Catalog resource project](https://cloud.google.com/data-catalog/docs/concepts/resource-project).",
                                     "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/entryGroups/{entryGroupsId}",
                                     "httpMethod": "DELETE",
@@ -242,6 +395,7 @@
                                     ]
                                 },
                                 "get": {
+                                    "deprecated": true,
                                     "description": "Gets an entry group.",
                                     "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/entryGroups/{entryGroupsId}",
                                     "httpMethod": "GET",
@@ -273,6 +427,7 @@
                                     ]
                                 },
                                 "getIamPolicy": {
+                                    "deprecated": true,
                                     "description": "Gets the access control policy for a resource. May return: * A`NOT_FOUND` error if the resource doesn't exist or you don't have the permission to view it. * An empty policy if the resource exists but doesn't have a set policy. Supported resources are: - Tag templates - Entry groups Note: This method doesn't get policies from Google Cloud Platform resources ingested into Data Catalog. To call this method, you must have the following Google IAM permissions: - `datacatalog.tagTemplates.getIamPolicy` to get policies on tag templates. - `datacatalog.entryGroups.getIamPolicy` to get policies on entry groups.",
                                     "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/entryGroups/{entryGroupsId}:getIamPolicy",
                                     "httpMethod": "POST",
@@ -301,6 +456,7 @@
                                     ]
                                 },
                                 "list": {
+                                    "deprecated": true,
                                     "description": "Lists entry groups.",
                                     "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/entryGroups",
                                     "httpMethod": "GET",
@@ -337,6 +493,7 @@
                                     ]
                                 },
                                 "patch": {
+                                    "deprecated": true,
                                     "description": "Updates an entry group. You must enable the Data Catalog API in the project identified by the `entry_group.name` parameter. For more information, see [Data Catalog resource project](https://cloud.google.com/data-catalog/docs/concepts/resource-project).",
                                     "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/entryGroups/{entryGroupsId}",
                                     "httpMethod": "PATCH",
@@ -371,6 +528,7 @@
                                     ]
                                 },
                                 "setIamPolicy": {
+                                    "deprecated": true,
                                     "description": "Sets an access control policy for a resource. Replaces any existing policy. Supported resources are: - Tag templates - Entry groups Note: This method sets policies only within Data Catalog and can't be used to manage policies in BigQuery, Pub/Sub, Dataproc Metastore, and any external Google Cloud Platform resources synced with the Data Catalog. To call this method, you must have the following Google IAM permissions: - `datacatalog.tagTemplates.setIamPolicy` to set policies on tag templates. - `datacatalog.entryGroups.setIamPolicy` to set policies on entry groups.",
                                     "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/entryGroups/{entryGroupsId}:setIamPolicy",
                                     "httpMethod": "POST",
@@ -399,6 +557,7 @@
                                     ]
                                 },
                                 "testIamPermissions": {
+                                    "deprecated": true,
                                     "description": "Gets your permissions on a resource. Returns an empty set of permissions if the resource doesn't exist. Supported resources are: - Tag templates - Entry groups Note: This method gets policies only within Data Catalog and can't be used to get policies from BigQuery, Pub/Sub, Dataproc Metastore, and any external Google Cloud Platform resources ingested into Data Catalog. No Google IAM permissions are required to call this method.",
                                     "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/entryGroups/{entryGroupsId}:testIamPermissions",
                                     "httpMethod": "POST",
@@ -431,6 +590,7 @@
                                 "entries": {
                                     "methods": {
                                         "create": {
+                                            "deprecated": true,
                                             "description": "Creates an entry. You can create entries only with 'FILESET', 'CLUSTER', 'DATA_STREAM', or custom types. Data Catalog automatically creates entries with other types during metadata ingestion from integrated systems. You must enable the Data Catalog API in the project identified by the `parent` parameter. For more information, see [Data Catalog resource project](https://cloud.google.com/data-catalog/docs/concepts/resource-project). An entry group can have a maximum of 100,000 entries.",
                                             "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/entryGroups/{entryGroupsId}/entries",
                                             "httpMethod": "POST",
@@ -464,6 +624,7 @@
                                             ]
                                         },
                                         "delete": {
+                                            "deprecated": true,
                                             "description": "Deletes an existing entry. You can delete only the entries created by the CreateEntry method. You must enable the Data Catalog API in the project identified by the `name` parameter. For more information, see [Data Catalog resource project](https://cloud.google.com/data-catalog/docs/concepts/resource-project).",
                                             "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/entryGroups/{entryGroupsId}/entries/{entriesId}",
                                             "httpMethod": "DELETE",
@@ -489,6 +650,7 @@
                                             ]
                                         },
                                         "get": {
+                                            "deprecated": true,
                                             "description": "Gets an entry.",
                                             "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/entryGroups/{entryGroupsId}/entries/{entriesId}",
                                             "httpMethod": "GET",
@@ -514,6 +676,7 @@
                                             ]
                                         },
                                         "getIamPolicy": {
+                                            "deprecated": true,
                                             "description": "Gets the access control policy for a resource. May return: * A`NOT_FOUND` error if the resource doesn't exist or you don't have the permission to view it. * An empty policy if the resource exists but doesn't have a set policy. Supported resources are: - Tag templates - Entry groups Note: This method doesn't get policies from Google Cloud Platform resources ingested into Data Catalog. To call this method, you must have the following Google IAM permissions: - `datacatalog.tagTemplates.getIamPolicy` to get policies on tag templates. - `datacatalog.entryGroups.getIamPolicy` to get policies on entry groups.",
                                             "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/entryGroups/{entryGroupsId}/entries/{entriesId}:getIamPolicy",
                                             "httpMethod": "POST",
@@ -542,6 +705,7 @@
                                             ]
                                         },
                                         "import": {
+                                            "deprecated": true,
                                             "description": "Imports entries from a source, such as data previously dumped into a Cloud Storage bucket, into Data Catalog. Import of entries is a sync operation that reconciles the state of the third-party system with the Data Catalog. `ImportEntries` accepts source data snapshots of a third-party system. Snapshot should be delivered as a .wire or base65-encoded .txt file containing a sequence of Protocol Buffer messages of DumpItem type. `ImportEntries` returns a long-running operation resource that can be queried with Operations.GetOperation to return ImportEntriesMetadata and an ImportEntriesResponse message.",
                                             "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/entryGroups/{entryGroupsId}/entries:import",
                                             "httpMethod": "POST",
@@ -570,6 +734,7 @@
                                             ]
                                         },
                                         "list": {
+                                            "deprecated": true,
                                             "description": "Lists entries. Note: Currently, this method can list only custom entries. To get a list of both custom and automatically created entries, use SearchCatalog.",
                                             "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/entryGroups/{entryGroupsId}/entries",
                                             "httpMethod": "GET",
@@ -612,6 +777,7 @@
                                             ]
                                         },
                                         "modifyEntryContacts": {
+                                            "deprecated": true,
                                             "description": "Modifies contacts, part of the business context of an Entry. To call this method, you must have the `datacatalog.entries.updateContacts` IAM permission on the corresponding project.",
                                             "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/entryGroups/{entryGroupsId}/entries/{entriesId}:modifyEntryContacts",
                                             "httpMethod": "POST",
@@ -640,6 +806,7 @@
                                             ]
                                         },
                                         "modifyEntryOverview": {
+                                            "deprecated": true,
                                             "description": "Modifies entry overview, part of the business context of an Entry. To call this method, you must have the `datacatalog.entries.updateOverview` IAM permission on the corresponding project.",
                                             "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/entryGroups/{entryGroupsId}/entries/{entriesId}:modifyEntryOverview",
                                             "httpMethod": "POST",
@@ -668,6 +835,7 @@
                                             ]
                                         },
                                         "patch": {
+                                            "deprecated": true,
                                             "description": "Updates an existing entry. You must enable the Data Catalog API in the project identified by the `entry.name` parameter. For more information, see [Data Catalog resource project](https://cloud.google.com/data-catalog/docs/concepts/resource-project).",
                                             "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/entryGroups/{entryGroupsId}/entries/{entriesId}",
                                             "httpMethod": "PATCH",
@@ -702,6 +870,7 @@
                                             ]
                                         },
                                         "star": {
+                                            "deprecated": true,
                                             "description": "Marks an Entry as starred by the current user. Starring information is private to each user.",
                                             "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/entryGroups/{entryGroupsId}/entries/{entriesId}:star",
                                             "httpMethod": "POST",
@@ -730,6 +899,7 @@
                                             ]
                                         },
                                         "testIamPermissions": {
+                                            "deprecated": true,
                                             "description": "Gets your permissions on a resource. Returns an empty set of permissions if the resource doesn't exist. Supported resources are: - Tag templates - Entry groups Note: This method gets policies only within Data Catalog and can't be used to get policies from BigQuery, Pub/Sub, Dataproc Metastore, and any external Google Cloud Platform resources ingested into Data Catalog. No Google IAM permissions are required to call this method.",
                                             "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/entryGroups/{entryGroupsId}/entries/{entriesId}:testIamPermissions",
                                             "httpMethod": "POST",
@@ -758,6 +928,7 @@
                                             ]
                                         },
                                         "unstar": {
+                                            "deprecated": true,
                                             "description": "Marks an Entry as NOT starred by the current user. Starring information is private to each user.",
                                             "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/entryGroups/{entryGroupsId}/entries/{entriesId}:unstar",
                                             "httpMethod": "POST",
@@ -788,8 +959,10 @@
                                     },
                                     "resources": {
                                         "tags": {
+                                            "deprecated": true,
                                             "methods": {
                                                 "create": {
+                                                    "deprecated": true,
                                                     "description": "Creates a tag and assigns it to: * An Entry if the method name is `projects.locations.entryGroups.entries.tags.create`. * Or EntryGroupif the method name is `projects.locations.entryGroups.tags.create`. Note: The project identified by the `parent` parameter for the [tag] (https://cloud.google.com/data-catalog/docs/reference/rest/v1/projects.locations.entryGroups.entries.tags/create#path-parameters) and the [tag template] (https://cloud.google.com/data-catalog/docs/reference/rest/v1/projects.locations.tagTemplates/create#path-parameters) used to create the tag must be in the same organization.",
                                                     "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/entryGroups/{entryGroupsId}/entries/{entriesId}/tags",
                                                     "httpMethod": "POST",
@@ -818,6 +991,7 @@
                                                     ]
                                                 },
                                                 "delete": {
+                                                    "deprecated": true,
                                                     "description": "Deletes a tag.",
                                                     "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/entryGroups/{entryGroupsId}/entries/{entriesId}/tags/{tagsId}",
                                                     "httpMethod": "DELETE",
@@ -843,6 +1017,7 @@
                                                     ]
                                                 },
                                                 "list": {
+                                                    "deprecated": true,
                                                     "description": "Lists tags assigned to an Entry. The columns in the response are lowercased.",
                                                     "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/entryGroups/{entryGroupsId}/entries/{entriesId}/tags",
                                                     "httpMethod": "GET",
@@ -879,6 +1054,7 @@
                                                     ]
                                                 },
                                                 "patch": {
+                                                    "deprecated": true,
                                                     "description": "Updates an existing tag.",
                                                     "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/entryGroups/{entryGroupsId}/entries/{entriesId}/tags/{tagsId}",
                                                     "httpMethod": "PATCH",
@@ -913,7 +1089,8 @@
                                                     ]
                                                 },
                                                 "reconcile": {
-                                                    "description": "`ReconcileTags` creates or updates a list of tags on the entry. If the ReconcileTagsRequest.force_delete_missing parameter is set, the operation deletes tags not included in the input tag list. `ReconcileTags` returns a long-running operation resource that can be queried with Operations.GetOperation to return ReconcileTagsMetadata and a ReconcileTagsResponse message.",
+                                                    "deprecated": true,
+                                                    "description": "`ReconcileTags` creates or updates a list of tags on the entry. If the ReconcileTagsRequest.force_delete_missing parameter is set, the operation deletes tags not included in the input tag list. `ReconcileTags` returns a long-running operation resource that can be queried with Operations.GetOperation to return ReconcileTagsMetadata and a ReconcileTagsResponse message. Note: SearchCatalog might return stale search results for up to 24 hours after the `ReconcileTags` operation completes.",
                                                     "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/entryGroups/{entryGroupsId}/entries/{entriesId}/tags:reconcile",
                                                     "httpMethod": "POST",
                                                     "id": "datacatalog.projects.locations.entryGroups.entries.tags.reconcile",
@@ -945,8 +1122,10 @@
                                     }
                                 },
                                 "tags": {
+                                    "deprecated": true,
                                     "methods": {
                                         "create": {
+                                            "deprecated": true,
                                             "description": "Creates a tag and assigns it to: * An Entry if the method name is `projects.locations.entryGroups.entries.tags.create`. * Or EntryGroupif the method name is `projects.locations.entryGroups.tags.create`. Note: The project identified by the `parent` parameter for the [tag] (https://cloud.google.com/data-catalog/docs/reference/rest/v1/projects.locations.entryGroups.entries.tags/create#path-parameters) and the [tag template] (https://cloud.google.com/data-catalog/docs/reference/rest/v1/projects.locations.tagTemplates/create#path-parameters) used to create the tag must be in the same organization.",
                                             "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/entryGroups/{entryGroupsId}/tags",
                                             "httpMethod": "POST",
@@ -975,6 +1154,7 @@
                                             ]
                                         },
                                         "delete": {
+                                            "deprecated": true,
                                             "description": "Deletes a tag.",
                                             "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/entryGroups/{entryGroupsId}/tags/{tagsId}",
                                             "httpMethod": "DELETE",
@@ -1000,6 +1180,7 @@
                                             ]
                                         },
                                         "list": {
+                                            "deprecated": true,
                                             "description": "Lists tags assigned to an Entry. The columns in the response are lowercased.",
                                             "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/entryGroups/{entryGroupsId}/tags",
                                             "httpMethod": "GET",
@@ -1036,6 +1217,7 @@
                                             ]
                                         },
                                         "patch": {
+                                            "deprecated": true,
                                             "description": "Updates an existing tag.",
                                             "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/entryGroups/{entryGroupsId}/tags/{tagsId}",
                                             "httpMethod": "PATCH",
@@ -1076,7 +1258,7 @@
                         "operations": {
                             "methods": {
                                 "cancel": {
-                                    "description": "Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of 1, corresponding to `Code.CANCELLED`.",
+                                    "description": "Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of `1`, corresponding to `Code.CANCELLED`.",
                                     "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/operations/{operationsId}:cancel",
                                     "httpMethod": "POST",
                                     "id": "datacatalog.projects.locations.operations.cancel",
@@ -1181,6 +1363,11 @@
                                             "description": "The standard list page token.",
                                             "location": "query",
                                             "type": "string"
+                                        },
+                                        "returnPartialSuccess": {
+                                            "description": "When set to `true`, operations that are reachable are returned as normal, and those that are unreachable are returned in the ListOperationsResponse.unreachable field. This can only be `true` when reading across collections. For example, when `parent` is set to `\"projects/example/locations/-\"`. This field is not supported by default and will result in an `UNIMPLEMENTED` error if set unless explicitly documented otherwise in service or product specific documentation.",
+                                            "location": "query",
+                                            "type": "boolean"
                                         }
                                     },
                                     "path": "v1/{+name}/operations",
@@ -1196,6 +1383,7 @@
                         "tagTemplates": {
                             "methods": {
                                 "create": {
+                                    "deprecated": true,
                                     "description": "Creates a tag template. You must enable the Data Catalog API in the project identified by the `parent` parameter. For more information, see [Data Catalog resource project] (https://cloud.google.com/data-catalog/docs/concepts/resource-project).",
                                     "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/tagTemplates",
                                     "httpMethod": "POST",
@@ -1229,6 +1417,7 @@
                                     ]
                                 },
                                 "delete": {
+                                    "deprecated": true,
                                     "description": "Deletes a tag template and all tags that use it. You must enable the Data Catalog API in the project identified by the `name` parameter. For more information, see [Data Catalog resource project](https://cloud.google.com/data-catalog/docs/concepts/resource-project).",
                                     "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/tagTemplates/{tagTemplatesId}",
                                     "httpMethod": "DELETE",
@@ -1259,6 +1448,7 @@
                                     ]
                                 },
                                 "get": {
+                                    "deprecated": true,
                                     "description": "Gets a tag template.",
                                     "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/tagTemplates/{tagTemplatesId}",
                                     "httpMethod": "GET",
@@ -1284,6 +1474,7 @@
                                     ]
                                 },
                                 "getIamPolicy": {
+                                    "deprecated": true,
                                     "description": "Gets the access control policy for a resource. May return: * A`NOT_FOUND` error if the resource doesn't exist or you don't have the permission to view it. * An empty policy if the resource exists but doesn't have a set policy. Supported resources are: - Tag templates - Entry groups Note: This method doesn't get policies from Google Cloud Platform resources ingested into Data Catalog. To call this method, you must have the following Google IAM permissions: - `datacatalog.tagTemplates.getIamPolicy` to get policies on tag templates. - `datacatalog.entryGroups.getIamPolicy` to get policies on entry groups.",
                                     "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/tagTemplates/{tagTemplatesId}:getIamPolicy",
                                     "httpMethod": "POST",
@@ -1312,6 +1503,7 @@
                                     ]
                                 },
                                 "patch": {
+                                    "deprecated": true,
                                     "description": "Updates a tag template. You can't update template fields with this method. These fields are separate resources with their own create, update, and delete methods. You must enable the Data Catalog API in the project identified by the `tag_template.name` parameter. For more information, see [Data Catalog resource project](https://cloud.google.com/data-catalog/docs/concepts/resource-project).",
                                     "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/tagTemplates/{tagTemplatesId}",
                                     "httpMethod": "PATCH",
@@ -1346,6 +1538,7 @@
                                     ]
                                 },
                                 "setIamPolicy": {
+                                    "deprecated": true,
                                     "description": "Sets an access control policy for a resource. Replaces any existing policy. Supported resources are: - Tag templates - Entry groups Note: This method sets policies only within Data Catalog and can't be used to manage policies in BigQuery, Pub/Sub, Dataproc Metastore, and any external Google Cloud Platform resources synced with the Data Catalog. To call this method, you must have the following Google IAM permissions: - `datacatalog.tagTemplates.setIamPolicy` to set policies on tag templates. - `datacatalog.entryGroups.setIamPolicy` to set policies on entry groups.",
                                     "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/tagTemplates/{tagTemplatesId}:setIamPolicy",
                                     "httpMethod": "POST",
@@ -1374,6 +1567,7 @@
                                     ]
                                 },
                                 "testIamPermissions": {
+                                    "deprecated": true,
                                     "description": "Gets your permissions on a resource. Returns an empty set of permissions if the resource doesn't exist. Supported resources are: - Tag templates - Entry groups Note: This method gets policies only within Data Catalog and can't be used to get policies from BigQuery, Pub/Sub, Dataproc Metastore, and any external Google Cloud Platform resources ingested into Data Catalog. No Google IAM permissions are required to call this method.",
                                     "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/tagTemplates/{tagTemplatesId}:testIamPermissions",
                                     "httpMethod": "POST",
@@ -1406,6 +1600,7 @@
                                 "fields": {
                                     "methods": {
                                         "create": {
+                                            "deprecated": true,
                                             "description": "Creates a field in a tag template. You must enable the Data Catalog API in the project identified by the `parent` parameter. For more information, see [Data Catalog resource project](https://cloud.google.com/data-catalog/docs/concepts/resource-project).",
                                             "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/tagTemplates/{tagTemplatesId}/fields",
                                             "httpMethod": "POST",
@@ -1439,6 +1634,7 @@
                                             ]
                                         },
                                         "delete": {
+                                            "deprecated": true,
                                             "description": "Deletes a field in a tag template and all uses of this field from the tags based on this template. You must enable the Data Catalog API in the project identified by the `name` parameter. For more information, see [Data Catalog resource project](https://cloud.google.com/data-catalog/docs/concepts/resource-project).",
                                             "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/tagTemplates/{tagTemplatesId}/fields/{fieldsId}",
                                             "httpMethod": "DELETE",
@@ -1469,6 +1665,7 @@
                                             ]
                                         },
                                         "patch": {
+                                            "deprecated": true,
                                             "description": "Updates a field in a tag template. You can't update the field type with this method. You must enable the Data Catalog API in the project identified by the `name` parameter. For more information, see [Data Catalog resource project](https://cloud.google.com/data-catalog/docs/concepts/resource-project).",
                                             "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/tagTemplates/{tagTemplatesId}/fields/{fieldsId}",
                                             "httpMethod": "PATCH",
@@ -1503,6 +1700,7 @@
                                             ]
                                         },
                                         "rename": {
+                                            "deprecated": true,
                                             "description": "Renames a field in a tag template. You must enable the Data Catalog API in the project identified by the `name` parameter. For more information, see [Data Catalog resource project] (https://cloud.google.com/data-catalog/docs/concepts/resource-project).",
                                             "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/tagTemplates/{tagTemplatesId}/fields/{fieldsId}:rename",
                                             "httpMethod": "POST",
@@ -1533,8 +1731,10 @@
                                     },
                                     "resources": {
                                         "enumValues": {
+                                            "deprecated": true,
                                             "methods": {
                                                 "rename": {
+                                                    "deprecated": true,
                                                     "description": "Renames an enum value in a tag template. Within a single enum field, enum values must be unique.",
                                                     "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/tagTemplates/{tagTemplatesId}/fields/{fieldsId}/enumValues/{enumValuesId}:rename",
                                                     "httpMethod": "POST",
@@ -2144,7 +2344,7 @@
             }
         }
     },
-    "revision": "20240624",
+    "revision": "20251210",
     "rootUrl": "https://datacatalog.googleapis.com/",
     "schemas": {
         "Binding": {
@@ -2624,11 +2824,11 @@
             "properties": {
                 "databaseViewSpec": {
                     "$ref": "GoogleCloudDatacatalogV1DatabaseTableSpecDatabaseViewSpec",
-                    "description": "Spec what aplies to tables that are actually views. Not set for \"real\" tables."
+                    "description": "Spec what applies to tables that are actually views. Not set for \"real\" tables."
                 },
                 "dataplexTable": {
                     "$ref": "GoogleCloudDatacatalogV1DataplexTableSpec",
-                    "description": "Output only. Fields specific to a Dataplex table and present only in the Dataplex table entries.",
+                    "description": "Output only. Fields specific to a Dataplex Universal Catalog table and present only in the Dataplex Universal Catalog table entries.",
                     "readOnly": true
                 },
                 "type": {
@@ -2678,7 +2878,7 @@
             "type": "object"
         },
         "GoogleCloudDatacatalogV1DataplexExternalTable": {
-            "description": "External table registered by Dataplex. Dataplex publishes data discovered from an asset into multiple other systems (BigQuery, DPMS) in form of tables. We call them \"external tables\". External tables are also synced into the Data Catalog. This message contains pointers to those external tables (fully qualified name, resource name et cetera) within the Data Catalog.",
+            "description": "External table registered by Dataplex Universal Catalog. Dataplex Universal Catalog publishes data discovered from an asset into multiple other systems (BigQuery, DPMS) in form of tables. We call them \"external tables\". External tables are also synced into the Data Catalog. This message contains pointers to those external tables (fully qualified name, resource name et cetera) within the Data Catalog.",
             "id": "GoogleCloudDatacatalogV1DataplexExternalTable",
             "properties": {
                 "dataCatalogEntry": {
@@ -2712,7 +2912,7 @@
                         "BigQuery.",
                         "Cloud Pub/Sub.",
                         "Dataproc Metastore.",
-                        "Dataplex.",
+                        "Dataplex Universal Catalog.",
                         "Cloud Spanner",
                         "Cloud Bigtable",
                         "Cloud Sql",
@@ -2725,22 +2925,22 @@
             "type": "object"
         },
         "GoogleCloudDatacatalogV1DataplexFilesetSpec": {
-            "description": "Entry specyfication for a Dataplex fileset.",
+            "description": "Entry specification for a Dataplex Universal Catalog fileset.",
             "id": "GoogleCloudDatacatalogV1DataplexFilesetSpec",
             "properties": {
                 "dataplexSpec": {
                     "$ref": "GoogleCloudDatacatalogV1DataplexSpec",
-                    "description": "Common Dataplex fields."
+                    "description": "Common Dataplex Universal Catalog fields."
                 }
             },
             "type": "object"
         },
         "GoogleCloudDatacatalogV1DataplexSpec": {
-            "description": "Common Dataplex fields.",
+            "description": "Common Dataplex Universal Catalog fields.",
             "id": "GoogleCloudDatacatalogV1DataplexSpec",
             "properties": {
                 "asset": {
-                    "description": "Fully qualified resource name of an asset in Dataplex, to which the underlying data source (Cloud Storage bucket or BigQuery dataset) of the entity is attached.",
+                    "description": "Fully qualified resource name of an asset in Dataplex Universal Catalog, to which the underlying data source (Cloud Storage bucket or BigQuery dataset) of the entity is attached.",
                     "type": "string"
                 },
                 "compressionFormat": {
@@ -2752,22 +2952,22 @@
                     "description": "Format of the data."
                 },
                 "projectId": {
-                    "description": "Project ID of the underlying Cloud Storage or BigQuery data. Note that this may not be the same project as the correspondingly Dataplex lake / zone / asset.",
+                    "description": "Project ID of the underlying Cloud Storage or BigQuery data. Note that this may not be the same project as the corresponding Dataplex Universal Catalog lake / zone / asset.",
                     "type": "string"
                 }
             },
             "type": "object"
         },
         "GoogleCloudDatacatalogV1DataplexTableSpec": {
-            "description": "Entry specification for a Dataplex table.",
+            "description": "Entry specification for a Dataplex Universal Catalog table.",
             "id": "GoogleCloudDatacatalogV1DataplexTableSpec",
             "properties": {
                 "dataplexSpec": {
                     "$ref": "GoogleCloudDatacatalogV1DataplexSpec",
-                    "description": "Common Dataplex fields."
+                    "description": "Common Dataplex Universal Catalog fields."
                 },
                 "externalTables": {
-                    "description": "List of external tables registered by Dataplex in other systems based on the same underlying data. External tables allow to query this data in those systems.",
+                    "description": "List of external tables registered by Dataplex Universal Catalog in other systems based on the same underlying data. External tables allow to query this data in those systems.",
                     "items": {
                         "$ref": "GoogleCloudDatacatalogV1DataplexExternalTable"
                     },
@@ -2865,6 +3065,10 @@
                     "$ref": "GoogleCloudDatacatalogV1GcsFilesetSpec",
                     "description": "Specification that applies to a Cloud Storage fileset. Valid only for entries with the `FILESET` type."
                 },
+                "graphSpec": {
+                    "$ref": "GoogleCloudDatacatalogV1GraphSpec",
+                    "description": "Spec for graph."
+                },
                 "integratedSystem": {
                     "description": "Output only. Indicates the entry's source system that Data Catalog integrates with, such as BigQuery, Pub/Sub, or Dataproc Metastore.",
                     "enum": [
@@ -2884,7 +3088,7 @@
                         "BigQuery.",
                         "Cloud Pub/Sub.",
                         "Dataproc Metastore.",
-                        "Dataplex.",
+                        "Dataplex Universal Catalog.",
                         "Cloud Spanner",
                         "Cloud Bigtable",
                         "Cloud Sql",
@@ -2964,7 +3168,8 @@
                         "LOOK",
                         "FEATURE_ONLINE_STORE",
                         "FEATURE_VIEW",
-                        "FEATURE_GROUP"
+                        "FEATURE_GROUP",
+                        "GRAPH"
                     ],
                     "enumDescriptions": [
                         "Default unknown type.",
@@ -2976,8 +3181,8 @@
                         "A database.",
                         "Connection to a data source. For example, a BigQuery connection.",
                         "Routine, for example, a BigQuery routine.",
-                        "A Dataplex lake.",
-                        "A Dataplex zone.",
+                        "A Dataplex Universal Catalog lake.",
+                        "A Dataplex Universal Catalog zone.",
                         "A service, for example, a Dataproc Metastore service.",
                         "Schema within a relational database.",
                         "A Dashboard, for example from Looker.",
@@ -2985,7 +3190,8 @@
                         "A Looker Look. For more information, see [Looker Look API] (https://developers.looker.com/api/explorer/4.0/methods/Look).",
                         "Feature Online Store resource in Vertex AI Feature Store.",
                         "Feature View resource in Vertex AI Feature Store.",
-                        "Feature Group resource in Vertex AI Feature Store."
+                        "Feature Group resource in Vertex AI Feature Store.",
+                        "An entry type for a graph."
                     ],
                     "type": "string"
                 },
@@ -3024,6 +3230,10 @@
                 "name": {
                     "description": "Identifier. The resource name of the entry group in URL format. Note: The entry group itself and its child resources might not be stored in the location specified in its name.",
                     "type": "string"
+                },
+                "transferredToDataplex": {
+                    "description": "Optional. When set to [true], it means DataCatalog EntryGroup was transferred to Dataplex Universal Catalog. It makes EntryGroup and its Entries to be read-only in DataCatalog. However, new Tags on EntryGroup and its Entries can be created. After setting the flag to [true] it cannot be unset.",
+                    "type": "boolean"
                 }
             },
             "type": "object"
@@ -3058,7 +3268,7 @@
             "id": "GoogleCloudDatacatalogV1FeatureOnlineStoreSpec",
             "properties": {
                 "storageType": {
-                    "description": "Output only. Type of underelaying storage for the FeatureOnlineStore.",
+                    "description": "Output only. Type of underlying storage for the FeatureOnlineStore.",
                     "enum": [
                         "STORAGE_TYPE_UNSPECIFIED",
                         "BIGTABLE",
@@ -3067,7 +3277,7 @@
                     "enumDescriptions": [
                         "Should not be used.",
                         "Underlsying storgae is Bigtable.",
-                        "Underlaying is optimized online server (Lightning)."
+                        "Underlying is optimized online server (Lightning)."
                     ],
                     "readOnly": true,
                     "type": "string"
@@ -3134,7 +3344,7 @@
             "properties": {
                 "dataplexFileset": {
                     "$ref": "GoogleCloudDatacatalogV1DataplexFilesetSpec",
-                    "description": "Fields specific to a Dataplex fileset and present only in the Dataplex fileset entries."
+                    "description": "Fields specific to a Dataplex Universal Catalog fileset and present only in the Dataplex Universal Catalog fileset entries."
                 }
             },
             "type": "object"
@@ -3166,7 +3376,7 @@
             "id": "GoogleCloudDatacatalogV1GcsFilesetSpec",
             "properties": {
                 "filePatterns": {
-                    "description": "Required. Patterns to identify a set of files in Google Cloud Storage. For more information, see [Wildcard Names] (https://cloud.google.com/storage/docs/gsutil/addlhelp/WildcardNames). Note: Currently, bucket wildcards are not supported. Examples of valid `file_patterns`: * `gs://bucket_name/dir/*`: matches all files in `bucket_name/dir` directory * `gs://bucket_name/dir/**`: matches all files in `bucket_name/dir` and all subdirectories * `gs://bucket_name/file*`: matches files prefixed by `file` in `bucket_name` * `gs://bucket_name/??.txt`: matches files with two characters followed by `.txt` in `bucket_name` * `gs://bucket_name/[aeiou].txt`: matches files that contain a single vowel character followed by `.txt` in `bucket_name` * `gs://bucket_name/[a-m].txt`: matches files that contain `a`, `b`, ... or `m` followed by `.txt` in `bucket_name` * `gs://bucket_name/a/*/b`: matches all files in `bucket_name` that match the `a/*/b` pattern, such as `a/c/b`, `a/d/b` * `gs://another_bucket/a.txt`: matches `gs://another_bucket/a.txt` You can combine wildcards to match complex sets of files, for example: `gs://bucket_name/[a-m]??.j*g`",
+                    "description": "Required. Patterns to identify a set of files in Google Cloud Storage. For more information, see [Wildcard Names] (https://cloud.google.com/storage/docs/wildcards). Note: Currently, bucket wildcards are not supported. Examples of valid `file_patterns`: * `gs://bucket_name/dir/*`: matches all files in `bucket_name/dir` directory * `gs://bucket_name/dir/**`: matches all files in `bucket_name/dir` and all subdirectories * `gs://bucket_name/file*`: matches files prefixed by `file` in `bucket_name` * `gs://bucket_name/??.txt`: matches files with two characters followed by `.txt` in `bucket_name` * `gs://bucket_name/[aeiou].txt`: matches files that contain a single vowel character followed by `.txt` in `bucket_name` * `gs://bucket_name/[a-m].txt`: matches files that contain `a`, `b`, ... or `m` followed by `.txt` in `bucket_name` * `gs://bucket_name/a/*/b`: matches all files in `bucket_name` that match the `a/*/b` pattern, such as `a/c/b`, `a/d/b` * `gs://another_bucket/a.txt`: matches `gs://another_bucket/a.txt` You can combine wildcards to match complex sets of files, for example: `gs://bucket_name/[a-m]??.j*g`",
                     "items": {
                         "type": "string"
                     },
@@ -3179,6 +3389,163 @@
                     },
                     "readOnly": true,
                     "type": "array"
+                }
+            },
+            "type": "object"
+        },
+        "GoogleCloudDatacatalogV1GraphSpec": {
+            "description": "Specification that applies to a graph.",
+            "id": "GoogleCloudDatacatalogV1GraphSpec",
+            "properties": {
+                "edgeTables": {
+                    "description": "Optional. Edge tables of the graph.",
+                    "items": {
+                        "$ref": "GoogleCloudDatacatalogV1GraphSpecGraphElementTable"
+                    },
+                    "type": "array"
+                },
+                "name": {
+                    "description": "Output only. Fully qualified graph name. e.g. `named_catalog.MyGraph`",
+                    "readOnly": true,
+                    "type": "string"
+                },
+                "nodeTables": {
+                    "description": "Required. Node tables of the graph.",
+                    "items": {
+                        "$ref": "GoogleCloudDatacatalogV1GraphSpecGraphElementTable"
+                    },
+                    "type": "array"
+                }
+            },
+            "type": "object"
+        },
+        "GoogleCloudDatacatalogV1GraphSpecGraphElementTable": {
+            "description": "Element table definition.",
+            "id": "GoogleCloudDatacatalogV1GraphSpecGraphElementTable",
+            "properties": {
+                "alias": {
+                    "description": "Required. The alias name of the graph element.",
+                    "type": "string"
+                },
+                "dataSource": {
+                    "description": "Required. The name of the data source. This is either a table name or a view name that is used for graph element input source. E.g. `Person` table or `PersonView` view.",
+                    "type": "string"
+                },
+                "destinationNodeReference": {
+                    "$ref": "GoogleCloudDatacatalogV1GraphSpecGraphElementTableGraphNodeReference",
+                    "description": "Optional. The destination node reference of the edge."
+                },
+                "dynamicLabelColumn": {
+                    "description": "Optional. If set, this is the input column for dynamic label in schemaless data model.",
+                    "type": "string"
+                },
+                "dynamicPropertiesColumn": {
+                    "description": "Optional. If set, this is the input column for dynamic properties in schemaless data model.",
+                    "type": "string"
+                },
+                "elementKeys": {
+                    "description": "Required. The name of the keys of the elements in the table.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "inputSource": {
+                    "description": "Required. The input source of the graph element.",
+                    "enum": [
+                        "INPUT_SOURCE_UNSPECIFIED",
+                        "TABLE",
+                        "VIEW"
+                    ],
+                    "enumDescriptions": [
+                        "Default unknown input source.",
+                        "Table input source.",
+                        "View input source."
+                    ],
+                    "type": "string"
+                },
+                "kind": {
+                    "description": "Required. The kind of the graph element.",
+                    "enum": [
+                        "KIND_UNSPECIFIED",
+                        "NODE",
+                        "EDGE"
+                    ],
+                    "enumDescriptions": [
+                        "Default unknown kind.",
+                        "Node kind.",
+                        "Edge kind."
+                    ],
+                    "type": "string"
+                },
+                "labelAndProperties": {
+                    "description": "Required. The labels and their properties for the graph element.",
+                    "items": {
+                        "$ref": "GoogleCloudDatacatalogV1GraphSpecGraphElementTableLabelAndProperties"
+                    },
+                    "type": "array"
+                },
+                "sourceNodeReference": {
+                    "$ref": "GoogleCloudDatacatalogV1GraphSpecGraphElementTableGraphNodeReference",
+                    "description": "Optional. The source node reference of the edge."
+                }
+            },
+            "type": "object"
+        },
+        "GoogleCloudDatacatalogV1GraphSpecGraphElementTableGraphNodeReference": {
+            "description": "A reference to a source or destination node in a graph edge.",
+            "id": "GoogleCloudDatacatalogV1GraphSpecGraphElementTableGraphNodeReference",
+            "properties": {
+                "edgeTableColumns": {
+                    "description": "Required. The referencing columns in the edge table. The size of `edge_table_columns` must be equal to the size of `node_table_columns`.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "nodeAlias": {
+                    "description": "Required. The reference to the source/destination node of the edge. This name must be a valid `alias` of a node element in the same graph. Example, `Person` node can be a source node name of an edge element `Person_to_Address`.",
+                    "type": "string"
+                },
+                "nodeTableColumns": {
+                    "description": "Required. The referenced columns of the source node table.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                }
+            },
+            "type": "object"
+        },
+        "GoogleCloudDatacatalogV1GraphSpecGraphElementTableLabelAndProperties": {
+            "description": "The label and its properties. Each label is associated with a set of properties.",
+            "id": "GoogleCloudDatacatalogV1GraphSpecGraphElementTableLabelAndProperties",
+            "properties": {
+                "label": {
+                    "description": "Required. The name of the label.",
+                    "type": "string"
+                },
+                "properties": {
+                    "description": "Optional. The properties associated with the label.",
+                    "items": {
+                        "$ref": "GoogleCloudDatacatalogV1GraphSpecGraphElementTableProperty"
+                    },
+                    "type": "array"
+                }
+            },
+            "type": "object"
+        },
+        "GoogleCloudDatacatalogV1GraphSpecGraphElementTableProperty": {
+            "description": "A property declaration.",
+            "id": "GoogleCloudDatacatalogV1GraphSpecGraphElementTableProperty",
+            "properties": {
+                "name": {
+                    "description": "Required. Property name.",
+                    "type": "string"
+                },
+                "type": {
+                    "description": "Required. Property data type.",
+                    "type": "string"
                 }
             },
             "type": "object"
@@ -3224,7 +3591,7 @@
                     "type": "string"
                 },
                 "jobId": {
-                    "description": "Optional. (Optional) Dataplex task job id, if specified will be used as part of ImportEntries LRO ID",
+                    "description": "Optional. (Optional) Dataplex Universal Catalog task job id, if specified will be used as part of ImportEntries LRO ID",
                     "type": "string"
                 }
             },
@@ -3411,6 +3778,46 @@
             },
             "type": "object"
         },
+        "GoogleCloudDatacatalogV1MigrationConfig": {
+            "description": "The configuration related to the migration to Dataplex Universal Catalog applied to an organization or project. It is the response message for SetConfig and RetrieveEffectiveConfig.",
+            "id": "GoogleCloudDatacatalogV1MigrationConfig",
+            "properties": {
+                "catalogUiExperience": {
+                    "description": "Opt-in status for the UI switch to Dataplex Universal Catalog.",
+                    "enum": [
+                        "CATALOG_UI_EXPERIENCE_UNSPECIFIED",
+                        "CATALOG_UI_EXPERIENCE_ENABLED",
+                        "CATALOG_UI_EXPERIENCE_DISABLED"
+                    ],
+                    "enumDescriptions": [
+                        "Default value. The default UI is Dataplex Universal Catalog.",
+                        "The UI is Dataplex Universal Catalog.",
+                        "The UI is Data Catalog."
+                    ],
+                    "type": "string"
+                },
+                "tagTemplateMigration": {
+                    "description": "Opt-in status for the migration of Tag Templates to Dataplex Universal Catalog.",
+                    "enum": [
+                        "TAG_TEMPLATE_MIGRATION_UNSPECIFIED",
+                        "TAG_TEMPLATE_MIGRATION_ENABLED",
+                        "TAG_TEMPLATE_MIGRATION_DISABLED"
+                    ],
+                    "enumDescriptions": [
+                        "Default value. Migration of Tag Templates from Data Catalog to Dataplex Universal Catalog is not performed. For projects that are under an organization, the project inherits the organization's configuration when you set the project-level configuration to unspecified (`TAG_TEMPLATE_MIGRATION_UNSPECIFIED`). This means that when migration is enabled at the organization level, and the project-level configuration is unspecified, the project is migrated. To explicitly opt-in or opt-out individual projects, set the project-level configuration to enabled (`TAG_TEMPLATE_MIGRATION_ENABLED`) or disabled (`TAG_TEMPLATE_MIGRATION_DISABLED`).",
+                        "Migration of Tag Templates from Data Catalog to Dataplex Universal Catalog is enabled.",
+                        "Migration of Tag Templates from Data Catalog to Dataplex Universal Catalog is disabled."
+                    ],
+                    "type": "string"
+                },
+                "templateMigrationEnabledTime": {
+                    "description": "The time when the Tag Template migration was enabled. If the Tag Template migration is not enabled, this field is not set.",
+                    "format": "google-datetime",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
         "GoogleCloudDatacatalogV1ModelSpec": {
             "description": "Specification that applies to a model. Valid only for entries with the `MODEL` type.",
             "id": "GoogleCloudDatacatalogV1ModelSpec",
@@ -3440,6 +3847,20 @@
                 "entryOverview": {
                     "$ref": "GoogleCloudDatacatalogV1EntryOverview",
                     "description": "Required. The new value for the Entry Overview."
+                }
+            },
+            "type": "object"
+        },
+        "GoogleCloudDatacatalogV1OrganizationConfig": {
+            "description": "The configuration related to the migration from Data Catalog to Dataplex Universal Catalog that has been applied to an organization and any projects under it. It is the response message for RetrieveConfig.",
+            "id": "GoogleCloudDatacatalogV1OrganizationConfig",
+            "properties": {
+                "config": {
+                    "additionalProperties": {
+                        "$ref": "GoogleCloudDatacatalogV1MigrationConfig"
+                    },
+                    "description": "Map of organizations and project resource names and their configuration. The format for the map keys is `organizations/{organizationId}` or `projects/{projectId}`.",
+                    "type": "object"
                 }
             },
             "type": "object"
@@ -3608,7 +4029,6 @@
             "id": "GoogleCloudDatacatalogV1ReconcileTagsRequest",
             "properties": {
                 "forceDeleteMissing": {
-                    "description": "If set to `true`, deletes entry tags related to a tag template not listed in the tags source from an entry. If set to `false`, unlisted tags are retained.",
                     "type": "boolean"
                 },
                 "tagTemplate": {
@@ -3907,7 +4327,7 @@
                         "BigQuery.",
                         "Cloud Pub/Sub.",
                         "Dataproc Metastore.",
-                        "Dataplex.",
+                        "Dataplex Universal Catalog.",
                         "Cloud Spanner",
                         "Cloud Bigtable",
                         "Cloud Sql",
@@ -4031,6 +4451,41 @@
             },
             "type": "object"
         },
+        "GoogleCloudDatacatalogV1SetConfigRequest": {
+            "description": "Request message for SetConfig.",
+            "id": "GoogleCloudDatacatalogV1SetConfigRequest",
+            "properties": {
+                "catalogUiExperience": {
+                    "description": "Opt-in status for the UI switch to Dataplex Universal Catalog.",
+                    "enum": [
+                        "CATALOG_UI_EXPERIENCE_UNSPECIFIED",
+                        "CATALOG_UI_EXPERIENCE_ENABLED",
+                        "CATALOG_UI_EXPERIENCE_DISABLED"
+                    ],
+                    "enumDescriptions": [
+                        "Default value. The default UI is Dataplex Universal Catalog.",
+                        "The UI is Dataplex Universal Catalog.",
+                        "The UI is Data Catalog."
+                    ],
+                    "type": "string"
+                },
+                "tagTemplateMigration": {
+                    "description": "Opt-in status for the migration of Tag Templates to Dataplex Universal Catalog.",
+                    "enum": [
+                        "TAG_TEMPLATE_MIGRATION_UNSPECIFIED",
+                        "TAG_TEMPLATE_MIGRATION_ENABLED",
+                        "TAG_TEMPLATE_MIGRATION_DISABLED"
+                    ],
+                    "enumDescriptions": [
+                        "Default value. Migration of Tag Templates from Data Catalog to Dataplex Universal Catalog is not performed. For projects that are under an organization, the project inherits the organization's configuration when you set the project-level configuration to unspecified (`TAG_TEMPLATE_MIGRATION_UNSPECIFIED`). This means that when migration is enabled at the organization level, and the project-level configuration is unspecified, the project is migrated. To explicitly opt-in or opt-out individual projects, set the project-level configuration to enabled (`TAG_TEMPLATE_MIGRATION_ENABLED`) or disabled (`TAG_TEMPLATE_MIGRATION_DISABLED`).",
+                        "Migration of Tag Templates from Data Catalog to Dataplex Universal Catalog is enabled.",
+                        "Migration of Tag Templates from Data Catalog to Dataplex Universal Catalog is disabled."
+                    ],
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
         "GoogleCloudDatacatalogV1SqlDatabaseSystemSpec": {
             "description": "Specification that applies to entries that are part `SQL_DATABASE` system (user_specified_type)",
             "id": "GoogleCloudDatacatalogV1SqlDatabaseSystemSpec",
@@ -4123,6 +4578,26 @@
                     "description": "Resources like entry can have schemas associated with them. This scope allows you to attach tags to an individual column based on that schema. To attach a tag to a nested column, separate column names with a dot (`.`). Example: `column.nested_column`.",
                     "type": "string"
                 },
+                "dataplexTransferStatus": {
+                    "description": "Output only. Denotes the transfer status of the Tag Template.",
+                    "enum": [
+                        "DATAPLEX_TRANSFER_STATUS_UNSPECIFIED",
+                        "MIGRATED",
+                        "TRANSFERRED"
+                    ],
+                    "enumDeprecated": [
+                        false,
+                        true,
+                        false
+                    ],
+                    "enumDescriptions": [
+                        "Default value. TagTemplate and its tags are only visible and editable in Data Catalog.",
+                        "TagTemplate and its tags are auto-copied to Dataplex Universal Catalog service. Visible in both services. Editable in Data Catalog, read-only in Dataplex Universal Catalog. Deprecated: Individual TagTemplate migration is deprecated in favor of organization or project wide TagTemplate migration opt-in.",
+                        "TagTemplate and its tags are auto-copied to Dataplex Universal Catalog service. Visible in both services. Editable in Dataplex Universal Catalog, read-only in Data Catalog."
+                    ],
+                    "readOnly": true,
+                    "type": "string"
+                },
                 "fields": {
                     "additionalProperties": {
                         "$ref": "GoogleCloudDatacatalogV1TagField"
@@ -4209,15 +4684,18 @@
                     "description": "Optional. Transfer status of the TagTemplate",
                     "enum": [
                         "DATAPLEX_TRANSFER_STATUS_UNSPECIFIED",
-                        "MIGRATED"
+                        "MIGRATED",
+                        "TRANSFERRED"
                     ],
                     "enumDeprecated": [
                         false,
-                        true
+                        true,
+                        false
                     ],
                     "enumDescriptions": [
-                        "Default value. TagTemplate and its tags are only visible and editable in DataCatalog.",
-                        "TagTemplate and its tags are auto-copied to Dataplex service. Visible in both services. Editable in DataCatalog, read-only in Dataplex. Deprecated: Individual TagTemplate migration is deprecated in favor of organization or project wide TagTemplate migration opt-in."
+                        "Default value. TagTemplate and its tags are only visible and editable in Data Catalog.",
+                        "TagTemplate and its tags are auto-copied to Dataplex Universal Catalog service. Visible in both services. Editable in Data Catalog, read-only in Dataplex Universal Catalog. Deprecated: Individual TagTemplate migration is deprecated in favor of organization or project wide TagTemplate migration opt-in.",
+                        "TagTemplate and its tags are auto-copied to Dataplex Universal Catalog service. Visible in both services. Editable in Dataplex Universal Catalog, read-only in Data Catalog."
                     ],
                     "type": "string"
                 },
@@ -4367,7 +4845,7 @@
                     ],
                     "enumDescriptions": [
                         "Default value",
-                        "Dataplex.",
+                        "Dataplex Universal Catalog.",
                         "Other"
                     ],
                     "type": "string"
@@ -4581,6 +5059,13 @@
                     "description": "A list of operations that matches the specified filter in the request.",
                     "items": {
                         "$ref": "Operation"
+                    },
+                    "type": "array"
+                },
+                "unreachable": {
+                    "description": "Unordered list. Unreachable resources. Populated when the request sets `ListOperationsRequest.return_partial_success` and reads across collections. For example, when attempting to list all resources across all supported locations.",
+                    "items": {
+                        "type": "string"
                     },
                     "type": "array"
                 }

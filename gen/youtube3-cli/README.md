@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *YouTube* API at revision *20240626*. The CLI is at version *6.0.0*.
+This documentation was generated from the *YouTube* API at revision *20251222*. The CLI is at version *7.0.0*.
 
 ```bash
 youtube3 [options]
@@ -128,6 +128,8 @@ youtube3 [options]
                 list <part>... [-p <v>]... [-o <out>]
         video-categories
                 list <part>... [-p <v>]... [-o <out>]
+        video-trainability
+                get [-p <v>]... [-o <out>]
         videos
                 delete <id> [-p <v>]...
                 get-rating <id>... [-p <v>]... [-o <out>]
@@ -140,7 +142,9 @@ youtube3 [options]
                 set <channel-id> (-r <kv>)... (-u simple -f <file> [-m <mime>]) [-p <v>]...
                 unset <channel-id> [-p <v>]...
         youtube
+                v3-live-chat-messages-stream [-p <v>]... [-o <out>]
                 v3-update-comment-threads (-r <kv>)... [-p <v>]... [-o <out>]
+                v3-videos-batch-get-stats [-p <v>]... [-o <out>]
   youtube3 --help
 
 Configuration:

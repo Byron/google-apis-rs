@@ -851,7 +851,7 @@
         "scripts": {
             "methods": {
                 "run": {
-                    "description": "Runs a function in an Apps Script project. The script project must be deployed for use with the Apps Script API and the calling application must share the same Cloud Platform project. This method requires authorization with an OAuth 2.0 token that includes at least one of the scopes listed in the [Authorization](#authorization-scopes) section; script projects that do not require authorization cannot be executed through this API. To find the correct scopes to include in the authentication token, open the script project **Overview** page and scroll down to \"Project OAuth Scopes.\" The error `403, PERMISSION_DENIED: The caller does not have permission` indicates that the Cloud Platform project used to authorize the request is not the same as the one used by the script.",
+                    "description": "",
                     "flatPath": "v1/scripts/{scriptId}:run",
                     "httpMethod": "POST",
                     "id": "script.scripts.run",
@@ -891,7 +891,7 @@
             }
         }
     },
-    "revision": "20240617",
+    "revision": "20251130",
     "rootUrl": "https://script.googleapis.com/",
     "schemas": {
         "Content": {
@@ -913,7 +913,7 @@
             "type": "object"
         },
         "CreateProjectRequest": {
-            "description": "Request to create a script project. Request to create a script project.",
+            "description": "Request to create a script project.",
             "id": "CreateProjectRequest",
             "properties": {
                 "parentId": {
@@ -1019,17 +1019,6 @@
             },
             "type": "object"
         },
-        "ExecuteStreamResponse": {
-            "description": "The response for executing or debugging a function in an Apps Script project.",
-            "id": "ExecuteStreamResponse",
-            "properties": {
-                "result": {
-                    "$ref": "ScriptExecutionResult",
-                    "description": "The result of the execution."
-                }
-            },
-            "type": "object"
-        },
         "ExecutionError": {
             "description": "An object that provides information about the nature of an error resulting from an attempted execution of a script function using the Apps Script API. If a run call succeeds but the script function (or Apps Script itself) throws an exception, the response body's error field contains a Status object. The `Status` object's `details` field contains an array with a single one of these `ExecutionError` objects.",
             "id": "ExecutionError",
@@ -1094,7 +1083,7 @@
             "id": "File",
             "properties": {
                 "createTime": {
-                    "description": "Creation date timestamp. This read-only field is only visible to users who have WRITER permission for the script project.",
+                    "description": "Creation date timestamp.",
                     "format": "google-datetime",
                     "type": "string"
                 },
@@ -1104,7 +1093,7 @@
                 },
                 "lastModifyUser": {
                     "$ref": "GoogleAppsScriptTypeUser",
-                    "description": "The user who modified the file most recently. This read-only field is only visible to users who have WRITER permission for the script project."
+                    "description": "The user who modified the file most recently. The details visible in this object are controlled by the profile visibility settings of the last modifying user."
                 },
                 "name": {
                     "description": "The name of the file. The file extension is not part of the file name, which can be identified from the type field.",
@@ -1131,7 +1120,7 @@
                     "type": "string"
                 },
                 "updateTime": {
-                    "description": "Last modified date timestamp. This read-only field is only visible to users who have WRITER permission for the script project.",
+                    "description": "Last modified date timestamp.",
                     "format": "google-datetime",
                     "type": "string"
                 }
@@ -1491,20 +1480,6 @@
             },
             "type": "object"
         },
-        "ListValue": {
-            "description": "`ListValue` is a wrapper around a repeated field of values.",
-            "id": "ListValue",
-            "properties": {
-                "values": {
-                    "description": "Repeated field of dynamically typed values.",
-                    "items": {
-                        "$ref": "Value"
-                    },
-                    "type": "array"
-                }
-            },
-            "type": "object"
-        },
         "ListVersionsResponse": {
             "description": "Response with the list of the versions for the specified script project.",
             "id": "ListVersionsResponse",
@@ -1614,7 +1589,7 @@
                     "description": "User who last modified the script."
                 },
                 "parentId": {
-                    "description": "The parent's Drive ID that the script will be attached to. This is usually the ID of a Google Document or Google Sheet. This filed is optional, and if not set, a stand-alone script will be created.",
+                    "description": "The parent's Drive ID that the script will be attached to. This is usually the ID of a Google Document or Google Sheet. This field is optional, and if not set, a stand-alone script will be created.",
                     "type": "string"
                 },
                 "scriptId": {
@@ -1629,17 +1604,6 @@
                     "description": "When the script was last updated.",
                     "format": "google-datetime",
                     "type": "string"
-                }
-            },
-            "type": "object"
-        },
-        "ScriptExecutionResult": {
-            "description": "The result of an execution.",
-            "id": "ScriptExecutionResult",
-            "properties": {
-                "returnValue": {
-                    "$ref": "Value",
-                    "description": "The returned value of the execution."
                 }
             },
             "type": "object"
@@ -1687,20 +1651,6 @@
             },
             "type": "object"
         },
-        "Struct": {
-            "description": "`Struct` represents a structured data value, consisting of fields which map to dynamically typed values.",
-            "id": "Struct",
-            "properties": {
-                "fields": {
-                    "additionalProperties": {
-                        "$ref": "Value"
-                    },
-                    "description": "Unordered map of dynamically typed values.",
-                    "type": "object"
-                }
-            },
-            "type": "object"
-        },
         "UpdateDeploymentRequest": {
             "description": "Request with deployment information to update an existing deployment.",
             "id": "UpdateDeploymentRequest",
@@ -1708,62 +1658,6 @@
                 "deploymentConfig": {
                     "$ref": "DeploymentConfig",
                     "description": "The deployment configuration."
-                }
-            },
-            "type": "object"
-        },
-        "Value": {
-            "description": "`Value` represents a dynamically typed value which is the outcome of an executed script.",
-            "id": "Value",
-            "properties": {
-                "boolValue": {
-                    "description": "Represents a boolean value.",
-                    "type": "boolean"
-                },
-                "bytesValue": {
-                    "description": "Represents raw byte values.",
-                    "format": "byte",
-                    "type": "string"
-                },
-                "dateValue": {
-                    "description": "Represents a date in ms since the epoch.",
-                    "format": "int64",
-                    "type": "string"
-                },
-                "listValue": {
-                    "$ref": "ListValue",
-                    "description": "Represents a repeated `Value`."
-                },
-                "nullValue": {
-                    "description": "Represents a null value.",
-                    "enum": [
-                        "NULL_VALUE"
-                    ],
-                    "enumDescriptions": [
-                        "Null value."
-                    ],
-                    "type": "string"
-                },
-                "numberValue": {
-                    "description": "Represents a double value.",
-                    "format": "double",
-                    "type": "number"
-                },
-                "protoValue": {
-                    "additionalProperties": {
-                        "description": "Properties of the object. Contains field @type with type URL.",
-                        "type": "any"
-                    },
-                    "description": "Represents a structured proto value.",
-                    "type": "object"
-                },
-                "stringValue": {
-                    "description": "Represents a string value.",
-                    "type": "string"
-                },
-                "structValue": {
-                    "$ref": "Struct",
-                    "description": "Represents a structured value."
                 }
             },
             "type": "object"

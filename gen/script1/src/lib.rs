@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Script* crate version *7.0.0+20240617*, where *20240617* is the exact revision of the *script:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v7.0.0*.
+//! This documentation was generated from *Script* crate version *7.0.0+20251130*, where *20251130* is the exact revision of the *script:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v7.0.0*.
 //!
 //! Everything else about the *Script* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/apps-script/api/).

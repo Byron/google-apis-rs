@@ -1210,6 +1210,20 @@ where
 
             let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
             {
+                "allocation-options.allocation-strategy" => Some((
+                    "allocationOptions.allocationStrategy",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "allocation-options.first-available-ranges-lookup-size" => Some((
+                    "allocationOptions.firstAvailableRangesLookupSize",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "create-time" => Some((
                     "createTime",
                     JsonTypeInfo {
@@ -1221,6 +1235,20 @@ where
                     "description",
                     JsonTypeInfo {
                         jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "exclude-cidr-ranges" => Some((
+                    "excludeCidrRanges",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "immutable" => Some((
+                    "immutable",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
                         ctype: ComplexType::Pod,
                     },
                 )),
@@ -1236,6 +1264,20 @@ where
                     JsonTypeInfo {
                         jtype: JsonType::String,
                         ctype: ComplexType::Map,
+                    },
+                )),
+                "migration.source" => Some((
+                    "migration.source",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "migration.target" => Some((
+                    "migration.target",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
                     },
                 )),
                 "name" => Some((
@@ -1305,15 +1347,23 @@ where
                     let suggestion = FieldCursor::did_you_mean(
                         key,
                         &vec![
+                            "allocation-options",
+                            "allocation-strategy",
                             "create-time",
                             "description",
+                            "exclude-cidr-ranges",
+                            "first-available-ranges-lookup-size",
+                            "immutable",
                             "ip-cidr-range",
                             "labels",
+                            "migration",
                             "name",
                             "network",
                             "overlaps",
                             "peering",
                             "prefix-length",
+                            "source",
+                            "target",
                             "target-cidr-range",
                             "update-time",
                             "usage",
@@ -1811,6 +1861,20 @@ where
 
             let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
             {
+                "allocation-options.allocation-strategy" => Some((
+                    "allocationOptions.allocationStrategy",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "allocation-options.first-available-ranges-lookup-size" => Some((
+                    "allocationOptions.firstAvailableRangesLookupSize",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "create-time" => Some((
                     "createTime",
                     JsonTypeInfo {
@@ -1822,6 +1886,20 @@ where
                     "description",
                     JsonTypeInfo {
                         jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "exclude-cidr-ranges" => Some((
+                    "excludeCidrRanges",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "immutable" => Some((
+                    "immutable",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
                         ctype: ComplexType::Pod,
                     },
                 )),
@@ -1837,6 +1915,20 @@ where
                     JsonTypeInfo {
                         jtype: JsonType::String,
                         ctype: ComplexType::Map,
+                    },
+                )),
+                "migration.source" => Some((
+                    "migration.source",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "migration.target" => Some((
+                    "migration.target",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
                     },
                 )),
                 "name" => Some((
@@ -1906,15 +1998,23 @@ where
                     let suggestion = FieldCursor::did_you_mean(
                         key,
                         &vec![
+                            "allocation-options",
+                            "allocation-strategy",
                             "create-time",
                             "description",
+                            "exclude-cidr-ranges",
+                            "first-available-ranges-lookup-size",
+                            "immutable",
                             "ip-cidr-range",
                             "labels",
+                            "migration",
                             "name",
                             "network",
                             "overlaps",
                             "peering",
                             "prefix-length",
+                            "source",
+                            "target",
                             "target-cidr-range",
                             "update-time",
                             "usage",
@@ -2349,6 +2449,9 @@ where
                 "filter" => {
                     call = call.filter(value.unwrap_or(""));
                 }
+                "extra-location-types" => {
+                    call = call.add_extra_location_types(value.unwrap_or(""));
+                }
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -2366,7 +2469,11 @@ where
                             .push(CLIError::UnknownParameter(key.to_string(), {
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
-                                v.extend(["filter", "page-size", "page-token"].iter().map(|v| *v));
+                                v.extend(
+                                    ["extra-location-types", "filter", "page-size", "page-token"]
+                                        .iter()
+                                        .map(|v| *v),
+                                );
                                 v
                             }));
                     }
@@ -2721,6 +2828,13 @@ where
         {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "return-partial-success" => {
+                    call = call.return_partial_success(
+                        value
+                            .map(|v| arg_from_str(v, err, "return-partial-success", "boolean"))
+                            .unwrap_or(false),
+                    );
+                }
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
                 }
@@ -2751,7 +2865,16 @@ where
                             .push(CLIError::UnknownParameter(key.to_string(), {
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
-                                v.extend(["filter", "page-size", "page-token"].iter().map(|v| *v));
+                                v.extend(
+                                    [
+                                        "filter",
+                                        "page-size",
+                                        "page-token",
+                                        "return-partial-success",
+                                    ]
+                                    .iter()
+                                    .map(|v| *v),
+                                );
                                 v
                             }));
                     }
@@ -4088,7 +4211,9 @@ where
         let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
             secret,
             yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-            hyper_util::client::legacy::Client::builder(executor).build(connector),
+            yup_oauth2::client::CustomHyperClientBuilder::from(
+                hyper_util::client::legacy::Client::builder(executor).build(connector),
+            ),
         )
         .persist_tokens_to_disk(format!("{}/networkconnectivity1-alpha1", config_dir))
         .build()
@@ -4543,7 +4668,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-operations-cancel",
-                    Some(r##"Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of 1, corresponding to `Code.CANCELLED`."##),
+                    Some(r##"Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of `1`, corresponding to `Code.CANCELLED`."##),
                     "Details at http://byron.github.io/google-apis-rs/google_networkconnectivity1_alpha1_cli/projects_locations-operations-cancel",
                   vec![
                     (Some(r##"name"##),
@@ -4812,7 +4937,7 @@ async fn main() {
 
     let mut app = App::new("networkconnectivity1-alpha1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("6.0.0+20240618")
+           .version("7.0.0+20251125")
            .about("This API enables connectivity with and between Google Cloud resources.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_networkconnectivity1_alpha1_cli")
            .arg(Arg::with_name("url")
@@ -4877,7 +5002,7 @@ async fn main() {
         .with_native_roots()
         .unwrap()
         .https_or_http()
-        .enable_http1()
+        .enable_http2()
         .build();
 
     match Engine::new(matches, connector).await {

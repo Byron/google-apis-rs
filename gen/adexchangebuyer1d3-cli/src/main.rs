@@ -48,7 +48,7 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let id: i32 = arg_from_str(&opt.value_of("id").unwrap_or(""), err, "<id>", "integer");
+        let id: i32 = arg_from_str(&opt.value_of("id").unwrap_or(""), err, "<id>", "int32");
         let mut call = self.hub.accounts().get(id);
         for parg in opt
             .values_of("v")
@@ -311,7 +311,7 @@ where
             }
         }
         let mut request: api::Account = serde_json::value::from_value(object).unwrap();
-        let id: i32 = arg_from_str(&opt.value_of("id").unwrap_or(""), err, "<id>", "integer");
+        let id: i32 = arg_from_str(&opt.value_of("id").unwrap_or(""), err, "<id>", "int32");
         let mut call = self.hub.accounts().patch(request, id);
         for parg in opt
             .values_of("v")
@@ -496,7 +496,7 @@ where
             }
         }
         let mut request: api::Account = serde_json::value::from_value(object).unwrap();
-        let id: i32 = arg_from_str(&opt.value_of("id").unwrap_or(""), err, "<id>", "integer");
+        let id: i32 = arg_from_str(&opt.value_of("id").unwrap_or(""), err, "<id>", "int32");
         let mut call = self.hub.accounts().update(request, id);
         for parg in opt
             .values_of("v")
@@ -579,7 +579,7 @@ where
             &opt.value_of("account-id").unwrap_or(""),
             err,
             "<account-id>",
-            "integer",
+            "int32",
         );
         let mut call = self.hub.billing_info().get(account_id);
         for parg in opt
@@ -737,10 +737,19 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self.hub.budget().get(
-            opt.value_of("account-id").unwrap_or(""),
-            opt.value_of("billing-id").unwrap_or(""),
+        let account_id: i64 = arg_from_str(
+            &opt.value_of("account-id").unwrap_or(""),
+            err,
+            "<account-id>",
+            "int64",
         );
+        let billing_id: i64 = arg_from_str(
+            &opt.value_of("billing-id").unwrap_or(""),
+            err,
+            "<billing-id>",
+            "int64",
+        );
+        let mut call = self.hub.budget().get(account_id, billing_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -916,11 +925,19 @@ where
             }
         }
         let mut request: api::Budget = serde_json::value::from_value(object).unwrap();
-        let mut call = self.hub.budget().patch(
-            request,
-            opt.value_of("account-id").unwrap_or(""),
-            opt.value_of("billing-id").unwrap_or(""),
+        let account_id: i64 = arg_from_str(
+            &opt.value_of("account-id").unwrap_or(""),
+            err,
+            "<account-id>",
+            "int64",
         );
+        let billing_id: i64 = arg_from_str(
+            &opt.value_of("billing-id").unwrap_or(""),
+            err,
+            "<billing-id>",
+            "int64",
+        );
+        let mut call = self.hub.budget().patch(request, account_id, billing_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -1096,11 +1113,19 @@ where
             }
         }
         let mut request: api::Budget = serde_json::value::from_value(object).unwrap();
-        let mut call = self.hub.budget().update(
-            request,
-            opt.value_of("account-id").unwrap_or(""),
-            opt.value_of("billing-id").unwrap_or(""),
+        let account_id: i64 = arg_from_str(
+            &opt.value_of("account-id").unwrap_or(""),
+            err,
+            "<account-id>",
+            "int64",
         );
+        let billing_id: i64 = arg_from_str(
+            &opt.value_of("billing-id").unwrap_or(""),
+            err,
+            "<billing-id>",
+            "int64",
+        );
+        let mut call = self.hub.budget().update(request, account_id, billing_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -1182,7 +1207,7 @@ where
             &opt.value_of("account-id").unwrap_or(""),
             err,
             "<account-id>",
-            "integer",
+            "int32",
         );
         let mut call = self
             .hub
@@ -1822,10 +1847,8 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self
-            .hub
-            .direct_deals()
-            .get(opt.value_of("id").unwrap_or(""));
+        let id: i64 = arg_from_str(&opt.value_of("id").unwrap_or(""), err, "<id>", "int64");
+        let mut call = self.hub.direct_deals().get(id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -1981,8 +2004,14 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
+        let account_id: i64 = arg_from_str(
+            &opt.value_of("account-id").unwrap_or(""),
+            err,
+            "<account-id>",
+            "int64",
+        );
         let mut call = self.hub.performance_report().list(
-            opt.value_of("account-id").unwrap_or(""),
+            account_id,
             opt.value_of("end-date-time").unwrap_or(""),
             opt.value_of("start-date-time").unwrap_or(""),
         );
@@ -2074,10 +2103,19 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self.hub.pretargeting_config().delete(
-            opt.value_of("account-id").unwrap_or(""),
-            opt.value_of("config-id").unwrap_or(""),
+        let account_id: i64 = arg_from_str(
+            &opt.value_of("account-id").unwrap_or(""),
+            err,
+            "<account-id>",
+            "int64",
         );
+        let config_id: i64 = arg_from_str(
+            &opt.value_of("config-id").unwrap_or(""),
+            err,
+            "<config-id>",
+            "int64",
+        );
+        let mut call = self.hub.pretargeting_config().delete(account_id, config_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -2139,10 +2177,19 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self.hub.pretargeting_config().get(
-            opt.value_of("account-id").unwrap_or(""),
-            opt.value_of("config-id").unwrap_or(""),
+        let account_id: i64 = arg_from_str(
+            &opt.value_of("account-id").unwrap_or(""),
+            err,
+            "<account-id>",
+            "int64",
         );
+        let config_id: i64 = arg_from_str(
+            &opt.value_of("config-id").unwrap_or(""),
+            err,
+            "<config-id>",
+            "int64",
+        );
+        let mut call = self.hub.pretargeting_config().get(account_id, config_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -2438,10 +2485,13 @@ where
             }
         }
         let mut request: api::PretargetingConfig = serde_json::value::from_value(object).unwrap();
-        let mut call = self
-            .hub
-            .pretargeting_config()
-            .insert(request, opt.value_of("account-id").unwrap_or(""));
+        let account_id: i64 = arg_from_str(
+            &opt.value_of("account-id").unwrap_or(""),
+            err,
+            "<account-id>",
+            "int64",
+        );
+        let mut call = self.hub.pretargeting_config().insert(request, account_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -2519,10 +2569,13 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self
-            .hub
-            .pretargeting_config()
-            .list(opt.value_of("account-id").unwrap_or(""));
+        let account_id: i64 = arg_from_str(
+            &opt.value_of("account-id").unwrap_or(""),
+            err,
+            "<account-id>",
+            "int64",
+        );
+        let mut call = self.hub.pretargeting_config().list(account_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -2818,11 +2871,22 @@ where
             }
         }
         let mut request: api::PretargetingConfig = serde_json::value::from_value(object).unwrap();
-        let mut call = self.hub.pretargeting_config().patch(
-            request,
-            opt.value_of("account-id").unwrap_or(""),
-            opt.value_of("config-id").unwrap_or(""),
+        let account_id: i64 = arg_from_str(
+            &opt.value_of("account-id").unwrap_or(""),
+            err,
+            "<account-id>",
+            "int64",
         );
+        let config_id: i64 = arg_from_str(
+            &opt.value_of("config-id").unwrap_or(""),
+            err,
+            "<config-id>",
+            "int64",
+        );
+        let mut call = self
+            .hub
+            .pretargeting_config()
+            .patch(request, account_id, config_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -3118,11 +3182,22 @@ where
             }
         }
         let mut request: api::PretargetingConfig = serde_json::value::from_value(object).unwrap();
-        let mut call = self.hub.pretargeting_config().update(
-            request,
-            opt.value_of("account-id").unwrap_or(""),
-            opt.value_of("config-id").unwrap_or(""),
+        let account_id: i64 = arg_from_str(
+            &opt.value_of("account-id").unwrap_or(""),
+            err,
+            "<account-id>",
+            "int64",
         );
+        let config_id: i64 = arg_from_str(
+            &opt.value_of("config-id").unwrap_or(""),
+            err,
+            "<config-id>",
+            "int64",
+        );
+        let mut call = self
+            .hub
+            .pretargeting_config()
+            .update(request, account_id, config_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -3364,7 +3439,9 @@ where
         let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
             secret,
             yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-            hyper_util::client::legacy::Client::builder(executor).build(connector),
+            yup_oauth2::client::CustomHyperClientBuilder::from(
+                hyper_util::client::legacy::Client::builder(executor).build(connector),
+            ),
         )
         .persist_tokens_to_disk(format!("{}/adexchangebuyer1d3", config_dir))
         .build()
@@ -3908,7 +3985,7 @@ async fn main() {
 
     let mut app = App::new("adexchangebuyer1d3")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("6.0.0+20210330")
+           .version("7.0.0+20210330")
            .about("Accesses your bidding-account information, submits creatives for validation, finds available direct deals, and retrieves performance reports.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_adexchangebuyer1d3_cli")
            .arg(Arg::with_name("url")
@@ -3973,7 +4050,7 @@ async fn main() {
         .with_native_roots()
         .unwrap()
         .https_or_http()
-        .enable_http1()
+        .enable_http2()
         .build();
 
     match Engine::new(matches, connector).await {

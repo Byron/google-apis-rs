@@ -1,4 +1,4 @@
-site_name: Payments Reseller Subscription v6.0.0+20240626
+site_name: Payments Reseller Subscription v7.0.0+20251210
 site_url: http://byron.github.io/google-apis-rs/google-paymentsresellersubscription1-cli
 site_description: A complete library to interact with Payments Reseller Subscription (protocol v1)
 
@@ -18,8 +18,12 @@ nav:
     - 'Subscriptions Entitle': 'partners_subscriptions-entitle.md'
     - 'Subscriptions Extend': 'partners_subscriptions-extend.md'
     - 'Subscriptions Get': 'partners_subscriptions-get.md'
+    - 'Subscriptions Line Items Patch': 'partners_subscriptions-line-items-patch.md'
     - 'Subscriptions Provision': 'partners_subscriptions-provision.md'
+    - 'Subscriptions Resume': 'partners_subscriptions-resume.md'
+    - 'Subscriptions Suspend': 'partners_subscriptions-suspend.md'
     - 'Subscriptions Undo Cancel': 'partners_subscriptions-undo-cancel.md'
+    - 'User Sessions Generate': 'partners_user-sessions-generate.md'
 
 theme: readthedocs
 

@@ -170,10 +170,13 @@ where
             }
         }
         let mut request: api::Client = serde_json::value::from_value(object).unwrap();
-        let mut call = self
-            .hub
-            .accounts()
-            .clients_create(request, opt.value_of("account-id").unwrap_or(""));
+        let account_id: i64 = arg_from_str(
+            &opt.value_of("account-id").unwrap_or(""),
+            err,
+            "<account-id>",
+            "int64",
+        );
+        let mut call = self.hub.accounts().clients_create(request, account_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -251,10 +254,22 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self.hub.accounts().clients_get(
-            opt.value_of("account-id").unwrap_or(""),
-            opt.value_of("client-account-id").unwrap_or(""),
+        let account_id: i64 = arg_from_str(
+            &opt.value_of("account-id").unwrap_or(""),
+            err,
+            "<account-id>",
+            "int64",
         );
+        let client_account_id: i64 = arg_from_str(
+            &opt.value_of("client-account-id").unwrap_or(""),
+            err,
+            "<client-account-id>",
+            "int64",
+        );
+        let mut call = self
+            .hub
+            .accounts()
+            .clients_get(account_id, client_account_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -402,11 +417,22 @@ where
             }
         }
         let mut request: api::ClientUserInvitation = serde_json::value::from_value(object).unwrap();
-        let mut call = self.hub.accounts().clients_invitations_create(
-            request,
-            opt.value_of("account-id").unwrap_or(""),
-            opt.value_of("client-account-id").unwrap_or(""),
+        let account_id: i64 = arg_from_str(
+            &opt.value_of("account-id").unwrap_or(""),
+            err,
+            "<account-id>",
+            "int64",
         );
+        let client_account_id: i64 = arg_from_str(
+            &opt.value_of("client-account-id").unwrap_or(""),
+            err,
+            "<client-account-id>",
+            "int64",
+        );
+        let mut call =
+            self.hub
+                .accounts()
+                .clients_invitations_create(request, account_id, client_account_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -484,10 +510,28 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
+        let account_id: i64 = arg_from_str(
+            &opt.value_of("account-id").unwrap_or(""),
+            err,
+            "<account-id>",
+            "int64",
+        );
+        let client_account_id: i64 = arg_from_str(
+            &opt.value_of("client-account-id").unwrap_or(""),
+            err,
+            "<client-account-id>",
+            "int64",
+        );
+        let invitation_id: i64 = arg_from_str(
+            &opt.value_of("invitation-id").unwrap_or(""),
+            err,
+            "<invitation-id>",
+            "int64",
+        );
         let mut call = self.hub.accounts().clients_invitations_get(
-            opt.value_of("account-id").unwrap_or(""),
-            opt.value_of("client-account-id").unwrap_or(""),
-            opt.value_of("invitation-id").unwrap_or(""),
+            account_id,
+            client_account_id,
+            invitation_id,
         );
         for parg in opt
             .values_of("v")
@@ -566,10 +610,16 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self.hub.accounts().clients_invitations_list(
-            opt.value_of("account-id").unwrap_or(""),
-            opt.value_of("client-account-id").unwrap_or(""),
+        let account_id: i64 = arg_from_str(
+            &opt.value_of("account-id").unwrap_or(""),
+            err,
+            "<account-id>",
+            "int64",
         );
+        let mut call = self
+            .hub
+            .accounts()
+            .clients_invitations_list(account_id, opt.value_of("client-account-id").unwrap_or(""));
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -658,10 +708,13 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self
-            .hub
-            .accounts()
-            .clients_list(opt.value_of("account-id").unwrap_or(""));
+        let account_id: i64 = arg_from_str(
+            &opt.value_of("account-id").unwrap_or(""),
+            err,
+            "<account-id>",
+            "int64",
+        );
+        let mut call = self.hub.accounts().clients_list(account_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -879,11 +932,22 @@ where
             }
         }
         let mut request: api::Client = serde_json::value::from_value(object).unwrap();
-        let mut call = self.hub.accounts().clients_update(
-            request,
-            opt.value_of("account-id").unwrap_or(""),
-            opt.value_of("client-account-id").unwrap_or(""),
+        let account_id: i64 = arg_from_str(
+            &opt.value_of("account-id").unwrap_or(""),
+            err,
+            "<account-id>",
+            "int64",
         );
+        let client_account_id: i64 = arg_from_str(
+            &opt.value_of("client-account-id").unwrap_or(""),
+            err,
+            "<client-account-id>",
+            "int64",
+        );
+        let mut call = self
+            .hub
+            .accounts()
+            .clients_update(request, account_id, client_account_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -961,11 +1025,28 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self.hub.accounts().clients_users_get(
-            opt.value_of("account-id").unwrap_or(""),
-            opt.value_of("client-account-id").unwrap_or(""),
-            opt.value_of("user-id").unwrap_or(""),
+        let account_id: i64 = arg_from_str(
+            &opt.value_of("account-id").unwrap_or(""),
+            err,
+            "<account-id>",
+            "int64",
         );
+        let client_account_id: i64 = arg_from_str(
+            &opt.value_of("client-account-id").unwrap_or(""),
+            err,
+            "<client-account-id>",
+            "int64",
+        );
+        let user_id: i64 = arg_from_str(
+            &opt.value_of("user-id").unwrap_or(""),
+            err,
+            "<user-id>",
+            "int64",
+        );
+        let mut call =
+            self.hub
+                .accounts()
+                .clients_users_get(account_id, client_account_id, user_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -1043,10 +1124,16 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self.hub.accounts().clients_users_list(
-            opt.value_of("account-id").unwrap_or(""),
-            opt.value_of("client-account-id").unwrap_or(""),
+        let account_id: i64 = arg_from_str(
+            &opt.value_of("account-id").unwrap_or(""),
+            err,
+            "<account-id>",
+            "int64",
         );
+        let mut call = self
+            .hub
+            .accounts()
+            .clients_users_list(account_id, opt.value_of("client-account-id").unwrap_or(""));
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -1212,11 +1299,29 @@ where
             }
         }
         let mut request: api::ClientUser = serde_json::value::from_value(object).unwrap();
+        let account_id: i64 = arg_from_str(
+            &opt.value_of("account-id").unwrap_or(""),
+            err,
+            "<account-id>",
+            "int64",
+        );
+        let client_account_id: i64 = arg_from_str(
+            &opt.value_of("client-account-id").unwrap_or(""),
+            err,
+            "<client-account-id>",
+            "int64",
+        );
+        let user_id: i64 = arg_from_str(
+            &opt.value_of("user-id").unwrap_or(""),
+            err,
+            "<user-id>",
+            "int64",
+        );
         let mut call = self.hub.accounts().clients_users_update(
             request,
-            opt.value_of("account-id").unwrap_or(""),
-            opt.value_of("client-account-id").unwrap_or(""),
-            opt.value_of("user-id").unwrap_or(""),
+            account_id,
+            client_account_id,
+            user_id,
         );
         for parg in opt
             .values_of("v")
@@ -6159,7 +6264,7 @@ where
             &opt.value_of("creative-status-id").unwrap_or(""),
             err,
             "<creative-status-id>",
-            "integer",
+            "int32",
         );
         let mut call = self
             .hub
@@ -6260,7 +6365,7 @@ where
             &opt.value_of("creative-status-id").unwrap_or(""),
             err,
             "<creative-status-id>",
-            "integer",
+            "int32",
         );
         let mut call = self
             .hub
@@ -7658,7 +7763,7 @@ where
             &opt.value_of("creative-status-id").unwrap_or(""),
             err,
             "<creative-status-id>",
-            "integer",
+            "int32",
         );
         let mut call = self.hub.bidders().filter_sets_filtered_bids_creatives_list(
             opt.value_of("filter-set-name").unwrap_or(""),
@@ -7756,7 +7861,7 @@ where
             &opt.value_of("creative-status-id").unwrap_or(""),
             err,
             "<creative-status-id>",
-            "integer",
+            "int32",
         );
         let mut call = self.hub.bidders().filter_sets_filtered_bids_details_list(
             opt.value_of("filter-set-name").unwrap_or(""),
@@ -9149,7 +9254,7 @@ where
             &opt.value_of("creative-status-id").unwrap_or(""),
             err,
             "<creative-status-id>",
-            "integer",
+            "int32",
         );
         let mut call = self.hub.buyers().filter_sets_filtered_bids_creatives_list(
             opt.value_of("filter-set-name").unwrap_or(""),
@@ -9247,7 +9352,7 @@ where
             &opt.value_of("creative-status-id").unwrap_or(""),
             err,
             "<creative-status-id>",
-            "integer",
+            "int32",
         );
         let mut call = self.hub.buyers().filter_sets_filtered_bids_details_list(
             opt.value_of("filter-set-name").unwrap_or(""),
@@ -10321,7 +10426,9 @@ where
         let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
             secret,
             yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-            hyper_util::client::legacy::Client::builder(executor).build(connector),
+            yup_oauth2::client::CustomHyperClientBuilder::from(
+                hyper_util::client::legacy::Client::builder(executor).build(connector),
+            ),
         )
         .persist_tokens_to_disk(format!("{}/adexchangebuyer2-v2-beta1", config_dir))
         .build()
@@ -12239,7 +12346,7 @@ async fn main() {
 
     let mut app = App::new("adexchangebuyer2-v2-beta1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("6.0.0+20240625")
+           .version("7.0.0+20251211")
            .about("Accesses the latest features for managing Authorized Buyers accounts, Real-Time Bidding configurations and auction metrics, and Marketplace programmatic deals.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_adexchangebuyer2_v2_beta1_cli")
            .arg(Arg::with_name("url")
@@ -12304,7 +12411,7 @@ async fn main() {
         .with_native_roots()
         .unwrap()
         .https_or_http()
-        .enable_http1()
+        .enable_http2()
         .build();
 
     match Engine::new(matches, connector).await {

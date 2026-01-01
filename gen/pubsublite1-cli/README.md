@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *PubsubLite* API at revision *20240614*. The CLI is at version *6.0.0*.
+This documentation was generated from the *PubsubLite* API at revision *20251212*. The CLI is at version *7.0.0*.
 
 ```bash
 pubsublite1 [options]

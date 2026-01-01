@@ -1,4 +1,4 @@
-site_name: Cloud Composer v6.0.0+20240618
+site_name: Cloud Composer v7.0.0+20251209
 site_url: http://byron.github.io/google-apis-rs/google-composer1-cli
 site_description: A complete library to interact with Cloud Composer (protocol v1)
 
@@ -21,6 +21,7 @@ nav:
     - 'Locations Environments Load Snapshot': 'projects_locations-environments-load-snapshot.md'
     - 'Locations Environments Patch': 'projects_locations-environments-patch.md'
     - 'Locations Environments Poll Airflow Command': 'projects_locations-environments-poll-airflow-command.md'
+    - 'Locations Environments Restart Web Server': 'projects_locations-environments-restart-web-server.md'
     - 'Locations Environments Save Snapshot': 'projects_locations-environments-save-snapshot.md'
     - 'Locations Environments Stop Airflow Command': 'projects_locations-environments-stop-airflow-command.md'
     - 'Locations Environments User Workloads Config Maps Create': 'projects_locations-environments-user-workloads-config-maps-create.md'

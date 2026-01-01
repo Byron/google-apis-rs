@@ -1,4 +1,4 @@
-site_name: Document v6.0.0+20240619
+site_name: Document v7.0.0+20251213
 site_url: http://byron.github.io/google-apis-rs/google-documentai1-cli
 site_description: A complete library to interact with Document (protocol v1)
 
@@ -41,6 +41,17 @@ nav:
     - 'Locations Processors Processor Versions Train': 'projects_locations-processors-processor-versions-train.md'
     - 'Locations Processors Processor Versions Undeploy': 'projects_locations-processors-processor-versions-undeploy.md'
     - 'Locations Processors Set Default Processor Version': 'projects_locations-processors-set-default-processor-version.md'
+    - 'Locations Schemas Create': 'projects_locations-schemas-create.md'
+    - 'Locations Schemas Delete': 'projects_locations-schemas-delete.md'
+    - 'Locations Schemas Get': 'projects_locations-schemas-get.md'
+    - 'Locations Schemas List': 'projects_locations-schemas-list.md'
+    - 'Locations Schemas Patch': 'projects_locations-schemas-patch.md'
+    - 'Locations Schemas Schema Versions Create': 'projects_locations-schemas-schema-versions-create.md'
+    - 'Locations Schemas Schema Versions Delete': 'projects_locations-schemas-schema-versions-delete.md'
+    - 'Locations Schemas Schema Versions Generate': 'projects_locations-schemas-schema-versions-generate.md'
+    - 'Locations Schemas Schema Versions Get': 'projects_locations-schemas-schema-versions-get.md'
+    - 'Locations Schemas Schema Versions List': 'projects_locations-schemas-schema-versions-list.md'
+    - 'Locations Schemas Schema Versions Patch': 'projects_locations-schemas-schema-versions-patch.md'
     - 'Operations Get': 'projects_operations-get.md'
 
 theme: readthedocs

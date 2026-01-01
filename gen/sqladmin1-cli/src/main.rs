@@ -42,16 +42,970 @@ impl<'n, C> Engine<'n, C>
 where
     C: apis_common::Connector,
 {
+    async fn _backups_create_backup(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut field_cursor = FieldCursor::default();
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "backup-interval.end-time" => Some(("backupInterval.endTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "backup-interval.start-time" => Some(("backupInterval.startTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "backup-kind" => Some(("backupKind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "backup-run" => Some(("backupRun", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "database-version" => Some(("databaseVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "error.code" => Some(("error.code", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "error.kind" => Some(("error.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "error.message" => Some(("error.message", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "expiry-time" => Some(("expiryTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance" => Some(("instance", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-deletion-time" => Some(("instanceDeletionTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.available-maintenance-versions" => Some(("instanceSettings.availableMaintenanceVersions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "instance-settings.backend-type" => Some(("instanceSettings.backendType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.connection-name" => Some(("instanceSettings.connectionName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.create-time" => Some(("instanceSettings.createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.current-disk-size" => Some(("instanceSettings.currentDiskSize", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.database-installed-version" => Some(("instanceSettings.databaseInstalledVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.database-version" => Some(("instanceSettings.databaseVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.disk-encryption-configuration.kind" => Some(("instanceSettings.diskEncryptionConfiguration.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.disk-encryption-configuration.kms-key-name" => Some(("instanceSettings.diskEncryptionConfiguration.kmsKeyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.disk-encryption-status.kind" => Some(("instanceSettings.diskEncryptionStatus.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.disk-encryption-status.kms-key-version-name" => Some(("instanceSettings.diskEncryptionStatus.kmsKeyVersionName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.dns-name" => Some(("instanceSettings.dnsName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.etag" => Some(("instanceSettings.etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.failover-replica.available" => Some(("instanceSettings.failoverReplica.available", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "instance-settings.failover-replica.name" => Some(("instanceSettings.failoverReplica.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.gce-zone" => Some(("instanceSettings.gceZone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.gemini-config.active-query-enabled" => Some(("instanceSettings.geminiConfig.activeQueryEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "instance-settings.gemini-config.entitled" => Some(("instanceSettings.geminiConfig.entitled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "instance-settings.gemini-config.flag-recommender-enabled" => Some(("instanceSettings.geminiConfig.flagRecommenderEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "instance-settings.gemini-config.google-vacuum-mgmt-enabled" => Some(("instanceSettings.geminiConfig.googleVacuumMgmtEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "instance-settings.gemini-config.index-advisor-enabled" => Some(("instanceSettings.geminiConfig.indexAdvisorEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "instance-settings.gemini-config.oom-session-cancel-enabled" => Some(("instanceSettings.geminiConfig.oomSessionCancelEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "instance-settings.include-replicas-for-major-version-upgrade" => Some(("instanceSettings.includeReplicasForMajorVersionUpgrade", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "instance-settings.instance-type" => Some(("instanceSettings.instanceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.ipv6-address" => Some(("instanceSettings.ipv6Address", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.kind" => Some(("instanceSettings.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.maintenance-version" => Some(("instanceSettings.maintenanceVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.master-instance-name" => Some(("instanceSettings.masterInstanceName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.max-disk-size" => Some(("instanceSettings.maxDiskSize", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.name" => Some(("instanceSettings.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.node-count" => Some(("instanceSettings.nodeCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "instance-settings.on-premises-configuration.ca-certificate" => Some(("instanceSettings.onPremisesConfiguration.caCertificate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.on-premises-configuration.client-certificate" => Some(("instanceSettings.onPremisesConfiguration.clientCertificate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.on-premises-configuration.client-key" => Some(("instanceSettings.onPremisesConfiguration.clientKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.on-premises-configuration.dump-file-path" => Some(("instanceSettings.onPremisesConfiguration.dumpFilePath", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.on-premises-configuration.host-port" => Some(("instanceSettings.onPremisesConfiguration.hostPort", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.on-premises-configuration.kind" => Some(("instanceSettings.onPremisesConfiguration.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.on-premises-configuration.password" => Some(("instanceSettings.onPremisesConfiguration.password", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.on-premises-configuration.source-instance.name" => Some(("instanceSettings.onPremisesConfiguration.sourceInstance.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.on-premises-configuration.source-instance.project" => Some(("instanceSettings.onPremisesConfiguration.sourceInstance.project", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.on-premises-configuration.source-instance.region" => Some(("instanceSettings.onPremisesConfiguration.sourceInstance.region", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.on-premises-configuration.ssl-option" => Some(("instanceSettings.onPremisesConfiguration.sslOption", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.on-premises-configuration.username" => Some(("instanceSettings.onPremisesConfiguration.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.out-of-disk-report.sql-min-recommended-increase-size-gb" => Some(("instanceSettings.outOfDiskReport.sqlMinRecommendedIncreaseSizeGb", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "instance-settings.out-of-disk-report.sql-out-of-disk-state" => Some(("instanceSettings.outOfDiskReport.sqlOutOfDiskState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.primary-dns-name" => Some(("instanceSettings.primaryDnsName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.project" => Some(("instanceSettings.project", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.psc-service-attachment-link" => Some(("instanceSettings.pscServiceAttachmentLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.region" => Some(("instanceSettings.region", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.replica-configuration.cascadable-replica" => Some(("instanceSettings.replicaConfiguration.cascadableReplica", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "instance-settings.replica-configuration.failover-target" => Some(("instanceSettings.replicaConfiguration.failoverTarget", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "instance-settings.replica-configuration.kind" => Some(("instanceSettings.replicaConfiguration.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.replica-configuration.mysql-replica-configuration.ca-certificate" => Some(("instanceSettings.replicaConfiguration.mysqlReplicaConfiguration.caCertificate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.replica-configuration.mysql-replica-configuration.client-certificate" => Some(("instanceSettings.replicaConfiguration.mysqlReplicaConfiguration.clientCertificate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.replica-configuration.mysql-replica-configuration.client-key" => Some(("instanceSettings.replicaConfiguration.mysqlReplicaConfiguration.clientKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.replica-configuration.mysql-replica-configuration.connect-retry-interval" => Some(("instanceSettings.replicaConfiguration.mysqlReplicaConfiguration.connectRetryInterval", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "instance-settings.replica-configuration.mysql-replica-configuration.dump-file-path" => Some(("instanceSettings.replicaConfiguration.mysqlReplicaConfiguration.dumpFilePath", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.replica-configuration.mysql-replica-configuration.kind" => Some(("instanceSettings.replicaConfiguration.mysqlReplicaConfiguration.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.replica-configuration.mysql-replica-configuration.master-heartbeat-period" => Some(("instanceSettings.replicaConfiguration.mysqlReplicaConfiguration.masterHeartbeatPeriod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.replica-configuration.mysql-replica-configuration.password" => Some(("instanceSettings.replicaConfiguration.mysqlReplicaConfiguration.password", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.replica-configuration.mysql-replica-configuration.ssl-cipher" => Some(("instanceSettings.replicaConfiguration.mysqlReplicaConfiguration.sslCipher", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.replica-configuration.mysql-replica-configuration.username" => Some(("instanceSettings.replicaConfiguration.mysqlReplicaConfiguration.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.replica-configuration.mysql-replica-configuration.verify-server-certificate" => Some(("instanceSettings.replicaConfiguration.mysqlReplicaConfiguration.verifyServerCertificate", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "instance-settings.replica-names" => Some(("instanceSettings.replicaNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "instance-settings.replication-cluster.dr-replica" => Some(("instanceSettings.replicationCluster.drReplica", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "instance-settings.replication-cluster.failover-dr-replica-name" => Some(("instanceSettings.replicationCluster.failoverDrReplicaName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.replication-cluster.psa-write-endpoint" => Some(("instanceSettings.replicationCluster.psaWriteEndpoint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.root-password" => Some(("instanceSettings.rootPassword", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.satisfies-pzi" => Some(("instanceSettings.satisfiesPzi", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "instance-settings.satisfies-pzs" => Some(("instanceSettings.satisfiesPzs", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "instance-settings.scheduled-maintenance.can-defer" => Some(("instanceSettings.scheduledMaintenance.canDefer", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "instance-settings.scheduled-maintenance.can-reschedule" => Some(("instanceSettings.scheduledMaintenance.canReschedule", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "instance-settings.scheduled-maintenance.schedule-deadline-time" => Some(("instanceSettings.scheduledMaintenance.scheduleDeadlineTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.scheduled-maintenance.start-time" => Some(("instanceSettings.scheduledMaintenance.startTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.secondary-gce-zone" => Some(("instanceSettings.secondaryGceZone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.self-link" => Some(("instanceSettings.selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.server-ca-cert.cert" => Some(("instanceSettings.serverCaCert.cert", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.server-ca-cert.cert-serial-number" => Some(("instanceSettings.serverCaCert.certSerialNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.server-ca-cert.common-name" => Some(("instanceSettings.serverCaCert.commonName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.server-ca-cert.create-time" => Some(("instanceSettings.serverCaCert.createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.server-ca-cert.expiration-time" => Some(("instanceSettings.serverCaCert.expirationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.server-ca-cert.instance" => Some(("instanceSettings.serverCaCert.instance", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.server-ca-cert.kind" => Some(("instanceSettings.serverCaCert.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.server-ca-cert.self-link" => Some(("instanceSettings.serverCaCert.selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.server-ca-cert.sha1-fingerprint" => Some(("instanceSettings.serverCaCert.sha1Fingerprint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.service-account-email-address" => Some(("instanceSettings.serviceAccountEmailAddress", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.activation-policy" => Some(("instanceSettings.settings.activationPolicy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.active-directory-config.admin-credential-secret-name" => Some(("instanceSettings.settings.activeDirectoryConfig.adminCredentialSecretName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.active-directory-config.dns-servers" => Some(("instanceSettings.settings.activeDirectoryConfig.dnsServers", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "instance-settings.settings.active-directory-config.domain" => Some(("instanceSettings.settings.activeDirectoryConfig.domain", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.active-directory-config.kind" => Some(("instanceSettings.settings.activeDirectoryConfig.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.active-directory-config.mode" => Some(("instanceSettings.settings.activeDirectoryConfig.mode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.active-directory-config.organizational-unit" => Some(("instanceSettings.settings.activeDirectoryConfig.organizationalUnit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.advanced-machine-features.threads-per-core" => Some(("instanceSettings.settings.advancedMachineFeatures.threadsPerCore", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.authorized-gae-applications" => Some(("instanceSettings.settings.authorizedGaeApplications", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "instance-settings.settings.auto-upgrade-enabled" => Some(("instanceSettings.settings.autoUpgradeEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.availability-type" => Some(("instanceSettings.settings.availabilityType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.backup-configuration.backup-retention-settings.retained-backups" => Some(("instanceSettings.settings.backupConfiguration.backupRetentionSettings.retainedBackups", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.backup-configuration.backup-retention-settings.retention-unit" => Some(("instanceSettings.settings.backupConfiguration.backupRetentionSettings.retentionUnit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.backup-configuration.backup-tier" => Some(("instanceSettings.settings.backupConfiguration.backupTier", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.backup-configuration.binary-log-enabled" => Some(("instanceSettings.settings.backupConfiguration.binaryLogEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.backup-configuration.enabled" => Some(("instanceSettings.settings.backupConfiguration.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.backup-configuration.kind" => Some(("instanceSettings.settings.backupConfiguration.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.backup-configuration.location" => Some(("instanceSettings.settings.backupConfiguration.location", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.backup-configuration.point-in-time-recovery-enabled" => Some(("instanceSettings.settings.backupConfiguration.pointInTimeRecoveryEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.backup-configuration.replication-log-archiving-enabled" => Some(("instanceSettings.settings.backupConfiguration.replicationLogArchivingEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.backup-configuration.start-time" => Some(("instanceSettings.settings.backupConfiguration.startTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.backup-configuration.transaction-log-retention-days" => Some(("instanceSettings.settings.backupConfiguration.transactionLogRetentionDays", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.backup-configuration.transactional-log-storage-state" => Some(("instanceSettings.settings.backupConfiguration.transactionalLogStorageState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.collation" => Some(("instanceSettings.settings.collation", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.connection-pool-config.connection-pooling-enabled" => Some(("instanceSettings.settings.connectionPoolConfig.connectionPoolingEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.connection-pool-config.pooler-count" => Some(("instanceSettings.settings.connectionPoolConfig.poolerCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.connector-enforcement" => Some(("instanceSettings.settings.connectorEnforcement", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.crash-safe-replication-enabled" => Some(("instanceSettings.settings.crashSafeReplicationEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.data-api-access" => Some(("instanceSettings.settings.dataApiAccess", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.data-cache-config.data-cache-enabled" => Some(("instanceSettings.settings.dataCacheConfig.dataCacheEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.data-disk-provisioned-iops" => Some(("instanceSettings.settings.dataDiskProvisionedIops", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.data-disk-provisioned-throughput" => Some(("instanceSettings.settings.dataDiskProvisionedThroughput", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.data-disk-size-gb" => Some(("instanceSettings.settings.dataDiskSizeGb", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.data-disk-type" => Some(("instanceSettings.settings.dataDiskType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.database-replication-enabled" => Some(("instanceSettings.settings.databaseReplicationEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.deletion-protection-enabled" => Some(("instanceSettings.settings.deletionProtectionEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.edition" => Some(("instanceSettings.settings.edition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.enable-dataplex-integration" => Some(("instanceSettings.settings.enableDataplexIntegration", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.enable-google-ml-integration" => Some(("instanceSettings.settings.enableGoogleMlIntegration", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.entraid-config.application-id" => Some(("instanceSettings.settings.entraidConfig.applicationId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.entraid-config.kind" => Some(("instanceSettings.settings.entraidConfig.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.entraid-config.tenant-id" => Some(("instanceSettings.settings.entraidConfig.tenantId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.final-backup-config.enabled" => Some(("instanceSettings.settings.finalBackupConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.final-backup-config.retention-days" => Some(("instanceSettings.settings.finalBackupConfig.retentionDays", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.insights-config.query-insights-enabled" => Some(("instanceSettings.settings.insightsConfig.queryInsightsEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.insights-config.query-plans-per-minute" => Some(("instanceSettings.settings.insightsConfig.queryPlansPerMinute", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.insights-config.query-string-length" => Some(("instanceSettings.settings.insightsConfig.queryStringLength", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.insights-config.record-application-tags" => Some(("instanceSettings.settings.insightsConfig.recordApplicationTags", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.insights-config.record-client-address" => Some(("instanceSettings.settings.insightsConfig.recordClientAddress", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.ip-configuration.allocated-ip-range" => Some(("instanceSettings.settings.ipConfiguration.allocatedIpRange", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.ip-configuration.custom-subject-alternative-names" => Some(("instanceSettings.settings.ipConfiguration.customSubjectAlternativeNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "instance-settings.settings.ip-configuration.enable-private-path-for-google-cloud-services" => Some(("instanceSettings.settings.ipConfiguration.enablePrivatePathForGoogleCloudServices", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.ip-configuration.ipv4-enabled" => Some(("instanceSettings.settings.ipConfiguration.ipv4Enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.ip-configuration.private-network" => Some(("instanceSettings.settings.ipConfiguration.privateNetwork", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.ip-configuration.psc-config.allowed-consumer-projects" => Some(("instanceSettings.settings.ipConfiguration.pscConfig.allowedConsumerProjects", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "instance-settings.settings.ip-configuration.psc-config.network-attachment-uri" => Some(("instanceSettings.settings.ipConfiguration.pscConfig.networkAttachmentUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.ip-configuration.psc-config.psc-enabled" => Some(("instanceSettings.settings.ipConfiguration.pscConfig.pscEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.ip-configuration.require-ssl" => Some(("instanceSettings.settings.ipConfiguration.requireSsl", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.ip-configuration.server-ca-mode" => Some(("instanceSettings.settings.ipConfiguration.serverCaMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.ip-configuration.server-ca-pool" => Some(("instanceSettings.settings.ipConfiguration.serverCaPool", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.ip-configuration.server-certificate-rotation-mode" => Some(("instanceSettings.settings.ipConfiguration.serverCertificateRotationMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.ip-configuration.ssl-mode" => Some(("instanceSettings.settings.ipConfiguration.sslMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.kind" => Some(("instanceSettings.settings.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.location-preference.follow-gae-application" => Some(("instanceSettings.settings.locationPreference.followGaeApplication", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.location-preference.kind" => Some(("instanceSettings.settings.locationPreference.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.location-preference.secondary-zone" => Some(("instanceSettings.settings.locationPreference.secondaryZone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.location-preference.zone" => Some(("instanceSettings.settings.locationPreference.zone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.maintenance-window.day" => Some(("instanceSettings.settings.maintenanceWindow.day", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.maintenance-window.hour" => Some(("instanceSettings.settings.maintenanceWindow.hour", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.maintenance-window.kind" => Some(("instanceSettings.settings.maintenanceWindow.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.maintenance-window.update-track" => Some(("instanceSettings.settings.maintenanceWindow.updateTrack", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.password-validation-policy.complexity" => Some(("instanceSettings.settings.passwordValidationPolicy.complexity", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.password-validation-policy.disallow-compromised-credentials" => Some(("instanceSettings.settings.passwordValidationPolicy.disallowCompromisedCredentials", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.password-validation-policy.disallow-username-substring" => Some(("instanceSettings.settings.passwordValidationPolicy.disallowUsernameSubstring", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.password-validation-policy.enable-password-policy" => Some(("instanceSettings.settings.passwordValidationPolicy.enablePasswordPolicy", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.password-validation-policy.min-length" => Some(("instanceSettings.settings.passwordValidationPolicy.minLength", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.password-validation-policy.password-change-interval" => Some(("instanceSettings.settings.passwordValidationPolicy.passwordChangeInterval", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.password-validation-policy.reuse-interval" => Some(("instanceSettings.settings.passwordValidationPolicy.reuseInterval", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.performance-capture-config.enabled" => Some(("instanceSettings.settings.performanceCaptureConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.performance-capture-config.probe-threshold" => Some(("instanceSettings.settings.performanceCaptureConfig.probeThreshold", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.performance-capture-config.probing-interval-seconds" => Some(("instanceSettings.settings.performanceCaptureConfig.probingIntervalSeconds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.performance-capture-config.running-threads-threshold" => Some(("instanceSettings.settings.performanceCaptureConfig.runningThreadsThreshold", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.performance-capture-config.seconds-behind-source-threshold" => Some(("instanceSettings.settings.performanceCaptureConfig.secondsBehindSourceThreshold", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.performance-capture-config.transaction-duration-threshold" => Some(("instanceSettings.settings.performanceCaptureConfig.transactionDurationThreshold", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.pricing-plan" => Some(("instanceSettings.settings.pricingPlan", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.read-pool-auto-scale-config.disable-scale-in" => Some(("instanceSettings.settings.readPoolAutoScaleConfig.disableScaleIn", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.read-pool-auto-scale-config.enabled" => Some(("instanceSettings.settings.readPoolAutoScaleConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.read-pool-auto-scale-config.max-node-count" => Some(("instanceSettings.settings.readPoolAutoScaleConfig.maxNodeCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.read-pool-auto-scale-config.min-node-count" => Some(("instanceSettings.settings.readPoolAutoScaleConfig.minNodeCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.read-pool-auto-scale-config.scale-in-cooldown-seconds" => Some(("instanceSettings.settings.readPoolAutoScaleConfig.scaleInCooldownSeconds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.read-pool-auto-scale-config.scale-out-cooldown-seconds" => Some(("instanceSettings.settings.readPoolAutoScaleConfig.scaleOutCooldownSeconds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.replication-lag-max-seconds" => Some(("instanceSettings.settings.replicationLagMaxSeconds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.replication-type" => Some(("instanceSettings.settings.replicationType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.retain-backups-on-delete" => Some(("instanceSettings.settings.retainBackupsOnDelete", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.settings-version" => Some(("instanceSettings.settings.settingsVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.sql-server-audit-config.bucket" => Some(("instanceSettings.settings.sqlServerAuditConfig.bucket", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.sql-server-audit-config.kind" => Some(("instanceSettings.settings.sqlServerAuditConfig.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.sql-server-audit-config.retention-interval" => Some(("instanceSettings.settings.sqlServerAuditConfig.retentionInterval", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.sql-server-audit-config.upload-interval" => Some(("instanceSettings.settings.sqlServerAuditConfig.uploadInterval", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.storage-auto-resize" => Some(("instanceSettings.settings.storageAutoResize", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.storage-auto-resize-limit" => Some(("instanceSettings.settings.storageAutoResizeLimit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.tier" => Some(("instanceSettings.settings.tier", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.time-zone" => Some(("instanceSettings.settings.timeZone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.user-labels" => Some(("instanceSettings.settings.userLabels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "instance-settings.sql-network-architecture" => Some(("instanceSettings.sqlNetworkArchitecture", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.state" => Some(("instanceSettings.state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.suspension-reason" => Some(("instanceSettings.suspensionReason", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "instance-settings.switch-transaction-logs-to-cloud-storage-enabled" => Some(("instanceSettings.switchTransactionLogsToCloudStorageEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "instance-settings.tags" => Some(("instanceSettings.tags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "instance-settings.write-endpoint" => Some(("instanceSettings.writeEndpoint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kms-key" => Some(("kmsKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kms-key-version" => Some(("kmsKeyVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "location" => Some(("location", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "max-chargeable-bytes" => Some(("maxChargeableBytes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "satisfies-pzi" => Some(("satisfiesPzi", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "satisfies-pzs" => Some(("satisfiesPzs", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "time-zone" => Some(("timeZone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "ttl-days" => Some(("ttlDays", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["activation-policy", "active-directory-config", "active-query-enabled", "admin-credential-secret-name", "advanced-machine-features", "allocated-ip-range", "allowed-consumer-projects", "application-id", "authorized-gae-applications", "auto-upgrade-enabled", "availability-type", "available", "available-maintenance-versions", "backend-type", "backup-configuration", "backup-interval", "backup-kind", "backup-retention-settings", "backup-run", "backup-tier", "binary-log-enabled", "bucket", "ca-certificate", "can-defer", "can-reschedule", "cascadable-replica", "cert", "cert-serial-number", "client-certificate", "client-key", "code", "collation", "common-name", "complexity", "connect-retry-interval", "connection-name", "connection-pool-config", "connection-pooling-enabled", "connector-enforcement", "crash-safe-replication-enabled", "create-time", "current-disk-size", "custom-subject-alternative-names", "data-api-access", "data-cache-config", "data-cache-enabled", "data-disk-provisioned-iops", "data-disk-provisioned-throughput", "data-disk-size-gb", "data-disk-type", "database-installed-version", "database-replication-enabled", "database-version", "day", "deletion-protection-enabled", "description", "disable-scale-in", "disallow-compromised-credentials", "disallow-username-substring", "disk-encryption-configuration", "disk-encryption-status", "dns-name", "dns-servers", "domain", "dr-replica", "dump-file-path", "edition", "enable-dataplex-integration", "enable-google-ml-integration", "enable-password-policy", "enable-private-path-for-google-cloud-services", "enabled", "end-time", "entitled", "entraid-config", "error", "etag", "expiration-time", "expiry-time", "failover-dr-replica-name", "failover-replica", "failover-target", "final-backup-config", "flag-recommender-enabled", "follow-gae-application", "gce-zone", "gemini-config", "google-vacuum-mgmt-enabled", "host-port", "hour", "include-replicas-for-major-version-upgrade", "index-advisor-enabled", "insights-config", "instance", "instance-deletion-time", "instance-settings", "instance-type", "ip-configuration", "ipv4-enabled", "ipv6-address", "kind", "kms-key", "kms-key-name", "kms-key-version", "kms-key-version-name", "location", "location-preference", "maintenance-version", "maintenance-window", "master-heartbeat-period", "master-instance-name", "max-chargeable-bytes", "max-disk-size", "max-node-count", "message", "min-length", "min-node-count", "mode", "mysql-replica-configuration", "name", "network-attachment-uri", "node-count", "on-premises-configuration", "oom-session-cancel-enabled", "organizational-unit", "out-of-disk-report", "password", "password-change-interval", "password-validation-policy", "performance-capture-config", "point-in-time-recovery-enabled", "pooler-count", "pricing-plan", "primary-dns-name", "private-network", "probe-threshold", "probing-interval-seconds", "project", "psa-write-endpoint", "psc-config", "psc-enabled", "psc-service-attachment-link", "query-insights-enabled", "query-plans-per-minute", "query-string-length", "read-pool-auto-scale-config", "record-application-tags", "record-client-address", "region", "replica-configuration", "replica-names", "replication-cluster", "replication-lag-max-seconds", "replication-log-archiving-enabled", "replication-type", "require-ssl", "retain-backups-on-delete", "retained-backups", "retention-days", "retention-interval", "retention-unit", "reuse-interval", "root-password", "running-threads-threshold", "satisfies-pzi", "satisfies-pzs", "scale-in-cooldown-seconds", "scale-out-cooldown-seconds", "schedule-deadline-time", "scheduled-maintenance", "secondary-gce-zone", "secondary-zone", "seconds-behind-source-threshold", "self-link", "server-ca-cert", "server-ca-mode", "server-ca-pool", "server-certificate-rotation-mode", "service-account-email-address", "settings", "settings-version", "sha1-fingerprint", "source-instance", "sql-min-recommended-increase-size-gb", "sql-network-architecture", "sql-out-of-disk-state", "sql-server-audit-config", "ssl-cipher", "ssl-mode", "ssl-option", "start-time", "state", "storage-auto-resize", "storage-auto-resize-limit", "suspension-reason", "switch-transaction-logs-to-cloud-storage-enabled", "tags", "tenant-id", "threads-per-core", "tier", "time-zone", "transaction-duration-threshold", "transaction-log-retention-days", "transactional-log-storage-state", "ttl-days", "type", "update-track", "upload-interval", "user-labels", "username", "verify-server-certificate", "write-endpoint", "zone"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
+            }
+        }
+        let mut request: api::Backup = serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .backups()
+            .create_backup(request, opt.value_of("parent").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _backups_delete_backup(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .backups()
+            .delete_backup(opt.value_of("name").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _backups_get_backup(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .backups()
+            .get_backup(opt.value_of("name").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _backups_list_backups(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .backups()
+            .list_backups(opt.value_of("parent").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                }
+                "page-size" => {
+                    call = call.page_size(
+                        value
+                            .map(|v| arg_from_str(v, err, "page-size", "int32"))
+                            .unwrap_or(-0),
+                    );
+                }
+                "filter" => {
+                    call = call.filter(value.unwrap_or(""));
+                }
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["filter", "page-size", "page-token"].iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _backups_update_backup(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut field_cursor = FieldCursor::default();
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "backup-interval.end-time" => Some(("backupInterval.endTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "backup-interval.start-time" => Some(("backupInterval.startTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "backup-kind" => Some(("backupKind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "backup-run" => Some(("backupRun", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "database-version" => Some(("databaseVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "error.code" => Some(("error.code", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "error.kind" => Some(("error.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "error.message" => Some(("error.message", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "expiry-time" => Some(("expiryTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance" => Some(("instance", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-deletion-time" => Some(("instanceDeletionTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.available-maintenance-versions" => Some(("instanceSettings.availableMaintenanceVersions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "instance-settings.backend-type" => Some(("instanceSettings.backendType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.connection-name" => Some(("instanceSettings.connectionName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.create-time" => Some(("instanceSettings.createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.current-disk-size" => Some(("instanceSettings.currentDiskSize", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.database-installed-version" => Some(("instanceSettings.databaseInstalledVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.database-version" => Some(("instanceSettings.databaseVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.disk-encryption-configuration.kind" => Some(("instanceSettings.diskEncryptionConfiguration.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.disk-encryption-configuration.kms-key-name" => Some(("instanceSettings.diskEncryptionConfiguration.kmsKeyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.disk-encryption-status.kind" => Some(("instanceSettings.diskEncryptionStatus.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.disk-encryption-status.kms-key-version-name" => Some(("instanceSettings.diskEncryptionStatus.kmsKeyVersionName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.dns-name" => Some(("instanceSettings.dnsName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.etag" => Some(("instanceSettings.etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.failover-replica.available" => Some(("instanceSettings.failoverReplica.available", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "instance-settings.failover-replica.name" => Some(("instanceSettings.failoverReplica.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.gce-zone" => Some(("instanceSettings.gceZone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.gemini-config.active-query-enabled" => Some(("instanceSettings.geminiConfig.activeQueryEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "instance-settings.gemini-config.entitled" => Some(("instanceSettings.geminiConfig.entitled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "instance-settings.gemini-config.flag-recommender-enabled" => Some(("instanceSettings.geminiConfig.flagRecommenderEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "instance-settings.gemini-config.google-vacuum-mgmt-enabled" => Some(("instanceSettings.geminiConfig.googleVacuumMgmtEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "instance-settings.gemini-config.index-advisor-enabled" => Some(("instanceSettings.geminiConfig.indexAdvisorEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "instance-settings.gemini-config.oom-session-cancel-enabled" => Some(("instanceSettings.geminiConfig.oomSessionCancelEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "instance-settings.include-replicas-for-major-version-upgrade" => Some(("instanceSettings.includeReplicasForMajorVersionUpgrade", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "instance-settings.instance-type" => Some(("instanceSettings.instanceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.ipv6-address" => Some(("instanceSettings.ipv6Address", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.kind" => Some(("instanceSettings.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.maintenance-version" => Some(("instanceSettings.maintenanceVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.master-instance-name" => Some(("instanceSettings.masterInstanceName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.max-disk-size" => Some(("instanceSettings.maxDiskSize", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.name" => Some(("instanceSettings.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.node-count" => Some(("instanceSettings.nodeCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "instance-settings.on-premises-configuration.ca-certificate" => Some(("instanceSettings.onPremisesConfiguration.caCertificate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.on-premises-configuration.client-certificate" => Some(("instanceSettings.onPremisesConfiguration.clientCertificate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.on-premises-configuration.client-key" => Some(("instanceSettings.onPremisesConfiguration.clientKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.on-premises-configuration.dump-file-path" => Some(("instanceSettings.onPremisesConfiguration.dumpFilePath", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.on-premises-configuration.host-port" => Some(("instanceSettings.onPremisesConfiguration.hostPort", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.on-premises-configuration.kind" => Some(("instanceSettings.onPremisesConfiguration.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.on-premises-configuration.password" => Some(("instanceSettings.onPremisesConfiguration.password", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.on-premises-configuration.source-instance.name" => Some(("instanceSettings.onPremisesConfiguration.sourceInstance.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.on-premises-configuration.source-instance.project" => Some(("instanceSettings.onPremisesConfiguration.sourceInstance.project", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.on-premises-configuration.source-instance.region" => Some(("instanceSettings.onPremisesConfiguration.sourceInstance.region", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.on-premises-configuration.ssl-option" => Some(("instanceSettings.onPremisesConfiguration.sslOption", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.on-premises-configuration.username" => Some(("instanceSettings.onPremisesConfiguration.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.out-of-disk-report.sql-min-recommended-increase-size-gb" => Some(("instanceSettings.outOfDiskReport.sqlMinRecommendedIncreaseSizeGb", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "instance-settings.out-of-disk-report.sql-out-of-disk-state" => Some(("instanceSettings.outOfDiskReport.sqlOutOfDiskState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.primary-dns-name" => Some(("instanceSettings.primaryDnsName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.project" => Some(("instanceSettings.project", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.psc-service-attachment-link" => Some(("instanceSettings.pscServiceAttachmentLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.region" => Some(("instanceSettings.region", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.replica-configuration.cascadable-replica" => Some(("instanceSettings.replicaConfiguration.cascadableReplica", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "instance-settings.replica-configuration.failover-target" => Some(("instanceSettings.replicaConfiguration.failoverTarget", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "instance-settings.replica-configuration.kind" => Some(("instanceSettings.replicaConfiguration.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.replica-configuration.mysql-replica-configuration.ca-certificate" => Some(("instanceSettings.replicaConfiguration.mysqlReplicaConfiguration.caCertificate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.replica-configuration.mysql-replica-configuration.client-certificate" => Some(("instanceSettings.replicaConfiguration.mysqlReplicaConfiguration.clientCertificate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.replica-configuration.mysql-replica-configuration.client-key" => Some(("instanceSettings.replicaConfiguration.mysqlReplicaConfiguration.clientKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.replica-configuration.mysql-replica-configuration.connect-retry-interval" => Some(("instanceSettings.replicaConfiguration.mysqlReplicaConfiguration.connectRetryInterval", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "instance-settings.replica-configuration.mysql-replica-configuration.dump-file-path" => Some(("instanceSettings.replicaConfiguration.mysqlReplicaConfiguration.dumpFilePath", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.replica-configuration.mysql-replica-configuration.kind" => Some(("instanceSettings.replicaConfiguration.mysqlReplicaConfiguration.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.replica-configuration.mysql-replica-configuration.master-heartbeat-period" => Some(("instanceSettings.replicaConfiguration.mysqlReplicaConfiguration.masterHeartbeatPeriod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.replica-configuration.mysql-replica-configuration.password" => Some(("instanceSettings.replicaConfiguration.mysqlReplicaConfiguration.password", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.replica-configuration.mysql-replica-configuration.ssl-cipher" => Some(("instanceSettings.replicaConfiguration.mysqlReplicaConfiguration.sslCipher", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.replica-configuration.mysql-replica-configuration.username" => Some(("instanceSettings.replicaConfiguration.mysqlReplicaConfiguration.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.replica-configuration.mysql-replica-configuration.verify-server-certificate" => Some(("instanceSettings.replicaConfiguration.mysqlReplicaConfiguration.verifyServerCertificate", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "instance-settings.replica-names" => Some(("instanceSettings.replicaNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "instance-settings.replication-cluster.dr-replica" => Some(("instanceSettings.replicationCluster.drReplica", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "instance-settings.replication-cluster.failover-dr-replica-name" => Some(("instanceSettings.replicationCluster.failoverDrReplicaName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.replication-cluster.psa-write-endpoint" => Some(("instanceSettings.replicationCluster.psaWriteEndpoint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.root-password" => Some(("instanceSettings.rootPassword", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.satisfies-pzi" => Some(("instanceSettings.satisfiesPzi", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "instance-settings.satisfies-pzs" => Some(("instanceSettings.satisfiesPzs", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "instance-settings.scheduled-maintenance.can-defer" => Some(("instanceSettings.scheduledMaintenance.canDefer", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "instance-settings.scheduled-maintenance.can-reschedule" => Some(("instanceSettings.scheduledMaintenance.canReschedule", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "instance-settings.scheduled-maintenance.schedule-deadline-time" => Some(("instanceSettings.scheduledMaintenance.scheduleDeadlineTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.scheduled-maintenance.start-time" => Some(("instanceSettings.scheduledMaintenance.startTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.secondary-gce-zone" => Some(("instanceSettings.secondaryGceZone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.self-link" => Some(("instanceSettings.selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.server-ca-cert.cert" => Some(("instanceSettings.serverCaCert.cert", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.server-ca-cert.cert-serial-number" => Some(("instanceSettings.serverCaCert.certSerialNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.server-ca-cert.common-name" => Some(("instanceSettings.serverCaCert.commonName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.server-ca-cert.create-time" => Some(("instanceSettings.serverCaCert.createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.server-ca-cert.expiration-time" => Some(("instanceSettings.serverCaCert.expirationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.server-ca-cert.instance" => Some(("instanceSettings.serverCaCert.instance", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.server-ca-cert.kind" => Some(("instanceSettings.serverCaCert.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.server-ca-cert.self-link" => Some(("instanceSettings.serverCaCert.selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.server-ca-cert.sha1-fingerprint" => Some(("instanceSettings.serverCaCert.sha1Fingerprint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.service-account-email-address" => Some(("instanceSettings.serviceAccountEmailAddress", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.activation-policy" => Some(("instanceSettings.settings.activationPolicy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.active-directory-config.admin-credential-secret-name" => Some(("instanceSettings.settings.activeDirectoryConfig.adminCredentialSecretName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.active-directory-config.dns-servers" => Some(("instanceSettings.settings.activeDirectoryConfig.dnsServers", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "instance-settings.settings.active-directory-config.domain" => Some(("instanceSettings.settings.activeDirectoryConfig.domain", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.active-directory-config.kind" => Some(("instanceSettings.settings.activeDirectoryConfig.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.active-directory-config.mode" => Some(("instanceSettings.settings.activeDirectoryConfig.mode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.active-directory-config.organizational-unit" => Some(("instanceSettings.settings.activeDirectoryConfig.organizationalUnit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.advanced-machine-features.threads-per-core" => Some(("instanceSettings.settings.advancedMachineFeatures.threadsPerCore", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.authorized-gae-applications" => Some(("instanceSettings.settings.authorizedGaeApplications", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "instance-settings.settings.auto-upgrade-enabled" => Some(("instanceSettings.settings.autoUpgradeEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.availability-type" => Some(("instanceSettings.settings.availabilityType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.backup-configuration.backup-retention-settings.retained-backups" => Some(("instanceSettings.settings.backupConfiguration.backupRetentionSettings.retainedBackups", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.backup-configuration.backup-retention-settings.retention-unit" => Some(("instanceSettings.settings.backupConfiguration.backupRetentionSettings.retentionUnit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.backup-configuration.backup-tier" => Some(("instanceSettings.settings.backupConfiguration.backupTier", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.backup-configuration.binary-log-enabled" => Some(("instanceSettings.settings.backupConfiguration.binaryLogEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.backup-configuration.enabled" => Some(("instanceSettings.settings.backupConfiguration.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.backup-configuration.kind" => Some(("instanceSettings.settings.backupConfiguration.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.backup-configuration.location" => Some(("instanceSettings.settings.backupConfiguration.location", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.backup-configuration.point-in-time-recovery-enabled" => Some(("instanceSettings.settings.backupConfiguration.pointInTimeRecoveryEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.backup-configuration.replication-log-archiving-enabled" => Some(("instanceSettings.settings.backupConfiguration.replicationLogArchivingEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.backup-configuration.start-time" => Some(("instanceSettings.settings.backupConfiguration.startTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.backup-configuration.transaction-log-retention-days" => Some(("instanceSettings.settings.backupConfiguration.transactionLogRetentionDays", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.backup-configuration.transactional-log-storage-state" => Some(("instanceSettings.settings.backupConfiguration.transactionalLogStorageState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.collation" => Some(("instanceSettings.settings.collation", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.connection-pool-config.connection-pooling-enabled" => Some(("instanceSettings.settings.connectionPoolConfig.connectionPoolingEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.connection-pool-config.pooler-count" => Some(("instanceSettings.settings.connectionPoolConfig.poolerCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.connector-enforcement" => Some(("instanceSettings.settings.connectorEnforcement", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.crash-safe-replication-enabled" => Some(("instanceSettings.settings.crashSafeReplicationEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.data-api-access" => Some(("instanceSettings.settings.dataApiAccess", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.data-cache-config.data-cache-enabled" => Some(("instanceSettings.settings.dataCacheConfig.dataCacheEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.data-disk-provisioned-iops" => Some(("instanceSettings.settings.dataDiskProvisionedIops", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.data-disk-provisioned-throughput" => Some(("instanceSettings.settings.dataDiskProvisionedThroughput", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.data-disk-size-gb" => Some(("instanceSettings.settings.dataDiskSizeGb", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.data-disk-type" => Some(("instanceSettings.settings.dataDiskType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.database-replication-enabled" => Some(("instanceSettings.settings.databaseReplicationEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.deletion-protection-enabled" => Some(("instanceSettings.settings.deletionProtectionEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.edition" => Some(("instanceSettings.settings.edition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.enable-dataplex-integration" => Some(("instanceSettings.settings.enableDataplexIntegration", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.enable-google-ml-integration" => Some(("instanceSettings.settings.enableGoogleMlIntegration", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.entraid-config.application-id" => Some(("instanceSettings.settings.entraidConfig.applicationId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.entraid-config.kind" => Some(("instanceSettings.settings.entraidConfig.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.entraid-config.tenant-id" => Some(("instanceSettings.settings.entraidConfig.tenantId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.final-backup-config.enabled" => Some(("instanceSettings.settings.finalBackupConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.final-backup-config.retention-days" => Some(("instanceSettings.settings.finalBackupConfig.retentionDays", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.insights-config.query-insights-enabled" => Some(("instanceSettings.settings.insightsConfig.queryInsightsEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.insights-config.query-plans-per-minute" => Some(("instanceSettings.settings.insightsConfig.queryPlansPerMinute", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.insights-config.query-string-length" => Some(("instanceSettings.settings.insightsConfig.queryStringLength", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.insights-config.record-application-tags" => Some(("instanceSettings.settings.insightsConfig.recordApplicationTags", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.insights-config.record-client-address" => Some(("instanceSettings.settings.insightsConfig.recordClientAddress", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.ip-configuration.allocated-ip-range" => Some(("instanceSettings.settings.ipConfiguration.allocatedIpRange", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.ip-configuration.custom-subject-alternative-names" => Some(("instanceSettings.settings.ipConfiguration.customSubjectAlternativeNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "instance-settings.settings.ip-configuration.enable-private-path-for-google-cloud-services" => Some(("instanceSettings.settings.ipConfiguration.enablePrivatePathForGoogleCloudServices", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.ip-configuration.ipv4-enabled" => Some(("instanceSettings.settings.ipConfiguration.ipv4Enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.ip-configuration.private-network" => Some(("instanceSettings.settings.ipConfiguration.privateNetwork", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.ip-configuration.psc-config.allowed-consumer-projects" => Some(("instanceSettings.settings.ipConfiguration.pscConfig.allowedConsumerProjects", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "instance-settings.settings.ip-configuration.psc-config.network-attachment-uri" => Some(("instanceSettings.settings.ipConfiguration.pscConfig.networkAttachmentUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.ip-configuration.psc-config.psc-enabled" => Some(("instanceSettings.settings.ipConfiguration.pscConfig.pscEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.ip-configuration.require-ssl" => Some(("instanceSettings.settings.ipConfiguration.requireSsl", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.ip-configuration.server-ca-mode" => Some(("instanceSettings.settings.ipConfiguration.serverCaMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.ip-configuration.server-ca-pool" => Some(("instanceSettings.settings.ipConfiguration.serverCaPool", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.ip-configuration.server-certificate-rotation-mode" => Some(("instanceSettings.settings.ipConfiguration.serverCertificateRotationMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.ip-configuration.ssl-mode" => Some(("instanceSettings.settings.ipConfiguration.sslMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.kind" => Some(("instanceSettings.settings.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.location-preference.follow-gae-application" => Some(("instanceSettings.settings.locationPreference.followGaeApplication", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.location-preference.kind" => Some(("instanceSettings.settings.locationPreference.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.location-preference.secondary-zone" => Some(("instanceSettings.settings.locationPreference.secondaryZone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.location-preference.zone" => Some(("instanceSettings.settings.locationPreference.zone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.maintenance-window.day" => Some(("instanceSettings.settings.maintenanceWindow.day", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.maintenance-window.hour" => Some(("instanceSettings.settings.maintenanceWindow.hour", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.maintenance-window.kind" => Some(("instanceSettings.settings.maintenanceWindow.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.maintenance-window.update-track" => Some(("instanceSettings.settings.maintenanceWindow.updateTrack", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.password-validation-policy.complexity" => Some(("instanceSettings.settings.passwordValidationPolicy.complexity", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.password-validation-policy.disallow-compromised-credentials" => Some(("instanceSettings.settings.passwordValidationPolicy.disallowCompromisedCredentials", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.password-validation-policy.disallow-username-substring" => Some(("instanceSettings.settings.passwordValidationPolicy.disallowUsernameSubstring", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.password-validation-policy.enable-password-policy" => Some(("instanceSettings.settings.passwordValidationPolicy.enablePasswordPolicy", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.password-validation-policy.min-length" => Some(("instanceSettings.settings.passwordValidationPolicy.minLength", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.password-validation-policy.password-change-interval" => Some(("instanceSettings.settings.passwordValidationPolicy.passwordChangeInterval", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.password-validation-policy.reuse-interval" => Some(("instanceSettings.settings.passwordValidationPolicy.reuseInterval", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.performance-capture-config.enabled" => Some(("instanceSettings.settings.performanceCaptureConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.performance-capture-config.probe-threshold" => Some(("instanceSettings.settings.performanceCaptureConfig.probeThreshold", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.performance-capture-config.probing-interval-seconds" => Some(("instanceSettings.settings.performanceCaptureConfig.probingIntervalSeconds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.performance-capture-config.running-threads-threshold" => Some(("instanceSettings.settings.performanceCaptureConfig.runningThreadsThreshold", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.performance-capture-config.seconds-behind-source-threshold" => Some(("instanceSettings.settings.performanceCaptureConfig.secondsBehindSourceThreshold", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.performance-capture-config.transaction-duration-threshold" => Some(("instanceSettings.settings.performanceCaptureConfig.transactionDurationThreshold", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.pricing-plan" => Some(("instanceSettings.settings.pricingPlan", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.read-pool-auto-scale-config.disable-scale-in" => Some(("instanceSettings.settings.readPoolAutoScaleConfig.disableScaleIn", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.read-pool-auto-scale-config.enabled" => Some(("instanceSettings.settings.readPoolAutoScaleConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.read-pool-auto-scale-config.max-node-count" => Some(("instanceSettings.settings.readPoolAutoScaleConfig.maxNodeCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.read-pool-auto-scale-config.min-node-count" => Some(("instanceSettings.settings.readPoolAutoScaleConfig.minNodeCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.read-pool-auto-scale-config.scale-in-cooldown-seconds" => Some(("instanceSettings.settings.readPoolAutoScaleConfig.scaleInCooldownSeconds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.read-pool-auto-scale-config.scale-out-cooldown-seconds" => Some(("instanceSettings.settings.readPoolAutoScaleConfig.scaleOutCooldownSeconds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.replication-lag-max-seconds" => Some(("instanceSettings.settings.replicationLagMaxSeconds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.replication-type" => Some(("instanceSettings.settings.replicationType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.retain-backups-on-delete" => Some(("instanceSettings.settings.retainBackupsOnDelete", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.settings-version" => Some(("instanceSettings.settings.settingsVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.sql-server-audit-config.bucket" => Some(("instanceSettings.settings.sqlServerAuditConfig.bucket", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.sql-server-audit-config.kind" => Some(("instanceSettings.settings.sqlServerAuditConfig.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.sql-server-audit-config.retention-interval" => Some(("instanceSettings.settings.sqlServerAuditConfig.retentionInterval", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.sql-server-audit-config.upload-interval" => Some(("instanceSettings.settings.sqlServerAuditConfig.uploadInterval", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.storage-auto-resize" => Some(("instanceSettings.settings.storageAutoResize", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.storage-auto-resize-limit" => Some(("instanceSettings.settings.storageAutoResizeLimit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.tier" => Some(("instanceSettings.settings.tier", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.time-zone" => Some(("instanceSettings.settings.timeZone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.settings.user-labels" => Some(("instanceSettings.settings.userLabels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "instance-settings.sql-network-architecture" => Some(("instanceSettings.sqlNetworkArchitecture", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.state" => Some(("instanceSettings.state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-settings.suspension-reason" => Some(("instanceSettings.suspensionReason", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "instance-settings.switch-transaction-logs-to-cloud-storage-enabled" => Some(("instanceSettings.switchTransactionLogsToCloudStorageEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "instance-settings.tags" => Some(("instanceSettings.tags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "instance-settings.write-endpoint" => Some(("instanceSettings.writeEndpoint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kms-key" => Some(("kmsKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kms-key-version" => Some(("kmsKeyVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "location" => Some(("location", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "max-chargeable-bytes" => Some(("maxChargeableBytes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "satisfies-pzi" => Some(("satisfiesPzi", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "satisfies-pzs" => Some(("satisfiesPzs", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "time-zone" => Some(("timeZone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "ttl-days" => Some(("ttlDays", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["activation-policy", "active-directory-config", "active-query-enabled", "admin-credential-secret-name", "advanced-machine-features", "allocated-ip-range", "allowed-consumer-projects", "application-id", "authorized-gae-applications", "auto-upgrade-enabled", "availability-type", "available", "available-maintenance-versions", "backend-type", "backup-configuration", "backup-interval", "backup-kind", "backup-retention-settings", "backup-run", "backup-tier", "binary-log-enabled", "bucket", "ca-certificate", "can-defer", "can-reschedule", "cascadable-replica", "cert", "cert-serial-number", "client-certificate", "client-key", "code", "collation", "common-name", "complexity", "connect-retry-interval", "connection-name", "connection-pool-config", "connection-pooling-enabled", "connector-enforcement", "crash-safe-replication-enabled", "create-time", "current-disk-size", "custom-subject-alternative-names", "data-api-access", "data-cache-config", "data-cache-enabled", "data-disk-provisioned-iops", "data-disk-provisioned-throughput", "data-disk-size-gb", "data-disk-type", "database-installed-version", "database-replication-enabled", "database-version", "day", "deletion-protection-enabled", "description", "disable-scale-in", "disallow-compromised-credentials", "disallow-username-substring", "disk-encryption-configuration", "disk-encryption-status", "dns-name", "dns-servers", "domain", "dr-replica", "dump-file-path", "edition", "enable-dataplex-integration", "enable-google-ml-integration", "enable-password-policy", "enable-private-path-for-google-cloud-services", "enabled", "end-time", "entitled", "entraid-config", "error", "etag", "expiration-time", "expiry-time", "failover-dr-replica-name", "failover-replica", "failover-target", "final-backup-config", "flag-recommender-enabled", "follow-gae-application", "gce-zone", "gemini-config", "google-vacuum-mgmt-enabled", "host-port", "hour", "include-replicas-for-major-version-upgrade", "index-advisor-enabled", "insights-config", "instance", "instance-deletion-time", "instance-settings", "instance-type", "ip-configuration", "ipv4-enabled", "ipv6-address", "kind", "kms-key", "kms-key-name", "kms-key-version", "kms-key-version-name", "location", "location-preference", "maintenance-version", "maintenance-window", "master-heartbeat-period", "master-instance-name", "max-chargeable-bytes", "max-disk-size", "max-node-count", "message", "min-length", "min-node-count", "mode", "mysql-replica-configuration", "name", "network-attachment-uri", "node-count", "on-premises-configuration", "oom-session-cancel-enabled", "organizational-unit", "out-of-disk-report", "password", "password-change-interval", "password-validation-policy", "performance-capture-config", "point-in-time-recovery-enabled", "pooler-count", "pricing-plan", "primary-dns-name", "private-network", "probe-threshold", "probing-interval-seconds", "project", "psa-write-endpoint", "psc-config", "psc-enabled", "psc-service-attachment-link", "query-insights-enabled", "query-plans-per-minute", "query-string-length", "read-pool-auto-scale-config", "record-application-tags", "record-client-address", "region", "replica-configuration", "replica-names", "replication-cluster", "replication-lag-max-seconds", "replication-log-archiving-enabled", "replication-type", "require-ssl", "retain-backups-on-delete", "retained-backups", "retention-days", "retention-interval", "retention-unit", "reuse-interval", "root-password", "running-threads-threshold", "satisfies-pzi", "satisfies-pzs", "scale-in-cooldown-seconds", "scale-out-cooldown-seconds", "schedule-deadline-time", "scheduled-maintenance", "secondary-gce-zone", "secondary-zone", "seconds-behind-source-threshold", "self-link", "server-ca-cert", "server-ca-mode", "server-ca-pool", "server-certificate-rotation-mode", "service-account-email-address", "settings", "settings-version", "sha1-fingerprint", "source-instance", "sql-min-recommended-increase-size-gb", "sql-network-architecture", "sql-out-of-disk-state", "sql-server-audit-config", "ssl-cipher", "ssl-mode", "ssl-option", "start-time", "state", "storage-auto-resize", "storage-auto-resize-limit", "suspension-reason", "switch-transaction-logs-to-cloud-storage-enabled", "tags", "tenant-id", "threads-per-core", "tier", "time-zone", "transaction-duration-threshold", "transaction-log-retention-days", "transactional-log-storage-state", "ttl-days", "type", "update-track", "upload-interval", "user-labels", "username", "verify-server-certificate", "write-endpoint", "zone"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
+            }
+        }
+        let mut request: api::Backup = serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .backups()
+            .update_backup(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "update-mask" => {
+                    call = call.update_mask(
+                        value
+                            .map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask"))
+                            .unwrap_or(apis_common::FieldMask::default()),
+                    );
+                }
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["update-mask"].iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _backup_runs_delete(
         &self,
         opt: &ArgMatches<'n>,
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
+        let id: i64 = arg_from_str(&opt.value_of("id").unwrap_or(""), err, "<id>", "int64");
         let mut call = self.hub.backup_runs().delete(
             opt.value_of("project").unwrap_or(""),
             opt.value_of("instance").unwrap_or(""),
-            opt.value_of("id").unwrap_or(""),
+            id,
         );
         for parg in opt
             .values_of("v")
@@ -130,10 +1084,11 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
+        let id: i64 = arg_from_str(&opt.value_of("id").unwrap_or(""), err, "<id>", "int64");
         let mut call = self.hub.backup_runs().get(
             opt.value_of("project").unwrap_or(""),
             opt.value_of("instance").unwrap_or(""),
-            opt.value_of("id").unwrap_or(""),
+            id,
         );
         for parg in opt
             .values_of("v")
@@ -244,6 +1199,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "database-version" => Some((
+                    "databaseVersion",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "description" => Some((
                     "description",
                     JsonTypeInfo {
@@ -342,6 +1304,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "max-chargeable-bytes" => Some((
+                    "maxChargeableBytes",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "self-link" => Some((
                     "selfLink",
                     JsonTypeInfo {
@@ -390,6 +1359,7 @@ where
                         &vec![
                             "backup-kind",
                             "code",
+                            "database-version",
                             "description",
                             "disk-encryption-configuration",
                             "disk-encryption-status",
@@ -402,6 +1372,7 @@ where
                             "kms-key-name",
                             "kms-key-version-name",
                             "location",
+                            "max-chargeable-bytes",
                             "message",
                             "self-link",
                             "start-time",
@@ -1748,6 +2719,9 @@ where
         {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "flag-scope" => {
+                    call = call.flag_scope(value.unwrap_or(""));
+                }
                 "database-version" => {
                     call = call.database_version(value.unwrap_or(""));
                 }
@@ -1768,7 +2742,465 @@ where
                             .push(CLIError::UnknownParameter(key.to_string(), {
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
-                                v.extend(["database-version"].iter().map(|v| *v));
+                                v.extend(["database-version", "flag-scope"].iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _instances_list_entra_id_certificates(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self.hub.instances().list_entra_id_certificates(
+            opt.value_of("project").unwrap_or(""),
+            opt.value_of("instance").unwrap_or(""),
+        );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _instances_list_server_certificates(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self.hub.instances().list_server_certificates(
+            opt.value_of("project").unwrap_or(""),
+            opt.value_of("instance").unwrap_or(""),
+        );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _instances_rotate_entra_id_certificate(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut field_cursor = FieldCursor::default();
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "rotate-entra-id-certificate-context.kind" => Some((
+                    "rotateEntraIdCertificateContext.kind",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "rotate-entra-id-certificate-context.next-version" => Some((
+                    "rotateEntraIdCertificateContext.nextVersion",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec![
+                            "kind",
+                            "next-version",
+                            "rotate-entra-id-certificate-context",
+                        ],
+                    );
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
+            }
+        }
+        let mut request: api::InstancesRotateEntraIdCertificateRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self.hub.instances().rotate_entra_id_certificate(
+            request,
+            opt.value_of("project").unwrap_or(""),
+            opt.value_of("instance").unwrap_or(""),
+        );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _instances_rotate_server_certificate(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut field_cursor = FieldCursor::default();
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "rotate-server-certificate-context.kind" => Some((
+                    "rotateServerCertificateContext.kind",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "rotate-server-certificate-context.next-version" => Some((
+                    "rotateServerCertificateContext.nextVersion",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec!["kind", "next-version", "rotate-server-certificate-context"],
+                    );
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
+            }
+        }
+        let mut request: api::InstancesRotateServerCertificateRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self.hub.instances().rotate_server_certificate(
+            request,
+            opt.value_of("project").unwrap_or(""),
+            opt.value_of("instance").unwrap_or(""),
+        );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
                                 v
                             }));
                     }
@@ -1981,6 +3413,87 @@ where
         }
     }
 
+    async fn _instances_add_entra_id_certificate(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self.hub.instances().add_entra_id_certificate(
+            opt.value_of("project").unwrap_or(""),
+            opt.value_of("instance").unwrap_or(""),
+        );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _instances_add_server_ca(
         &self,
         opt: &ArgMatches<'n>,
@@ -1988,6 +3501,87 @@ where
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
         let mut call = self.hub.instances().add_server_ca(
+            opt.value_of("project").unwrap_or(""),
+            opt.value_of("instance").unwrap_or(""),
+        );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _instances_add_server_certificate(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self.hub.instances().add_server_certificate(
             opt.value_of("project").unwrap_or(""),
             opt.value_of("instance").unwrap_or(""),
         );
@@ -2156,8 +3750,22 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "clone-context.preferred-secondary-zone" => Some((
+                    "cloneContext.preferredSecondaryZone",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "clone-context.preferred-zone" => Some((
                     "cloneContext.preferredZone",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "clone-context.source-instance-deletion-time" => Some((
+                    "cloneContext.sourceInstanceDeletionTime",
                     JsonTypeInfo {
                         jtype: JsonType::String,
                         ctype: ComplexType::Pod,
@@ -2177,7 +3785,9 @@ where
                             "kind",
                             "pitr-timestamp-ms",
                             "point-in-time",
+                            "preferred-secondary-zone",
                             "preferred-zone",
+                            "source-instance-deletion-time",
                         ],
                     );
                     err.issues.push(CLIError::Field(FieldError::Unknown(
@@ -2294,6 +3904,32 @@ where
         {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "final-backup-ttl-days" => {
+                    call = call.final_backup_ttl_days(
+                        value
+                            .map(|v| arg_from_str(v, err, "final-backup-ttl-days", "int64"))
+                            .unwrap_or(-0),
+                    );
+                }
+                "final-backup-expiry-time" => {
+                    call = call.final_backup_expiry_time(
+                        value
+                            .map(|v| {
+                                arg_from_str(v, err, "final-backup-expiry-time", "google-datetime")
+                            })
+                            .unwrap_or(chrono::Utc::now()),
+                    );
+                }
+                "final-backup-description" => {
+                    call = call.final_backup_description(value.unwrap_or(""));
+                }
+                "enable-final-backup" => {
+                    call = call.enable_final_backup(
+                        value
+                            .map(|v| arg_from_str(v, err, "enable-final-backup", "boolean"))
+                            .unwrap_or(false),
+                    );
+                }
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -2311,6 +3947,16 @@ where
                             .push(CLIError::UnknownParameter(key.to_string(), {
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(
+                                    [
+                                        "enable-final-backup",
+                                        "final-backup-description",
+                                        "final-backup-expiry-time",
+                                        "final-backup-ttl-days",
+                                    ]
+                                    .iter()
+                                    .map(|v| *v),
+                                );
                                 v
                             }));
                     }
@@ -2643,6 +4289,186 @@ where
         }
     }
 
+    async fn _instances_execute_sql(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut field_cursor = FieldCursor::default();
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "auto-iam-authn" => Some((
+                    "autoIamAuthn",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "database" => Some((
+                    "database",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "partial-result-mode" => Some((
+                    "partialResultMode",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "row-limit" => Some((
+                    "rowLimit",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "sql-statement" => Some((
+                    "sqlStatement",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "user" => Some((
+                    "user",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec![
+                            "auto-iam-authn",
+                            "database",
+                            "partial-result-mode",
+                            "row-limit",
+                            "sql-statement",
+                            "user",
+                        ],
+                    );
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
+            }
+        }
+        let mut request: api::ExecuteSqlPayload = serde_json::value::from_value(object).unwrap();
+        let mut call = self.hub.instances().execute_sql(
+            request,
+            opt.value_of("project").unwrap_or(""),
+            opt.value_of("instance").unwrap_or(""),
+        );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _instances_export(
         &self,
         opt: &ArgMatches<'n>,
@@ -2692,6 +4518,20 @@ where
                     "exportContext.bakExportOptions.differentialBase",
                     JsonTypeInfo {
                         jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "export-context.bak-export-options.export-log-end-time" => Some((
+                    "exportContext.bakExportOptions.exportLogEndTime",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "export-context.bak-export-options.export-log-start-time" => Some((
+                    "exportContext.bakExportOptions.exportLogStartTime",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
                         ctype: ComplexType::Pod,
                     },
                 )),
@@ -2786,6 +4626,20 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "export-context.sql-export-options.postgres-export-options.clean" => Some((
+                    "exportContext.sqlExportOptions.postgresExportOptions.clean",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "export-context.sql-export-options.postgres-export-options.if-exists" => Some((
+                    "exportContext.sqlExportOptions.postgresExportOptions.ifExists",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "export-context.sql-export-options.schema-only" => Some((
                     "exportContext.sqlExportOptions.schemaOnly",
                     JsonTypeInfo {
@@ -2807,6 +4661,34 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "export-context.tde-export-options.certificate-path" => Some((
+                    "exportContext.tdeExportOptions.certificatePath",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "export-context.tde-export-options.name" => Some((
+                    "exportContext.tdeExportOptions.name",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "export-context.tde-export-options.private-key-password" => Some((
+                    "exportContext.tdeExportOptions.privateKeyPassword",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "export-context.tde-export-options.private-key-path" => Some((
+                    "exportContext.tdeExportOptions.privateKeyPath",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "export-context.uri" => Some((
                     "exportContext.uri",
                     JsonTypeInfo {
@@ -2820,20 +4702,29 @@ where
                         &vec![
                             "bak-export-options",
                             "bak-type",
+                            "certificate-path",
+                            "clean",
                             "copy-only",
                             "csv-export-options",
                             "databases",
                             "differential-base",
                             "escape-character",
                             "export-context",
+                            "export-log-end-time",
+                            "export-log-start-time",
                             "fields-terminated-by",
                             "file-type",
+                            "if-exists",
                             "kind",
                             "lines-terminated-by",
                             "master-data",
                             "mysql-export-options",
+                            "name",
                             "offload",
                             "parallel",
+                            "postgres-export-options",
+                            "private-key-password",
+                            "private-key-path",
                             "quote-character",
                             "schema-only",
                             "select-query",
@@ -2841,6 +4732,7 @@ where
                             "stripe-count",
                             "striped",
                             "tables",
+                            "tde-export-options",
                             "threads",
                             "uri",
                         ],
@@ -3213,6 +5105,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "import-context.bak-import-options.encryption-options.keep-encrypted" => Some((
+                    "importContext.bakImportOptions.encryptionOptions.keepEncrypted",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "import-context.bak-import-options.encryption-options.pvk-password" => Some((
                     "importContext.bakImportOptions.encryptionOptions.pvkPassword",
                     JsonTypeInfo {
@@ -3339,10 +5238,52 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "import-context.sql-import-options.postgres-import-options.clean" => Some((
+                    "importContext.sqlImportOptions.postgresImportOptions.clean",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "import-context.sql-import-options.postgres-import-options.if-exists" => Some((
+                    "importContext.sqlImportOptions.postgresImportOptions.ifExists",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "import-context.sql-import-options.threads" => Some((
                     "importContext.sqlImportOptions.threads",
                     JsonTypeInfo {
                         jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "import-context.tde-import-options.certificate-path" => Some((
+                    "importContext.tdeImportOptions.certificatePath",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "import-context.tde-import-options.name" => Some((
+                    "importContext.tdeImportOptions.name",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "import-context.tde-import-options.private-key-password" => Some((
+                    "importContext.tdeImportOptions.privateKeyPassword",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "import-context.tde-import-options.private-key-path" => Some((
+                    "importContext.tdeImportOptions.privateKeyPath",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
                         ctype: ComplexType::Pod,
                     },
                 )),
@@ -3360,6 +5301,8 @@ where
                             "bak-import-options",
                             "bak-type",
                             "cert-path",
+                            "certificate-path",
+                            "clean",
                             "columns",
                             "csv-import-options",
                             "database",
@@ -3367,12 +5310,18 @@ where
                             "escape-character",
                             "fields-terminated-by",
                             "file-type",
+                            "if-exists",
                             "import-context",
                             "import-user",
+                            "keep-encrypted",
                             "kind",
                             "lines-terminated-by",
+                            "name",
                             "no-recovery",
                             "parallel",
+                            "postgres-import-options",
+                            "private-key-password",
+                            "private-key-path",
                             "pvk-password",
                             "pvk-path",
                             "quote-character",
@@ -3382,6 +5331,7 @@ where
                             "stop-at-mark",
                             "striped",
                             "table",
+                            "tde-import-options",
                             "threads",
                             "uri",
                         ],
@@ -3667,6 +5617,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "include-replicas-for-major-version-upgrade" => Some((
+                    "includeReplicasForMajorVersionUpgrade",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "instance-type" => Some((
                     "instanceType",
                     JsonTypeInfo {
@@ -3713,6 +5670,13 @@ where
                     "name",
                     JsonTypeInfo {
                         jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "node-count" => Some((
+                    "nodeCount",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
                         ctype: ComplexType::Pod,
                     },
                 )),
@@ -3781,6 +5745,13 @@ where
                 )),
                 "on-premises-configuration.source-instance.region" => Some((
                     "onPremisesConfiguration.sourceInstance.region",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "on-premises-configuration.ssl-option" => Some((
+                    "onPremisesConfiguration.sslOption",
                     JsonTypeInfo {
                         jtype: JsonType::String,
                         ctype: ComplexType::Pod,
@@ -3974,6 +5945,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "satisfies-pzi" => Some((
+                    "satisfiesPzi",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "satisfies-pzs" => Some((
                     "satisfiesPzs",
                     JsonTypeInfo {
@@ -4100,6 +6078,20 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "settings.active-directory-config.admin-credential-secret-name" => Some((
+                    "settings.activeDirectoryConfig.adminCredentialSecretName",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "settings.active-directory-config.dns-servers" => Some((
+                    "settings.activeDirectoryConfig.dnsServers",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
                 "settings.active-directory-config.domain" => Some((
                     "settings.activeDirectoryConfig.domain",
                     JsonTypeInfo {
@@ -4109,6 +6101,20 @@ where
                 )),
                 "settings.active-directory-config.kind" => Some((
                     "settings.activeDirectoryConfig.kind",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "settings.active-directory-config.mode" => Some((
+                    "settings.activeDirectoryConfig.mode",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "settings.active-directory-config.organizational-unit" => Some((
+                    "settings.activeDirectoryConfig.organizationalUnit",
                     JsonTypeInfo {
                         jtype: JsonType::String,
                         ctype: ComplexType::Pod,
@@ -4126,6 +6132,13 @@ where
                     JsonTypeInfo {
                         jtype: JsonType::String,
                         ctype: ComplexType::Vec,
+                    },
+                )),
+                "settings.auto-upgrade-enabled" => Some((
+                    "settings.autoUpgradeEnabled",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
                     },
                 )),
                 "settings.availability-type" => Some((
@@ -4146,6 +6159,13 @@ where
                 }
                 "settings.backup-configuration.backup-retention-settings.retention-unit" => Some((
                     "settings.backupConfiguration.backupRetentionSettings.retentionUnit",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "settings.backup-configuration.backup-tier" => Some((
+                    "settings.backupConfiguration.backupTier",
                     JsonTypeInfo {
                         jtype: JsonType::String,
                         ctype: ComplexType::Pod,
@@ -4221,6 +6241,20 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "settings.connection-pool-config.connection-pooling-enabled" => Some((
+                    "settings.connectionPoolConfig.connectionPoolingEnabled",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "settings.connection-pool-config.pooler-count" => Some((
+                    "settings.connectionPoolConfig.poolerCount",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "settings.connector-enforcement" => Some((
                     "settings.connectorEnforcement",
                     JsonTypeInfo {
@@ -4235,10 +6269,31 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "settings.data-api-access" => Some((
+                    "settings.dataApiAccess",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "settings.data-cache-config.data-cache-enabled" => Some((
                     "settings.dataCacheConfig.dataCacheEnabled",
                     JsonTypeInfo {
                         jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "settings.data-disk-provisioned-iops" => Some((
+                    "settings.dataDiskProvisionedIops",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "settings.data-disk-provisioned-throughput" => Some((
+                    "settings.dataDiskProvisionedThroughput",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
                         ctype: ComplexType::Pod,
                     },
                 )),
@@ -4291,6 +6346,41 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "settings.entraid-config.application-id" => Some((
+                    "settings.entraidConfig.applicationId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "settings.entraid-config.kind" => Some((
+                    "settings.entraidConfig.kind",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "settings.entraid-config.tenant-id" => Some((
+                    "settings.entraidConfig.tenantId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "settings.final-backup-config.enabled" => Some((
+                    "settings.finalBackupConfig.enabled",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "settings.final-backup-config.retention-days" => Some((
+                    "settings.finalBackupConfig.retentionDays",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "settings.insights-config.query-insights-enabled" => Some((
                     "settings.insightsConfig.queryInsightsEnabled",
                     JsonTypeInfo {
@@ -4333,6 +6423,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "settings.ip-configuration.custom-subject-alternative-names" => Some((
+                    "settings.ipConfiguration.customSubjectAlternativeNames",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
                 "settings.ip-configuration.enable-private-path-for-google-cloud-services" => {
                     Some((
                         "settings.ipConfiguration.enablePrivatePathForGoogleCloudServices",
@@ -4363,6 +6460,13 @@ where
                         ctype: ComplexType::Vec,
                     },
                 )),
+                "settings.ip-configuration.psc-config.network-attachment-uri" => Some((
+                    "settings.ipConfiguration.pscConfig.networkAttachmentUri",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "settings.ip-configuration.psc-config.psc-enabled" => Some((
                     "settings.ipConfiguration.pscConfig.pscEnabled",
                     JsonTypeInfo {
@@ -4374,6 +6478,27 @@ where
                     "settings.ipConfiguration.requireSsl",
                     JsonTypeInfo {
                         jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "settings.ip-configuration.server-ca-mode" => Some((
+                    "settings.ipConfiguration.serverCaMode",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "settings.ip-configuration.server-ca-pool" => Some((
+                    "settings.ipConfiguration.serverCaPool",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "settings.ip-configuration.server-certificate-rotation-mode" => Some((
+                    "settings.ipConfiguration.serverCertificateRotationMode",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
                         ctype: ComplexType::Pod,
                     },
                 )),
@@ -4496,6 +6621,48 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "settings.performance-capture-config.enabled" => Some((
+                    "settings.performanceCaptureConfig.enabled",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "settings.performance-capture-config.probe-threshold" => Some((
+                    "settings.performanceCaptureConfig.probeThreshold",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "settings.performance-capture-config.probing-interval-seconds" => Some((
+                    "settings.performanceCaptureConfig.probingIntervalSeconds",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "settings.performance-capture-config.running-threads-threshold" => Some((
+                    "settings.performanceCaptureConfig.runningThreadsThreshold",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "settings.performance-capture-config.seconds-behind-source-threshold" => Some((
+                    "settings.performanceCaptureConfig.secondsBehindSourceThreshold",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "settings.performance-capture-config.transaction-duration-threshold" => Some((
+                    "settings.performanceCaptureConfig.transactionDurationThreshold",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "settings.pricing-plan" => Some((
                     "settings.pricingPlan",
                     JsonTypeInfo {
@@ -4503,10 +6670,66 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "settings.read-pool-auto-scale-config.disable-scale-in" => Some((
+                    "settings.readPoolAutoScaleConfig.disableScaleIn",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "settings.read-pool-auto-scale-config.enabled" => Some((
+                    "settings.readPoolAutoScaleConfig.enabled",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "settings.read-pool-auto-scale-config.max-node-count" => Some((
+                    "settings.readPoolAutoScaleConfig.maxNodeCount",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "settings.read-pool-auto-scale-config.min-node-count" => Some((
+                    "settings.readPoolAutoScaleConfig.minNodeCount",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "settings.read-pool-auto-scale-config.scale-in-cooldown-seconds" => Some((
+                    "settings.readPoolAutoScaleConfig.scaleInCooldownSeconds",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "settings.read-pool-auto-scale-config.scale-out-cooldown-seconds" => Some((
+                    "settings.readPoolAutoScaleConfig.scaleOutCooldownSeconds",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "settings.replication-lag-max-seconds" => Some((
+                    "settings.replicationLagMaxSeconds",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "settings.replication-type" => Some((
                     "settings.replicationType",
                     JsonTypeInfo {
                         jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "settings.retain-backups-on-delete" => Some((
+                    "settings.retainBackupsOnDelete",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
                         ctype: ComplexType::Pod,
                     },
                 )),
@@ -4601,6 +6824,20 @@ where
                         ctype: ComplexType::Vec,
                     },
                 )),
+                "switch-transaction-logs-to-cloud-storage-enabled" => Some((
+                    "switchTransactionLogsToCloudStorageEnabled",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "tags" => Some((
+                    "tags",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Map,
+                    },
+                )),
                 "write-endpoint" => Some((
                     "writeEndpoint",
                     JsonTypeInfo {
@@ -4615,16 +6852,20 @@ where
                             "activation-policy",
                             "active-directory-config",
                             "active-query-enabled",
+                            "admin-credential-secret-name",
                             "advanced-machine-features",
                             "allocated-ip-range",
                             "allowed-consumer-projects",
+                            "application-id",
                             "authorized-gae-applications",
+                            "auto-upgrade-enabled",
                             "availability-type",
                             "available",
                             "available-maintenance-versions",
                             "backend-type",
                             "backup-configuration",
                             "backup-retention-settings",
+                            "backup-tier",
                             "binary-log-enabled",
                             "bucket",
                             "ca-certificate",
@@ -4640,12 +6881,18 @@ where
                             "complexity",
                             "connect-retry-interval",
                             "connection-name",
+                            "connection-pool-config",
+                            "connection-pooling-enabled",
                             "connector-enforcement",
                             "crash-safe-replication-enabled",
                             "create-time",
                             "current-disk-size",
+                            "custom-subject-alternative-names",
+                            "data-api-access",
                             "data-cache-config",
                             "data-cache-enabled",
+                            "data-disk-provisioned-iops",
+                            "data-disk-provisioned-throughput",
                             "data-disk-size-gb",
                             "data-disk-type",
                             "database-installed-version",
@@ -4653,11 +6900,13 @@ where
                             "database-version",
                             "day",
                             "deletion-protection-enabled",
+                            "disable-scale-in",
                             "disallow-compromised-credentials",
                             "disallow-username-substring",
                             "disk-encryption-configuration",
                             "disk-encryption-status",
                             "dns-name",
+                            "dns-servers",
                             "domain",
                             "dr-replica",
                             "dump-file-path",
@@ -4668,11 +6917,13 @@ where
                             "enable-private-path-for-google-cloud-services",
                             "enabled",
                             "entitled",
+                            "entraid-config",
                             "etag",
                             "expiration-time",
                             "failover-dr-replica-name",
                             "failover-replica",
                             "failover-target",
+                            "final-backup-config",
                             "flag-recommender-enabled",
                             "follow-gae-application",
                             "gce-zone",
@@ -4680,6 +6931,7 @@ where
                             "google-vacuum-mgmt-enabled",
                             "host-port",
                             "hour",
+                            "include-replicas-for-major-version-upgrade",
                             "index-advisor-enabled",
                             "insights-config",
                             "instance",
@@ -4697,19 +6949,29 @@ where
                             "master-heartbeat-period",
                             "master-instance-name",
                             "max-disk-size",
+                            "max-node-count",
                             "min-length",
+                            "min-node-count",
+                            "mode",
                             "mysql-replica-configuration",
                             "name",
+                            "network-attachment-uri",
+                            "node-count",
                             "on-premises-configuration",
                             "oom-session-cancel-enabled",
+                            "organizational-unit",
                             "out-of-disk-report",
                             "password",
                             "password-change-interval",
                             "password-validation-policy",
+                            "performance-capture-config",
                             "point-in-time-recovery-enabled",
+                            "pooler-count",
                             "pricing-plan",
                             "primary-dns-name",
                             "private-network",
+                            "probe-threshold",
+                            "probing-interval-seconds",
                             "project",
                             "psa-write-endpoint",
                             "psc-config",
@@ -4718,27 +6980,39 @@ where
                             "query-insights-enabled",
                             "query-plans-per-minute",
                             "query-string-length",
+                            "read-pool-auto-scale-config",
                             "record-application-tags",
                             "record-client-address",
                             "region",
                             "replica-configuration",
                             "replica-names",
                             "replication-cluster",
+                            "replication-lag-max-seconds",
                             "replication-log-archiving-enabled",
                             "replication-type",
                             "require-ssl",
+                            "retain-backups-on-delete",
                             "retained-backups",
+                            "retention-days",
                             "retention-interval",
                             "retention-unit",
                             "reuse-interval",
                             "root-password",
+                            "running-threads-threshold",
+                            "satisfies-pzi",
                             "satisfies-pzs",
+                            "scale-in-cooldown-seconds",
+                            "scale-out-cooldown-seconds",
                             "schedule-deadline-time",
                             "scheduled-maintenance",
                             "secondary-gce-zone",
                             "secondary-zone",
+                            "seconds-behind-source-threshold",
                             "self-link",
                             "server-ca-cert",
+                            "server-ca-mode",
+                            "server-ca-pool",
+                            "server-certificate-rotation-mode",
                             "service-account-email-address",
                             "settings",
                             "settings-version",
@@ -4750,14 +7024,19 @@ where
                             "sql-server-audit-config",
                             "ssl-cipher",
                             "ssl-mode",
+                            "ssl-option",
                             "start-time",
                             "state",
                             "storage-auto-resize",
                             "storage-auto-resize-limit",
                             "suspension-reason",
+                            "switch-transaction-logs-to-cloud-storage-enabled",
+                            "tags",
+                            "tenant-id",
                             "threads-per-core",
                             "tier",
                             "time-zone",
+                            "transaction-duration-threshold",
                             "transaction-log-retention-days",
                             "transactional-log-storage-state",
                             "update-track",
@@ -5226,6 +7505,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "include-replicas-for-major-version-upgrade" => Some((
+                    "includeReplicasForMajorVersionUpgrade",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "instance-type" => Some((
                     "instanceType",
                     JsonTypeInfo {
@@ -5272,6 +7558,13 @@ where
                     "name",
                     JsonTypeInfo {
                         jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "node-count" => Some((
+                    "nodeCount",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
                         ctype: ComplexType::Pod,
                     },
                 )),
@@ -5340,6 +7633,13 @@ where
                 )),
                 "on-premises-configuration.source-instance.region" => Some((
                     "onPremisesConfiguration.sourceInstance.region",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "on-premises-configuration.ssl-option" => Some((
+                    "onPremisesConfiguration.sslOption",
                     JsonTypeInfo {
                         jtype: JsonType::String,
                         ctype: ComplexType::Pod,
@@ -5533,6 +7833,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "satisfies-pzi" => Some((
+                    "satisfiesPzi",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "satisfies-pzs" => Some((
                     "satisfiesPzs",
                     JsonTypeInfo {
@@ -5659,6 +7966,20 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "settings.active-directory-config.admin-credential-secret-name" => Some((
+                    "settings.activeDirectoryConfig.adminCredentialSecretName",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "settings.active-directory-config.dns-servers" => Some((
+                    "settings.activeDirectoryConfig.dnsServers",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
                 "settings.active-directory-config.domain" => Some((
                     "settings.activeDirectoryConfig.domain",
                     JsonTypeInfo {
@@ -5668,6 +7989,20 @@ where
                 )),
                 "settings.active-directory-config.kind" => Some((
                     "settings.activeDirectoryConfig.kind",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "settings.active-directory-config.mode" => Some((
+                    "settings.activeDirectoryConfig.mode",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "settings.active-directory-config.organizational-unit" => Some((
+                    "settings.activeDirectoryConfig.organizationalUnit",
                     JsonTypeInfo {
                         jtype: JsonType::String,
                         ctype: ComplexType::Pod,
@@ -5685,6 +8020,13 @@ where
                     JsonTypeInfo {
                         jtype: JsonType::String,
                         ctype: ComplexType::Vec,
+                    },
+                )),
+                "settings.auto-upgrade-enabled" => Some((
+                    "settings.autoUpgradeEnabled",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
                     },
                 )),
                 "settings.availability-type" => Some((
@@ -5705,6 +8047,13 @@ where
                 }
                 "settings.backup-configuration.backup-retention-settings.retention-unit" => Some((
                     "settings.backupConfiguration.backupRetentionSettings.retentionUnit",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "settings.backup-configuration.backup-tier" => Some((
+                    "settings.backupConfiguration.backupTier",
                     JsonTypeInfo {
                         jtype: JsonType::String,
                         ctype: ComplexType::Pod,
@@ -5780,6 +8129,20 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "settings.connection-pool-config.connection-pooling-enabled" => Some((
+                    "settings.connectionPoolConfig.connectionPoolingEnabled",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "settings.connection-pool-config.pooler-count" => Some((
+                    "settings.connectionPoolConfig.poolerCount",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "settings.connector-enforcement" => Some((
                     "settings.connectorEnforcement",
                     JsonTypeInfo {
@@ -5794,10 +8157,31 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "settings.data-api-access" => Some((
+                    "settings.dataApiAccess",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "settings.data-cache-config.data-cache-enabled" => Some((
                     "settings.dataCacheConfig.dataCacheEnabled",
                     JsonTypeInfo {
                         jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "settings.data-disk-provisioned-iops" => Some((
+                    "settings.dataDiskProvisionedIops",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "settings.data-disk-provisioned-throughput" => Some((
+                    "settings.dataDiskProvisionedThroughput",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
                         ctype: ComplexType::Pod,
                     },
                 )),
@@ -5850,6 +8234,41 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "settings.entraid-config.application-id" => Some((
+                    "settings.entraidConfig.applicationId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "settings.entraid-config.kind" => Some((
+                    "settings.entraidConfig.kind",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "settings.entraid-config.tenant-id" => Some((
+                    "settings.entraidConfig.tenantId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "settings.final-backup-config.enabled" => Some((
+                    "settings.finalBackupConfig.enabled",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "settings.final-backup-config.retention-days" => Some((
+                    "settings.finalBackupConfig.retentionDays",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "settings.insights-config.query-insights-enabled" => Some((
                     "settings.insightsConfig.queryInsightsEnabled",
                     JsonTypeInfo {
@@ -5892,6 +8311,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "settings.ip-configuration.custom-subject-alternative-names" => Some((
+                    "settings.ipConfiguration.customSubjectAlternativeNames",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
                 "settings.ip-configuration.enable-private-path-for-google-cloud-services" => {
                     Some((
                         "settings.ipConfiguration.enablePrivatePathForGoogleCloudServices",
@@ -5922,6 +8348,13 @@ where
                         ctype: ComplexType::Vec,
                     },
                 )),
+                "settings.ip-configuration.psc-config.network-attachment-uri" => Some((
+                    "settings.ipConfiguration.pscConfig.networkAttachmentUri",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "settings.ip-configuration.psc-config.psc-enabled" => Some((
                     "settings.ipConfiguration.pscConfig.pscEnabled",
                     JsonTypeInfo {
@@ -5933,6 +8366,27 @@ where
                     "settings.ipConfiguration.requireSsl",
                     JsonTypeInfo {
                         jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "settings.ip-configuration.server-ca-mode" => Some((
+                    "settings.ipConfiguration.serverCaMode",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "settings.ip-configuration.server-ca-pool" => Some((
+                    "settings.ipConfiguration.serverCaPool",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "settings.ip-configuration.server-certificate-rotation-mode" => Some((
+                    "settings.ipConfiguration.serverCertificateRotationMode",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
                         ctype: ComplexType::Pod,
                     },
                 )),
@@ -6055,6 +8509,48 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "settings.performance-capture-config.enabled" => Some((
+                    "settings.performanceCaptureConfig.enabled",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "settings.performance-capture-config.probe-threshold" => Some((
+                    "settings.performanceCaptureConfig.probeThreshold",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "settings.performance-capture-config.probing-interval-seconds" => Some((
+                    "settings.performanceCaptureConfig.probingIntervalSeconds",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "settings.performance-capture-config.running-threads-threshold" => Some((
+                    "settings.performanceCaptureConfig.runningThreadsThreshold",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "settings.performance-capture-config.seconds-behind-source-threshold" => Some((
+                    "settings.performanceCaptureConfig.secondsBehindSourceThreshold",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "settings.performance-capture-config.transaction-duration-threshold" => Some((
+                    "settings.performanceCaptureConfig.transactionDurationThreshold",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "settings.pricing-plan" => Some((
                     "settings.pricingPlan",
                     JsonTypeInfo {
@@ -6062,10 +8558,66 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "settings.read-pool-auto-scale-config.disable-scale-in" => Some((
+                    "settings.readPoolAutoScaleConfig.disableScaleIn",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "settings.read-pool-auto-scale-config.enabled" => Some((
+                    "settings.readPoolAutoScaleConfig.enabled",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "settings.read-pool-auto-scale-config.max-node-count" => Some((
+                    "settings.readPoolAutoScaleConfig.maxNodeCount",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "settings.read-pool-auto-scale-config.min-node-count" => Some((
+                    "settings.readPoolAutoScaleConfig.minNodeCount",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "settings.read-pool-auto-scale-config.scale-in-cooldown-seconds" => Some((
+                    "settings.readPoolAutoScaleConfig.scaleInCooldownSeconds",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "settings.read-pool-auto-scale-config.scale-out-cooldown-seconds" => Some((
+                    "settings.readPoolAutoScaleConfig.scaleOutCooldownSeconds",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "settings.replication-lag-max-seconds" => Some((
+                    "settings.replicationLagMaxSeconds",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "settings.replication-type" => Some((
                     "settings.replicationType",
                     JsonTypeInfo {
                         jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "settings.retain-backups-on-delete" => Some((
+                    "settings.retainBackupsOnDelete",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
                         ctype: ComplexType::Pod,
                     },
                 )),
@@ -6160,6 +8712,20 @@ where
                         ctype: ComplexType::Vec,
                     },
                 )),
+                "switch-transaction-logs-to-cloud-storage-enabled" => Some((
+                    "switchTransactionLogsToCloudStorageEnabled",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "tags" => Some((
+                    "tags",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Map,
+                    },
+                )),
                 "write-endpoint" => Some((
                     "writeEndpoint",
                     JsonTypeInfo {
@@ -6174,16 +8740,20 @@ where
                             "activation-policy",
                             "active-directory-config",
                             "active-query-enabled",
+                            "admin-credential-secret-name",
                             "advanced-machine-features",
                             "allocated-ip-range",
                             "allowed-consumer-projects",
+                            "application-id",
                             "authorized-gae-applications",
+                            "auto-upgrade-enabled",
                             "availability-type",
                             "available",
                             "available-maintenance-versions",
                             "backend-type",
                             "backup-configuration",
                             "backup-retention-settings",
+                            "backup-tier",
                             "binary-log-enabled",
                             "bucket",
                             "ca-certificate",
@@ -6199,12 +8769,18 @@ where
                             "complexity",
                             "connect-retry-interval",
                             "connection-name",
+                            "connection-pool-config",
+                            "connection-pooling-enabled",
                             "connector-enforcement",
                             "crash-safe-replication-enabled",
                             "create-time",
                             "current-disk-size",
+                            "custom-subject-alternative-names",
+                            "data-api-access",
                             "data-cache-config",
                             "data-cache-enabled",
+                            "data-disk-provisioned-iops",
+                            "data-disk-provisioned-throughput",
                             "data-disk-size-gb",
                             "data-disk-type",
                             "database-installed-version",
@@ -6212,11 +8788,13 @@ where
                             "database-version",
                             "day",
                             "deletion-protection-enabled",
+                            "disable-scale-in",
                             "disallow-compromised-credentials",
                             "disallow-username-substring",
                             "disk-encryption-configuration",
                             "disk-encryption-status",
                             "dns-name",
+                            "dns-servers",
                             "domain",
                             "dr-replica",
                             "dump-file-path",
@@ -6227,11 +8805,13 @@ where
                             "enable-private-path-for-google-cloud-services",
                             "enabled",
                             "entitled",
+                            "entraid-config",
                             "etag",
                             "expiration-time",
                             "failover-dr-replica-name",
                             "failover-replica",
                             "failover-target",
+                            "final-backup-config",
                             "flag-recommender-enabled",
                             "follow-gae-application",
                             "gce-zone",
@@ -6239,6 +8819,7 @@ where
                             "google-vacuum-mgmt-enabled",
                             "host-port",
                             "hour",
+                            "include-replicas-for-major-version-upgrade",
                             "index-advisor-enabled",
                             "insights-config",
                             "instance",
@@ -6256,19 +8837,29 @@ where
                             "master-heartbeat-period",
                             "master-instance-name",
                             "max-disk-size",
+                            "max-node-count",
                             "min-length",
+                            "min-node-count",
+                            "mode",
                             "mysql-replica-configuration",
                             "name",
+                            "network-attachment-uri",
+                            "node-count",
                             "on-premises-configuration",
                             "oom-session-cancel-enabled",
+                            "organizational-unit",
                             "out-of-disk-report",
                             "password",
                             "password-change-interval",
                             "password-validation-policy",
+                            "performance-capture-config",
                             "point-in-time-recovery-enabled",
+                            "pooler-count",
                             "pricing-plan",
                             "primary-dns-name",
                             "private-network",
+                            "probe-threshold",
+                            "probing-interval-seconds",
                             "project",
                             "psa-write-endpoint",
                             "psc-config",
@@ -6277,27 +8868,39 @@ where
                             "query-insights-enabled",
                             "query-plans-per-minute",
                             "query-string-length",
+                            "read-pool-auto-scale-config",
                             "record-application-tags",
                             "record-client-address",
                             "region",
                             "replica-configuration",
                             "replica-names",
                             "replication-cluster",
+                            "replication-lag-max-seconds",
                             "replication-log-archiving-enabled",
                             "replication-type",
                             "require-ssl",
+                            "retain-backups-on-delete",
                             "retained-backups",
+                            "retention-days",
                             "retention-interval",
                             "retention-unit",
                             "reuse-interval",
                             "root-password",
+                            "running-threads-threshold",
+                            "satisfies-pzi",
                             "satisfies-pzs",
+                            "scale-in-cooldown-seconds",
+                            "scale-out-cooldown-seconds",
                             "schedule-deadline-time",
                             "scheduled-maintenance",
                             "secondary-gce-zone",
                             "secondary-zone",
+                            "seconds-behind-source-threshold",
                             "self-link",
                             "server-ca-cert",
+                            "server-ca-mode",
+                            "server-ca-pool",
+                            "server-certificate-rotation-mode",
                             "service-account-email-address",
                             "settings",
                             "settings-version",
@@ -6309,14 +8912,19 @@ where
                             "sql-server-audit-config",
                             "ssl-cipher",
                             "ssl-mode",
+                            "ssl-option",
                             "start-time",
                             "state",
                             "storage-auto-resize",
                             "storage-auto-resize-limit",
                             "suspension-reason",
+                            "switch-transaction-logs-to-cloud-storage-enabled",
+                            "tags",
+                            "tenant-id",
                             "threads-per-core",
                             "tier",
                             "time-zone",
+                            "transaction-duration-threshold",
                             "transaction-log-retention-days",
                             "transactional-log-storage-state",
                             "update-track",
@@ -6348,6 +8956,344 @@ where
         }
         let mut request: api::DatabaseInstance = serde_json::value::from_value(object).unwrap();
         let mut call = self.hub.instances().patch(
+            request,
+            opt.value_of("project").unwrap_or(""),
+            opt.value_of("instance").unwrap_or(""),
+        );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _instances_point_in_time_restore(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut field_cursor = FieldCursor::default();
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "allocated-ip-range" => Some((
+                    "allocatedIpRange",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "datasource" => Some((
+                    "datasource",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "point-in-time" => Some((
+                    "pointInTime",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "preferred-secondary-zone" => Some((
+                    "preferredSecondaryZone",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "preferred-zone" => Some((
+                    "preferredZone",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "private-network" => Some((
+                    "privateNetwork",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "target-instance" => Some((
+                    "targetInstance",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec![
+                            "allocated-ip-range",
+                            "datasource",
+                            "point-in-time",
+                            "preferred-secondary-zone",
+                            "preferred-zone",
+                            "private-network",
+                            "target-instance",
+                        ],
+                    );
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
+            }
+        }
+        let mut request: api::PointInTimeRestoreContext =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .instances()
+            .point_in_time_restore(request, opt.value_of("parent").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _instances_pre_check_major_version_upgrade(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut field_cursor = FieldCursor::default();
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "pre-check-major-version-upgrade-context.kind" => Some((
+                    "preCheckMajorVersionUpgradeContext.kind",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "pre-check-major-version-upgrade-context.target-database-version" => Some((
+                    "preCheckMajorVersionUpgradeContext.targetDatabaseVersion",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec![
+                            "kind",
+                            "pre-check-major-version-upgrade-context",
+                            "target-database-version",
+                        ],
+                    );
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
+            }
+        }
+        let mut request: api::InstancesPreCheckMajorVersionUpgradeRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self.hub.instances().pre_check_major_version_upgrade(
             request,
             opt.value_of("project").unwrap_or(""),
             opt.value_of("instance").unwrap_or(""),
@@ -6757,6 +9703,9 @@ where
         {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "mode" => {
+                    call = call.mode(value.unwrap_or(""));
+                }
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -6774,6 +9723,7 @@ where
                             .push(CLIError::UnknownParameter(key.to_string(), {
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["mode"].iter().map(|v| *v));
                                 v
                             }));
                     }
@@ -6930,55 +9880,217 @@ where
                 continue;
             }
 
-            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
-            {
-                "restore-backup-context.backup-run-id" => Some((
-                    "restoreBackupContext.backupRunId",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "restore-backup-context.instance-id" => Some((
-                    "restoreBackupContext.instanceId",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "restore-backup-context.kind" => Some((
-                    "restoreBackupContext.kind",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "restore-backup-context.project" => Some((
-                    "restoreBackupContext.project",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(
-                        key,
-                        &vec![
-                            "backup-run-id",
-                            "instance-id",
-                            "kind",
-                            "project",
-                            "restore-backup-context",
-                        ],
-                    );
-                    err.issues.push(CLIError::Field(FieldError::Unknown(
-                        temp_cursor.to_string(),
-                        suggestion,
-                        value.map(|v| v.to_string()),
-                    )));
-                    None
-                }
-            };
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "backup" => Some(("backup", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "backupdr-backup" => Some(("backupdrBackup", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-backup-context.backup-run-id" => Some(("restoreBackupContext.backupRunId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-backup-context.instance-id" => Some(("restoreBackupContext.instanceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-backup-context.kind" => Some(("restoreBackupContext.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-backup-context.project" => Some(("restoreBackupContext.project", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-instance-clear-overrides-field-names" => Some(("restoreInstanceClearOverridesFieldNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "restore-instance-settings.available-maintenance-versions" => Some(("restoreInstanceSettings.availableMaintenanceVersions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "restore-instance-settings.backend-type" => Some(("restoreInstanceSettings.backendType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.connection-name" => Some(("restoreInstanceSettings.connectionName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.create-time" => Some(("restoreInstanceSettings.createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.current-disk-size" => Some(("restoreInstanceSettings.currentDiskSize", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.database-installed-version" => Some(("restoreInstanceSettings.databaseInstalledVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.database-version" => Some(("restoreInstanceSettings.databaseVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.disk-encryption-configuration.kind" => Some(("restoreInstanceSettings.diskEncryptionConfiguration.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.disk-encryption-configuration.kms-key-name" => Some(("restoreInstanceSettings.diskEncryptionConfiguration.kmsKeyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.disk-encryption-status.kind" => Some(("restoreInstanceSettings.diskEncryptionStatus.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.disk-encryption-status.kms-key-version-name" => Some(("restoreInstanceSettings.diskEncryptionStatus.kmsKeyVersionName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.dns-name" => Some(("restoreInstanceSettings.dnsName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.etag" => Some(("restoreInstanceSettings.etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.failover-replica.available" => Some(("restoreInstanceSettings.failoverReplica.available", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.failover-replica.name" => Some(("restoreInstanceSettings.failoverReplica.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.gce-zone" => Some(("restoreInstanceSettings.gceZone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.gemini-config.active-query-enabled" => Some(("restoreInstanceSettings.geminiConfig.activeQueryEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.gemini-config.entitled" => Some(("restoreInstanceSettings.geminiConfig.entitled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.gemini-config.flag-recommender-enabled" => Some(("restoreInstanceSettings.geminiConfig.flagRecommenderEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.gemini-config.google-vacuum-mgmt-enabled" => Some(("restoreInstanceSettings.geminiConfig.googleVacuumMgmtEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.gemini-config.index-advisor-enabled" => Some(("restoreInstanceSettings.geminiConfig.indexAdvisorEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.gemini-config.oom-session-cancel-enabled" => Some(("restoreInstanceSettings.geminiConfig.oomSessionCancelEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.include-replicas-for-major-version-upgrade" => Some(("restoreInstanceSettings.includeReplicasForMajorVersionUpgrade", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.instance-type" => Some(("restoreInstanceSettings.instanceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.ipv6-address" => Some(("restoreInstanceSettings.ipv6Address", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.kind" => Some(("restoreInstanceSettings.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.maintenance-version" => Some(("restoreInstanceSettings.maintenanceVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.master-instance-name" => Some(("restoreInstanceSettings.masterInstanceName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.max-disk-size" => Some(("restoreInstanceSettings.maxDiskSize", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.name" => Some(("restoreInstanceSettings.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.node-count" => Some(("restoreInstanceSettings.nodeCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.on-premises-configuration.ca-certificate" => Some(("restoreInstanceSettings.onPremisesConfiguration.caCertificate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.on-premises-configuration.client-certificate" => Some(("restoreInstanceSettings.onPremisesConfiguration.clientCertificate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.on-premises-configuration.client-key" => Some(("restoreInstanceSettings.onPremisesConfiguration.clientKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.on-premises-configuration.dump-file-path" => Some(("restoreInstanceSettings.onPremisesConfiguration.dumpFilePath", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.on-premises-configuration.host-port" => Some(("restoreInstanceSettings.onPremisesConfiguration.hostPort", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.on-premises-configuration.kind" => Some(("restoreInstanceSettings.onPremisesConfiguration.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.on-premises-configuration.password" => Some(("restoreInstanceSettings.onPremisesConfiguration.password", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.on-premises-configuration.source-instance.name" => Some(("restoreInstanceSettings.onPremisesConfiguration.sourceInstance.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.on-premises-configuration.source-instance.project" => Some(("restoreInstanceSettings.onPremisesConfiguration.sourceInstance.project", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.on-premises-configuration.source-instance.region" => Some(("restoreInstanceSettings.onPremisesConfiguration.sourceInstance.region", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.on-premises-configuration.ssl-option" => Some(("restoreInstanceSettings.onPremisesConfiguration.sslOption", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.on-premises-configuration.username" => Some(("restoreInstanceSettings.onPremisesConfiguration.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.out-of-disk-report.sql-min-recommended-increase-size-gb" => Some(("restoreInstanceSettings.outOfDiskReport.sqlMinRecommendedIncreaseSizeGb", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.out-of-disk-report.sql-out-of-disk-state" => Some(("restoreInstanceSettings.outOfDiskReport.sqlOutOfDiskState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.primary-dns-name" => Some(("restoreInstanceSettings.primaryDnsName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.project" => Some(("restoreInstanceSettings.project", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.psc-service-attachment-link" => Some(("restoreInstanceSettings.pscServiceAttachmentLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.region" => Some(("restoreInstanceSettings.region", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.replica-configuration.cascadable-replica" => Some(("restoreInstanceSettings.replicaConfiguration.cascadableReplica", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.replica-configuration.failover-target" => Some(("restoreInstanceSettings.replicaConfiguration.failoverTarget", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.replica-configuration.kind" => Some(("restoreInstanceSettings.replicaConfiguration.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.replica-configuration.mysql-replica-configuration.ca-certificate" => Some(("restoreInstanceSettings.replicaConfiguration.mysqlReplicaConfiguration.caCertificate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.replica-configuration.mysql-replica-configuration.client-certificate" => Some(("restoreInstanceSettings.replicaConfiguration.mysqlReplicaConfiguration.clientCertificate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.replica-configuration.mysql-replica-configuration.client-key" => Some(("restoreInstanceSettings.replicaConfiguration.mysqlReplicaConfiguration.clientKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.replica-configuration.mysql-replica-configuration.connect-retry-interval" => Some(("restoreInstanceSettings.replicaConfiguration.mysqlReplicaConfiguration.connectRetryInterval", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.replica-configuration.mysql-replica-configuration.dump-file-path" => Some(("restoreInstanceSettings.replicaConfiguration.mysqlReplicaConfiguration.dumpFilePath", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.replica-configuration.mysql-replica-configuration.kind" => Some(("restoreInstanceSettings.replicaConfiguration.mysqlReplicaConfiguration.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.replica-configuration.mysql-replica-configuration.master-heartbeat-period" => Some(("restoreInstanceSettings.replicaConfiguration.mysqlReplicaConfiguration.masterHeartbeatPeriod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.replica-configuration.mysql-replica-configuration.password" => Some(("restoreInstanceSettings.replicaConfiguration.mysqlReplicaConfiguration.password", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.replica-configuration.mysql-replica-configuration.ssl-cipher" => Some(("restoreInstanceSettings.replicaConfiguration.mysqlReplicaConfiguration.sslCipher", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.replica-configuration.mysql-replica-configuration.username" => Some(("restoreInstanceSettings.replicaConfiguration.mysqlReplicaConfiguration.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.replica-configuration.mysql-replica-configuration.verify-server-certificate" => Some(("restoreInstanceSettings.replicaConfiguration.mysqlReplicaConfiguration.verifyServerCertificate", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.replica-names" => Some(("restoreInstanceSettings.replicaNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "restore-instance-settings.replication-cluster.dr-replica" => Some(("restoreInstanceSettings.replicationCluster.drReplica", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.replication-cluster.failover-dr-replica-name" => Some(("restoreInstanceSettings.replicationCluster.failoverDrReplicaName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.replication-cluster.psa-write-endpoint" => Some(("restoreInstanceSettings.replicationCluster.psaWriteEndpoint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.root-password" => Some(("restoreInstanceSettings.rootPassword", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.satisfies-pzi" => Some(("restoreInstanceSettings.satisfiesPzi", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.satisfies-pzs" => Some(("restoreInstanceSettings.satisfiesPzs", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.scheduled-maintenance.can-defer" => Some(("restoreInstanceSettings.scheduledMaintenance.canDefer", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.scheduled-maintenance.can-reschedule" => Some(("restoreInstanceSettings.scheduledMaintenance.canReschedule", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.scheduled-maintenance.schedule-deadline-time" => Some(("restoreInstanceSettings.scheduledMaintenance.scheduleDeadlineTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.scheduled-maintenance.start-time" => Some(("restoreInstanceSettings.scheduledMaintenance.startTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.secondary-gce-zone" => Some(("restoreInstanceSettings.secondaryGceZone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.self-link" => Some(("restoreInstanceSettings.selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.server-ca-cert.cert" => Some(("restoreInstanceSettings.serverCaCert.cert", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.server-ca-cert.cert-serial-number" => Some(("restoreInstanceSettings.serverCaCert.certSerialNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.server-ca-cert.common-name" => Some(("restoreInstanceSettings.serverCaCert.commonName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.server-ca-cert.create-time" => Some(("restoreInstanceSettings.serverCaCert.createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.server-ca-cert.expiration-time" => Some(("restoreInstanceSettings.serverCaCert.expirationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.server-ca-cert.instance" => Some(("restoreInstanceSettings.serverCaCert.instance", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.server-ca-cert.kind" => Some(("restoreInstanceSettings.serverCaCert.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.server-ca-cert.self-link" => Some(("restoreInstanceSettings.serverCaCert.selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.server-ca-cert.sha1-fingerprint" => Some(("restoreInstanceSettings.serverCaCert.sha1Fingerprint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.service-account-email-address" => Some(("restoreInstanceSettings.serviceAccountEmailAddress", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.settings.activation-policy" => Some(("restoreInstanceSettings.settings.activationPolicy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.settings.active-directory-config.admin-credential-secret-name" => Some(("restoreInstanceSettings.settings.activeDirectoryConfig.adminCredentialSecretName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.settings.active-directory-config.dns-servers" => Some(("restoreInstanceSettings.settings.activeDirectoryConfig.dnsServers", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "restore-instance-settings.settings.active-directory-config.domain" => Some(("restoreInstanceSettings.settings.activeDirectoryConfig.domain", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.settings.active-directory-config.kind" => Some(("restoreInstanceSettings.settings.activeDirectoryConfig.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.settings.active-directory-config.mode" => Some(("restoreInstanceSettings.settings.activeDirectoryConfig.mode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.settings.active-directory-config.organizational-unit" => Some(("restoreInstanceSettings.settings.activeDirectoryConfig.organizationalUnit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.settings.advanced-machine-features.threads-per-core" => Some(("restoreInstanceSettings.settings.advancedMachineFeatures.threadsPerCore", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.settings.authorized-gae-applications" => Some(("restoreInstanceSettings.settings.authorizedGaeApplications", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "restore-instance-settings.settings.auto-upgrade-enabled" => Some(("restoreInstanceSettings.settings.autoUpgradeEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.settings.availability-type" => Some(("restoreInstanceSettings.settings.availabilityType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.settings.backup-configuration.backup-retention-settings.retained-backups" => Some(("restoreInstanceSettings.settings.backupConfiguration.backupRetentionSettings.retainedBackups", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.settings.backup-configuration.backup-retention-settings.retention-unit" => Some(("restoreInstanceSettings.settings.backupConfiguration.backupRetentionSettings.retentionUnit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.settings.backup-configuration.backup-tier" => Some(("restoreInstanceSettings.settings.backupConfiguration.backupTier", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.settings.backup-configuration.binary-log-enabled" => Some(("restoreInstanceSettings.settings.backupConfiguration.binaryLogEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.settings.backup-configuration.enabled" => Some(("restoreInstanceSettings.settings.backupConfiguration.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.settings.backup-configuration.kind" => Some(("restoreInstanceSettings.settings.backupConfiguration.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.settings.backup-configuration.location" => Some(("restoreInstanceSettings.settings.backupConfiguration.location", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.settings.backup-configuration.point-in-time-recovery-enabled" => Some(("restoreInstanceSettings.settings.backupConfiguration.pointInTimeRecoveryEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.settings.backup-configuration.replication-log-archiving-enabled" => Some(("restoreInstanceSettings.settings.backupConfiguration.replicationLogArchivingEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.settings.backup-configuration.start-time" => Some(("restoreInstanceSettings.settings.backupConfiguration.startTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.settings.backup-configuration.transaction-log-retention-days" => Some(("restoreInstanceSettings.settings.backupConfiguration.transactionLogRetentionDays", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.settings.backup-configuration.transactional-log-storage-state" => Some(("restoreInstanceSettings.settings.backupConfiguration.transactionalLogStorageState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.settings.collation" => Some(("restoreInstanceSettings.settings.collation", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.settings.connection-pool-config.connection-pooling-enabled" => Some(("restoreInstanceSettings.settings.connectionPoolConfig.connectionPoolingEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.settings.connection-pool-config.pooler-count" => Some(("restoreInstanceSettings.settings.connectionPoolConfig.poolerCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.settings.connector-enforcement" => Some(("restoreInstanceSettings.settings.connectorEnforcement", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.settings.crash-safe-replication-enabled" => Some(("restoreInstanceSettings.settings.crashSafeReplicationEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.settings.data-api-access" => Some(("restoreInstanceSettings.settings.dataApiAccess", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.settings.data-cache-config.data-cache-enabled" => Some(("restoreInstanceSettings.settings.dataCacheConfig.dataCacheEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.settings.data-disk-provisioned-iops" => Some(("restoreInstanceSettings.settings.dataDiskProvisionedIops", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.settings.data-disk-provisioned-throughput" => Some(("restoreInstanceSettings.settings.dataDiskProvisionedThroughput", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.settings.data-disk-size-gb" => Some(("restoreInstanceSettings.settings.dataDiskSizeGb", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.settings.data-disk-type" => Some(("restoreInstanceSettings.settings.dataDiskType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.settings.database-replication-enabled" => Some(("restoreInstanceSettings.settings.databaseReplicationEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.settings.deletion-protection-enabled" => Some(("restoreInstanceSettings.settings.deletionProtectionEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.settings.edition" => Some(("restoreInstanceSettings.settings.edition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.settings.enable-dataplex-integration" => Some(("restoreInstanceSettings.settings.enableDataplexIntegration", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.settings.enable-google-ml-integration" => Some(("restoreInstanceSettings.settings.enableGoogleMlIntegration", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.settings.entraid-config.application-id" => Some(("restoreInstanceSettings.settings.entraidConfig.applicationId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.settings.entraid-config.kind" => Some(("restoreInstanceSettings.settings.entraidConfig.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.settings.entraid-config.tenant-id" => Some(("restoreInstanceSettings.settings.entraidConfig.tenantId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.settings.final-backup-config.enabled" => Some(("restoreInstanceSettings.settings.finalBackupConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.settings.final-backup-config.retention-days" => Some(("restoreInstanceSettings.settings.finalBackupConfig.retentionDays", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.settings.insights-config.query-insights-enabled" => Some(("restoreInstanceSettings.settings.insightsConfig.queryInsightsEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.settings.insights-config.query-plans-per-minute" => Some(("restoreInstanceSettings.settings.insightsConfig.queryPlansPerMinute", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.settings.insights-config.query-string-length" => Some(("restoreInstanceSettings.settings.insightsConfig.queryStringLength", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.settings.insights-config.record-application-tags" => Some(("restoreInstanceSettings.settings.insightsConfig.recordApplicationTags", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.settings.insights-config.record-client-address" => Some(("restoreInstanceSettings.settings.insightsConfig.recordClientAddress", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.settings.ip-configuration.allocated-ip-range" => Some(("restoreInstanceSettings.settings.ipConfiguration.allocatedIpRange", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.settings.ip-configuration.custom-subject-alternative-names" => Some(("restoreInstanceSettings.settings.ipConfiguration.customSubjectAlternativeNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "restore-instance-settings.settings.ip-configuration.enable-private-path-for-google-cloud-services" => Some(("restoreInstanceSettings.settings.ipConfiguration.enablePrivatePathForGoogleCloudServices", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.settings.ip-configuration.ipv4-enabled" => Some(("restoreInstanceSettings.settings.ipConfiguration.ipv4Enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.settings.ip-configuration.private-network" => Some(("restoreInstanceSettings.settings.ipConfiguration.privateNetwork", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.settings.ip-configuration.psc-config.allowed-consumer-projects" => Some(("restoreInstanceSettings.settings.ipConfiguration.pscConfig.allowedConsumerProjects", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "restore-instance-settings.settings.ip-configuration.psc-config.network-attachment-uri" => Some(("restoreInstanceSettings.settings.ipConfiguration.pscConfig.networkAttachmentUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.settings.ip-configuration.psc-config.psc-enabled" => Some(("restoreInstanceSettings.settings.ipConfiguration.pscConfig.pscEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.settings.ip-configuration.require-ssl" => Some(("restoreInstanceSettings.settings.ipConfiguration.requireSsl", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.settings.ip-configuration.server-ca-mode" => Some(("restoreInstanceSettings.settings.ipConfiguration.serverCaMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.settings.ip-configuration.server-ca-pool" => Some(("restoreInstanceSettings.settings.ipConfiguration.serverCaPool", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.settings.ip-configuration.server-certificate-rotation-mode" => Some(("restoreInstanceSettings.settings.ipConfiguration.serverCertificateRotationMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.settings.ip-configuration.ssl-mode" => Some(("restoreInstanceSettings.settings.ipConfiguration.sslMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.settings.kind" => Some(("restoreInstanceSettings.settings.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.settings.location-preference.follow-gae-application" => Some(("restoreInstanceSettings.settings.locationPreference.followGaeApplication", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.settings.location-preference.kind" => Some(("restoreInstanceSettings.settings.locationPreference.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.settings.location-preference.secondary-zone" => Some(("restoreInstanceSettings.settings.locationPreference.secondaryZone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.settings.location-preference.zone" => Some(("restoreInstanceSettings.settings.locationPreference.zone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.settings.maintenance-window.day" => Some(("restoreInstanceSettings.settings.maintenanceWindow.day", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.settings.maintenance-window.hour" => Some(("restoreInstanceSettings.settings.maintenanceWindow.hour", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.settings.maintenance-window.kind" => Some(("restoreInstanceSettings.settings.maintenanceWindow.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.settings.maintenance-window.update-track" => Some(("restoreInstanceSettings.settings.maintenanceWindow.updateTrack", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.settings.password-validation-policy.complexity" => Some(("restoreInstanceSettings.settings.passwordValidationPolicy.complexity", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.settings.password-validation-policy.disallow-compromised-credentials" => Some(("restoreInstanceSettings.settings.passwordValidationPolicy.disallowCompromisedCredentials", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.settings.password-validation-policy.disallow-username-substring" => Some(("restoreInstanceSettings.settings.passwordValidationPolicy.disallowUsernameSubstring", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.settings.password-validation-policy.enable-password-policy" => Some(("restoreInstanceSettings.settings.passwordValidationPolicy.enablePasswordPolicy", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.settings.password-validation-policy.min-length" => Some(("restoreInstanceSettings.settings.passwordValidationPolicy.minLength", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.settings.password-validation-policy.password-change-interval" => Some(("restoreInstanceSettings.settings.passwordValidationPolicy.passwordChangeInterval", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.settings.password-validation-policy.reuse-interval" => Some(("restoreInstanceSettings.settings.passwordValidationPolicy.reuseInterval", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.settings.performance-capture-config.enabled" => Some(("restoreInstanceSettings.settings.performanceCaptureConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.settings.performance-capture-config.probe-threshold" => Some(("restoreInstanceSettings.settings.performanceCaptureConfig.probeThreshold", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.settings.performance-capture-config.probing-interval-seconds" => Some(("restoreInstanceSettings.settings.performanceCaptureConfig.probingIntervalSeconds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.settings.performance-capture-config.running-threads-threshold" => Some(("restoreInstanceSettings.settings.performanceCaptureConfig.runningThreadsThreshold", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.settings.performance-capture-config.seconds-behind-source-threshold" => Some(("restoreInstanceSettings.settings.performanceCaptureConfig.secondsBehindSourceThreshold", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.settings.performance-capture-config.transaction-duration-threshold" => Some(("restoreInstanceSettings.settings.performanceCaptureConfig.transactionDurationThreshold", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.settings.pricing-plan" => Some(("restoreInstanceSettings.settings.pricingPlan", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.settings.read-pool-auto-scale-config.disable-scale-in" => Some(("restoreInstanceSettings.settings.readPoolAutoScaleConfig.disableScaleIn", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.settings.read-pool-auto-scale-config.enabled" => Some(("restoreInstanceSettings.settings.readPoolAutoScaleConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.settings.read-pool-auto-scale-config.max-node-count" => Some(("restoreInstanceSettings.settings.readPoolAutoScaleConfig.maxNodeCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.settings.read-pool-auto-scale-config.min-node-count" => Some(("restoreInstanceSettings.settings.readPoolAutoScaleConfig.minNodeCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.settings.read-pool-auto-scale-config.scale-in-cooldown-seconds" => Some(("restoreInstanceSettings.settings.readPoolAutoScaleConfig.scaleInCooldownSeconds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.settings.read-pool-auto-scale-config.scale-out-cooldown-seconds" => Some(("restoreInstanceSettings.settings.readPoolAutoScaleConfig.scaleOutCooldownSeconds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.settings.replication-lag-max-seconds" => Some(("restoreInstanceSettings.settings.replicationLagMaxSeconds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.settings.replication-type" => Some(("restoreInstanceSettings.settings.replicationType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.settings.retain-backups-on-delete" => Some(("restoreInstanceSettings.settings.retainBackupsOnDelete", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.settings.settings-version" => Some(("restoreInstanceSettings.settings.settingsVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.settings.sql-server-audit-config.bucket" => Some(("restoreInstanceSettings.settings.sqlServerAuditConfig.bucket", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.settings.sql-server-audit-config.kind" => Some(("restoreInstanceSettings.settings.sqlServerAuditConfig.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.settings.sql-server-audit-config.retention-interval" => Some(("restoreInstanceSettings.settings.sqlServerAuditConfig.retentionInterval", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.settings.sql-server-audit-config.upload-interval" => Some(("restoreInstanceSettings.settings.sqlServerAuditConfig.uploadInterval", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.settings.storage-auto-resize" => Some(("restoreInstanceSettings.settings.storageAutoResize", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.settings.storage-auto-resize-limit" => Some(("restoreInstanceSettings.settings.storageAutoResizeLimit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.settings.tier" => Some(("restoreInstanceSettings.settings.tier", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.settings.time-zone" => Some(("restoreInstanceSettings.settings.timeZone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.settings.user-labels" => Some(("restoreInstanceSettings.settings.userLabels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "restore-instance-settings.sql-network-architecture" => Some(("restoreInstanceSettings.sqlNetworkArchitecture", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.state" => Some(("restoreInstanceSettings.state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.suspension-reason" => Some(("restoreInstanceSettings.suspensionReason", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "restore-instance-settings.switch-transaction-logs-to-cloud-storage-enabled" => Some(("restoreInstanceSettings.switchTransactionLogsToCloudStorageEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "restore-instance-settings.tags" => Some(("restoreInstanceSettings.tags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "restore-instance-settings.write-endpoint" => Some(("restoreInstanceSettings.writeEndpoint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["activation-policy", "active-directory-config", "active-query-enabled", "admin-credential-secret-name", "advanced-machine-features", "allocated-ip-range", "allowed-consumer-projects", "application-id", "authorized-gae-applications", "auto-upgrade-enabled", "availability-type", "available", "available-maintenance-versions", "backend-type", "backup", "backup-configuration", "backup-retention-settings", "backup-run-id", "backup-tier", "backupdr-backup", "binary-log-enabled", "bucket", "ca-certificate", "can-defer", "can-reschedule", "cascadable-replica", "cert", "cert-serial-number", "client-certificate", "client-key", "collation", "common-name", "complexity", "connect-retry-interval", "connection-name", "connection-pool-config", "connection-pooling-enabled", "connector-enforcement", "crash-safe-replication-enabled", "create-time", "current-disk-size", "custom-subject-alternative-names", "data-api-access", "data-cache-config", "data-cache-enabled", "data-disk-provisioned-iops", "data-disk-provisioned-throughput", "data-disk-size-gb", "data-disk-type", "database-installed-version", "database-replication-enabled", "database-version", "day", "deletion-protection-enabled", "disable-scale-in", "disallow-compromised-credentials", "disallow-username-substring", "disk-encryption-configuration", "disk-encryption-status", "dns-name", "dns-servers", "domain", "dr-replica", "dump-file-path", "edition", "enable-dataplex-integration", "enable-google-ml-integration", "enable-password-policy", "enable-private-path-for-google-cloud-services", "enabled", "entitled", "entraid-config", "etag", "expiration-time", "failover-dr-replica-name", "failover-replica", "failover-target", "final-backup-config", "flag-recommender-enabled", "follow-gae-application", "gce-zone", "gemini-config", "google-vacuum-mgmt-enabled", "host-port", "hour", "include-replicas-for-major-version-upgrade", "index-advisor-enabled", "insights-config", "instance", "instance-id", "instance-type", "ip-configuration", "ipv4-enabled", "ipv6-address", "kind", "kms-key-name", "kms-key-version-name", "location", "location-preference", "maintenance-version", "maintenance-window", "master-heartbeat-period", "master-instance-name", "max-disk-size", "max-node-count", "min-length", "min-node-count", "mode", "mysql-replica-configuration", "name", "network-attachment-uri", "node-count", "on-premises-configuration", "oom-session-cancel-enabled", "organizational-unit", "out-of-disk-report", "password", "password-change-interval", "password-validation-policy", "performance-capture-config", "point-in-time-recovery-enabled", "pooler-count", "pricing-plan", "primary-dns-name", "private-network", "probe-threshold", "probing-interval-seconds", "project", "psa-write-endpoint", "psc-config", "psc-enabled", "psc-service-attachment-link", "query-insights-enabled", "query-plans-per-minute", "query-string-length", "read-pool-auto-scale-config", "record-application-tags", "record-client-address", "region", "replica-configuration", "replica-names", "replication-cluster", "replication-lag-max-seconds", "replication-log-archiving-enabled", "replication-type", "require-ssl", "restore-backup-context", "restore-instance-clear-overrides-field-names", "restore-instance-settings", "retain-backups-on-delete", "retained-backups", "retention-days", "retention-interval", "retention-unit", "reuse-interval", "root-password", "running-threads-threshold", "satisfies-pzi", "satisfies-pzs", "scale-in-cooldown-seconds", "scale-out-cooldown-seconds", "schedule-deadline-time", "scheduled-maintenance", "secondary-gce-zone", "secondary-zone", "seconds-behind-source-threshold", "self-link", "server-ca-cert", "server-ca-mode", "server-ca-pool", "server-certificate-rotation-mode", "service-account-email-address", "settings", "settings-version", "sha1-fingerprint", "source-instance", "sql-min-recommended-increase-size-gb", "sql-network-architecture", "sql-out-of-disk-state", "sql-server-audit-config", "ssl-cipher", "ssl-mode", "ssl-option", "start-time", "state", "storage-auto-resize", "storage-auto-resize-limit", "suspension-reason", "switch-transaction-logs-to-cloud-storage-enabled", "tags", "tenant-id", "threads-per-core", "tier", "time-zone", "transaction-duration-threshold", "transaction-log-retention-days", "transactional-log-storage-state", "update-track", "upload-interval", "user-labels", "username", "verify-server-certificate", "write-endpoint", "zone"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
             if let Some((field_cursor_str, type_info)) = type_info {
                 FieldCursor::from(field_cursor_str).set_json_value(
                     &mut object,
@@ -7795,6 +10907,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "include-replicas-for-major-version-upgrade" => Some((
+                    "includeReplicasForMajorVersionUpgrade",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "instance-type" => Some((
                     "instanceType",
                     JsonTypeInfo {
@@ -7841,6 +10960,13 @@ where
                     "name",
                     JsonTypeInfo {
                         jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "node-count" => Some((
+                    "nodeCount",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
                         ctype: ComplexType::Pod,
                     },
                 )),
@@ -7909,6 +11035,13 @@ where
                 )),
                 "on-premises-configuration.source-instance.region" => Some((
                     "onPremisesConfiguration.sourceInstance.region",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "on-premises-configuration.ssl-option" => Some((
+                    "onPremisesConfiguration.sslOption",
                     JsonTypeInfo {
                         jtype: JsonType::String,
                         ctype: ComplexType::Pod,
@@ -8102,6 +11235,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "satisfies-pzi" => Some((
+                    "satisfiesPzi",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "satisfies-pzs" => Some((
                     "satisfiesPzs",
                     JsonTypeInfo {
@@ -8228,6 +11368,20 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "settings.active-directory-config.admin-credential-secret-name" => Some((
+                    "settings.activeDirectoryConfig.adminCredentialSecretName",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "settings.active-directory-config.dns-servers" => Some((
+                    "settings.activeDirectoryConfig.dnsServers",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
                 "settings.active-directory-config.domain" => Some((
                     "settings.activeDirectoryConfig.domain",
                     JsonTypeInfo {
@@ -8237,6 +11391,20 @@ where
                 )),
                 "settings.active-directory-config.kind" => Some((
                     "settings.activeDirectoryConfig.kind",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "settings.active-directory-config.mode" => Some((
+                    "settings.activeDirectoryConfig.mode",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "settings.active-directory-config.organizational-unit" => Some((
+                    "settings.activeDirectoryConfig.organizationalUnit",
                     JsonTypeInfo {
                         jtype: JsonType::String,
                         ctype: ComplexType::Pod,
@@ -8254,6 +11422,13 @@ where
                     JsonTypeInfo {
                         jtype: JsonType::String,
                         ctype: ComplexType::Vec,
+                    },
+                )),
+                "settings.auto-upgrade-enabled" => Some((
+                    "settings.autoUpgradeEnabled",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
                     },
                 )),
                 "settings.availability-type" => Some((
@@ -8274,6 +11449,13 @@ where
                 }
                 "settings.backup-configuration.backup-retention-settings.retention-unit" => Some((
                     "settings.backupConfiguration.backupRetentionSettings.retentionUnit",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "settings.backup-configuration.backup-tier" => Some((
+                    "settings.backupConfiguration.backupTier",
                     JsonTypeInfo {
                         jtype: JsonType::String,
                         ctype: ComplexType::Pod,
@@ -8349,6 +11531,20 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "settings.connection-pool-config.connection-pooling-enabled" => Some((
+                    "settings.connectionPoolConfig.connectionPoolingEnabled",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "settings.connection-pool-config.pooler-count" => Some((
+                    "settings.connectionPoolConfig.poolerCount",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "settings.connector-enforcement" => Some((
                     "settings.connectorEnforcement",
                     JsonTypeInfo {
@@ -8363,10 +11559,31 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "settings.data-api-access" => Some((
+                    "settings.dataApiAccess",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "settings.data-cache-config.data-cache-enabled" => Some((
                     "settings.dataCacheConfig.dataCacheEnabled",
                     JsonTypeInfo {
                         jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "settings.data-disk-provisioned-iops" => Some((
+                    "settings.dataDiskProvisionedIops",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "settings.data-disk-provisioned-throughput" => Some((
+                    "settings.dataDiskProvisionedThroughput",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
                         ctype: ComplexType::Pod,
                     },
                 )),
@@ -8419,6 +11636,41 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "settings.entraid-config.application-id" => Some((
+                    "settings.entraidConfig.applicationId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "settings.entraid-config.kind" => Some((
+                    "settings.entraidConfig.kind",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "settings.entraid-config.tenant-id" => Some((
+                    "settings.entraidConfig.tenantId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "settings.final-backup-config.enabled" => Some((
+                    "settings.finalBackupConfig.enabled",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "settings.final-backup-config.retention-days" => Some((
+                    "settings.finalBackupConfig.retentionDays",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "settings.insights-config.query-insights-enabled" => Some((
                     "settings.insightsConfig.queryInsightsEnabled",
                     JsonTypeInfo {
@@ -8461,6 +11713,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "settings.ip-configuration.custom-subject-alternative-names" => Some((
+                    "settings.ipConfiguration.customSubjectAlternativeNames",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
                 "settings.ip-configuration.enable-private-path-for-google-cloud-services" => {
                     Some((
                         "settings.ipConfiguration.enablePrivatePathForGoogleCloudServices",
@@ -8491,6 +11750,13 @@ where
                         ctype: ComplexType::Vec,
                     },
                 )),
+                "settings.ip-configuration.psc-config.network-attachment-uri" => Some((
+                    "settings.ipConfiguration.pscConfig.networkAttachmentUri",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "settings.ip-configuration.psc-config.psc-enabled" => Some((
                     "settings.ipConfiguration.pscConfig.pscEnabled",
                     JsonTypeInfo {
@@ -8502,6 +11768,27 @@ where
                     "settings.ipConfiguration.requireSsl",
                     JsonTypeInfo {
                         jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "settings.ip-configuration.server-ca-mode" => Some((
+                    "settings.ipConfiguration.serverCaMode",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "settings.ip-configuration.server-ca-pool" => Some((
+                    "settings.ipConfiguration.serverCaPool",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "settings.ip-configuration.server-certificate-rotation-mode" => Some((
+                    "settings.ipConfiguration.serverCertificateRotationMode",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
                         ctype: ComplexType::Pod,
                     },
                 )),
@@ -8624,6 +11911,48 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "settings.performance-capture-config.enabled" => Some((
+                    "settings.performanceCaptureConfig.enabled",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "settings.performance-capture-config.probe-threshold" => Some((
+                    "settings.performanceCaptureConfig.probeThreshold",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "settings.performance-capture-config.probing-interval-seconds" => Some((
+                    "settings.performanceCaptureConfig.probingIntervalSeconds",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "settings.performance-capture-config.running-threads-threshold" => Some((
+                    "settings.performanceCaptureConfig.runningThreadsThreshold",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "settings.performance-capture-config.seconds-behind-source-threshold" => Some((
+                    "settings.performanceCaptureConfig.secondsBehindSourceThreshold",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "settings.performance-capture-config.transaction-duration-threshold" => Some((
+                    "settings.performanceCaptureConfig.transactionDurationThreshold",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "settings.pricing-plan" => Some((
                     "settings.pricingPlan",
                     JsonTypeInfo {
@@ -8631,10 +11960,66 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "settings.read-pool-auto-scale-config.disable-scale-in" => Some((
+                    "settings.readPoolAutoScaleConfig.disableScaleIn",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "settings.read-pool-auto-scale-config.enabled" => Some((
+                    "settings.readPoolAutoScaleConfig.enabled",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "settings.read-pool-auto-scale-config.max-node-count" => Some((
+                    "settings.readPoolAutoScaleConfig.maxNodeCount",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "settings.read-pool-auto-scale-config.min-node-count" => Some((
+                    "settings.readPoolAutoScaleConfig.minNodeCount",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "settings.read-pool-auto-scale-config.scale-in-cooldown-seconds" => Some((
+                    "settings.readPoolAutoScaleConfig.scaleInCooldownSeconds",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "settings.read-pool-auto-scale-config.scale-out-cooldown-seconds" => Some((
+                    "settings.readPoolAutoScaleConfig.scaleOutCooldownSeconds",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "settings.replication-lag-max-seconds" => Some((
+                    "settings.replicationLagMaxSeconds",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "settings.replication-type" => Some((
                     "settings.replicationType",
                     JsonTypeInfo {
                         jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "settings.retain-backups-on-delete" => Some((
+                    "settings.retainBackupsOnDelete",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
                         ctype: ComplexType::Pod,
                     },
                 )),
@@ -8729,6 +12114,20 @@ where
                         ctype: ComplexType::Vec,
                     },
                 )),
+                "switch-transaction-logs-to-cloud-storage-enabled" => Some((
+                    "switchTransactionLogsToCloudStorageEnabled",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "tags" => Some((
+                    "tags",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Map,
+                    },
+                )),
                 "write-endpoint" => Some((
                     "writeEndpoint",
                     JsonTypeInfo {
@@ -8743,16 +12142,20 @@ where
                             "activation-policy",
                             "active-directory-config",
                             "active-query-enabled",
+                            "admin-credential-secret-name",
                             "advanced-machine-features",
                             "allocated-ip-range",
                             "allowed-consumer-projects",
+                            "application-id",
                             "authorized-gae-applications",
+                            "auto-upgrade-enabled",
                             "availability-type",
                             "available",
                             "available-maintenance-versions",
                             "backend-type",
                             "backup-configuration",
                             "backup-retention-settings",
+                            "backup-tier",
                             "binary-log-enabled",
                             "bucket",
                             "ca-certificate",
@@ -8768,12 +12171,18 @@ where
                             "complexity",
                             "connect-retry-interval",
                             "connection-name",
+                            "connection-pool-config",
+                            "connection-pooling-enabled",
                             "connector-enforcement",
                             "crash-safe-replication-enabled",
                             "create-time",
                             "current-disk-size",
+                            "custom-subject-alternative-names",
+                            "data-api-access",
                             "data-cache-config",
                             "data-cache-enabled",
+                            "data-disk-provisioned-iops",
+                            "data-disk-provisioned-throughput",
                             "data-disk-size-gb",
                             "data-disk-type",
                             "database-installed-version",
@@ -8781,11 +12190,13 @@ where
                             "database-version",
                             "day",
                             "deletion-protection-enabled",
+                            "disable-scale-in",
                             "disallow-compromised-credentials",
                             "disallow-username-substring",
                             "disk-encryption-configuration",
                             "disk-encryption-status",
                             "dns-name",
+                            "dns-servers",
                             "domain",
                             "dr-replica",
                             "dump-file-path",
@@ -8796,11 +12207,13 @@ where
                             "enable-private-path-for-google-cloud-services",
                             "enabled",
                             "entitled",
+                            "entraid-config",
                             "etag",
                             "expiration-time",
                             "failover-dr-replica-name",
                             "failover-replica",
                             "failover-target",
+                            "final-backup-config",
                             "flag-recommender-enabled",
                             "follow-gae-application",
                             "gce-zone",
@@ -8808,6 +12221,7 @@ where
                             "google-vacuum-mgmt-enabled",
                             "host-port",
                             "hour",
+                            "include-replicas-for-major-version-upgrade",
                             "index-advisor-enabled",
                             "insights-config",
                             "instance",
@@ -8825,19 +12239,29 @@ where
                             "master-heartbeat-period",
                             "master-instance-name",
                             "max-disk-size",
+                            "max-node-count",
                             "min-length",
+                            "min-node-count",
+                            "mode",
                             "mysql-replica-configuration",
                             "name",
+                            "network-attachment-uri",
+                            "node-count",
                             "on-premises-configuration",
                             "oom-session-cancel-enabled",
+                            "organizational-unit",
                             "out-of-disk-report",
                             "password",
                             "password-change-interval",
                             "password-validation-policy",
+                            "performance-capture-config",
                             "point-in-time-recovery-enabled",
+                            "pooler-count",
                             "pricing-plan",
                             "primary-dns-name",
                             "private-network",
+                            "probe-threshold",
+                            "probing-interval-seconds",
                             "project",
                             "psa-write-endpoint",
                             "psc-config",
@@ -8846,27 +12270,39 @@ where
                             "query-insights-enabled",
                             "query-plans-per-minute",
                             "query-string-length",
+                            "read-pool-auto-scale-config",
                             "record-application-tags",
                             "record-client-address",
                             "region",
                             "replica-configuration",
                             "replica-names",
                             "replication-cluster",
+                            "replication-lag-max-seconds",
                             "replication-log-archiving-enabled",
                             "replication-type",
                             "require-ssl",
+                            "retain-backups-on-delete",
                             "retained-backups",
+                            "retention-days",
                             "retention-interval",
                             "retention-unit",
                             "reuse-interval",
                             "root-password",
+                            "running-threads-threshold",
+                            "satisfies-pzi",
                             "satisfies-pzs",
+                            "scale-in-cooldown-seconds",
+                            "scale-out-cooldown-seconds",
                             "schedule-deadline-time",
                             "scheduled-maintenance",
                             "secondary-gce-zone",
                             "secondary-zone",
+                            "seconds-behind-source-threshold",
                             "self-link",
                             "server-ca-cert",
+                            "server-ca-mode",
+                            "server-ca-pool",
+                            "server-certificate-rotation-mode",
                             "service-account-email-address",
                             "settings",
                             "settings-version",
@@ -8878,14 +12314,19 @@ where
                             "sql-server-audit-config",
                             "ssl-cipher",
                             "ssl-mode",
+                            "ssl-option",
                             "start-time",
                             "state",
                             "storage-auto-resize",
                             "storage-auto-resize-limit",
                             "suspension-reason",
+                            "switch-transaction-logs-to-cloud-storage-enabled",
+                            "tags",
+                            "tenant-id",
                             "threads-per-core",
                             "tier",
                             "time-zone",
+                            "transaction-duration-threshold",
                             "transaction-log-retention-days",
                             "transactional-log-storage-state",
                             "update-track",
@@ -9350,6 +12791,20 @@ where
         {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "source-instance-deletion-time" => {
+                    call = call.source_instance_deletion_time(
+                        value
+                            .map(|v| {
+                                arg_from_str(
+                                    v,
+                                    err,
+                                    "source-instance-deletion-time",
+                                    "google-datetime",
+                                )
+                            })
+                            .unwrap_or(chrono::Utc::now()),
+                    );
+                }
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -9367,6 +12822,7 @@ where
                             .push(CLIError::UnknownParameter(key.to_string(), {
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["source-instance-deletion-time"].iter().map(|v| *v));
                                 v
                             }));
                     }
@@ -9862,6 +13318,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "replica-overwrite-enabled" => Some((
+                    "replicaOverwriteEnabled",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "skip-verification" => Some((
                     "skipVerification",
                     JsonTypeInfo {
@@ -9888,6 +13351,7 @@ where
                         key,
                         &vec![
                             "migration-type",
+                            "replica-overwrite-enabled",
                             "skip-verification",
                             "sync-mode",
                             "sync-parallel-level",
@@ -10970,6 +14434,13 @@ where
 
             let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
             {
+                "database-roles" => Some((
+                    "databaseRoles",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
                 "dual-password-type" => Some((
                     "dualPasswordType",
                     JsonTypeInfo {
@@ -10986,6 +14457,20 @@ where
                 )),
                 "host" => Some((
                     "host",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "iam-email" => Some((
+                    "iamEmail",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "iam-status" => Some((
+                    "iamStatus",
                     JsonTypeInfo {
                         jtype: JsonType::String,
                         ctype: ComplexType::Pod,
@@ -11094,12 +14579,15 @@ where
                         key,
                         &vec![
                             "allowed-failed-attempts",
+                            "database-roles",
                             "disabled",
                             "dual-password-type",
                             "enable-failed-attempts-check",
                             "enable-password-verification",
                             "etag",
                             "host",
+                            "iam-email",
+                            "iam-status",
                             "instance",
                             "kind",
                             "locked",
@@ -11322,6 +14810,13 @@ where
 
             let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
             {
+                "database-roles" => Some((
+                    "databaseRoles",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
                 "dual-password-type" => Some((
                     "dualPasswordType",
                     JsonTypeInfo {
@@ -11338,6 +14833,20 @@ where
                 )),
                 "host" => Some((
                     "host",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "iam-email" => Some((
+                    "iamEmail",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "iam-status" => Some((
+                    "iamStatus",
                     JsonTypeInfo {
                         jtype: JsonType::String,
                         ctype: ComplexType::Pod,
@@ -11446,12 +14955,15 @@ where
                         key,
                         &vec![
                             "allowed-failed-attempts",
+                            "database-roles",
                             "disabled",
                             "dual-password-type",
                             "enable-failed-attempts-check",
                             "enable-password-verification",
                             "etag",
                             "host",
+                            "iam-email",
+                            "iam-status",
                             "instance",
                             "kind",
                             "locked",
@@ -11505,6 +15017,9 @@ where
                 "host" => {
                     call = call.host(value.unwrap_or(""));
                 }
+                "database-roles" => {
+                    call = call.add_database_roles(value.unwrap_or(""));
+                }
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -11522,7 +15037,7 @@ where
                             .push(CLIError::UnknownParameter(key.to_string(), {
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
-                                v.extend(["host", "name"].iter().map(|v| *v));
+                                v.extend(["database-roles", "host", "name"].iter().map(|v| *v));
                                 v
                             }));
                     }
@@ -11577,6 +15092,28 @@ where
         let mut call_result: Result<(), DoitError> = Ok(());
         let mut err_opt: Option<InvalidOptionsError> = None;
         match self.opt.subcommand() {
+            ("backups", Some(opt)) => match opt.subcommand() {
+                ("create-backup", Some(opt)) => {
+                    call_result = self._backups_create_backup(opt, dry_run, &mut err).await;
+                }
+                ("delete-backup", Some(opt)) => {
+                    call_result = self._backups_delete_backup(opt, dry_run, &mut err).await;
+                }
+                ("get-backup", Some(opt)) => {
+                    call_result = self._backups_get_backup(opt, dry_run, &mut err).await;
+                }
+                ("list-backups", Some(opt)) => {
+                    call_result = self._backups_list_backups(opt, dry_run, &mut err).await;
+                }
+                ("update-backup", Some(opt)) => {
+                    call_result = self._backups_update_backup(opt, dry_run, &mut err).await;
+                }
+                _ => {
+                    err.issues
+                        .push(CLIError::MissingMethodError("backups".to_string()));
+                    writeln!(std::io::stderr(), "{}\n", opt.usage()).ok();
+                }
+            },
             ("backup-runs", Some(opt)) => match opt.subcommand() {
                 ("delete", Some(opt)) => {
                     call_result = self._backup_runs_delete(opt, dry_run, &mut err).await;
@@ -11647,13 +15184,43 @@ where
                 }
             },
             ("instances", Some(opt)) => match opt.subcommand() {
+                ("list-entra-id-certificates", Some(opt)) => {
+                    call_result = self
+                        ._instances_list_entra_id_certificates(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("list-server-certificates", Some(opt)) => {
+                    call_result = self
+                        ._instances_list_server_certificates(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("rotate-entra-id-certificate", Some(opt)) => {
+                    call_result = self
+                        ._instances_rotate_entra_id_certificate(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("rotate-server-certificate", Some(opt)) => {
+                    call_result = self
+                        ._instances_rotate_server_certificate(opt, dry_run, &mut err)
+                        .await;
+                }
                 ("acquire-ssrs-lease", Some(opt)) => {
                     call_result = self
                         ._instances_acquire_ssrs_lease(opt, dry_run, &mut err)
                         .await;
                 }
+                ("add-entra-id-certificate", Some(opt)) => {
+                    call_result = self
+                        ._instances_add_entra_id_certificate(opt, dry_run, &mut err)
+                        .await;
+                }
                 ("add-server-ca", Some(opt)) => {
                     call_result = self._instances_add_server_ca(opt, dry_run, &mut err).await;
+                }
+                ("add-server-certificate", Some(opt)) => {
+                    call_result = self
+                        ._instances_add_server_certificate(opt, dry_run, &mut err)
+                        .await;
                 }
                 ("clone", Some(opt)) => {
                     call_result = self._instances_clone(opt, dry_run, &mut err).await;
@@ -11666,6 +15233,9 @@ where
                 }
                 ("demote-master", Some(opt)) => {
                     call_result = self._instances_demote_master(opt, dry_run, &mut err).await;
+                }
+                ("execute-sql", Some(opt)) => {
+                    call_result = self._instances_execute_sql(opt, dry_run, &mut err).await;
                 }
                 ("export", Some(opt)) => {
                     call_result = self._instances_export(opt, dry_run, &mut err).await;
@@ -11692,6 +15262,16 @@ where
                 }
                 ("patch", Some(opt)) => {
                     call_result = self._instances_patch(opt, dry_run, &mut err).await;
+                }
+                ("point-in-time-restore", Some(opt)) => {
+                    call_result = self
+                        ._instances_point_in_time_restore(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("pre-check-major-version-upgrade", Some(opt)) => {
+                    call_result = self
+                        ._instances_pre_check_major_version_upgrade(opt, dry_run, &mut err)
+                        .await;
                 }
                 ("promote-replica", Some(opt)) => {
                     call_result = self
@@ -11897,7 +15477,9 @@ where
         let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
             secret,
             yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-            hyper_util::client::legacy::Client::builder(executor).build(connector),
+            yup_oauth2::client::CustomHyperClientBuilder::from(
+                hyper_util::client::legacy::Client::builder(executor).build(connector),
+            ),
         )
         .persist_tokens_to_disk(format!("{}/sqladmin1", config_dir))
         .build()
@@ -11950,7 +15532,119 @@ where
 async fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("backup-runs", "methods: 'delete', 'get', 'insert' and 'list'", vec![
+        ("backups", "methods: 'create-backup', 'delete-backup', 'get-backup', 'list-backups' and 'update-backup'", vec![
+            ("create-backup",
+                    Some(r##"Creates a backup for a Cloud SQL instance. This API can be used only to create on-demand backups."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_sqladmin1_cli/backups_create-backup",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. The parent resource where this backup is created. Format: projects/{project}"##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("delete-backup",
+                    Some(r##"Deletes the backup."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_sqladmin1_cli/backups_delete-backup",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The name of the backup to delete. Format: projects/{project}/backups/{backup}"##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("get-backup",
+                    Some(r##"Retrieves a resource containing information about a backup."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_sqladmin1_cli/backups_get-backup",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The name of the backup to retrieve. Format: projects/{project}/backups/{backup}"##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("list-backups",
+                    Some(r##"Lists all backups associated with the project."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_sqladmin1_cli/backups_list-backups",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. The parent that owns this collection of backups. Format: projects/{project}"##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("update-backup",
+                    Some(r##"Updates the retention period and description of the backup. You can use this API to update final backups only."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_sqladmin1_cli/backups_update-backup",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Output only. The resource name of the backup. Format: projects/{project}/backups/{backup}."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ]),
+            ("backup-runs", "methods: 'delete', 'get', 'insert' and 'list'", vec![
             ("delete",
                     Some(r##"Deletes the backup taken by a backup run."##),
                     "Details at http://byron.github.io/google-apis-rs/google_sqladmin1_cli/backup-runs_delete",
@@ -12328,7 +16022,117 @@ async fn main() {
                      Some(false)),
                   ]),
             ]),
-            ("instances", "methods: 'acquire-ssrs-lease', 'add-server-ca', 'clone', 'delete', 'demote', 'demote-master', 'export', 'failover', 'get', 'import', 'insert', 'list', 'list-server-cas', 'patch', 'promote-replica', 'reencrypt', 'release-ssrs-lease', 'reset-ssl-config', 'restart', 'restore-backup', 'rotate-server-ca', 'start-replica', 'stop-replica', 'switchover', 'truncate-log' and 'update'", vec![
+            ("instances", "methods: 'list-entra-id-certificates', 'list-server-certificates', 'rotate-entra-id-certificate', 'rotate-server-certificate', 'acquire-ssrs-lease', 'add-entra-id-certificate', 'add-server-ca', 'add-server-certificate', 'clone', 'delete', 'demote', 'demote-master', 'execute-sql', 'export', 'failover', 'get', 'import', 'insert', 'list', 'list-server-cas', 'patch', 'point-in-time-restore', 'pre-check-major-version-upgrade', 'promote-replica', 'reencrypt', 'release-ssrs-lease', 'reset-ssl-config', 'restart', 'restore-backup', 'rotate-server-ca', 'start-replica', 'stop-replica', 'switchover', 'truncate-log' and 'update'", vec![
+            ("list-entra-id-certificates",
+                    Some(r##"Lists all versions of EntraID certificates for the specified instance. There can be up to three sets of certificates listed: the certificate that is currently in use, a future that has been added but not yet used to sign a certificate, and a certificate that has been rotated out."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_sqladmin1_cli/instances_list-entra-id-certificates",
+                  vec![
+                    (Some(r##"project"##),
+                     None,
+                     Some(r##"Required. Project ID of the project that contains the instance."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"instance"##),
+                     None,
+                     Some(r##"Required. Cloud SQL instance ID. This does not include the project ID."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("list-server-certificates",
+                    Some(r##"Lists all versions of server certificates and certificate authorities (CAs) for the specified instance. There can be up to three sets of certs listed: the certificate that is currently in use, a future that has been added but not yet used to sign a certificate, and a certificate that has been rotated out. For instances not using Certificate Authority Service (CAS) server CA, use ListServerCas instead."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_sqladmin1_cli/instances_list-server-certificates",
+                  vec![
+                    (Some(r##"project"##),
+                     None,
+                     Some(r##"Required. Project ID of the project that contains the instance."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"instance"##),
+                     None,
+                     Some(r##"Required. Cloud SQL instance ID. This does not include the project ID."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("rotate-entra-id-certificate",
+                    Some(r##"Rotates the server certificate version to one previously added with the addEntraIdCertificate method."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_sqladmin1_cli/instances_rotate-entra-id-certificate",
+                  vec![
+                    (Some(r##"project"##),
+                     None,
+                     Some(r##"Required. Project ID of the project that contains the instance."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"instance"##),
+                     None,
+                     Some(r##"Required. Cloud SQL instance ID. This does not include the project ID."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("rotate-server-certificate",
+                    Some(r##"Rotates the server certificate version to one previously added with the addServerCertificate method. For instances not using Certificate Authority Service (CAS) server CA, use RotateServerCa instead."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_sqladmin1_cli/instances_rotate-server-certificate",
+                  vec![
+                    (Some(r##"project"##),
+                     None,
+                     Some(r##"Required. Project ID of the project that contains the instance."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"instance"##),
+                     None,
+                     Some(r##"Required. Cloud SQL instance ID. This does not include the project ID."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("acquire-ssrs-lease",
                     Some(r##"Acquire a lease for the setup of SQL Server Reporting Services (SSRS)."##),
                     "Details at http://byron.github.io/google-apis-rs/google_sqladmin1_cli/instances_acquire-ssrs-lease",
@@ -12359,9 +16163,59 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("add-entra-id-certificate",
+                    Some(r##"Adds a new Entra ID certificate for the specified instance. If an Entra ID certificate was previously added but never used in a certificate rotation, this operation replaces that version."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_sqladmin1_cli/instances_add-entra-id-certificate",
+                  vec![
+                    (Some(r##"project"##),
+                     None,
+                     Some(r##"Required. Project ID of the project that contains the instance."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"instance"##),
+                     None,
+                     Some(r##"Required. Cloud SQL instance ID. This does not include the project ID."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("add-server-ca",
-                    Some(r##"Adds a new trusted Certificate Authority (CA) version for the specified instance. Required to prepare for a certificate rotation. If a CA version was previously added but never used in a certificate rotation, this operation replaces that version. There cannot be more than one CA version waiting to be rotated in."##),
+                    Some(r##"Adds a new trusted Certificate Authority (CA) version for the specified instance. Required to prepare for a certificate rotation. If a CA version was previously added but never used in a certificate rotation, this operation replaces that version. There cannot be more than one CA version waiting to be rotated in. For instances that have enabled Certificate Authority Service (CAS) based server CA, use AddServerCertificate to add a new server certificate."##),
                     "Details at http://byron.github.io/google-apis-rs/google_sqladmin1_cli/instances_add-server-ca",
+                  vec![
+                    (Some(r##"project"##),
+                     None,
+                     Some(r##"Project ID of the project that contains the instance."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"instance"##),
+                     None,
+                     Some(r##"Cloud SQL instance ID. This does not include the project ID."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("add-server-certificate",
+                    Some(r##"Add a new trusted server certificate version for the specified instance using Certificate Authority Service (CAS) server CA. Required to prepare for a certificate rotation. If a server certificate version was previously added but never used in a certificate rotation, this operation replaces that version. There cannot be more than one certificate version waiting to be rotated in. For instances not using CAS server CA, use AddServerCa instead."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_sqladmin1_cli/instances_add-server-certificate",
                   vec![
                     (Some(r##"project"##),
                      None,
@@ -12390,12 +16244,12 @@ async fn main() {
                   vec![
                     (Some(r##"project"##),
                      None,
-                     Some(r##"Project ID of the source as well as the clone Cloud SQL instance."##),
+                     Some(r##"Required. Project ID of the source as well as the clone Cloud SQL instance."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"instance"##),
                      None,
-                     Some(r##"The ID of the Cloud SQL instance to be cloned (source). This does not include the project ID."##),
+                     Some(r##"Required. The ID of the Cloud SQL instance to be cloned (source). This does not include the project ID."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -12499,6 +16353,36 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("execute-sql",
+                    Some(r##"Execute SQL statements."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_sqladmin1_cli/instances_execute-sql",
+                  vec![
+                    (Some(r##"project"##),
+                     None,
+                     Some(r##"Required. Project ID of the project that contains the instance."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"instance"##),
+                     None,
+                     Some(r##"Required. Database instance ID. This does not include the project ID."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("export",
                     Some(r##"Exports data from a Cloud SQL instance to a Cloud Storage bucket as a SQL dump or CSV file."##),
                     "Details at http://byron.github.io/google-apis-rs/google_sqladmin1_cli/instances_export",
@@ -12565,12 +16449,12 @@ async fn main() {
                   vec![
                     (Some(r##"project"##),
                      None,
-                     Some(r##"Project ID of the project that contains the instance."##),
+                     Some(r##"Required. Project ID of the project that contains the instance."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"instance"##),
                      None,
-                     Some(r##"Database instance ID. This does not include the project ID."##),
+                     Some(r##"Required. Database instance ID. This does not include the project ID."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -12696,6 +16580,61 @@ async fn main() {
                     (Some(r##"instance"##),
                      None,
                      Some(r##"Cloud SQL instance ID. This does not include the project ID."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("point-in-time-restore",
+                    Some(r##"Point in time restore for an instance managed by Google Cloud Backup and Disaster Recovery."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_sqladmin1_cli/instances_point-in-time-restore",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. The parent resource where you created this instance. Format: projects/{project}"##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("pre-check-major-version-upgrade",
+                    Some(r##"Execute MVU Pre-checks"##),
+                    "Details at http://byron.github.io/google-apis-rs/google_sqladmin1_cli/instances_pre-check-major-version-upgrade",
+                  vec![
+                    (Some(r##"project"##),
+                     None,
+                     Some(r##"Required. Project ID of the project that contains the instance."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"instance"##),
+                     None,
+                     Some(r##"Required. Cloud SQL instance ID. This does not include the project ID."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -12875,7 +16814,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("rotate-server-ca",
-                    Some(r##"Rotates the server certificate to one signed by the Certificate Authority (CA) version previously added with the addServerCA method."##),
+                    Some(r##"Rotates the server certificate to one signed by the Certificate Authority (CA) version previously added with the addServerCA method. For instances that have enabled Certificate Authority Service (CAS) based server CA, use RotateServerCertificate to rotate the server certificate."##),
                     "Details at http://byron.github.io/google-apis-rs/google_sqladmin1_cli/instances_rotate-server-ca",
                   vec![
                     (Some(r##"project"##),
@@ -12955,7 +16894,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("switchover",
-                    Some(r##"Switches over from the primary instance to the designated DR replica instance."##),
+                    Some(r##"Switches over from the primary instance to the DR replica instance."##),
                     "Details at http://byron.github.io/google-apis-rs/google_sqladmin1_cli/instances_switchover",
                   vec![
                     (Some(r##"project"##),
@@ -13072,12 +17011,12 @@ async fn main() {
                   vec![
                     (Some(r##"project"##),
                      None,
-                     Some(r##"Project ID of the project that contains the instance."##),
+                     Some(r##"Required. Project ID of the project that contains the instance."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"operation"##),
                      None,
-                     Some(r##"Instance operation ID."##),
+                     Some(r##"Required. Instance operation ID."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -13629,7 +17568,7 @@ async fn main() {
 
     let mut app = App::new("sqladmin1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("6.0.0+20240618")
+           .version("7.0.0+20251201")
            .about("API for Cloud SQL database instance management")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_sqladmin1_cli")
            .arg(Arg::with_name("url")
@@ -13694,7 +17633,7 @@ async fn main() {
         .with_native_roots()
         .unwrap()
         .https_or_http()
-        .enable_http1()
+        .enable_http2()
         .build();
 
     match Engine::new(matches, connector).await {

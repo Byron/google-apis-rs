@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Area120 Tables* API at revision *20240625*. The CLI is at version *6.0.0*.
+This documentation was generated from the *Area120 Tables* API at revision *20251222*. The CLI is at version *7.0.0*.
 
 ```bash
 area120tables1-alpha1 [options]

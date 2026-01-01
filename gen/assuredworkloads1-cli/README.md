@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Assuredworkloads* API at revision *20240617*. The CLI is at version *6.0.0*.
+This documentation was generated from the *Assuredworkloads* API at revision *20251211*. The CLI is at version *7.0.0*.
 
 ```bash
 assuredworkloads1 [options]
@@ -35,12 +35,15 @@ assuredworkloads1 [options]
                 locations-workloads-analyze-workload-move <target> [-p <v>]... [-o <out>]
                 locations-workloads-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-workloads-delete <name> [-p <v>]... [-o <out>]
+                locations-workloads-enable-compliance-updates <name> [-p <v>]... [-o <out>]
                 locations-workloads-enable-resource-monitoring <name> [-p <v>]... [-o <out>]
                 locations-workloads-get <name> [-p <v>]... [-o <out>]
                 locations-workloads-list <parent> [-p <v>]... [-o <out>]
                 locations-workloads-mutate-partner-permissions <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-workloads-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-workloads-restrict-allowed-resources <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-workloads-updates-apply <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-workloads-updates-list <parent> [-p <v>]... [-o <out>]
                 locations-workloads-violations-acknowledge <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-workloads-violations-get <name> [-p <v>]... [-o <out>]
                 locations-workloads-violations-list <parent> [-p <v>]... [-o <out>]

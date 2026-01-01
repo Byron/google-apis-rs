@@ -326,7 +326,7 @@ where
             &opt.value_of("steps-to-increment").unwrap_or(""),
             err,
             "<steps-to-increment>",
-            "integer",
+            "int32",
         );
         let mut call = self.hub.achievements().increment(
             opt.value_of("achievement-id").unwrap_or(""),
@@ -604,7 +604,7 @@ where
             &opt.value_of("steps").unwrap_or(""),
             err,
             "<steps>",
-            "integer",
+            "int32",
         );
         let mut call = self
             .hub
@@ -3369,10 +3369,16 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self.hub.scores().submit(
-            opt.value_of("leaderboard-id").unwrap_or(""),
-            opt.value_of("score").unwrap_or(""),
+        let score: i64 = arg_from_str(
+            &opt.value_of("score").unwrap_or(""),
+            err,
+            "<score>",
+            "int64",
         );
+        let mut call = self
+            .hub
+            .scores()
+            .submit(opt.value_of("leaderboard-id").unwrap_or(""), score);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -4130,7 +4136,9 @@ where
         let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
             secret,
             yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-            hyper_util::client::legacy::Client::builder(executor).build(connector),
+            yup_oauth2::client::CustomHyperClientBuilder::from(
+                hyper_util::client::legacy::Client::builder(executor).build(connector),
+            ),
         )
         .persist_tokens_to_disk(format!("{}/games1", config_dir))
         .build()
@@ -4978,8 +4986,8 @@ async fn main() {
 
     let mut app = App::new("games1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("6.0.0+20240618")
-           .about("The Google Play games service allows developers to enhance games with social leaderboards, achievements, game state, sign-in with Google, and more.")
+           .version("7.0.0+20251216")
+           .about("The Google Play Games Service allows developers to enhance games with social leaderboards, achievements, game state, sign-in with Google, and more.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_games1_cli")
            .arg(Arg::with_name("url")
                    .long("scope")
@@ -5043,7 +5051,7 @@ async fn main() {
         .with_native_roots()
         .unwrap()
         .https_or_http()
-        .enable_http1()
+        .enable_http2()
         .build();
 
     match Engine::new(matches, connector).await {

@@ -2016,6 +2016,9 @@ where
                 "filter" => {
                     call = call.filter(value.unwrap_or(""));
                 }
+                "extra-location-types" => {
+                    call = call.add_extra_location_types(value.unwrap_or(""));
+                }
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -2033,7 +2036,11 @@ where
                             .push(CLIError::UnknownParameter(key.to_string(), {
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
-                                v.extend(["filter", "page-size", "page-token"].iter().map(|v| *v));
+                                v.extend(
+                                    ["extra-location-types", "filter", "page-size", "page-token"]
+                                        .iter()
+                                        .map(|v| *v),
+                                );
                                 v
                             }));
                     }
@@ -7112,7 +7119,9 @@ where
         let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
             secret,
             yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-            hyper_util::client::legacy::Client::builder(executor).build(connector),
+            yup_oauth2::client::CustomHyperClientBuilder::from(
+                hyper_util::client::legacy::Client::builder(executor).build(connector),
+            ),
         )
         .persist_tokens_to_disk(format!("{}/baremetalsolution2", config_dir))
         .build()
@@ -7917,7 +7926,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-provisioning-configs-submit",
-                    Some(r##"Submit a provisiong configuration for a given project."##),
+                    Some(r##"Submit a provisioning configuration for a given project."##),
                     "Details at http://byron.github.io/google-apis-rs/google_baremetalsolution2_cli/projects_locations-provisioning-configs-submit",
                   vec![
                     (Some(r##"parent"##),
@@ -8346,7 +8355,7 @@ async fn main() {
 
     let mut app = App::new("baremetalsolution2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("6.0.0+20240617")
+           .version("7.0.0+20251008")
            .about("Provides ways to manage Bare Metal Solution hardware installed in a regional extension located near a Google Cloud data center.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_baremetalsolution2_cli")
            .arg(Arg::with_name("url")
@@ -8411,7 +8420,7 @@ async fn main() {
         .with_native_roots()
         .unwrap()
         .https_or_http()
-        .enable_http1()
+        .enable_http2()
         .build();
 
     match Engine::new(matches, connector).await {

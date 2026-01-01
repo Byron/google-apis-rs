@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Firestore* API at revision *20240617*. The CLI is at version *6.0.0*.
+This documentation was generated from the *Firestore* API at revision *20251216*. The CLI is at version *7.0.0*.
 
 ```bash
 firestore1 [options]
@@ -36,6 +36,7 @@ firestore1 [options]
                 databases-backup-schedules-list <parent> [-p <v>]... [-o <out>]
                 databases-backup-schedules-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 databases-bulk-delete-documents <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                databases-clone <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 databases-collection-groups-fields-get <name> [-p <v>]... [-o <out>]
                 databases-collection-groups-fields-list <parent> [-p <v>]... [-o <out>]
                 databases-collection-groups-fields-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
@@ -51,6 +52,7 @@ firestore1 [options]
                 databases-documents-commit <database> (-r <kv>)... [-p <v>]... [-o <out>]
                 databases-documents-create-document <parent> <collection-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 databases-documents-delete <name> [-p <v>]... [-o <out>]
+                databases-documents-execute-pipeline <database> (-r <kv>)... [-p <v>]... [-o <out>]
                 databases-documents-get <name> [-p <v>]... [-o <out>]
                 databases-documents-list <parent> <collection-id> [-p <v>]... [-o <out>]
                 databases-documents-list-collection-ids <parent> (-r <kv>)... [-p <v>]... [-o <out>]
@@ -72,6 +74,13 @@ firestore1 [options]
                 databases-operations-list <name> [-p <v>]... [-o <out>]
                 databases-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 databases-restore <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                databases-user-creds-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                databases-user-creds-delete <name> [-p <v>]... [-o <out>]
+                databases-user-creds-disable <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                databases-user-creds-enable <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                databases-user-creds-get <name> [-p <v>]... [-o <out>]
+                databases-user-creds-list <parent> [-p <v>]... [-o <out>]
+                databases-user-creds-reset-password <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-backups-delete <name> [-p <v>]... [-o <out>]
                 locations-backups-get <name> [-p <v>]... [-o <out>]
                 locations-backups-list <parent> [-p <v>]... [-o <out>]

@@ -143,6 +143,12 @@
                                 "name"
                             ],
                             "parameters": {
+                                "extraLocationTypes": {
+                                    "description": "Optional. Unless explicitly documented otherwise, don't use this unsupported field which is primarily intended for internal usage.",
+                                    "location": "query",
+                                    "repeated": true,
+                                    "type": "string"
+                                },
                                 "filter": {
                                     "description": "A filter to narrow down results to a preferred subset. The filtering language accepts strings like `\"displayName=tokyo\"`, and is documented in more detail in [AIP-160](https://google.aip.dev/160).",
                                     "location": "query",
@@ -487,7 +493,7 @@
                         "operations": {
                             "methods": {
                                 "cancel": {
-                                    "description": "Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of 1, corresponding to `Code.CANCELLED`.",
+                                    "description": "Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of `1`, corresponding to `Code.CANCELLED`.",
                                     "flatPath": "v1beta2/projects/{projectsId}/locations/{locationsId}/operations/{operationsId}:cancel",
                                     "httpMethod": "POST",
                                     "id": "memcache.projects.locations.operations.cancel",
@@ -595,6 +601,11 @@
                                             "description": "The standard list page token.",
                                             "location": "query",
                                             "type": "string"
+                                        },
+                                        "returnPartialSuccess": {
+                                            "description": "When set to `true`, operations that are reachable are returned as normal, and those that are unreachable are returned in the [ListOperationsResponse.unreachable] field. This can only be `true` when reading across collections e.g. when `parent` is set to `\"projects/example/locations/-\"`. This field is not by default supported and will result in an `UNIMPLEMENTED` error if set unless explicitly documented otherwise in service or product specific documentation.",
+                                            "location": "query",
+                                            "type": "boolean"
                                         }
                                     },
                                     "path": "v1beta2/{+name}/operations",
@@ -612,7 +623,7 @@
             }
         }
     },
-    "revision": "20240614",
+    "revision": "20251005",
     "rootUrl": "https://memcache.googleapis.com/",
     "schemas": {
         "ApplyParametersRequest": {
@@ -718,6 +729,39 @@
             "description": "A generic empty message that you can re-use to avoid defining duplicated empty messages in your APIs. A typical example is to use it as the request or the response type of an API method. For instance: service Foo { rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty); }",
             "id": "Empty",
             "properties": {},
+            "type": "object"
+        },
+        "GetTagsRequest": {
+            "description": "Request message for GetTags.",
+            "id": "GetTagsRequest",
+            "properties": {
+                "name": {
+                    "description": "Required. The full One Platform resource name of the service resource.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "GetTagsResponse": {
+            "description": "Response message for GetTags.",
+            "id": "GetTagsResponse",
+            "properties": {
+                "name": {
+                    "description": "Required. The full One Platform resource name of the service resource.",
+                    "type": "string"
+                },
+                "tags": {
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "description": "Required. Tag keys/values directly bound to this resource. Each item in the map must be expressed as \" : \". For example: \"123/environment\" : \"production\", \"123/costCenter\" : \"marketing\"",
+                    "type": "object"
+                },
+                "tagsEtag": {
+                    "description": "A checksum based on the current bindings. This field is always set in server responses.",
+                    "type": "string"
+                }
+            },
             "type": "object"
         },
         "GoogleCloudMemcacheV1beta2LocationMetadata": {
@@ -841,6 +885,10 @@
             "properties": {
                 "consumerDefinedName": {
                     "description": "consumer_defined_name is the name of the instance set by the service consumers. Generally this is different from the `name` field which reperesents the system-assigned id of the instance which the service consumers do not recognize. This is a required field for tenants onboarding to Maintenance Window notifications (go/slm-rollout-maintenance-policies#prerequisites).",
+                    "type": "string"
+                },
+                "consumerProjectNumber": {
+                    "description": "Optional. The consumer_project_number associated with this Apigee instance. This field is added specifically to support Apigee integration with SLM Rollout and UMM. It represents the numerical project ID of the GCP project that consumes this Apigee instance. It is used for SLM rollout notifications and UMM integration, enabling proper mapping to customer projects and log delivery for Apigee instances. This field complements consumer_project_id and may be used for specific Apigee scenarios where the numerical ID is required.",
                     "type": "string"
                 },
                 "createTime": {
@@ -1340,6 +1388,13 @@
                         "$ref": "Operation"
                     },
                     "type": "array"
+                },
+                "unreachable": {
+                    "description": "Unordered list. Unreachable resources. Populated when the request sets `ListOperationsRequest.return_partial_success` and reads across collections e.g. when attempting to list all resources across all supported locations.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
                 }
             },
             "type": "object"
@@ -1740,6 +1795,54 @@
             },
             "type": "object"
         },
+        "SetTagsRequest": {
+            "description": "Request message for SetTags.",
+            "id": "SetTagsRequest",
+            "properties": {
+                "name": {
+                    "description": "Required. The full One Platform resource name of the service resource.",
+                    "type": "string"
+                },
+                "requestId": {
+                    "description": "Optional. A unique identifier for this request. Must be a valid UUID. This request is only idempotent if a `request_id` is provided.",
+                    "type": "string"
+                },
+                "tags": {
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "description": "Required. These bindings will override any bindings previously set and will be effective immediately. Each item in the map must be expressed as \" : \". For example: \"123/environment\" : \"production\", \"123/costCenter\" : \"marketing\"",
+                    "type": "object"
+                },
+                "tagsEtag": {
+                    "description": "Optional. A checksum based on the current bindings which can be passed to prevent race conditions. If not passed, etag check would be skipped.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "SetTagsResponse": {
+            "description": "Response message for SetTags.",
+            "id": "SetTagsResponse",
+            "properties": {
+                "name": {
+                    "description": "Required. The full One Platform resource name of the service resource.",
+                    "type": "string"
+                },
+                "tags": {
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "description": "Required. Tag keys/values directly bound to this resource. Each item in the map must be expressed as \" : \". For example: \"123/environment\" : \"production\", \"123/costCenter\" : \"marketing\"",
+                    "type": "object"
+                },
+                "tagsEtag": {
+                    "description": "A checksum based on the current bindings. This field is always set in server responses.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
         "Status": {
             "description": "The `Status` type defines a logical error model that is suitable for different programming environments, including REST APIs and RPC APIs. It is used by [gRPC](https://github.com/grpc). Each `Status` message contains three pieces of data: error code, error message, and error details. You can find out more about this error model and how to work with it in the [API Design Guide](https://cloud.google.com/apis/design/errors).",
             "id": "Status",
@@ -1772,22 +1875,22 @@
             "id": "TimeOfDay",
             "properties": {
                 "hours": {
-                    "description": "Hours of day in 24 hour format. Should be from 0 to 23. An API may choose to allow the value \"24:00:00\" for scenarios like business closing time.",
+                    "description": "Hours of a day in 24 hour format. Must be greater than or equal to 0 and typically must be less than or equal to 23. An API may choose to allow the value \"24:00:00\" for scenarios like business closing time.",
                     "format": "int32",
                     "type": "integer"
                 },
                 "minutes": {
-                    "description": "Minutes of hour of day. Must be from 0 to 59.",
+                    "description": "Minutes of an hour. Must be greater than or equal to 0 and less than or equal to 59.",
                     "format": "int32",
                     "type": "integer"
                 },
                 "nanos": {
-                    "description": "Fractions of seconds in nanoseconds. Must be from 0 to 999,999,999.",
+                    "description": "Fractions of seconds, in nanoseconds. Must be greater than or equal to 0 and less than or equal to 999,999,999.",
                     "format": "int32",
                     "type": "integer"
                 },
                 "seconds": {
-                    "description": "Seconds of minutes of the time. Must normally be from 0 to 59. An API may allow the value 60 if it allows leap-seconds.",
+                    "description": "Seconds of a minute. Must be greater than or equal to 0 and typically must be less than or equal to 59. An API may allow the value 60 if it allows leap-seconds.",
                     "format": "int32",
                     "type": "integer"
                 }

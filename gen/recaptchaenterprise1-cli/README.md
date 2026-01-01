@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Recaptcha Enterprise* API at revision *20240623*. The CLI is at version *6.0.0*.
+This documentation was generated from the *Recaptcha Enterprise* API at revision *20251210*. The CLI is at version *7.0.0*.
 
 ```bash
 recaptchaenterprise1 [options]
@@ -38,13 +38,16 @@ recaptchaenterprise1 [options]
                 firewallpolicies-list <parent> [-p <v>]... [-o <out>]
                 firewallpolicies-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 firewallpolicies-reorder <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                keys-add-ip-override <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 keys-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 keys-delete <name> [-p <v>]... [-o <out>]
                 keys-get <name> [-p <v>]... [-o <out>]
                 keys-get-metrics <name> [-p <v>]... [-o <out>]
                 keys-list <parent> [-p <v>]... [-o <out>]
+                keys-list-ip-overrides <parent> [-p <v>]... [-o <out>]
                 keys-migrate <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 keys-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                keys-remove-ip-override <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 keys-retrieve-legacy-secret-key <key> [-p <v>]... [-o <out>]
                 relatedaccountgroupmemberships-search <project> (-r <kv>)... [-p <v>]... [-o <out>]
                 relatedaccountgroups-list <parent> [-p <v>]... [-o <out>]

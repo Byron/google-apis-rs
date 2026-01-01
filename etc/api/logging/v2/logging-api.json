@@ -30,8 +30,133 @@
     "endpoints": [
         {
             "description": "Regional Endpoint",
+            "endpointUrl": "https://logging.africa-south1.rep.googleapis.com/",
+            "location": "africa-south1"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://logging.asia-east1.rep.googleapis.com/",
+            "location": "asia-east1"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://logging.asia-east2.rep.googleapis.com/",
+            "location": "asia-east2"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://logging.asia-northeast1.rep.googleapis.com/",
+            "location": "asia-northeast1"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://logging.asia-northeast2.rep.googleapis.com/",
+            "location": "asia-northeast2"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://logging.asia-northeast3.rep.googleapis.com/",
+            "location": "asia-northeast3"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://logging.asia-south1.rep.googleapis.com/",
+            "location": "asia-south1"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://logging.asia-south2.rep.googleapis.com/",
+            "location": "asia-south2"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://logging.asia-southeast1.rep.googleapis.com/",
+            "location": "asia-southeast1"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://logging.asia-southeast2.rep.googleapis.com/",
+            "location": "asia-southeast2"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://logging.asia-southeast3.rep.googleapis.com/",
+            "location": "asia-southeast3"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://logging.australia-southeast1.rep.googleapis.com/",
+            "location": "australia-southeast1"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://logging.australia-southeast2.rep.googleapis.com/",
+            "location": "australia-southeast2"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://logging.europe-central2.rep.googleapis.com/",
+            "location": "europe-central2"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://logging.europe-north1.rep.googleapis.com/",
+            "location": "europe-north1"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://logging.europe-north2.rep.googleapis.com/",
+            "location": "europe-north2"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://logging.europe-north3.rep.googleapis.com/",
+            "location": "europe-north3"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://logging.europe-southwest1.rep.googleapis.com/",
+            "location": "europe-southwest1"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://logging.europe-west1.rep.googleapis.com/",
+            "location": "europe-west1"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://logging.europe-west10.rep.googleapis.com/",
+            "location": "europe-west10"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://logging.europe-west12.rep.googleapis.com/",
+            "location": "europe-west12"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://logging.europe-west15.rep.googleapis.com/",
+            "location": "europe-west15"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://logging.europe-west2.rep.googleapis.com/",
+            "location": "europe-west2"
+        },
+        {
+            "description": "Regional Endpoint",
             "endpointUrl": "https://logging.europe-west3.rep.googleapis.com/",
             "location": "europe-west3"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://logging.europe-west4.rep.googleapis.com/",
+            "location": "europe-west4"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://logging.europe-west6.rep.googleapis.com/",
+            "location": "europe-west6"
         },
         {
             "description": "Regional Endpoint",
@@ -45,8 +170,43 @@
         },
         {
             "description": "Regional Endpoint",
+            "endpointUrl": "https://logging.me-central1.rep.googleapis.com/",
+            "location": "me-central1"
+        },
+        {
+            "description": "Regional Endpoint",
             "endpointUrl": "https://logging.me-central2.rep.googleapis.com/",
             "location": "me-central2"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://logging.me-west1.rep.googleapis.com/",
+            "location": "me-west1"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://logging.northamerica-northeast1.rep.googleapis.com/",
+            "location": "northamerica-northeast1"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://logging.northamerica-northeast2.rep.googleapis.com/",
+            "location": "northamerica-northeast2"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://logging.northamerica-south1.rep.googleapis.com/",
+            "location": "northamerica-south1"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://logging.southamerica-east1.rep.googleapis.com/",
+            "location": "southamerica-east1"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://logging.southamerica-west1.rep.googleapis.com/",
+            "location": "southamerica-west1"
         },
         {
             "description": "Regional Endpoint",
@@ -107,6 +267,21 @@
             "description": "Regional Endpoint",
             "endpointUrl": "https://logging.us-west8.rep.googleapis.com/",
             "location": "us-west8"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://logging.eu.rep.googleapis.com/",
+            "location": "eu"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://logging.in.rep.googleapis.com/",
+            "location": "in"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://logging.us.rep.googleapis.com/",
+            "location": "us"
         }
     ],
     "fullyEncodeReservedExpansion": true,
@@ -459,6 +634,12 @@
                                 "name"
                             ],
                             "parameters": {
+                                "extraLocationTypes": {
+                                    "description": "Optional. Do not use this field. It is unsupported and is ignored unless explicitly documented otherwise. This is primarily for internal usage.",
+                                    "location": "query",
+                                    "repeated": true,
+                                    "type": "string"
+                                },
                                 "filter": {
                                     "description": "A filter to narrow down results to a preferred subset. The filtering language accepts strings like \"displayName=tokyo\", and is documented in more detail in AIP-160 (https://google.aip.dev/160).",
                                     "location": "query",
@@ -777,7 +958,7 @@
                                                     "type": "string"
                                                 },
                                                 "parent": {
-                                                    "description": "Required. The full resource name of the bucket to create a link for. \"projects/[PROJECT_ID]/locations/[LOCATION_ID]/buckets/[BUCKET_ID]\" \"organizations/[ORGANIZATION_ID]/locations/[LOCATION_ID]/buckets/[BUCKET_ID]\" \"billingAccounts/[BILLING_ACCOUNT_ID]/locations/[LOCATION_ID]/buckets/[BUCKET_ID]\" \"folders/[FOLDER_ID]/locations/[LOCATION_ID]/buckets/[BUCKET_ID]\" ",
+                                                    "description": "Required. The full resource name of the bucket to create a link for. \"projects/[PROJECT_ID]/locations/[LOCATION_ID]/buckets/[BUCKET_ID]\" ",
                                                     "location": "path",
                                                     "pattern": "^billingAccounts/[^/]+/locations/[^/]+/buckets/[^/]+$",
                                                     "required": true,
@@ -910,7 +1091,7 @@
                                                     "type": "string"
                                                 },
                                                 "viewId": {
-                                                    "description": "Required. A client-assigned identifier such as \"my-view\". Identifiers are limited to 100 characters and can include only letters, digits, underscores, hyphens, and periods.",
+                                                    "description": "Required. A client-assigned identifier such as \"my-view\". Identifiers are limited to 100 characters and can include only letters, digits, underscores, and hyphens.",
                                                     "location": "query",
                                                     "type": "string"
                                                 }
@@ -1200,6 +1381,11 @@
                                             "description": "The standard list page token.",
                                             "location": "query",
                                             "type": "string"
+                                        },
+                                        "returnPartialSuccess": {
+                                            "description": "When set to true, operations that are reachable are returned as normal, and those that are unreachable are returned in the ListOperationsResponse.unreachable field.This can only be true when reading across collections. For example, when parent is set to \"projects/example/locations/-\".This field is not supported by default and will result in an UNIMPLEMENTED error if set unless explicitly documented otherwise in service or product specific documentation.",
+                                            "location": "query",
+                                            "type": "boolean"
                                         }
                                     },
                                     "path": "v2/{+name}/operations",
@@ -1226,6 +1412,11 @@
                                         "parent"
                                     ],
                                     "parameters": {
+                                        "filter": {
+                                            "description": "Optional. Specifies the type (\"Logging\" or \"OpsAnalytics\") of the recent queries to list. The only valid value for this field is one of the two allowable type function calls, which are the following: type(\"Logging\") type(\"OpsAnalytics\")",
+                                            "location": "query",
+                                            "type": "string"
+                                        },
                                         "pageSize": {
                                             "description": "Optional. The maximum number of results to return from this request. Non-positive values are ignored. The presence of nextPageToken in the response indicates that more results might be available.",
                                             "format": "int32",
@@ -1320,6 +1511,34 @@
                                         "https://www.googleapis.com/auth/logging.admin"
                                     ]
                                 },
+                                "get": {
+                                    "description": "Returns all data associated with the requested query.",
+                                    "flatPath": "v2/billingAccounts/{billingAccountsId}/locations/{locationsId}/savedQueries/{savedQueriesId}",
+                                    "httpMethod": "GET",
+                                    "id": "logging.billingAccounts.locations.savedQueries.get",
+                                    "parameterOrder": [
+                                        "name"
+                                    ],
+                                    "parameters": {
+                                        "name": {
+                                            "description": "Required. The resource name of the saved query. \"projects/[PROJECT_ID]/locations/[LOCATION_ID]/savedQueries/[QUERY_ID]\" \"organizations/[ORGANIZATION_ID]/locations/[LOCATION_ID]/savedQueries/[QUERY_ID]\" \"billingAccounts/[BILLING_ACCOUNT_ID]/locations/[LOCATION_ID]/savedQueries/[QUERY_ID]\" \"folders/[FOLDER_ID]/locations/[LOCATION_ID]/savedQueries/[QUERY_ID]\" For example: \"projects/my-project/locations/global/savedQueries/my-saved-query\" ",
+                                            "location": "path",
+                                            "pattern": "^billingAccounts/[^/]+/locations/[^/]+/savedQueries/[^/]+$",
+                                            "required": true,
+                                            "type": "string"
+                                        }
+                                    },
+                                    "path": "v2/{+name}",
+                                    "response": {
+                                        "$ref": "SavedQuery"
+                                    },
+                                    "scopes": [
+                                        "https://www.googleapis.com/auth/cloud-platform",
+                                        "https://www.googleapis.com/auth/cloud-platform.read-only",
+                                        "https://www.googleapis.com/auth/logging.admin",
+                                        "https://www.googleapis.com/auth/logging.read"
+                                    ]
+                                },
                                 "list": {
                                     "description": "Lists the SavedQueries that were created by the user making the request.",
                                     "flatPath": "v2/billingAccounts/{billingAccountsId}/locations/{locationsId}/savedQueries",
@@ -1329,6 +1548,11 @@
                                         "parent"
                                     ],
                                     "parameters": {
+                                        "filter": {
+                                            "description": "Optional. Specifies the type (\"Logging\" or \"OpsAnalytics\") and the visibility (PRIVATE or SHARED) of the saved queries to list. If provided, the filter must contain either the type function or a visibility token, or both. If both are chosen, they can be placed in any order, but they must be joined by the AND operator or the empty character.The two supported type function calls are: type(\"Logging\") type(\"OpsAnalytics\")The two supported visibility tokens are: visibility = PRIVATE visibility = SHAREDFor example:type(\"Logging\") AND visibility = PRIVATE visibility=SHARED type(\"OpsAnalytics\") type(\"OpsAnalytics)\" visibility = PRIVATE visibility = SHARED",
+                                            "location": "query",
+                                            "type": "string"
+                                        },
                                         "pageSize": {
                                             "description": "Optional. The maximum number of results to return from this request.Non-positive values are ignored. The presence of nextPageToken in the response indicates that more results might be available.",
                                             "format": "int32",
@@ -1358,6 +1582,41 @@
                                         "https://www.googleapis.com/auth/logging.admin",
                                         "https://www.googleapis.com/auth/logging.read"
                                     ]
+                                },
+                                "patch": {
+                                    "description": "Updates an existing SavedQuery.",
+                                    "flatPath": "v2/billingAccounts/{billingAccountsId}/locations/{locationsId}/savedQueries/{savedQueriesId}",
+                                    "httpMethod": "PATCH",
+                                    "id": "logging.billingAccounts.locations.savedQueries.patch",
+                                    "parameterOrder": [
+                                        "name"
+                                    ],
+                                    "parameters": {
+                                        "name": {
+                                            "description": "Output only. Resource name of the saved query.In the format: \"projects/[PROJECT_ID]/locations/[LOCATION_ID]/savedQueries/[QUERY_ID]\" For a list of supported locations, see Supported Regions (https://cloud.google.com/logging/docs/region-support#bucket-regions)After the saved query is created, the location cannot be changed.If the user doesn't provide a QUERY_ID, the system will generate an alphanumeric ID.",
+                                            "location": "path",
+                                            "pattern": "^billingAccounts/[^/]+/locations/[^/]+/savedQueries/[^/]+$",
+                                            "required": true,
+                                            "type": "string"
+                                        },
+                                        "updateMask": {
+                                            "description": "Required. A non-empty list of fields to change in the existing saved query. Fields are relative to the saved_query and new values for the fields are taken from the corresponding fields in the SavedQuery included in this request. Fields not mentioned in update_mask are not changed and are ignored in the request.To update all mutable fields, specify an update_mask of *.For example, to change the description and query filter text of a saved query, specify an update_mask of \"description, query.filter\".",
+                                            "format": "google-fieldmask",
+                                            "location": "query",
+                                            "type": "string"
+                                        }
+                                    },
+                                    "path": "v2/{+name}",
+                                    "request": {
+                                        "$ref": "SavedQuery"
+                                    },
+                                    "response": {
+                                        "$ref": "SavedQuery"
+                                    },
+                                    "scopes": [
+                                        "https://www.googleapis.com/auth/cloud-platform",
+                                        "https://www.googleapis.com/auth/logging.admin"
+                                    ]
                                 }
                             }
                         }
@@ -1366,7 +1625,7 @@
                 "logs": {
                     "methods": {
                         "delete": {
-                            "description": "Deletes all the log entries in a log for the _Default Log Bucket. The log reappears if it receives new entries. Log entries written shortly before the delete operation might not be deleted. Entries received after the delete operation with a timestamp before the operation will be deleted.",
+                            "description": "Deletes all the log entries in a log for the global _Default Log Bucket. The log reappears if it receives new entries. Log entries written shortly before the delete operation might not be deleted. Entries received after the delete operation with a timestamp before the operation will be deleted.",
                             "flatPath": "v2/billingAccounts/{billingAccountsId}/logs/{logsId}",
                             "httpMethod": "DELETE",
                             "id": "logging.billingAccounts.logs.delete",
@@ -1450,7 +1709,7 @@
                             ],
                             "parameters": {
                                 "customWriterIdentity": {
-                                    "description": "Optional. A service account provided by the caller that will be used to write the log entries. The format must be serviceAccount:some@email. This field can only be specified if you are routing logs to a destination outside this sink's project. If not specified, a Logging service account will automatically be generated.",
+                                    "description": "Optional. The service account provided by the caller that will be used to write the log entries. The format must be serviceAccount:some@email. This field can only be specified when you are routing logs to a log bucket that is in a different project than the sink. When not specified, a Logging service account will automatically be generated.",
                                     "location": "query",
                                     "type": "string"
                                 },
@@ -1587,7 +1846,7 @@
                             ],
                             "parameters": {
                                 "customWriterIdentity": {
-                                    "description": "Optional. A service account provided by the caller that will be used to write the log entries. The format must be serviceAccount:some@email. This field can only be specified if you are routing logs to a destination outside this sink's project. If not specified, a Logging service account will automatically be generated.",
+                                    "description": "Optional. The service account provided by the caller that will be used to write the log entries. The format must be serviceAccount:some@email. This field can only be specified when you are routing logs to a log bucket that is in a different project than the sink. When not specified, a Logging service account will automatically be generated.",
                                     "location": "query",
                                     "type": "string"
                                 },
@@ -1632,7 +1891,7 @@
                             ],
                             "parameters": {
                                 "customWriterIdentity": {
-                                    "description": "Optional. A service account provided by the caller that will be used to write the log entries. The format must be serviceAccount:some@email. This field can only be specified if you are routing logs to a destination outside this sink's project. If not specified, a Logging service account will automatically be generated.",
+                                    "description": "Optional. The service account provided by the caller that will be used to write the log entries. The format must be serviceAccount:some@email. This field can only be specified when you are routing logs to a log bucket that is in a different project than the sink. When not specified, a Logging service account will automatically be generated.",
                                     "location": "query",
                                     "type": "string"
                                 },
@@ -1985,7 +2244,7 @@
                     ],
                     "parameters": {
                         "name": {
-                            "description": "Required. The resource name for the settings to update. \"organizations/[ORGANIZATION_ID]/settings\" For example:\"organizations/12345/settings\"",
+                            "description": "Required. The resource name for the settings to update. \"organizations/[ORGANIZATION_ID]/settings\" \"folders/[FOLDER_ID]/settings\" For example:\"organizations/12345/settings\"",
                             "location": "path",
                             "pattern": "^folders/[^/]+$",
                             "required": true,
@@ -2212,6 +2471,12 @@
                                 "name"
                             ],
                             "parameters": {
+                                "extraLocationTypes": {
+                                    "description": "Optional. Do not use this field. It is unsupported and is ignored unless explicitly documented otherwise. This is primarily for internal usage.",
+                                    "location": "query",
+                                    "repeated": true,
+                                    "type": "string"
+                                },
                                 "filter": {
                                     "description": "A filter to narrow down results to a preferred subset. The filtering language accepts strings like \"displayName=tokyo\", and is documented in more detail in AIP-160 (https://google.aip.dev/160).",
                                     "location": "query",
@@ -2530,7 +2795,7 @@
                                                     "type": "string"
                                                 },
                                                 "parent": {
-                                                    "description": "Required. The full resource name of the bucket to create a link for. \"projects/[PROJECT_ID]/locations/[LOCATION_ID]/buckets/[BUCKET_ID]\" \"organizations/[ORGANIZATION_ID]/locations/[LOCATION_ID]/buckets/[BUCKET_ID]\" \"billingAccounts/[BILLING_ACCOUNT_ID]/locations/[LOCATION_ID]/buckets/[BUCKET_ID]\" \"folders/[FOLDER_ID]/locations/[LOCATION_ID]/buckets/[BUCKET_ID]\" ",
+                                                    "description": "Required. The full resource name of the bucket to create a link for. \"projects/[PROJECT_ID]/locations/[LOCATION_ID]/buckets/[BUCKET_ID]\" ",
                                                     "location": "path",
                                                     "pattern": "^folders/[^/]+/locations/[^/]+/buckets/[^/]+$",
                                                     "required": true,
@@ -2663,7 +2928,7 @@
                                                     "type": "string"
                                                 },
                                                 "viewId": {
-                                                    "description": "Required. A client-assigned identifier such as \"my-view\". Identifiers are limited to 100 characters and can include only letters, digits, underscores, hyphens, and periods.",
+                                                    "description": "Required. A client-assigned identifier such as \"my-view\". Identifiers are limited to 100 characters and can include only letters, digits, underscores, and hyphens.",
                                                     "location": "query",
                                                     "type": "string"
                                                 }
@@ -2954,6 +3219,172 @@
                                 }
                             }
                         },
+                        "logScopes": {
+                            "methods": {
+                                "create": {
+                                    "description": "Creates a log scope.",
+                                    "flatPath": "v2/folders/{foldersId}/locations/{locationsId}/logScopes",
+                                    "httpMethod": "POST",
+                                    "id": "logging.folders.locations.logScopes.create",
+                                    "parameterOrder": [
+                                        "parent"
+                                    ],
+                                    "parameters": {
+                                        "logScopeId": {
+                                            "description": "Required. A client-assigned identifier such as \"log-scope\". Identifiers are limited to 100 characters and can include only letters, digits, underscores, hyphens, and periods. First character has to be alphanumeric.",
+                                            "location": "query",
+                                            "type": "string"
+                                        },
+                                        "parent": {
+                                            "description": "Required. The parent resource in which to create the log scope: \"projects/[PROJECT_ID]/locations/[LOCATION_ID]\" \"organizations/[ORGANIZATION_ID]/locations/[LOCATION_ID]\" \"folders/[FOLDER_ID]/locations/[LOCATION_ID]\" For example:\"projects/my-project/locations/global\"",
+                                            "location": "path",
+                                            "pattern": "^folders/[^/]+/locations/[^/]+$",
+                                            "required": true,
+                                            "type": "string"
+                                        }
+                                    },
+                                    "path": "v2/{+parent}/logScopes",
+                                    "request": {
+                                        "$ref": "LogScope"
+                                    },
+                                    "response": {
+                                        "$ref": "LogScope"
+                                    },
+                                    "scopes": [
+                                        "https://www.googleapis.com/auth/cloud-platform",
+                                        "https://www.googleapis.com/auth/logging.admin"
+                                    ]
+                                },
+                                "delete": {
+                                    "description": "Deletes a log scope.",
+                                    "flatPath": "v2/folders/{foldersId}/locations/{locationsId}/logScopes/{logScopesId}",
+                                    "httpMethod": "DELETE",
+                                    "id": "logging.folders.locations.logScopes.delete",
+                                    "parameterOrder": [
+                                        "name"
+                                    ],
+                                    "parameters": {
+                                        "name": {
+                                            "description": "Required. The resource name of the log scope to delete: \"projects/[PROJECT_ID]/locations/[LOCATION_ID]\" \"organizations/[ORGANIZATION_ID]/locations/[LOCATION_ID]\" \"folders/[FOLDER_ID]/locations/[LOCATION_ID]\" For example:\"projects/my-project/locations/global/logScopes/my-log-scope\"",
+                                            "location": "path",
+                                            "pattern": "^folders/[^/]+/locations/[^/]+/logScopes/[^/]+$",
+                                            "required": true,
+                                            "type": "string"
+                                        }
+                                    },
+                                    "path": "v2/{+name}",
+                                    "response": {
+                                        "$ref": "Empty"
+                                    },
+                                    "scopes": [
+                                        "https://www.googleapis.com/auth/cloud-platform",
+                                        "https://www.googleapis.com/auth/logging.admin"
+                                    ]
+                                },
+                                "get": {
+                                    "description": "Gets a log scope.",
+                                    "flatPath": "v2/folders/{foldersId}/locations/{locationsId}/logScopes/{logScopesId}",
+                                    "httpMethod": "GET",
+                                    "id": "logging.folders.locations.logScopes.get",
+                                    "parameterOrder": [
+                                        "name"
+                                    ],
+                                    "parameters": {
+                                        "name": {
+                                            "description": "Required. The resource name of the log scope: \"projects/[PROJECT_ID]/locations/[LOCATION_ID]\" \"organizations/[ORGANIZATION_ID]/locations/[LOCATION_ID]\" \"folders/[FOLDER_ID]/locations/[LOCATION_ID]\" For example:\"projects/my-project/locations/global/logScopes/my-log-scope\"",
+                                            "location": "path",
+                                            "pattern": "^folders/[^/]+/locations/[^/]+/logScopes/[^/]+$",
+                                            "required": true,
+                                            "type": "string"
+                                        }
+                                    },
+                                    "path": "v2/{+name}",
+                                    "response": {
+                                        "$ref": "LogScope"
+                                    },
+                                    "scopes": [
+                                        "https://www.googleapis.com/auth/cloud-platform",
+                                        "https://www.googleapis.com/auth/cloud-platform.read-only",
+                                        "https://www.googleapis.com/auth/logging.admin",
+                                        "https://www.googleapis.com/auth/logging.read"
+                                    ]
+                                },
+                                "list": {
+                                    "description": "Lists log scopes.",
+                                    "flatPath": "v2/folders/{foldersId}/locations/{locationsId}/logScopes",
+                                    "httpMethod": "GET",
+                                    "id": "logging.folders.locations.logScopes.list",
+                                    "parameterOrder": [
+                                        "parent"
+                                    ],
+                                    "parameters": {
+                                        "pageSize": {
+                                            "description": "Optional. The maximum number of results to return from this request.Non-positive values are ignored. The presence of nextPageToken in the response indicates that more results might be available.",
+                                            "format": "int32",
+                                            "location": "query",
+                                            "type": "integer"
+                                        },
+                                        "pageToken": {
+                                            "description": "Optional. If present, then retrieve the next batch of results from the preceding call to this method. pageToken must be the value of nextPageToken from the previous response. The values of other method parameters should be identical to those in the previous call.",
+                                            "location": "query",
+                                            "type": "string"
+                                        },
+                                        "parent": {
+                                            "description": "Required. The parent resource whose log scopes are to be listed: \"projects/[PROJECT_ID]/locations/[LOCATION_ID]\" ",
+                                            "location": "path",
+                                            "pattern": "^folders/[^/]+/locations/[^/]+$",
+                                            "required": true,
+                                            "type": "string"
+                                        }
+                                    },
+                                    "path": "v2/{+parent}/logScopes",
+                                    "response": {
+                                        "$ref": "ListLogScopesResponse"
+                                    },
+                                    "scopes": [
+                                        "https://www.googleapis.com/auth/cloud-platform",
+                                        "https://www.googleapis.com/auth/cloud-platform.read-only",
+                                        "https://www.googleapis.com/auth/logging.admin",
+                                        "https://www.googleapis.com/auth/logging.read"
+                                    ]
+                                },
+                                "patch": {
+                                    "description": "Updates a log scope.",
+                                    "flatPath": "v2/folders/{foldersId}/locations/{locationsId}/logScopes/{logScopesId}",
+                                    "httpMethod": "PATCH",
+                                    "id": "logging.folders.locations.logScopes.patch",
+                                    "parameterOrder": [
+                                        "name"
+                                    ],
+                                    "parameters": {
+                                        "name": {
+                                            "description": "Output only. The resource name of the log scope.Log scopes are only available in the global location. For example:projects/my-project/locations/global/logScopes/my-log-scope",
+                                            "location": "path",
+                                            "pattern": "^folders/[^/]+/locations/[^/]+/logScopes/[^/]+$",
+                                            "required": true,
+                                            "type": "string"
+                                        },
+                                        "updateMask": {
+                                            "description": "Optional. Field mask that specifies the fields in log_scope that need an update. A field will be overwritten if, and only if, it is in the update mask. name and output only fields cannot be updated.For a detailed FieldMask definition, see https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#google.protobuf.FieldMaskFor example: updateMask=description",
+                                            "format": "google-fieldmask",
+                                            "location": "query",
+                                            "type": "string"
+                                        }
+                                    },
+                                    "path": "v2/{+name}",
+                                    "request": {
+                                        "$ref": "LogScope"
+                                    },
+                                    "response": {
+                                        "$ref": "LogScope"
+                                    },
+                                    "scopes": [
+                                        "https://www.googleapis.com/auth/cloud-platform",
+                                        "https://www.googleapis.com/auth/logging.admin"
+                                    ]
+                                }
+                            }
+                        },
                         "operations": {
                             "methods": {
                                 "cancel": {
@@ -3044,6 +3475,11 @@
                                             "description": "The standard list page token.",
                                             "location": "query",
                                             "type": "string"
+                                        },
+                                        "returnPartialSuccess": {
+                                            "description": "When set to true, operations that are reachable are returned as normal, and those that are unreachable are returned in the ListOperationsResponse.unreachable field.This can only be true when reading across collections. For example, when parent is set to \"projects/example/locations/-\".This field is not supported by default and will result in an UNIMPLEMENTED error if set unless explicitly documented otherwise in service or product specific documentation.",
+                                            "location": "query",
+                                            "type": "boolean"
                                         }
                                     },
                                     "path": "v2/{+name}/operations",
@@ -3070,6 +3506,11 @@
                                         "parent"
                                     ],
                                     "parameters": {
+                                        "filter": {
+                                            "description": "Optional. Specifies the type (\"Logging\" or \"OpsAnalytics\") of the recent queries to list. The only valid value for this field is one of the two allowable type function calls, which are the following: type(\"Logging\") type(\"OpsAnalytics\")",
+                                            "location": "query",
+                                            "type": "string"
+                                        },
                                         "pageSize": {
                                             "description": "Optional. The maximum number of results to return from this request. Non-positive values are ignored. The presence of nextPageToken in the response indicates that more results might be available.",
                                             "format": "int32",
@@ -3164,6 +3605,34 @@
                                         "https://www.googleapis.com/auth/logging.admin"
                                     ]
                                 },
+                                "get": {
+                                    "description": "Returns all data associated with the requested query.",
+                                    "flatPath": "v2/folders/{foldersId}/locations/{locationsId}/savedQueries/{savedQueriesId}",
+                                    "httpMethod": "GET",
+                                    "id": "logging.folders.locations.savedQueries.get",
+                                    "parameterOrder": [
+                                        "name"
+                                    ],
+                                    "parameters": {
+                                        "name": {
+                                            "description": "Required. The resource name of the saved query. \"projects/[PROJECT_ID]/locations/[LOCATION_ID]/savedQueries/[QUERY_ID]\" \"organizations/[ORGANIZATION_ID]/locations/[LOCATION_ID]/savedQueries/[QUERY_ID]\" \"billingAccounts/[BILLING_ACCOUNT_ID]/locations/[LOCATION_ID]/savedQueries/[QUERY_ID]\" \"folders/[FOLDER_ID]/locations/[LOCATION_ID]/savedQueries/[QUERY_ID]\" For example: \"projects/my-project/locations/global/savedQueries/my-saved-query\" ",
+                                            "location": "path",
+                                            "pattern": "^folders/[^/]+/locations/[^/]+/savedQueries/[^/]+$",
+                                            "required": true,
+                                            "type": "string"
+                                        }
+                                    },
+                                    "path": "v2/{+name}",
+                                    "response": {
+                                        "$ref": "SavedQuery"
+                                    },
+                                    "scopes": [
+                                        "https://www.googleapis.com/auth/cloud-platform",
+                                        "https://www.googleapis.com/auth/cloud-platform.read-only",
+                                        "https://www.googleapis.com/auth/logging.admin",
+                                        "https://www.googleapis.com/auth/logging.read"
+                                    ]
+                                },
                                 "list": {
                                     "description": "Lists the SavedQueries that were created by the user making the request.",
                                     "flatPath": "v2/folders/{foldersId}/locations/{locationsId}/savedQueries",
@@ -3173,6 +3642,11 @@
                                         "parent"
                                     ],
                                     "parameters": {
+                                        "filter": {
+                                            "description": "Optional. Specifies the type (\"Logging\" or \"OpsAnalytics\") and the visibility (PRIVATE or SHARED) of the saved queries to list. If provided, the filter must contain either the type function or a visibility token, or both. If both are chosen, they can be placed in any order, but they must be joined by the AND operator or the empty character.The two supported type function calls are: type(\"Logging\") type(\"OpsAnalytics\")The two supported visibility tokens are: visibility = PRIVATE visibility = SHAREDFor example:type(\"Logging\") AND visibility = PRIVATE visibility=SHARED type(\"OpsAnalytics\") type(\"OpsAnalytics)\" visibility = PRIVATE visibility = SHARED",
+                                            "location": "query",
+                                            "type": "string"
+                                        },
                                         "pageSize": {
                                             "description": "Optional. The maximum number of results to return from this request.Non-positive values are ignored. The presence of nextPageToken in the response indicates that more results might be available.",
                                             "format": "int32",
@@ -3202,6 +3676,41 @@
                                         "https://www.googleapis.com/auth/logging.admin",
                                         "https://www.googleapis.com/auth/logging.read"
                                     ]
+                                },
+                                "patch": {
+                                    "description": "Updates an existing SavedQuery.",
+                                    "flatPath": "v2/folders/{foldersId}/locations/{locationsId}/savedQueries/{savedQueriesId}",
+                                    "httpMethod": "PATCH",
+                                    "id": "logging.folders.locations.savedQueries.patch",
+                                    "parameterOrder": [
+                                        "name"
+                                    ],
+                                    "parameters": {
+                                        "name": {
+                                            "description": "Output only. Resource name of the saved query.In the format: \"projects/[PROJECT_ID]/locations/[LOCATION_ID]/savedQueries/[QUERY_ID]\" For a list of supported locations, see Supported Regions (https://cloud.google.com/logging/docs/region-support#bucket-regions)After the saved query is created, the location cannot be changed.If the user doesn't provide a QUERY_ID, the system will generate an alphanumeric ID.",
+                                            "location": "path",
+                                            "pattern": "^folders/[^/]+/locations/[^/]+/savedQueries/[^/]+$",
+                                            "required": true,
+                                            "type": "string"
+                                        },
+                                        "updateMask": {
+                                            "description": "Required. A non-empty list of fields to change in the existing saved query. Fields are relative to the saved_query and new values for the fields are taken from the corresponding fields in the SavedQuery included in this request. Fields not mentioned in update_mask are not changed and are ignored in the request.To update all mutable fields, specify an update_mask of *.For example, to change the description and query filter text of a saved query, specify an update_mask of \"description, query.filter\".",
+                                            "format": "google-fieldmask",
+                                            "location": "query",
+                                            "type": "string"
+                                        }
+                                    },
+                                    "path": "v2/{+name}",
+                                    "request": {
+                                        "$ref": "SavedQuery"
+                                    },
+                                    "response": {
+                                        "$ref": "SavedQuery"
+                                    },
+                                    "scopes": [
+                                        "https://www.googleapis.com/auth/cloud-platform",
+                                        "https://www.googleapis.com/auth/logging.admin"
+                                    ]
                                 }
                             }
                         }
@@ -3210,7 +3719,7 @@
                 "logs": {
                     "methods": {
                         "delete": {
-                            "description": "Deletes all the log entries in a log for the _Default Log Bucket. The log reappears if it receives new entries. Log entries written shortly before the delete operation might not be deleted. Entries received after the delete operation with a timestamp before the operation will be deleted.",
+                            "description": "Deletes all the log entries in a log for the global _Default Log Bucket. The log reappears if it receives new entries. Log entries written shortly before the delete operation might not be deleted. Entries received after the delete operation with a timestamp before the operation will be deleted.",
                             "flatPath": "v2/folders/{foldersId}/logs/{logsId}",
                             "httpMethod": "DELETE",
                             "id": "logging.folders.logs.delete",
@@ -3294,7 +3803,7 @@
                             ],
                             "parameters": {
                                 "customWriterIdentity": {
-                                    "description": "Optional. A service account provided by the caller that will be used to write the log entries. The format must be serviceAccount:some@email. This field can only be specified if you are routing logs to a destination outside this sink's project. If not specified, a Logging service account will automatically be generated.",
+                                    "description": "Optional. The service account provided by the caller that will be used to write the log entries. The format must be serviceAccount:some@email. This field can only be specified when you are routing logs to a log bucket that is in a different project than the sink. When not specified, a Logging service account will automatically be generated.",
                                     "location": "query",
                                     "type": "string"
                                 },
@@ -3431,7 +3940,7 @@
                             ],
                             "parameters": {
                                 "customWriterIdentity": {
-                                    "description": "Optional. A service account provided by the caller that will be used to write the log entries. The format must be serviceAccount:some@email. This field can only be specified if you are routing logs to a destination outside this sink's project. If not specified, a Logging service account will automatically be generated.",
+                                    "description": "Optional. The service account provided by the caller that will be used to write the log entries. The format must be serviceAccount:some@email. This field can only be specified when you are routing logs to a log bucket that is in a different project than the sink. When not specified, a Logging service account will automatically be generated.",
                                     "location": "query",
                                     "type": "string"
                                 },
@@ -3476,7 +3985,7 @@
                             ],
                             "parameters": {
                                 "customWriterIdentity": {
-                                    "description": "Optional. A service account provided by the caller that will be used to write the log entries. The format must be serviceAccount:some@email. This field can only be specified if you are routing logs to a destination outside this sink's project. If not specified, a Logging service account will automatically be generated.",
+                                    "description": "Optional. The service account provided by the caller that will be used to write the log entries. The format must be serviceAccount:some@email. This field can only be specified when you are routing logs to a log bucket that is in a different project than the sink. When not specified, a Logging service account will automatically be generated.",
                                     "location": "query",
                                     "type": "string"
                                 },
@@ -3554,6 +4063,12 @@
                         "name"
                     ],
                     "parameters": {
+                        "extraLocationTypes": {
+                            "description": "Optional. Do not use this field. It is unsupported and is ignored unless explicitly documented otherwise. This is primarily for internal usage.",
+                            "location": "query",
+                            "repeated": true,
+                            "type": "string"
+                        },
                         "filter": {
                             "description": "A filter to narrow down results to a preferred subset. The filtering language accepts strings like \"displayName=tokyo\", and is documented in more detail in AIP-160 (https://google.aip.dev/160).",
                             "location": "query",
@@ -3872,7 +4387,7 @@
                                             "type": "string"
                                         },
                                         "parent": {
-                                            "description": "Required. The full resource name of the bucket to create a link for. \"projects/[PROJECT_ID]/locations/[LOCATION_ID]/buckets/[BUCKET_ID]\" \"organizations/[ORGANIZATION_ID]/locations/[LOCATION_ID]/buckets/[BUCKET_ID]\" \"billingAccounts/[BILLING_ACCOUNT_ID]/locations/[LOCATION_ID]/buckets/[BUCKET_ID]\" \"folders/[FOLDER_ID]/locations/[LOCATION_ID]/buckets/[BUCKET_ID]\" ",
+                                            "description": "Required. The full resource name of the bucket to create a link for. \"projects/[PROJECT_ID]/locations/[LOCATION_ID]/buckets/[BUCKET_ID]\" ",
                                             "location": "path",
                                             "pattern": "^[^/]+/[^/]+/locations/[^/]+/buckets/[^/]+$",
                                             "required": true,
@@ -4005,7 +4520,7 @@
                                             "type": "string"
                                         },
                                         "viewId": {
-                                            "description": "Required. A client-assigned identifier such as \"my-view\". Identifiers are limited to 100 characters and can include only letters, digits, underscores, hyphens, and periods.",
+                                            "description": "Required. A client-assigned identifier such as \"my-view\". Identifiers are limited to 100 characters and can include only letters, digits, underscores, and hyphens.",
                                             "location": "query",
                                             "type": "string"
                                         }
@@ -4335,6 +4850,11 @@
                                     "description": "The standard list page token.",
                                     "location": "query",
                                     "type": "string"
+                                },
+                                "returnPartialSuccess": {
+                                    "description": "When set to true, operations that are reachable are returned as normal, and those that are unreachable are returned in the ListOperationsResponse.unreachable field.This can only be true when reading across collections. For example, when parent is set to \"projects/example/locations/-\".This field is not supported by default and will result in an UNIMPLEMENTED error if set unless explicitly documented otherwise in service or product specific documentation.",
+                                    "location": "query",
+                                    "type": "boolean"
                                 }
                             },
                             "path": "v2/{+name}/operations",
@@ -4355,7 +4875,7 @@
         "logs": {
             "methods": {
                 "delete": {
-                    "description": "Deletes all the log entries in a log for the _Default Log Bucket. The log reappears if it receives new entries. Log entries written shortly before the delete operation might not be deleted. Entries received after the delete operation with a timestamp before the operation will be deleted.",
+                    "description": "Deletes all the log entries in a log for the global _Default Log Bucket. The log reappears if it receives new entries. Log entries written shortly before the delete operation might not be deleted. Entries received after the delete operation with a timestamp before the operation will be deleted.",
                     "flatPath": "v2/{v2Id}/{v2Id1}/logs/{logsId}",
                     "httpMethod": "DELETE",
                     "id": "logging.logs.delete",
@@ -4564,7 +5084,7 @@
                     ],
                     "parameters": {
                         "name": {
-                            "description": "Required. The resource name for the settings to update. \"organizations/[ORGANIZATION_ID]/settings\" For example:\"organizations/12345/settings\"",
+                            "description": "Required. The resource name for the settings to update. \"organizations/[ORGANIZATION_ID]/settings\" \"folders/[FOLDER_ID]/settings\" For example:\"organizations/12345/settings\"",
                             "location": "path",
                             "pattern": "^organizations/[^/]+$",
                             "required": true,
@@ -4791,6 +5311,12 @@
                                 "name"
                             ],
                             "parameters": {
+                                "extraLocationTypes": {
+                                    "description": "Optional. Do not use this field. It is unsupported and is ignored unless explicitly documented otherwise. This is primarily for internal usage.",
+                                    "location": "query",
+                                    "repeated": true,
+                                    "type": "string"
+                                },
                                 "filter": {
                                     "description": "A filter to narrow down results to a preferred subset. The filtering language accepts strings like \"displayName=tokyo\", and is documented in more detail in AIP-160 (https://google.aip.dev/160).",
                                     "location": "query",
@@ -5109,7 +5635,7 @@
                                                     "type": "string"
                                                 },
                                                 "parent": {
-                                                    "description": "Required. The full resource name of the bucket to create a link for. \"projects/[PROJECT_ID]/locations/[LOCATION_ID]/buckets/[BUCKET_ID]\" \"organizations/[ORGANIZATION_ID]/locations/[LOCATION_ID]/buckets/[BUCKET_ID]\" \"billingAccounts/[BILLING_ACCOUNT_ID]/locations/[LOCATION_ID]/buckets/[BUCKET_ID]\" \"folders/[FOLDER_ID]/locations/[LOCATION_ID]/buckets/[BUCKET_ID]\" ",
+                                                    "description": "Required. The full resource name of the bucket to create a link for. \"projects/[PROJECT_ID]/locations/[LOCATION_ID]/buckets/[BUCKET_ID]\" ",
                                                     "location": "path",
                                                     "pattern": "^organizations/[^/]+/locations/[^/]+/buckets/[^/]+$",
                                                     "required": true,
@@ -5242,7 +5768,7 @@
                                                     "type": "string"
                                                 },
                                                 "viewId": {
-                                                    "description": "Required. A client-assigned identifier such as \"my-view\". Identifiers are limited to 100 characters and can include only letters, digits, underscores, hyphens, and periods.",
+                                                    "description": "Required. A client-assigned identifier such as \"my-view\". Identifiers are limited to 100 characters and can include only letters, digits, underscores, and hyphens.",
                                                     "location": "query",
                                                     "type": "string"
                                                 }
@@ -5533,6 +6059,172 @@
                                 }
                             }
                         },
+                        "logScopes": {
+                            "methods": {
+                                "create": {
+                                    "description": "Creates a log scope.",
+                                    "flatPath": "v2/organizations/{organizationsId}/locations/{locationsId}/logScopes",
+                                    "httpMethod": "POST",
+                                    "id": "logging.organizations.locations.logScopes.create",
+                                    "parameterOrder": [
+                                        "parent"
+                                    ],
+                                    "parameters": {
+                                        "logScopeId": {
+                                            "description": "Required. A client-assigned identifier such as \"log-scope\". Identifiers are limited to 100 characters and can include only letters, digits, underscores, hyphens, and periods. First character has to be alphanumeric.",
+                                            "location": "query",
+                                            "type": "string"
+                                        },
+                                        "parent": {
+                                            "description": "Required. The parent resource in which to create the log scope: \"projects/[PROJECT_ID]/locations/[LOCATION_ID]\" \"organizations/[ORGANIZATION_ID]/locations/[LOCATION_ID]\" \"folders/[FOLDER_ID]/locations/[LOCATION_ID]\" For example:\"projects/my-project/locations/global\"",
+                                            "location": "path",
+                                            "pattern": "^organizations/[^/]+/locations/[^/]+$",
+                                            "required": true,
+                                            "type": "string"
+                                        }
+                                    },
+                                    "path": "v2/{+parent}/logScopes",
+                                    "request": {
+                                        "$ref": "LogScope"
+                                    },
+                                    "response": {
+                                        "$ref": "LogScope"
+                                    },
+                                    "scopes": [
+                                        "https://www.googleapis.com/auth/cloud-platform",
+                                        "https://www.googleapis.com/auth/logging.admin"
+                                    ]
+                                },
+                                "delete": {
+                                    "description": "Deletes a log scope.",
+                                    "flatPath": "v2/organizations/{organizationsId}/locations/{locationsId}/logScopes/{logScopesId}",
+                                    "httpMethod": "DELETE",
+                                    "id": "logging.organizations.locations.logScopes.delete",
+                                    "parameterOrder": [
+                                        "name"
+                                    ],
+                                    "parameters": {
+                                        "name": {
+                                            "description": "Required. The resource name of the log scope to delete: \"projects/[PROJECT_ID]/locations/[LOCATION_ID]\" \"organizations/[ORGANIZATION_ID]/locations/[LOCATION_ID]\" \"folders/[FOLDER_ID]/locations/[LOCATION_ID]\" For example:\"projects/my-project/locations/global/logScopes/my-log-scope\"",
+                                            "location": "path",
+                                            "pattern": "^organizations/[^/]+/locations/[^/]+/logScopes/[^/]+$",
+                                            "required": true,
+                                            "type": "string"
+                                        }
+                                    },
+                                    "path": "v2/{+name}",
+                                    "response": {
+                                        "$ref": "Empty"
+                                    },
+                                    "scopes": [
+                                        "https://www.googleapis.com/auth/cloud-platform",
+                                        "https://www.googleapis.com/auth/logging.admin"
+                                    ]
+                                },
+                                "get": {
+                                    "description": "Gets a log scope.",
+                                    "flatPath": "v2/organizations/{organizationsId}/locations/{locationsId}/logScopes/{logScopesId}",
+                                    "httpMethod": "GET",
+                                    "id": "logging.organizations.locations.logScopes.get",
+                                    "parameterOrder": [
+                                        "name"
+                                    ],
+                                    "parameters": {
+                                        "name": {
+                                            "description": "Required. The resource name of the log scope: \"projects/[PROJECT_ID]/locations/[LOCATION_ID]\" \"organizations/[ORGANIZATION_ID]/locations/[LOCATION_ID]\" \"folders/[FOLDER_ID]/locations/[LOCATION_ID]\" For example:\"projects/my-project/locations/global/logScopes/my-log-scope\"",
+                                            "location": "path",
+                                            "pattern": "^organizations/[^/]+/locations/[^/]+/logScopes/[^/]+$",
+                                            "required": true,
+                                            "type": "string"
+                                        }
+                                    },
+                                    "path": "v2/{+name}",
+                                    "response": {
+                                        "$ref": "LogScope"
+                                    },
+                                    "scopes": [
+                                        "https://www.googleapis.com/auth/cloud-platform",
+                                        "https://www.googleapis.com/auth/cloud-platform.read-only",
+                                        "https://www.googleapis.com/auth/logging.admin",
+                                        "https://www.googleapis.com/auth/logging.read"
+                                    ]
+                                },
+                                "list": {
+                                    "description": "Lists log scopes.",
+                                    "flatPath": "v2/organizations/{organizationsId}/locations/{locationsId}/logScopes",
+                                    "httpMethod": "GET",
+                                    "id": "logging.organizations.locations.logScopes.list",
+                                    "parameterOrder": [
+                                        "parent"
+                                    ],
+                                    "parameters": {
+                                        "pageSize": {
+                                            "description": "Optional. The maximum number of results to return from this request.Non-positive values are ignored. The presence of nextPageToken in the response indicates that more results might be available.",
+                                            "format": "int32",
+                                            "location": "query",
+                                            "type": "integer"
+                                        },
+                                        "pageToken": {
+                                            "description": "Optional. If present, then retrieve the next batch of results from the preceding call to this method. pageToken must be the value of nextPageToken from the previous response. The values of other method parameters should be identical to those in the previous call.",
+                                            "location": "query",
+                                            "type": "string"
+                                        },
+                                        "parent": {
+                                            "description": "Required. The parent resource whose log scopes are to be listed: \"projects/[PROJECT_ID]/locations/[LOCATION_ID]\" ",
+                                            "location": "path",
+                                            "pattern": "^organizations/[^/]+/locations/[^/]+$",
+                                            "required": true,
+                                            "type": "string"
+                                        }
+                                    },
+                                    "path": "v2/{+parent}/logScopes",
+                                    "response": {
+                                        "$ref": "ListLogScopesResponse"
+                                    },
+                                    "scopes": [
+                                        "https://www.googleapis.com/auth/cloud-platform",
+                                        "https://www.googleapis.com/auth/cloud-platform.read-only",
+                                        "https://www.googleapis.com/auth/logging.admin",
+                                        "https://www.googleapis.com/auth/logging.read"
+                                    ]
+                                },
+                                "patch": {
+                                    "description": "Updates a log scope.",
+                                    "flatPath": "v2/organizations/{organizationsId}/locations/{locationsId}/logScopes/{logScopesId}",
+                                    "httpMethod": "PATCH",
+                                    "id": "logging.organizations.locations.logScopes.patch",
+                                    "parameterOrder": [
+                                        "name"
+                                    ],
+                                    "parameters": {
+                                        "name": {
+                                            "description": "Output only. The resource name of the log scope.Log scopes are only available in the global location. For example:projects/my-project/locations/global/logScopes/my-log-scope",
+                                            "location": "path",
+                                            "pattern": "^organizations/[^/]+/locations/[^/]+/logScopes/[^/]+$",
+                                            "required": true,
+                                            "type": "string"
+                                        },
+                                        "updateMask": {
+                                            "description": "Optional. Field mask that specifies the fields in log_scope that need an update. A field will be overwritten if, and only if, it is in the update mask. name and output only fields cannot be updated.For a detailed FieldMask definition, see https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#google.protobuf.FieldMaskFor example: updateMask=description",
+                                            "format": "google-fieldmask",
+                                            "location": "query",
+                                            "type": "string"
+                                        }
+                                    },
+                                    "path": "v2/{+name}",
+                                    "request": {
+                                        "$ref": "LogScope"
+                                    },
+                                    "response": {
+                                        "$ref": "LogScope"
+                                    },
+                                    "scopes": [
+                                        "https://www.googleapis.com/auth/cloud-platform",
+                                        "https://www.googleapis.com/auth/logging.admin"
+                                    ]
+                                }
+                            }
+                        },
                         "operations": {
                             "methods": {
                                 "cancel": {
@@ -5623,6 +6315,11 @@
                                             "description": "The standard list page token.",
                                             "location": "query",
                                             "type": "string"
+                                        },
+                                        "returnPartialSuccess": {
+                                            "description": "When set to true, operations that are reachable are returned as normal, and those that are unreachable are returned in the ListOperationsResponse.unreachable field.This can only be true when reading across collections. For example, when parent is set to \"projects/example/locations/-\".This field is not supported by default and will result in an UNIMPLEMENTED error if set unless explicitly documented otherwise in service or product specific documentation.",
+                                            "location": "query",
+                                            "type": "boolean"
                                         }
                                     },
                                     "path": "v2/{+name}/operations",
@@ -5649,6 +6346,11 @@
                                         "parent"
                                     ],
                                     "parameters": {
+                                        "filter": {
+                                            "description": "Optional. Specifies the type (\"Logging\" or \"OpsAnalytics\") of the recent queries to list. The only valid value for this field is one of the two allowable type function calls, which are the following: type(\"Logging\") type(\"OpsAnalytics\")",
+                                            "location": "query",
+                                            "type": "string"
+                                        },
                                         "pageSize": {
                                             "description": "Optional. The maximum number of results to return from this request. Non-positive values are ignored. The presence of nextPageToken in the response indicates that more results might be available.",
                                             "format": "int32",
@@ -5743,6 +6445,34 @@
                                         "https://www.googleapis.com/auth/logging.admin"
                                     ]
                                 },
+                                "get": {
+                                    "description": "Returns all data associated with the requested query.",
+                                    "flatPath": "v2/organizations/{organizationsId}/locations/{locationsId}/savedQueries/{savedQueriesId}",
+                                    "httpMethod": "GET",
+                                    "id": "logging.organizations.locations.savedQueries.get",
+                                    "parameterOrder": [
+                                        "name"
+                                    ],
+                                    "parameters": {
+                                        "name": {
+                                            "description": "Required. The resource name of the saved query. \"projects/[PROJECT_ID]/locations/[LOCATION_ID]/savedQueries/[QUERY_ID]\" \"organizations/[ORGANIZATION_ID]/locations/[LOCATION_ID]/savedQueries/[QUERY_ID]\" \"billingAccounts/[BILLING_ACCOUNT_ID]/locations/[LOCATION_ID]/savedQueries/[QUERY_ID]\" \"folders/[FOLDER_ID]/locations/[LOCATION_ID]/savedQueries/[QUERY_ID]\" For example: \"projects/my-project/locations/global/savedQueries/my-saved-query\" ",
+                                            "location": "path",
+                                            "pattern": "^organizations/[^/]+/locations/[^/]+/savedQueries/[^/]+$",
+                                            "required": true,
+                                            "type": "string"
+                                        }
+                                    },
+                                    "path": "v2/{+name}",
+                                    "response": {
+                                        "$ref": "SavedQuery"
+                                    },
+                                    "scopes": [
+                                        "https://www.googleapis.com/auth/cloud-platform",
+                                        "https://www.googleapis.com/auth/cloud-platform.read-only",
+                                        "https://www.googleapis.com/auth/logging.admin",
+                                        "https://www.googleapis.com/auth/logging.read"
+                                    ]
+                                },
                                 "list": {
                                     "description": "Lists the SavedQueries that were created by the user making the request.",
                                     "flatPath": "v2/organizations/{organizationsId}/locations/{locationsId}/savedQueries",
@@ -5752,6 +6482,11 @@
                                         "parent"
                                     ],
                                     "parameters": {
+                                        "filter": {
+                                            "description": "Optional. Specifies the type (\"Logging\" or \"OpsAnalytics\") and the visibility (PRIVATE or SHARED) of the saved queries to list. If provided, the filter must contain either the type function or a visibility token, or both. If both are chosen, they can be placed in any order, but they must be joined by the AND operator or the empty character.The two supported type function calls are: type(\"Logging\") type(\"OpsAnalytics\")The two supported visibility tokens are: visibility = PRIVATE visibility = SHAREDFor example:type(\"Logging\") AND visibility = PRIVATE visibility=SHARED type(\"OpsAnalytics\") type(\"OpsAnalytics)\" visibility = PRIVATE visibility = SHARED",
+                                            "location": "query",
+                                            "type": "string"
+                                        },
                                         "pageSize": {
                                             "description": "Optional. The maximum number of results to return from this request.Non-positive values are ignored. The presence of nextPageToken in the response indicates that more results might be available.",
                                             "format": "int32",
@@ -5781,6 +6516,41 @@
                                         "https://www.googleapis.com/auth/logging.admin",
                                         "https://www.googleapis.com/auth/logging.read"
                                     ]
+                                },
+                                "patch": {
+                                    "description": "Updates an existing SavedQuery.",
+                                    "flatPath": "v2/organizations/{organizationsId}/locations/{locationsId}/savedQueries/{savedQueriesId}",
+                                    "httpMethod": "PATCH",
+                                    "id": "logging.organizations.locations.savedQueries.patch",
+                                    "parameterOrder": [
+                                        "name"
+                                    ],
+                                    "parameters": {
+                                        "name": {
+                                            "description": "Output only. Resource name of the saved query.In the format: \"projects/[PROJECT_ID]/locations/[LOCATION_ID]/savedQueries/[QUERY_ID]\" For a list of supported locations, see Supported Regions (https://cloud.google.com/logging/docs/region-support#bucket-regions)After the saved query is created, the location cannot be changed.If the user doesn't provide a QUERY_ID, the system will generate an alphanumeric ID.",
+                                            "location": "path",
+                                            "pattern": "^organizations/[^/]+/locations/[^/]+/savedQueries/[^/]+$",
+                                            "required": true,
+                                            "type": "string"
+                                        },
+                                        "updateMask": {
+                                            "description": "Required. A non-empty list of fields to change in the existing saved query. Fields are relative to the saved_query and new values for the fields are taken from the corresponding fields in the SavedQuery included in this request. Fields not mentioned in update_mask are not changed and are ignored in the request.To update all mutable fields, specify an update_mask of *.For example, to change the description and query filter text of a saved query, specify an update_mask of \"description, query.filter\".",
+                                            "format": "google-fieldmask",
+                                            "location": "query",
+                                            "type": "string"
+                                        }
+                                    },
+                                    "path": "v2/{+name}",
+                                    "request": {
+                                        "$ref": "SavedQuery"
+                                    },
+                                    "response": {
+                                        "$ref": "SavedQuery"
+                                    },
+                                    "scopes": [
+                                        "https://www.googleapis.com/auth/cloud-platform",
+                                        "https://www.googleapis.com/auth/logging.admin"
+                                    ]
                                 }
                             }
                         }
@@ -5789,7 +6559,7 @@
                 "logs": {
                     "methods": {
                         "delete": {
-                            "description": "Deletes all the log entries in a log for the _Default Log Bucket. The log reappears if it receives new entries. Log entries written shortly before the delete operation might not be deleted. Entries received after the delete operation with a timestamp before the operation will be deleted.",
+                            "description": "Deletes all the log entries in a log for the global _Default Log Bucket. The log reappears if it receives new entries. Log entries written shortly before the delete operation might not be deleted. Entries received after the delete operation with a timestamp before the operation will be deleted.",
                             "flatPath": "v2/organizations/{organizationsId}/logs/{logsId}",
                             "httpMethod": "DELETE",
                             "id": "logging.organizations.logs.delete",
@@ -5873,7 +6643,7 @@
                             ],
                             "parameters": {
                                 "customWriterIdentity": {
-                                    "description": "Optional. A service account provided by the caller that will be used to write the log entries. The format must be serviceAccount:some@email. This field can only be specified if you are routing logs to a destination outside this sink's project. If not specified, a Logging service account will automatically be generated.",
+                                    "description": "Optional. The service account provided by the caller that will be used to write the log entries. The format must be serviceAccount:some@email. This field can only be specified when you are routing logs to a log bucket that is in a different project than the sink. When not specified, a Logging service account will automatically be generated.",
                                     "location": "query",
                                     "type": "string"
                                 },
@@ -6010,7 +6780,7 @@
                             ],
                             "parameters": {
                                 "customWriterIdentity": {
-                                    "description": "Optional. A service account provided by the caller that will be used to write the log entries. The format must be serviceAccount:some@email. This field can only be specified if you are routing logs to a destination outside this sink's project. If not specified, a Logging service account will automatically be generated.",
+                                    "description": "Optional. The service account provided by the caller that will be used to write the log entries. The format must be serviceAccount:some@email. This field can only be specified when you are routing logs to a log bucket that is in a different project than the sink. When not specified, a Logging service account will automatically be generated.",
                                     "location": "query",
                                     "type": "string"
                                 },
@@ -6055,7 +6825,7 @@
                             ],
                             "parameters": {
                                 "customWriterIdentity": {
-                                    "description": "Optional. A service account provided by the caller that will be used to write the log entries. The format must be serviceAccount:some@email. This field can only be specified if you are routing logs to a destination outside this sink's project. If not specified, a Logging service account will automatically be generated.",
+                                    "description": "Optional. The service account provided by the caller that will be used to write the log entries. The format must be serviceAccount:some@email. This field can only be specified when you are routing logs to a log bucket that is in a different project than the sink. When not specified, a Logging service account will automatically be generated.",
                                     "location": "query",
                                     "type": "string"
                                 },
@@ -6354,6 +7124,12 @@
                                 "name"
                             ],
                             "parameters": {
+                                "extraLocationTypes": {
+                                    "description": "Optional. Do not use this field. It is unsupported and is ignored unless explicitly documented otherwise. This is primarily for internal usage.",
+                                    "location": "query",
+                                    "repeated": true,
+                                    "type": "string"
+                                },
                                 "filter": {
                                     "description": "A filter to narrow down results to a preferred subset. The filtering language accepts strings like \"displayName=tokyo\", and is documented in more detail in AIP-160 (https://google.aip.dev/160).",
                                     "location": "query",
@@ -6672,7 +7448,7 @@
                                                     "type": "string"
                                                 },
                                                 "parent": {
-                                                    "description": "Required. The full resource name of the bucket to create a link for. \"projects/[PROJECT_ID]/locations/[LOCATION_ID]/buckets/[BUCKET_ID]\" \"organizations/[ORGANIZATION_ID]/locations/[LOCATION_ID]/buckets/[BUCKET_ID]\" \"billingAccounts/[BILLING_ACCOUNT_ID]/locations/[LOCATION_ID]/buckets/[BUCKET_ID]\" \"folders/[FOLDER_ID]/locations/[LOCATION_ID]/buckets/[BUCKET_ID]\" ",
+                                                    "description": "Required. The full resource name of the bucket to create a link for. \"projects/[PROJECT_ID]/locations/[LOCATION_ID]/buckets/[BUCKET_ID]\" ",
                                                     "location": "path",
                                                     "pattern": "^projects/[^/]+/locations/[^/]+/buckets/[^/]+$",
                                                     "required": true,
@@ -6805,7 +7581,7 @@
                                                     "type": "string"
                                                 },
                                                 "viewId": {
-                                                    "description": "Required. A client-assigned identifier such as \"my-view\". Identifiers are limited to 100 characters and can include only letters, digits, underscores, hyphens, and periods.",
+                                                    "description": "Required. A client-assigned identifier such as \"my-view\". Identifiers are limited to 100 characters and can include only letters, digits, underscores, and hyphens.",
                                                     "location": "query",
                                                     "type": "string"
                                                 }
@@ -7096,6 +7872,172 @@
                                 }
                             }
                         },
+                        "logScopes": {
+                            "methods": {
+                                "create": {
+                                    "description": "Creates a log scope.",
+                                    "flatPath": "v2/projects/{projectsId}/locations/{locationsId}/logScopes",
+                                    "httpMethod": "POST",
+                                    "id": "logging.projects.locations.logScopes.create",
+                                    "parameterOrder": [
+                                        "parent"
+                                    ],
+                                    "parameters": {
+                                        "logScopeId": {
+                                            "description": "Required. A client-assigned identifier such as \"log-scope\". Identifiers are limited to 100 characters and can include only letters, digits, underscores, hyphens, and periods. First character has to be alphanumeric.",
+                                            "location": "query",
+                                            "type": "string"
+                                        },
+                                        "parent": {
+                                            "description": "Required. The parent resource in which to create the log scope: \"projects/[PROJECT_ID]/locations/[LOCATION_ID]\" \"organizations/[ORGANIZATION_ID]/locations/[LOCATION_ID]\" \"folders/[FOLDER_ID]/locations/[LOCATION_ID]\" For example:\"projects/my-project/locations/global\"",
+                                            "location": "path",
+                                            "pattern": "^projects/[^/]+/locations/[^/]+$",
+                                            "required": true,
+                                            "type": "string"
+                                        }
+                                    },
+                                    "path": "v2/{+parent}/logScopes",
+                                    "request": {
+                                        "$ref": "LogScope"
+                                    },
+                                    "response": {
+                                        "$ref": "LogScope"
+                                    },
+                                    "scopes": [
+                                        "https://www.googleapis.com/auth/cloud-platform",
+                                        "https://www.googleapis.com/auth/logging.admin"
+                                    ]
+                                },
+                                "delete": {
+                                    "description": "Deletes a log scope.",
+                                    "flatPath": "v2/projects/{projectsId}/locations/{locationsId}/logScopes/{logScopesId}",
+                                    "httpMethod": "DELETE",
+                                    "id": "logging.projects.locations.logScopes.delete",
+                                    "parameterOrder": [
+                                        "name"
+                                    ],
+                                    "parameters": {
+                                        "name": {
+                                            "description": "Required. The resource name of the log scope to delete: \"projects/[PROJECT_ID]/locations/[LOCATION_ID]\" \"organizations/[ORGANIZATION_ID]/locations/[LOCATION_ID]\" \"folders/[FOLDER_ID]/locations/[LOCATION_ID]\" For example:\"projects/my-project/locations/global/logScopes/my-log-scope\"",
+                                            "location": "path",
+                                            "pattern": "^projects/[^/]+/locations/[^/]+/logScopes/[^/]+$",
+                                            "required": true,
+                                            "type": "string"
+                                        }
+                                    },
+                                    "path": "v2/{+name}",
+                                    "response": {
+                                        "$ref": "Empty"
+                                    },
+                                    "scopes": [
+                                        "https://www.googleapis.com/auth/cloud-platform",
+                                        "https://www.googleapis.com/auth/logging.admin"
+                                    ]
+                                },
+                                "get": {
+                                    "description": "Gets a log scope.",
+                                    "flatPath": "v2/projects/{projectsId}/locations/{locationsId}/logScopes/{logScopesId}",
+                                    "httpMethod": "GET",
+                                    "id": "logging.projects.locations.logScopes.get",
+                                    "parameterOrder": [
+                                        "name"
+                                    ],
+                                    "parameters": {
+                                        "name": {
+                                            "description": "Required. The resource name of the log scope: \"projects/[PROJECT_ID]/locations/[LOCATION_ID]\" \"organizations/[ORGANIZATION_ID]/locations/[LOCATION_ID]\" \"folders/[FOLDER_ID]/locations/[LOCATION_ID]\" For example:\"projects/my-project/locations/global/logScopes/my-log-scope\"",
+                                            "location": "path",
+                                            "pattern": "^projects/[^/]+/locations/[^/]+/logScopes/[^/]+$",
+                                            "required": true,
+                                            "type": "string"
+                                        }
+                                    },
+                                    "path": "v2/{+name}",
+                                    "response": {
+                                        "$ref": "LogScope"
+                                    },
+                                    "scopes": [
+                                        "https://www.googleapis.com/auth/cloud-platform",
+                                        "https://www.googleapis.com/auth/cloud-platform.read-only",
+                                        "https://www.googleapis.com/auth/logging.admin",
+                                        "https://www.googleapis.com/auth/logging.read"
+                                    ]
+                                },
+                                "list": {
+                                    "description": "Lists log scopes.",
+                                    "flatPath": "v2/projects/{projectsId}/locations/{locationsId}/logScopes",
+                                    "httpMethod": "GET",
+                                    "id": "logging.projects.locations.logScopes.list",
+                                    "parameterOrder": [
+                                        "parent"
+                                    ],
+                                    "parameters": {
+                                        "pageSize": {
+                                            "description": "Optional. The maximum number of results to return from this request.Non-positive values are ignored. The presence of nextPageToken in the response indicates that more results might be available.",
+                                            "format": "int32",
+                                            "location": "query",
+                                            "type": "integer"
+                                        },
+                                        "pageToken": {
+                                            "description": "Optional. If present, then retrieve the next batch of results from the preceding call to this method. pageToken must be the value of nextPageToken from the previous response. The values of other method parameters should be identical to those in the previous call.",
+                                            "location": "query",
+                                            "type": "string"
+                                        },
+                                        "parent": {
+                                            "description": "Required. The parent resource whose log scopes are to be listed: \"projects/[PROJECT_ID]/locations/[LOCATION_ID]\" ",
+                                            "location": "path",
+                                            "pattern": "^projects/[^/]+/locations/[^/]+$",
+                                            "required": true,
+                                            "type": "string"
+                                        }
+                                    },
+                                    "path": "v2/{+parent}/logScopes",
+                                    "response": {
+                                        "$ref": "ListLogScopesResponse"
+                                    },
+                                    "scopes": [
+                                        "https://www.googleapis.com/auth/cloud-platform",
+                                        "https://www.googleapis.com/auth/cloud-platform.read-only",
+                                        "https://www.googleapis.com/auth/logging.admin",
+                                        "https://www.googleapis.com/auth/logging.read"
+                                    ]
+                                },
+                                "patch": {
+                                    "description": "Updates a log scope.",
+                                    "flatPath": "v2/projects/{projectsId}/locations/{locationsId}/logScopes/{logScopesId}",
+                                    "httpMethod": "PATCH",
+                                    "id": "logging.projects.locations.logScopes.patch",
+                                    "parameterOrder": [
+                                        "name"
+                                    ],
+                                    "parameters": {
+                                        "name": {
+                                            "description": "Output only. The resource name of the log scope.Log scopes are only available in the global location. For example:projects/my-project/locations/global/logScopes/my-log-scope",
+                                            "location": "path",
+                                            "pattern": "^projects/[^/]+/locations/[^/]+/logScopes/[^/]+$",
+                                            "required": true,
+                                            "type": "string"
+                                        },
+                                        "updateMask": {
+                                            "description": "Optional. Field mask that specifies the fields in log_scope that need an update. A field will be overwritten if, and only if, it is in the update mask. name and output only fields cannot be updated.For a detailed FieldMask definition, see https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#google.protobuf.FieldMaskFor example: updateMask=description",
+                                            "format": "google-fieldmask",
+                                            "location": "query",
+                                            "type": "string"
+                                        }
+                                    },
+                                    "path": "v2/{+name}",
+                                    "request": {
+                                        "$ref": "LogScope"
+                                    },
+                                    "response": {
+                                        "$ref": "LogScope"
+                                    },
+                                    "scopes": [
+                                        "https://www.googleapis.com/auth/cloud-platform",
+                                        "https://www.googleapis.com/auth/logging.admin"
+                                    ]
+                                }
+                            }
+                        },
                         "operations": {
                             "methods": {
                                 "cancel": {
@@ -7186,6 +8128,11 @@
                                             "description": "The standard list page token.",
                                             "location": "query",
                                             "type": "string"
+                                        },
+                                        "returnPartialSuccess": {
+                                            "description": "When set to true, operations that are reachable are returned as normal, and those that are unreachable are returned in the ListOperationsResponse.unreachable field.This can only be true when reading across collections. For example, when parent is set to \"projects/example/locations/-\".This field is not supported by default and will result in an UNIMPLEMENTED error if set unless explicitly documented otherwise in service or product specific documentation.",
+                                            "location": "query",
+                                            "type": "boolean"
                                         }
                                     },
                                     "path": "v2/{+name}/operations",
@@ -7212,6 +8159,11 @@
                                         "parent"
                                     ],
                                     "parameters": {
+                                        "filter": {
+                                            "description": "Optional. Specifies the type (\"Logging\" or \"OpsAnalytics\") of the recent queries to list. The only valid value for this field is one of the two allowable type function calls, which are the following: type(\"Logging\") type(\"OpsAnalytics\")",
+                                            "location": "query",
+                                            "type": "string"
+                                        },
                                         "pageSize": {
                                             "description": "Optional. The maximum number of results to return from this request. Non-positive values are ignored. The presence of nextPageToken in the response indicates that more results might be available.",
                                             "format": "int32",
@@ -7306,6 +8258,34 @@
                                         "https://www.googleapis.com/auth/logging.admin"
                                     ]
                                 },
+                                "get": {
+                                    "description": "Returns all data associated with the requested query.",
+                                    "flatPath": "v2/projects/{projectsId}/locations/{locationsId}/savedQueries/{savedQueriesId}",
+                                    "httpMethod": "GET",
+                                    "id": "logging.projects.locations.savedQueries.get",
+                                    "parameterOrder": [
+                                        "name"
+                                    ],
+                                    "parameters": {
+                                        "name": {
+                                            "description": "Required. The resource name of the saved query. \"projects/[PROJECT_ID]/locations/[LOCATION_ID]/savedQueries/[QUERY_ID]\" \"organizations/[ORGANIZATION_ID]/locations/[LOCATION_ID]/savedQueries/[QUERY_ID]\" \"billingAccounts/[BILLING_ACCOUNT_ID]/locations/[LOCATION_ID]/savedQueries/[QUERY_ID]\" \"folders/[FOLDER_ID]/locations/[LOCATION_ID]/savedQueries/[QUERY_ID]\" For example: \"projects/my-project/locations/global/savedQueries/my-saved-query\" ",
+                                            "location": "path",
+                                            "pattern": "^projects/[^/]+/locations/[^/]+/savedQueries/[^/]+$",
+                                            "required": true,
+                                            "type": "string"
+                                        }
+                                    },
+                                    "path": "v2/{+name}",
+                                    "response": {
+                                        "$ref": "SavedQuery"
+                                    },
+                                    "scopes": [
+                                        "https://www.googleapis.com/auth/cloud-platform",
+                                        "https://www.googleapis.com/auth/cloud-platform.read-only",
+                                        "https://www.googleapis.com/auth/logging.admin",
+                                        "https://www.googleapis.com/auth/logging.read"
+                                    ]
+                                },
                                 "list": {
                                     "description": "Lists the SavedQueries that were created by the user making the request.",
                                     "flatPath": "v2/projects/{projectsId}/locations/{locationsId}/savedQueries",
@@ -7315,6 +8295,11 @@
                                         "parent"
                                     ],
                                     "parameters": {
+                                        "filter": {
+                                            "description": "Optional. Specifies the type (\"Logging\" or \"OpsAnalytics\") and the visibility (PRIVATE or SHARED) of the saved queries to list. If provided, the filter must contain either the type function or a visibility token, or both. If both are chosen, they can be placed in any order, but they must be joined by the AND operator or the empty character.The two supported type function calls are: type(\"Logging\") type(\"OpsAnalytics\")The two supported visibility tokens are: visibility = PRIVATE visibility = SHAREDFor example:type(\"Logging\") AND visibility = PRIVATE visibility=SHARED type(\"OpsAnalytics\") type(\"OpsAnalytics)\" visibility = PRIVATE visibility = SHARED",
+                                            "location": "query",
+                                            "type": "string"
+                                        },
                                         "pageSize": {
                                             "description": "Optional. The maximum number of results to return from this request.Non-positive values are ignored. The presence of nextPageToken in the response indicates that more results might be available.",
                                             "format": "int32",
@@ -7344,6 +8329,41 @@
                                         "https://www.googleapis.com/auth/logging.admin",
                                         "https://www.googleapis.com/auth/logging.read"
                                     ]
+                                },
+                                "patch": {
+                                    "description": "Updates an existing SavedQuery.",
+                                    "flatPath": "v2/projects/{projectsId}/locations/{locationsId}/savedQueries/{savedQueriesId}",
+                                    "httpMethod": "PATCH",
+                                    "id": "logging.projects.locations.savedQueries.patch",
+                                    "parameterOrder": [
+                                        "name"
+                                    ],
+                                    "parameters": {
+                                        "name": {
+                                            "description": "Output only. Resource name of the saved query.In the format: \"projects/[PROJECT_ID]/locations/[LOCATION_ID]/savedQueries/[QUERY_ID]\" For a list of supported locations, see Supported Regions (https://cloud.google.com/logging/docs/region-support#bucket-regions)After the saved query is created, the location cannot be changed.If the user doesn't provide a QUERY_ID, the system will generate an alphanumeric ID.",
+                                            "location": "path",
+                                            "pattern": "^projects/[^/]+/locations/[^/]+/savedQueries/[^/]+$",
+                                            "required": true,
+                                            "type": "string"
+                                        },
+                                        "updateMask": {
+                                            "description": "Required. A non-empty list of fields to change in the existing saved query. Fields are relative to the saved_query and new values for the fields are taken from the corresponding fields in the SavedQuery included in this request. Fields not mentioned in update_mask are not changed and are ignored in the request.To update all mutable fields, specify an update_mask of *.For example, to change the description and query filter text of a saved query, specify an update_mask of \"description, query.filter\".",
+                                            "format": "google-fieldmask",
+                                            "location": "query",
+                                            "type": "string"
+                                        }
+                                    },
+                                    "path": "v2/{+name}",
+                                    "request": {
+                                        "$ref": "SavedQuery"
+                                    },
+                                    "response": {
+                                        "$ref": "SavedQuery"
+                                    },
+                                    "scopes": [
+                                        "https://www.googleapis.com/auth/cloud-platform",
+                                        "https://www.googleapis.com/auth/logging.admin"
+                                    ]
                                 }
                             }
                         }
@@ -7352,7 +8372,7 @@
                 "logs": {
                     "methods": {
                         "delete": {
-                            "description": "Deletes all the log entries in a log for the _Default Log Bucket. The log reappears if it receives new entries. Log entries written shortly before the delete operation might not be deleted. Entries received after the delete operation with a timestamp before the operation will be deleted.",
+                            "description": "Deletes all the log entries in a log for the global _Default Log Bucket. The log reappears if it receives new entries. Log entries written shortly before the delete operation might not be deleted. Entries received after the delete operation with a timestamp before the operation will be deleted.",
                             "flatPath": "v2/projects/{projectsId}/logs/{logsId}",
                             "httpMethod": "DELETE",
                             "id": "logging.projects.logs.delete",
@@ -7594,7 +8614,7 @@
                             ],
                             "parameters": {
                                 "customWriterIdentity": {
-                                    "description": "Optional. A service account provided by the caller that will be used to write the log entries. The format must be serviceAccount:some@email. This field can only be specified if you are routing logs to a destination outside this sink's project. If not specified, a Logging service account will automatically be generated.",
+                                    "description": "Optional. The service account provided by the caller that will be used to write the log entries. The format must be serviceAccount:some@email. This field can only be specified when you are routing logs to a log bucket that is in a different project than the sink. When not specified, a Logging service account will automatically be generated.",
                                     "location": "query",
                                     "type": "string"
                                 },
@@ -7731,7 +8751,7 @@
                             ],
                             "parameters": {
                                 "customWriterIdentity": {
-                                    "description": "Optional. A service account provided by the caller that will be used to write the log entries. The format must be serviceAccount:some@email. This field can only be specified if you are routing logs to a destination outside this sink's project. If not specified, a Logging service account will automatically be generated.",
+                                    "description": "Optional. The service account provided by the caller that will be used to write the log entries. The format must be serviceAccount:some@email. This field can only be specified when you are routing logs to a log bucket that is in a different project than the sink. When not specified, a Logging service account will automatically be generated.",
                                     "location": "query",
                                     "type": "string"
                                 },
@@ -7776,7 +8796,7 @@
                             ],
                             "parameters": {
                                 "customWriterIdentity": {
-                                    "description": "Optional. A service account provided by the caller that will be used to write the log entries. The format must be serviceAccount:some@email. This field can only be specified if you are routing logs to a destination outside this sink's project. If not specified, a Logging service account will automatically be generated.",
+                                    "description": "Optional. The service account provided by the caller that will be used to write the log entries. The format must be serviceAccount:some@email. This field can only be specified when you are routing logs to a log bucket that is in a different project than the sink. When not specified, a Logging service account will automatically be generated.",
                                     "location": "query",
                                     "type": "string"
                                 },
@@ -7827,7 +8847,7 @@
                     ],
                     "parameters": {
                         "customWriterIdentity": {
-                            "description": "Optional. A service account provided by the caller that will be used to write the log entries. The format must be serviceAccount:some@email. This field can only be specified if you are routing logs to a destination outside this sink's project. If not specified, a Logging service account will automatically be generated.",
+                            "description": "Optional. The service account provided by the caller that will be used to write the log entries. The format must be serviceAccount:some@email. This field can only be specified when you are routing logs to a log bucket that is in a different project than the sink. When not specified, a Logging service account will automatically be generated.",
                             "location": "query",
                             "type": "string"
                         },
@@ -7964,7 +8984,7 @@
                     ],
                     "parameters": {
                         "customWriterIdentity": {
-                            "description": "Optional. A service account provided by the caller that will be used to write the log entries. The format must be serviceAccount:some@email. This field can only be specified if you are routing logs to a destination outside this sink's project. If not specified, a Logging service account will automatically be generated.",
+                            "description": "Optional. The service account provided by the caller that will be used to write the log entries. The format must be serviceAccount:some@email. This field can only be specified when you are routing logs to a log bucket that is in a different project than the sink. When not specified, a Logging service account will automatically be generated.",
                             "location": "query",
                             "type": "string"
                         },
@@ -8104,7 +9124,7 @@
                     ],
                     "parameters": {
                         "name": {
-                            "description": "Required. The resource name for the settings to update. \"organizations/[ORGANIZATION_ID]/settings\" For example:\"organizations/12345/settings\"",
+                            "description": "Required. The resource name for the settings to update. \"organizations/[ORGANIZATION_ID]/settings\" \"folders/[FOLDER_ID]/settings\" For example:\"organizations/12345/settings\"",
                             "location": "path",
                             "pattern": "^[^/]+/[^/]+$",
                             "required": true,
@@ -8132,52 +9152,80 @@
             }
         }
     },
-    "revision": "20240531",
+    "revision": "20251202",
     "rootUrl": "https://logging.googleapis.com/",
     "schemas": {
-        "AuditConfig": {
-            "description": "Specifies the audit configuration for a service. The configuration determines which permission types are logged, and what identities, if any, are exempted from logging. An AuditConfig must have one or more AuditLogConfigs.If there are AuditConfigs for both allServices and a specific service, the union of the two AuditConfigs is used for that service: the log_types specified in each AuditConfig are enabled, and the exempted_members in each AuditLogConfig are exempted.Example Policy with multiple AuditConfigs: { \"audit_configs\": [ { \"service\": \"allServices\", \"audit_log_configs\": [ { \"log_type\": \"DATA_READ\", \"exempted_members\": [ \"user:jose@example.com\" ] }, { \"log_type\": \"DATA_WRITE\" }, { \"log_type\": \"ADMIN_READ\" } ] }, { \"service\": \"sampleservice.googleapis.com\", \"audit_log_configs\": [ { \"log_type\": \"DATA_READ\" }, { \"log_type\": \"DATA_WRITE\", \"exempted_members\": [ \"user:aliya@example.com\" ] } ] } ] } For sampleservice, this policy enables DATA_READ, DATA_WRITE and ADMIN_READ logging. It also exempts jose@example.com from DATA_READ logging, and aliya@example.com from DATA_WRITE logging.",
-            "id": "AuditConfig",
+        "AppHub": {
+            "description": "Metadata associated with App Hub.",
+            "id": "AppHub",
             "properties": {
-                "auditLogConfigs": {
-                    "description": "The configuration for logging of each type of permission.",
-                    "items": {
-                        "$ref": "AuditLogConfig"
-                    },
-                    "type": "array"
+                "application": {
+                    "$ref": "AppHubApplication",
+                    "description": "Metadata associated with the application."
                 },
                 "service": {
-                    "description": "Specifies a service that will be enabled for audit logging. For example, storage.googleapis.com, cloudsql.googleapis.com. allServices is a special value that covers all services.",
+                    "$ref": "AppHubService",
+                    "description": "Metadata associated with the service."
+                },
+                "workload": {
+                    "$ref": "AppHubWorkload",
+                    "description": "Metadata associated with the workload."
+                }
+            },
+            "type": "object"
+        },
+        "AppHubApplication": {
+            "description": "Resource identifiers associated with an AppHub application AppHub resources are of the form projects//locations//applications/ projects//locations//applications//services/ projects//locations//applications//workloads/ These resources can be reconstructed from the components below.",
+            "id": "AppHubApplication",
+            "properties": {
+                "container": {
+                    "description": "Resource container that owns the application. Example: \"projects/management_project\"",
+                    "type": "string"
+                },
+                "id": {
+                    "description": "Application Id. Example: \"my-app\"",
+                    "type": "string"
+                },
+                "location": {
+                    "description": "Location associated with the Application. Example: \"us-east1\"",
                     "type": "string"
                 }
             },
             "type": "object"
         },
-        "AuditLogConfig": {
-            "description": "Provides the configuration for logging a type of permissions. Example: { \"audit_log_configs\": [ { \"log_type\": \"DATA_READ\", \"exempted_members\": [ \"user:jose@example.com\" ] }, { \"log_type\": \"DATA_WRITE\" } ] } This enables 'DATA_READ' and 'DATA_WRITE' logging, while exempting jose@example.com from DATA_READ logging.",
-            "id": "AuditLogConfig",
+        "AppHubService": {
+            "description": "Metadata associated with an App Hub service.",
+            "id": "AppHubService",
             "properties": {
-                "exemptedMembers": {
-                    "description": "Specifies the identities that do not cause logging for this type of permission. Follows the same format of Binding.members.",
-                    "items": {
-                        "type": "string"
-                    },
-                    "type": "array"
+                "criticalityType": {
+                    "description": "Service criticality type Example: \"CRITICAL\"",
+                    "type": "string"
                 },
-                "logType": {
-                    "description": "The log type that this config enables.",
-                    "enum": [
-                        "LOG_TYPE_UNSPECIFIED",
-                        "ADMIN_READ",
-                        "DATA_WRITE",
-                        "DATA_READ"
-                    ],
-                    "enumDescriptions": [
-                        "Default case. Should never be this.",
-                        "Admin reads. Example: CloudIAM getIamPolicy",
-                        "Data writes. Example: CloudSQL Users create",
-                        "Data reads. Example: CloudSQL Users list"
-                    ],
+                "environmentType": {
+                    "description": "Service environment type Example: \"DEV\"",
+                    "type": "string"
+                },
+                "id": {
+                    "description": "Service Id. Example: \"my-service\"",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "AppHubWorkload": {
+            "description": "Metadata associated with an App Hub workload.",
+            "id": "AppHubWorkload",
+            "properties": {
+                "criticalityType": {
+                    "description": "Workload criticality type Example: \"CRITICAL\"",
+                    "type": "string"
+                },
+                "environmentType": {
+                    "description": "Workload environment type Example: \"DEV\"",
+                    "type": "string"
+                },
+                "id": {
+                    "description": "Workload Id. Example: \"my-workload\"",
                     "type": "string"
                 }
             },
@@ -8411,7 +9459,7 @@
             "id": "CopyLogEntriesRequest",
             "properties": {
                 "destination": {
-                    "description": "Required. Destination to which to copy log entries.",
+                    "description": "Required. Destination to which to copy log entries. For example: \"storage.googleapis.com/GCS_BUCKET\"",
                     "type": "string"
                 },
                 "filter": {
@@ -8469,7 +9517,7 @@
                     "type": "string"
                 },
                 "parent": {
-                    "description": "Required. The full resource name of the bucket to create a link for. \"projects/[PROJECT_ID]/locations/[LOCATION_ID]/buckets/[BUCKET_ID]\" \"organizations/[ORGANIZATION_ID]/locations/[LOCATION_ID]/buckets/[BUCKET_ID]\" \"billingAccounts/[BILLING_ACCOUNT_ID]/locations/[LOCATION_ID]/buckets/[BUCKET_ID]\" \"folders/[FOLDER_ID]/locations/[LOCATION_ID]/buckets/[BUCKET_ID]\" ",
+                    "description": "Required. The full resource name of the bucket to create a link for. \"projects/[PROJECT_ID]/locations/[LOCATION_ID]/buckets/[BUCKET_ID]\" ",
                     "type": "string"
                 }
             },
@@ -8629,12 +9677,12 @@
                     "type": "boolean"
                 },
                 "latency": {
-                    "description": "The request processing latency on the server, from the time the request was received until the response was sent.",
+                    "description": "The request processing latency on the server, from the time the request was received until the response was sent. For WebSocket connections, this field refers to the entire time duration of the connection.",
                     "format": "google-duration",
                     "type": "string"
                 },
                 "protocol": {
-                    "description": "Protocol used for the request. Examples: \"HTTP/1.1\", \"HTTP/2\", \"websocket\"",
+                    "description": "Protocol used for the request. Examples: \"HTTP/1.1\", \"HTTP/2\"",
                     "type": "string"
                 },
                 "referer": {
@@ -8690,7 +9738,7 @@
                     "type": "string"
                 },
                 "fieldPath": {
-                    "description": "Required. The LogEntry field path to index.Note that some paths are automatically indexed, and other paths are not eligible for indexing. See indexing documentation( https://cloud.google.com/logging/docs/view/advanced-queries#indexed-fields) for details.For example: jsonPayload.request.status",
+                    "description": "Required. The LogEntry field path to index.Note that some paths are automatically indexed, and other paths are not eligible for indexing. See indexing documentation( https://cloud.google.com/logging/docs/analyze/custom-index) for details.For example: jsonPayload.request.status",
                     "type": "string"
                 },
                 "type": {
@@ -8960,7 +10008,7 @@
                     "type": "array"
                 },
                 "resourceNames": {
-                    "description": "Required. Names of one or more parent resources from which to retrieve log entries: projects/[PROJECT_ID] organizations/[ORGANIZATION_ID] billingAccounts/[BILLING_ACCOUNT_ID] folders/[FOLDER_ID]May alternatively be one or more views: projects/[PROJECT_ID]/locations/[LOCATION_ID]/buckets/[BUCKET_ID]/views/[VIEW_ID] organizations/[ORGANIZATION_ID]/locations/[LOCATION_ID]/buckets/[BUCKET_ID]/views/[VIEW_ID] billingAccounts/[BILLING_ACCOUNT_ID]/locations/[LOCATION_ID]/buckets/[BUCKET_ID]/views/[VIEW_ID] folders/[FOLDER_ID]/locations/[LOCATION_ID]/buckets/[BUCKET_ID]/views/[VIEW_ID]Projects listed in the project_ids field are added to this list. A maximum of 100 resources may be specified in a single request.",
+                    "description": "Required. Names of one or more parent resources from which to retrieve log entries. Resources may either be resource containers or specific LogViews. For the case of resource containers, all logs ingested into that container will be returned regardless of which LogBuckets they are actually stored in - i.e. these queries may fan out to multiple regions. In the event of region unavailability, specify a specific set of LogViews that do not include the unavailable region. projects/[PROJECT_ID] organizations/[ORGANIZATION_ID] billingAccounts/[BILLING_ACCOUNT_ID] folders/[FOLDER_ID] projects/[PROJECT_ID]/locations/[LOCATION_ID]/buckets/[BUCKET_ID]/views/[VIEW_ID] organizations/[ORGANIZATION_ID]/locations/[LOCATION_ID]/buckets/[BUCKET_ID]/views/[VIEW_ID] billingAccounts/[BILLING_ACCOUNT_ID]/locations/[LOCATION_ID]/buckets/[BUCKET_ID]/views/[VIEW_ID] folders/[FOLDER_ID]/locations/[LOCATION_ID]/buckets/[BUCKET_ID]/views/[VIEW_ID]Projects listed in the project_ids field are added to this list. A maximum of 100 resources may be specified in a single request.",
                     "items": {
                         "type": "string"
                     },
@@ -9000,6 +10048,24 @@
                 },
                 "nextPageToken": {
                     "description": "If there might be more results than appear in this response, then nextPageToken is included. To get the next set of results, call this method again using the value of nextPageToken as pageToken.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "ListLogScopesResponse": {
+            "description": "The response from ListLogScopes. Every project has a _Default log scope that cannot be modified or deleted.",
+            "id": "ListLogScopesResponse",
+            "properties": {
+                "logScopes": {
+                    "description": "A list of log scopes.",
+                    "items": {
+                        "$ref": "LogScope"
+                    },
+                    "type": "array"
+                },
+                "nextPageToken": {
+                    "description": "If there might be more results than appear in this response, then nextPageToken is included. To get the next set of results, call the same method again using the value of nextPageToken as pageToken.",
                     "type": "string"
                 }
             },
@@ -9053,6 +10119,13 @@
                     "description": "A list of operations that matches the specified filter in the request.",
                     "items": {
                         "$ref": "Operation"
+                    },
+                    "type": "array"
+                },
+                "unreachable": {
+                    "description": "Unordered list. Unreachable resources. Populated when the request sets ListOperationsRequest.return_partial_success and reads across collections. For example, when attempting to list all resources across all supported locations.",
+                    "items": {
+                        "type": "string"
                     },
                     "type": "array"
                 }
@@ -9195,7 +10268,7 @@
             "id": "LogBucket",
             "properties": {
                 "analyticsEnabled": {
-                    "description": "Whether log analytics is enabled for this bucket.Once enabled, log analytics features cannot be disabled.",
+                    "description": "Optional. Whether log analytics is enabled for this bucket.Once enabled, log analytics features cannot be disabled.",
                     "type": "boolean"
                 },
                 "cmekSettings": {
@@ -9274,6 +10347,16 @@
             "description": "An individual entry in a log.",
             "id": "LogEntry",
             "properties": {
+                "apphub": {
+                    "$ref": "AppHub",
+                    "description": "Output only. AppHub application metadata associated with this LogEntry. May be empty if there is no associated AppHub application or multiple associated applications (such as for VPC flow logs)",
+                    "readOnly": true
+                },
+                "apphubDestination": {
+                    "$ref": "AppHub",
+                    "description": "Output only. AppHub application metadata associated with the destination application. This is only populated if the log represented \"edge\"-like data (such as for VPC flow logs) with a source and destination.",
+                    "readOnly": true
+                },
                 "errorGroups": {
                     "description": "Output only. The Error Reporting (https://cloud.google.com/error-reporting) error groups associated with this LogEntry. Error Reporting sets the values for this field during error group creation.For more information, see View error details( https://cloud.google.com/error-reporting/docs/viewing-errors#view_error_details)This field isn't available during log routing (https://cloud.google.com/logging/docs/routing/overview)",
                     "items": {
@@ -9472,8 +10555,7 @@
                     "type": "string"
                 },
                 "name": {
-                    "description": "Output only. A client-assigned identifier, such as \"load-balancer-exclusion\". Identifiers are limited to 100 characters and can include only letters, digits, underscores, hyphens, and periods. First character has to be alphanumeric.",
-                    "readOnly": true,
+                    "description": "Optional. A client-assigned identifier, such as \"load-balancer-exclusion\". Identifiers are limited to 100 characters and can include only letters, digits, underscores, hyphens, and periods. First character has to be alphanumeric.",
                     "type": "string"
                 },
                 "updateTime": {
@@ -9607,6 +10689,41 @@
             },
             "type": "object"
         },
+        "LogScope": {
+            "description": "Describes a group of resources to read log entries from.",
+            "id": "LogScope",
+            "properties": {
+                "createTime": {
+                    "description": "Output only. The creation timestamp of the log scope.",
+                    "format": "google-datetime",
+                    "readOnly": true,
+                    "type": "string"
+                },
+                "description": {
+                    "description": "Optional. Describes this log scope.The maximum length of the description is 8000 characters.",
+                    "type": "string"
+                },
+                "name": {
+                    "description": "Output only. The resource name of the log scope.Log scopes are only available in the global location. For example:projects/my-project/locations/global/logScopes/my-log-scope",
+                    "readOnly": true,
+                    "type": "string"
+                },
+                "resourceNames": {
+                    "description": "Required. Names of one or more parent resources (organizations and folders are not supported.): projects/[PROJECT_ID]May alternatively be one or more views: projects/[PROJECT_ID]/locations/[LOCATION_ID]/buckets/[BUCKET_ID]/views/[VIEW_ID]A log scope can include a maximum of 5 projects and a maximum of 100 resources in total.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "updateTime": {
+                    "description": "Output only. The last update timestamp of the log scope.",
+                    "format": "google-datetime",
+                    "readOnly": true,
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
         "LogSink": {
             "description": "Describes a sink used to export log entries to one of the following destinations: a Cloud Logging log bucket, a Cloud Storage bucket, a BigQuery dataset, a Pub/Sub topic, a Cloud project.A logs filter controls which log entries are exported. The sink must be created within a project, organization, billing account, or folder.",
             "id": "LogSink",
@@ -9634,7 +10751,7 @@
                     "type": "boolean"
                 },
                 "exclusions": {
-                    "description": "Optional. Log entries that match any of these exclusion filters will not be exported.If a log entry is matched by both filter and one of exclusion_filters it will not be exported.",
+                    "description": "Optional. Log entries that match any of these exclusion filters will not be exported.If a log entry is matched by both filter and one of exclusions it will not be exported.",
                     "items": {
                         "$ref": "LogExclusion"
                     },
@@ -9653,8 +10770,7 @@
                     "type": "boolean"
                 },
                 "name": {
-                    "description": "Output only. The client-assigned sink identifier, unique within the project.For example: \"my-syslog-errors-to-pubsub\".Sink identifiers are limited to 100 characters and can include only the following characters: upper and lower-case alphanumeric characters, underscores, hyphens, periods.First character has to be alphanumeric.",
-                    "readOnly": true,
+                    "description": "Optional. The client-assigned sink identifier, unique within the project.For example: \"my-syslog-errors-to-pubsub\".Sink identifiers are limited to 100 characters and can include only the following characters: upper and lower-case alphanumeric characters, underscores, hyphens, periods.First character has to be alphanumeric.",
                     "type": "string"
                 },
                 "outputVersionFormat": {
@@ -9917,6 +11033,25 @@
                     "description": "The sampling period of metric data points. For metrics which are written periodically, consecutive data points are stored at this time interval, excluding data loss due to errors. Metrics with a higher granularity have a smaller sampling period.",
                     "format": "google-duration",
                     "type": "string"
+                },
+                "timeSeriesResourceHierarchyLevel": {
+                    "description": "The scope of the timeseries data of the metric.",
+                    "items": {
+                        "enum": [
+                            "TIME_SERIES_RESOURCE_HIERARCHY_LEVEL_UNSPECIFIED",
+                            "PROJECT",
+                            "ORGANIZATION",
+                            "FOLDER"
+                        ],
+                        "enumDescriptions": [
+                            "Do not use this default value.",
+                            "Scopes a metric to a project.",
+                            "Scopes a metric to an organization.",
+                            "Scopes a metric to a folder."
+                        ],
+                        "type": "string"
+                    },
+                    "type": "array"
                 }
             },
             "type": "object"
@@ -10065,13 +11200,6 @@
             "description": "An Identity and Access Management (IAM) policy, which specifies access controls for Google Cloud resources.A Policy is a collection of bindings. A binding binds one or more members, or principals, to a single role. Principals can be user accounts, service accounts, Google groups, and domains (such as G Suite). A role is a named list of permissions; each role can be an IAM predefined role or a user-created custom role.For some types of Google Cloud resources, a binding can also specify a condition, which is a logical expression that allows access to a resource only if the expression evaluates to true. A condition can add constraints based on attributes of the request, the resource, or both. To learn which resources support conditions in their IAM policies, see the IAM documentation (https://cloud.google.com/iam/help/conditions/resource-policies).JSON example: { \"bindings\": [ { \"role\": \"roles/resourcemanager.organizationAdmin\", \"members\": [ \"user:mike@example.com\", \"group:admins@example.com\", \"domain:google.com\", \"serviceAccount:my-project-id@appspot.gserviceaccount.com\" ] }, { \"role\": \"roles/resourcemanager.organizationViewer\", \"members\": [ \"user:eve@example.com\" ], \"condition\": { \"title\": \"expirable access\", \"description\": \"Does not grant access after Sep 2020\", \"expression\": \"request.time < timestamp('2020-10-01T00:00:00.000Z')\", } } ], \"etag\": \"BwWWja0YfJA=\", \"version\": 3 } YAML example: bindings: - members: - user:mike@example.com - group:admins@example.com - domain:google.com - serviceAccount:my-project-id@appspot.gserviceaccount.com role: roles/resourcemanager.organizationAdmin - members: - user:eve@example.com role: roles/resourcemanager.organizationViewer condition: title: expirable access description: Does not grant access after Sep 2020 expression: request.time < timestamp('2020-10-01T00:00:00.000Z') etag: BwWWja0YfJA= version: 3 For a description of IAM and its features, see the IAM documentation (https://cloud.google.com/iam/docs/).",
             "id": "Policy",
             "properties": {
-                "auditConfigs": {
-                    "description": "Specifies cloud audit logging configuration for this policy.",
-                    "items": {
-                        "$ref": "AuditConfig"
-                    },
-                    "type": "array"
-                },
                 "bindings": {
                     "description": "Associates a list of members, or principals, with a role. Optionally, may specify a condition that determines how and when the bindings are applied. Each of the bindings must contain at least one principal.The bindings in a Policy can refer to up to 1,500 principals; up to 250 of these principals can be Google groups. Each occurrence of a principal counts towards these limits. For example, if the bindings grant 50 different roles to user:alice@example.com, and not to any other principal, then you can add another 1,450 principals to the bindings in the Policy.",
                     "items": {
