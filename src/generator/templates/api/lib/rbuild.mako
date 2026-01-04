@@ -119,6 +119,9 @@ impl${rb_params} ${ThisType} {
             % for p in optional_props:
             ${property(p.name)}: Default::default(),
             % endfor
+            % if m.get('supportsMediaDownload', False) and not m.get('id', '').endswith('.files.export'):
+            _range: Default::default(),
+            % endif
 % for prop_key, custom_name in api.properties.items():
             % if prop_key == 'scopes' and not method_default_scope(m):
 <% continue %>\
