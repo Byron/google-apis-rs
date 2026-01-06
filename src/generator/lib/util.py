@@ -1341,6 +1341,13 @@ def unique(
         return candidate
     return unique(original, desired, attempts + 1)
 
+# Check if method supports Range header.
+# files.export doesn't support Range headers.
+def supports_range_download(m):
+    return m.get("supportsMediaDownload", False) and not m.get("id", "").endswith(
+        ".files.export"
+    )
+
 
 if __name__ == "__main__":
     raise AssertionError("For import only")

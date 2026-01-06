@@ -6,7 +6,8 @@
                       rust_copy_value_s, organize_params, REQUEST_VALUE_PROPERTY_NAME,
                       build_all_params, rb_type_params_s, hub_type_params_s, mb_type_params_s, mb_additional_type_params,
                       struct_type_bounds_s, METHODS_RESOURCE, SPACES_PER_TAB, prefix_all_but_first_with,
-                      METHODS_BUILDER_MARKER_TRAIT, remove_empty_lines, method_default_scope, rust_doc_sanitize)
+                      METHODS_BUILDER_MARKER_TRAIT, remove_empty_lines, method_default_scope, rust_doc_sanitize,
+                      supports_range_download)
 %>\
 <%namespace name="util" file="../../../lib/util.mako"/>\
 <%namespace name="lib" file="lib.mako"/>\
@@ -119,7 +120,7 @@ impl${rb_params} ${ThisType} {
             % for p in optional_props:
             ${property(p.name)}: Default::default(),
             % endfor
-            % if m.get('supportsMediaDownload', False) and not m.get('id', '').endswith('.files.export'):
+            % if supports_range_download(m):
             _range: Default::default(),
             % endif
 % for prop_key, custom_name in api.properties.items():

@@ -12,7 +12,7 @@
                       re_find_replacements, ADD_PARAM_FN, ADD_PARAM_MEDIA_EXAMPLE, upload_action_fn, METHODS_RESOURCE,
                       method_name_to_variant, size_to_bytes, method_default_scope,
                       is_repeated_property, setter_fn_name, ADD_SCOPE_FN, ADD_SCOPES_FN, rust_doc_sanitize,
-                      CLEAR_SCOPES_FN, items, string_impl)
+                      CLEAR_SCOPES_FN, items, string_impl, supports_range_download)
 
     SIMPLE = "simple"
     RESUMABLE = "resumable"
@@ -130,7 +130,7 @@ pub struct ${ThisType}
  ${activity_rust_type(schemas, p)},
     % endif
 % endfor
-% if m.get('supportsMediaDownload', False) and not m.get('id', '').endswith('.files.export'):
+% if supports_range_download(m):
     _range: Option<String>,
 % endif
 ## A generic map for additinal parameters. Sometimes you can set some that are documented online only
@@ -214,7 +214,7 @@ ${self._setter_fn(resource, method, m, p, part_prop, ThisType, c)}\
         self
     }
     % endif
-    % if m.get('supportsMediaDownload', False) and not m.get('id', '').endswith('.files.export'):
+    % if supports_range_download(m):
 
     /// Sets the *Range* header for partial downloads.
     ///
@@ -743,7 +743,7 @@ else {
                 }
                 % endif
 
-                % if m.get('supportsMediaDownload', False) and not m.get('id', '').endswith('.files.export'):
+                % if supports_range_download(m):
                 if let Some(range_value) = self._range.as_ref() {
                     req_builder = req_builder.header("Range", range_value.clone());
                 }
