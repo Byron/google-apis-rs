@@ -12,7 +12,7 @@
                       re_find_replacements, ADD_PARAM_FN, ADD_PARAM_MEDIA_EXAMPLE, upload_action_fn, METHODS_RESOURCE,
                       method_name_to_variant, size_to_bytes, method_default_scope,
                       is_repeated_property, setter_fn_name, ADD_SCOPE_FN, ADD_SCOPES_FN, rust_doc_sanitize,
-                      CLEAR_SCOPES_FN, items, string_impl)
+                      CLEAR_SCOPES_FN, items, string_impl, supports_range_download)
 
     SIMPLE = "simple"
     RESUMABLE = "resumable"
@@ -130,6 +130,9 @@ pub struct ${ThisType}
  ${activity_rust_type(schemas, p)},
     % endif
 % endfor
+% if supports_range_download(m):
+    _range: Option<String>,
+% endif
 ## A generic map for additinal parameters. Sometimes you can set some that are documented online only
     ${api.properties.params}: HashMap<String, String>,
     % if method_default_scope(m):
@@ -208,6 +211,19 @@ ${self._setter_fn(resource, method, m, p, part_prop, ThisType, c)}\
     /// for details).
     pub fn ${CLEAR_SCOPES_FN}(mut self) -> ${ThisType} {
         self.${api.properties.scopes}.clear();
+        self
+    }
+    % endif
+    % if supports_range_download(m):
+
+    /// Sets the *Range* header for partial downloads.
+    ///
+    /// Use this to download only a portion of the file by specifying a byte range.
+    /// For example: "bytes=0-1023" downloads the first 1024 bytes.
+    ///
+    /// This is only effective when using `alt=media` parameter.
+    pub fn range(mut self, value: impl Into<String>) -> ${ThisType} {
+        self._range = Some(value.into());
         self
     }
     % endif
@@ -724,6 +740,12 @@ else {
                 % if default_scope:
                 if let Some(token) = token.as_ref() {
                     req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+                % endif
+
+                % if supports_range_download(m):
+                if let Some(range_value) = self._range.as_ref() {
+                    req_builder = req_builder.header("Range", range_value.clone());
                 }
                 % endif
 
