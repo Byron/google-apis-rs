@@ -207,7 +207,10 @@ Each episode sums up one major step in project development:
 - [Episode 2](https://youtu.be/wHlE1pNThjE): Making CLIs
 - [Episode 3](https://youtu.be/zrw2Qy-Ho5A): To make it work right
 
-[oauth]: yup-oauth2 ([crates.io](https://crates.io/crates/yup-oauth2), [Docs](https://docs.rs/yup-oauth2/latest/yup_oauth2/))
+# oauth
+yup-oauth2 ([crates.io](https://crates.io/crates/yup-oauth2), [Docs](https://docs.rs/yup-oauth2/latest/yup_oauth2/))
+
+
 [google-lic]: https://github.com/googleapis/google-api-go-client/blob/main/LICENSE
 [api-discovery-video]: https://youtu.be/lQbT1NrxpUo
 [api-discovery]: https://developers.google.com/discovery
