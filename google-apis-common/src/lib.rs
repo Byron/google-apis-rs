@@ -483,10 +483,8 @@ impl Read for MultiPartReader<'_> {
                 }
                 let mut total_bytes_read = hb + bytes_read;
                 while total_bytes_read < buf.len() && !self.is_depleted() {
-                    match self.read(&mut buf[total_bytes_read..]) {
-                        Ok(br) => total_bytes_read += br,
-                        Err(err) => return Err(err),
-                    }
+                    let br = self.read(&mut buf[total_bytes_read..])?;
+                    total_bytes_read += br
                 }
                 Ok(total_bytes_read)
             }

@@ -164,7 +164,7 @@ impl FieldCursor {
         let push_field = |fs: &mut Vec<String>, f: &mut String| {
             if !f.is_empty() {
                 fs.push(f.clone());
-                f.truncate(0);
+                f.clear();
             }
         };
 
@@ -186,7 +186,7 @@ impl FieldCursor {
             } else {
                 num_conscutive_field_seps = 0;
                 if cid == 1 && first_is_field_sep {
-                    fields.truncate(0);
+                    fields.clear();
                 }
                 field.push(c);
             }
@@ -197,7 +197,7 @@ impl FieldCursor {
         push_field(&mut fields, &mut field);
 
         if char_count == 1 && first_is_field_sep {
-            fields.truncate(0);
+            fields.clear();
         }
         if char_count > 1 && num_conscutive_field_seps == 1 {
             return Err(CLIError::Field(FieldError::TrailingFieldSep(
@@ -225,7 +225,7 @@ impl FieldCursor {
                     Some(candidate) => candidate,
                     None => f,
                 });
-                f.truncate(0);
+                f.clear();
             }
         };
 
@@ -452,14 +452,12 @@ pub enum ApplicationSecretError {
 impl fmt::Display for ApplicationSecretError {
     fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
         match *self {
-            ApplicationSecretError::DecoderError((ref path, ref err)) => writeln!(
-                f,
-                "Could not decode file at '{path}' with error: {err}."
-            ),
-            ApplicationSecretError::FormatError(ref path) => writeln!(
-                f,
-                "'installed' field is unset in secret file at '{path}'."
-            ),
+            ApplicationSecretError::DecoderError((ref path, ref err)) => {
+                writeln!(f, "Could not decode file at '{path}' with error: {err}.")
+            }
+            ApplicationSecretError::FormatError(ref path) => {
+                writeln!(f, "'installed' field is unset in secret file at '{path}'.")
+            }
         }
     }
 }
@@ -486,10 +484,9 @@ impl fmt::Display for ConfigurationError {
                 "Couldn't find HOME directory of current user, failed to expand '{dir}'."
             ),
             ConfigurationError::Secret(ref err) => writeln!(f, "Secret -> {err}"),
-            ConfigurationError::Io((ref path, ref err)) => writeln!(
-                f,
-                "IO operation failed on path '{path}' with error: {err}."
-            ),
+            ConfigurationError::Io((ref path, ref err)) => {
+                writeln!(f, "IO operation failed on path '{path}' with error: {err}.")
+            }
         }
     }
 }

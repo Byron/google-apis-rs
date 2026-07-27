@@ -14,7 +14,7 @@ edition = "2021"
 doctest = false
 
 [dependencies]
-base64 = "0.22"
+base64 = "0.23"
 chrono = { version = "0.4", default-features = false, features = ["clock", "serde"] }
 http = "1"
 http-body-util = "0.1"
