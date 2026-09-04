@@ -2,8 +2,6 @@
 
 No new features will be implemented, but contributions are welcome. From time to time new releases will be published to crates.io.
 
-Also, **we are looking for a new maintainer**.
-
 ### WARNING
 
 The following crates are not under our control and have been published by another party
