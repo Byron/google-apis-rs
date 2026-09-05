@@ -683,7 +683,7 @@ else {
         % if replacements:
         #[allow(clippy::single_element_loop)]
         for &(find_this, param_name) in [${', '.join('("%s", "%s")' % r for r in replacements)}].iter() {
-            url = params.uri_replacement(url, param_name, find_this, ${"true" if URL_ENCODE in special_cases else "false"});
+            url = params.uri_replacement(url, param_name, find_this, true);
         }
         ## Remove all used parameters
         {

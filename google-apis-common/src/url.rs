@@ -44,33 +44,31 @@ impl<'a> Params<'a> {
         url: String,
         param: &str,
         from: &str,
-        url_encode: bool,
+        _url_encode: bool,
     ) -> String {
-        const DEFAULT_ENCODE_SET: &AsciiSet = &CONTROLS
-            .add(b' ')
-            .add(b'"')
-            .add(b'#')
-            .add(b'<')
-            .add(b'>')
-            .add(b'`')
-            .add(b'?')
-            .add(b'{')
-            .add(b'}');
-        if url_encode {
-            let mut replace_with: Cow<str> = self.get(param).unwrap_or_default().into();
-            if from.as_bytes()[1] == b'+' {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET)
-                    .to_string()
-                    .into();
-            }
-            url.replace(from, &replace_with)
-        } else {
-            let replace_with = self
-                .get(param)
-                .expect("to find substitution value in params");
+        let replace_with = self.get(param).unwrap_or_default();
+        let is_plus = from.starts_with("{+");
 
-            url.replace(from, replace_with)
-        }
+        let replace_with = if is_plus {
+            const PLUS_ENCODE_SET: &AsciiSet = &CONTROLS
+                .add(b' ')
+                .add(b'"')
+                .add(b'<')
+                .add(b'>')
+                .add(b'`')
+                .add(b'{')
+                .add(b'}');
+            percent_encode(replace_with.as_bytes(), PLUS_ENCODE_SET).to_string()
+        } else {
+            const NORMAL_ENCODE_SET: &AsciiSet = &percent_encoding::NON_ALPHANUMERIC
+                .remove(b'-')
+                .remove(b'_')
+                .remove(b'.')
+                .remove(b'~');
+            percent_encode(replace_with.as_bytes(), NORMAL_ENCODE_SET).to_string()
+        };
+
+        url.replace(from, &replace_with)
     }
 
     /// Removes parameters
