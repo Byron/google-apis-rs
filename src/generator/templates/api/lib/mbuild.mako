@@ -879,7 +879,13 @@ else {
                                     ## delegate was called in upload() already - don't tell him again
                                     dlg.store_upload_url(None);
                                     ${delegate_finish}(false);
-                                    return Err(common::Error::Failure(common::Response::from_parts(parts, body)));
+                                    let bytes = common::to_bytes(body).await.unwrap_or_default();
+                                    let error = serde_json::from_str(&common::to_string(&bytes));
+                                    let response = common::to_response(parts, bytes.into());
+                                    return Err(match error {
+                                        Ok(value) => common::Error::BadRequest(value),
+                                        _ => common::Error::Failure(response),
+                                    });
                                 }
                             }
                         }
