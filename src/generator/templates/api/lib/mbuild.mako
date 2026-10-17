@@ -881,10 +881,9 @@ else {
                                     ${delegate_finish}(false);
                                     let bytes = common::to_bytes(body).await.unwrap_or_default();
                                     let error = serde_json::from_str(&common::to_string(&bytes));
-                                    let response = common::to_response(parts, bytes.into());
                                     return Err(match error {
                                         Ok(value) => common::Error::BadRequest(value),
-                                        _ => common::Error::Failure(response),
+                                        _ => common::Error::Failure(common::to_response(parts, bytes.into())),
                                     });
                                 }
                             }

@@ -632,6 +632,7 @@ where
     pub content_length: u64,
 }
 
+#[expect(clippy::result_large_err)]
 impl<A, C> ResumableUploadHelper<'_, A, C>
 where
     C: Connector,
