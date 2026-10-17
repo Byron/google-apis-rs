@@ -638,8 +638,10 @@ where
 {
     async fn query_transfer_status(
         &mut self,
-    ) -> std::result::Result<u64, std::result::Result<Response, hyper_util::client::legacy::Error>>
-    {
+    ) -> std::result::Result<
+        u64,
+        Box<std::result::Result<Response, hyper_util::client::legacy::Error>>,
+    > {
         loop {
             match self
                 .client
@@ -677,7 +679,7 @@ where
                                 sleep(d).await;
                                 continue;
                             }
-                            return Err(Ok(response));
+                            return Err(Box::new(Ok(response)));
                         }
                     };
                     return Ok(h.0.last);
@@ -687,7 +689,7 @@ where
                         sleep(d).await;
                         continue;
                     }
-                    return Err(Err(err));
+                    return Err(Box::new(Err(err)));
                 }
             }
         }
@@ -704,7 +706,7 @@ where
             Some(s) => s,
             None => match self.query_transfer_status().await {
                 Ok(s) => s,
-                Err(result) => return Some(result),
+                Err(result) => return Some(*result),
             },
         };
 
@@ -897,6 +899,36 @@ mod tests {
             <Chunk as FromStr>::from_str("2-42"),
             Ok(Chunk { first: 2, last: 42 })
         )
+    }
+
+    #[test]
+    fn resumable_upload_propagates_status_query_transport_error() {
+        let runtime = tokio::runtime::Builder::new_current_thread()
+            .enable_all()
+            .build()
+            .unwrap();
+        runtime.block_on(async {
+            let client =
+                hyper_util::client::legacy::Client::builder(hyper_util::rt::TokioExecutor::new())
+                    .build_http();
+            let mut delegate = DefaultDelegate;
+            let mut reader = Cursor::new(b"upload");
+            let mut upload = ResumableUploadHelper {
+                client: &client,
+                delegate: &mut delegate,
+                start_at: None,
+                auth: &(),
+                user_agent: "test",
+                auth_header: String::new(),
+                url: "ftp://localhost/upload",
+                reader: &mut reader,
+                media_type: mime::APPLICATION_OCTET_STREAM,
+                content_length: 6,
+            };
+
+            let error = upload.upload().await.unwrap().unwrap_err();
+            assert!(error.is_connect());
+        });
     }
 
     #[test]
